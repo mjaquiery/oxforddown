@@ -3,18 +3,17 @@
 ## thesis metadata ##
 #####################
 title: |
-  `oxforddown`: \
-  An Oxford University Thesis \
-  Template for R Markdown
-author: Author Name
-college: Your College
+  Exploring Social Metacognition: \
+  the role of confidence in updating estimates of advisor reliability with and without feedback.
+author: Matt Jaquiery
+college: Wolfson College
 degree: Doctor of Philosophy
-degreedate: Michaelmas 2018
+degreedate: Michaelmas 2021
 abstract: |
   `r paste(readLines("front-and-back-matter/_abstract.Rmd"), collapse = '\n  ')`
 acknowledgements: |
   `r paste(readLines("front-and-back-matter/_acknowledgements.Rmd"), collapse = '\n  ')`
-dedication: For Yihui Xie
+dedication: For TBC
 abbreviations: "front-and-back-matter/abbreviations" # path to .tex file with abbreviations
 
 #######################
@@ -37,7 +36,7 @@ mini-toc: true  # mini-table of contents at start of each chapter? (this just pr
 mini-lot: false  # mini-list of tables by start of each chapter?
 mini-lof: false  # mini-list of figures by start of each chapter?
 params:
-  corrections: true # set false to stop applying blue background to blocks of corrections
+  corrections: false # set false to stop applying blue background to blocks of corrections
 
 #####################
 ## output options  ##
@@ -47,7 +46,7 @@ output:
     template: templates/template.tex
     keep_tex: true
     citation_package: biblatex  
-    pandoc_args: ["--lua-filter=scripts_and_filters/correction_filter.lua"] #remove filter to stop applying blue background to inline corrections
+    # pandoc_args: ["--lua-filter=scripts_and_filters/correction_filter.lua"] #remove filter to stop applying blue background to inline corrections
   bookdown::gitbook:
     css: templates/style.css
     config:
@@ -73,5 +72,5 @@ If you need to create your own additional chunk options, edit the file scripts/c
 -->
 
 
-```{r introduction, child = '_00-introduction.Rmd'}
+```{r introduction, child = '_00-00-introduction.Rmd'}
 ```

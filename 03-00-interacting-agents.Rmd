@@ -1,0 +1,18 @@
+---
+#########################################
+# options for knitting a single chapter #
+#########################################
+output:
+  bookdown::html_document2: default
+  bookdown::word_document2: default
+  bookdown::pdf_document2:
+    template: templates/brief_template.tex
+documentclass: book
+---
+
+# (PART) Interaction {-}
+\minitoc <!-- this will include a mini table of contents-->
+
+# Interaction of psychological processes across minds {#chapter-interacting-agents}
+
+Models say this will go horribly wrong.

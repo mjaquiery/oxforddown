@@ -1,0 +1,15 @@
+---
+#########################################
+# options for knitting a single chapter #
+#########################################
+output:
+  bookdown::html_document2: default
+  bookdown::word_document2: default
+  bookdown::pdf_document2:
+    template: templates/brief_template.tex
+documentclass: book
+---
+
+# Sensitivity of advice-taking to context {#chapter-advice-taking-context}
+
+Actual advice-taking behaviour differs by context.
