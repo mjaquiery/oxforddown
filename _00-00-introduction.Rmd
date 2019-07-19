@@ -20,7 +20,7 @@ documentclass: book
 <!-- this adds an image in gitbook output --> 
 <img src="figures/cover.png" width="315" height="445" alt="Cover image" align="right" style="margin: 0 1em 0 1em" />
 
-My research aims to combine agent-based computational modelling with psychological theories of advisor evaluation processes that produce biases in assimilation of information and source selection, and to compare the structures of networks produced using these processes to naturally occurring social networks. The organisation is as follows: this introduction establishes the core concepts invoked in this thesis, and describes their treatment in the literature; the following sections each include a short chapter on the specific question addressed and the techniques used, a detailed description of the work conducted, and a short discussion of the conclusions drawn from the work; and a final section offers broader conclusions arising as a consequence of the presented work, alongside some suggestions for related research. 
+This thesis attempts to determine whether individual psychological processes in the seeking and taking of advice are sufficient to produce entrenched biases at the network level. The work includes empirical investigation into the individual psychological processes underlying advice seeking and advice taking using behavioural experiments; computational modelling and behavioural experimentation exploring the effects of contextual factors on advice-taking; agent-based computational modelling of the effects interactions between agents with psychological advisor evaluation processes that produce biases in assimilation of information and source selection; and a comparison between the structures of networks produced in these models and those naturally occurring social networks. The organisation is as follows: this introduction establishes the core concepts invoked in this thesis, and describes their treatment in the literature; the following sections each include a short chapter on the specific question addressed and the techniques used, a detailed description of the work conducted, and a short discussion of the conclusions drawn from the work; and a final section offers broader conclusions arising as a consequence of the presented work, alongside some suggestions for related research. 
 
 ## Advice {-}
 
@@ -30,13 +30,90 @@ Advice is broadly defined as information which comes from a social source. Advic
 
 Advice occurs in the context of a decision, and forms a part of the information which is integrated during the decision-making process to produce a decision. To the extent that the decision reached differs from the decision that would have occurred had the advice not been presented, the advice has had an effect on the decision; to the extent that this difference changes the decision in a way consistent with the advice, the advice has been 'taken' (as opposed to 'rejected').
 
-It is tacitly implied by many operationalizations of advice-taking that the informational content of the advice determines the extent to which it is taken or rejected `citation needed`. Insofar as the identity of the advisor matters, it matters because it functions as a cue to the informational content of the advice. This is likely a major oversimplification, however, because in many real-world contexts advice-giving and advice-taking form part of a developing social relationship: being consulted for advice and having one's advice followed are inherently rewarding [@hertzIntrinsicValueSocial2018; @hertzNeuralComputationsUnderpinning2017]; and taking advice can serve as a (sometimes costly) social signal of valuing a relationship with a person or group `citation needed`. While this thesis follows previous literature in omitting to consider the wider social concerns influencing the taking of advice, it is nevertheless important to remember that the processes investigated herein take place in a variety of social contexts where complex social agents attempt to optimise over numerous goals over numerous timescales.
+It is tacitly implied by many operationalizations of advice-taking that the informational content of the advice determines the extent to which it is taken or rejected `citation needed`. Insofar as the identity of the advisor matters, it matters because it functions as a cue to the informational content of the advice. This is likely a major oversimplification, however, because in many real-world contexts advice-giving and advice-taking form part of a developing social relationship: being consulted for advice and having one's advice followed are inherently rewarding [@hertzIntrinsicValueSocial2018; @hertzNeuralComputationsUnderpinning2017]; and taking advice can serve as a (sometimes costly) social signal of valuing a relationship with a person or group [@byrneOstracismReducesReliance2016]. Furthermore, some authors have argued that people may perceive taking advice as sacrificing their independence or autonomy [@CITATIONNEEDED]. While this thesis follows previous literature in omitting to consider the wider social concerns influencing the taking of advice, it is nevertheless important to remember that the processes investigated herein take place in a variety of social contexts where complex social agents attempt to optimise over numerous goals over numerous timescales.
 
-## Advisor evaluation {-}
+## Three-factor model of trust {-}
 
-The value of advice 
+The degree to which advice is taken is proportional to the trust placed in the advisor by the decision-maker. Interpersonal trust, or the degree to which one is prepared to place one's fortune in the hands of another (e.g. by relying on their advice), is apportioned by Mayer et al. [-@mayerIntegrativeModelOrganizational1995] onto three properties of the advisor (as judged by the decision-maker): ability, benevolence, and integrity. To these three properties of the advisor we may add the decision-maker's general propensity to trust, as well as situational cues and task cues (e.g. the phenomenon that advice is more readily taken for hard tasks than easy ones, [@ginoEffectsTaskDifficulty2007]).
+
+### Ability {-}
+
+Ability captures the expertise of an advisor: their raw ability to perform the task for which they are giving advice. In some cases this is relatively straightforward, as in the expertise of a General Practitioner in matters of health and disease, and in others more complex, as in the expertise of a hairdresser when deciding on a haircut (when matters of personal taste comingle with aesthetic considerations of facial structure, practical considerations of hair constitution, and social considerations of fashion). The greater the ability of an advisor, the greater the influence of their advice, as demonstrated by experiments showing that participants' decisions are more affected by the advice of advisors who are labelled as more expert in a relevant domain [@sahCheapTalkCredibility2013; @schultzeInabilityIgnoreUseless2017; @sniezekImprovingJudgementPrepaid2004; @sniezekTrustConfidenceExpertise2001; @sollJudgmentalAggregationStrategies2011], or are shown to be more expert empirically [@pescetelliUseMetacognitiveSignals2017; @sahCheapTalkCredibility2013; @yanivAdviceTakingDecision2000].
+
+### Benevolence {-}
+
+Benevolence refers to the extent to which the advisor seeks to further the interests of the decision-maker. Where ability represents the absolute limit on the quality of advice, benevolence represents the extent to which the advice approaches this limit. The advice of even a renouned expert may be doubted if there is reason to believe their goal is to mislead, a vital lesson for medieval monarchs with their councils of politicking advisors. Experimental work has shown that psychology students relied more on the advice of their friends than on the advice of labelled experts [@CITATIONNEEDED], and that participants are more inclined to reject advice when uncertainty is attributed to malice rather than ignorance [@schulInfluencesDistrustTrust2015].
+
+### Integrity {-}
+
+Advisors with integrity exhibit adherence to principles which the decision-maker endorses. As with benevolence, integrity acts to determine the extent to which advice approaches the limit imposed by ability. While not mutually exclusive, integrity is typically important where relationships are less personal (e.g. we may place great trust in a General Practitioner because of their expertise in medical matters and their _integrity_ in adhering to a set of professional ethical and conduct requirements). `Some description of the research`[@CITATIONNEEDED]
+
+## Normative models of advice-taking {-}
+
+Advice-taking can be evaluated formally with reference to a normative model. The simplest and most common of these views the decision-making task as an estimation problem (or combination of estimation problems), and provides an approximately Bayesian variance-weighted integration of independent estimates. To borrow from Galton [-@galtonVoxPopuliWisdom1907], consider the task of judging the weight of a bullock. We can model any single guess ($e$) as the true weight ($v$) plus some error ($\epsilon$):
+
+\begin{equation}
+e = v + \epsilon
+(\#eq:estimate)
+\end{equation}
+
+The key insight is to observe that the error is drawn from a normal distribution ($\mathcal{N}(\mu=0,\,\sigma^{2})$)[^symmetrical-distribution]. As the number of samples from this distribution increases, the mean of those samples tends towards the mean of the distribution. Thus, the more estimates are taken, the closer on average the sum of errors will be to 0.
+
+\begin{align}
+\frac{\sum_{i}^{N}(e_{i})}{N} &= \frac{\sum_{i}^{N}(v + \mathcal{N}(\mu=0,\,\sigma^{2}_{i}))}{N}\\
+\frac{\sum_{i}^{N}(e_{i})}{N} &= \frac{\sum_{i}^{N}(v)}{N} + \frac{\sum_{i}^{N}(\mathcal{N}(\mu=0,\,\sigma^{2}_{i}))}{N}\\
+\frac{\sum_{i}^{N}(e_{i})}{N} &= \frac{Nv}{N} + \hat{0}\\
+\frac{\sum_{i}^{N}(e_{i})}{N} &\approx v
+(\#eq:wisdom-of-crowds)
+\end{align}
+<!-- Could extend the above to include individual bias ($\mu_{i}$). This could then be used to show that correlated biases produce systematic distortions in the estimates, with the point that correlated biases differ from correlated error in that error is by definition due to chance while bias endures throughout repeated interactions. -->
+
+Observe that this formulation is true no matter the value of $N$. On average, it is always better to have more estimates than fewer. This suggests that, even in the situation where there are only two estimates (the decision-maker's and the advisor's), the best policy will be to incorporate both estimates into the final decision.
+
+The variance of the normal distribution from which errors are derived ($\sigma^{2}_{i}$) is, in the example above, drawn from a normal distribution itself ($\sigma^{2}_{i} \sim \mathcal{N}(\mu=0,\,\text{sd}^{2})$meaning that it is also cancelled out on average over repeated samples). Where few estimates are taken, weighting those estimates by the variance of the error distributions will increase the accuracy of the estimates in proportion to the difference between the variances. Many experimental implementations of this model avoid weighting issues by calibrating decision-makers and advisors to be equally accurate on average ($\sigma^{2}_{\text{decision-maker}}=\sigma^{2}_{\text{advisor}}$). The result of this constraint is that the optimal policy is simply to average all estimates together.
+
+[^symmetrical-distribution]: The normal distribution is well-supported by empirical evidence, but note that any symmetrical distribution around 0 will lead to the same conclusion.
+
+## Egocentric-discounting {-}
+
+From the perspective of the [normative model above](#normative-models-of-advice-taking), decision-makers should weigh their own estimate equally with each other estimate they receive in the process of coming to their decision. One of the most robust findings in the literature on advice-taking is that people routinely underweight advisory estimates relative to their own estimates, a phenomenon known as _egocentric discounting_[@danaAdviceChoice2015; @ginoEffectsTaskDifficulty2007; @hutterSeekingAdviceSampling2016; @libermanNaiveRealismCapturing2012; @minsonCostCollaborationWhy2012; @raderAdviceFormSocial2017; @ronayneIgnoringGoodAdvice2018; @seeDetrimentalEffectsPower2011; @sollJudgmentalAggregationStrategies2011; @troucheVigilantConservatismEvaluating2018; @yanivAdviceTakingDecision2000; @yanivExploitingWisdomOthers2012; @yanivUsingAdviceMultiple2007]. Egocentric discounting occurs in both feedback and no-feedback contexts [@yanivAdviceTakingDecision2000]. 
+
+Explanations for egocentric discounting are usually framed in terms of personal-level psychology: decision-makers have better access to reasons for their decision [@yanivAdviceTakingDecision2000]; overrate their own competence [@sniezekImprovingJudgementPrepaid2004]; may have a desire to appear consistent [@yanivUsingAdviceMultiple2007]; may see opinions as possessions [@sollJudgmentalAggregationStrategies2011]; may be loss-averse to providing a worse final estimate due to advice-taking [@sollJudgmentalAggregationStrategies2011]; or have difficulty avoiding anchoring [@schultzeInabilityIgnoreUseless2017] or repetition bias effects [@troucheVigilantConservatismEvaluating2018]. None of these explanations has survived rigorous empirical testing, however, and recently suggestions have widened to include consideration of aggregate-level rather than personal-level causes, with Trouche et al. [-@troucheVigilantConservatismEvaluating2018] arguing that the potential for misaligned incentives between decision-maker and advisor motivate discounting of advice. 
+
+In the course of this thesis `crossref needed`, I demonstrate that egocentric discounting may be a stable metastrategy which protects against exploitation, carelessness, incompetence, and miscommunication. From this perspective, the normative model pertains to a particular instantiation of a problem with questionable ecological validity given the typical ethology of advice-taking in humans. While such considerations affect the conclusions one draws from egocentric discounting relative to the normative model, they do not detract substantially from the practice of using the normative model as an optimum 'set point' from which to evaluate advice-taking behaviour.
+
+## Evaluation of advice {-}
+
+The value of advice, in informational terms, is measured in relation to the optimal decision. It is necessary to distinguish two perspectives on the value of advice: the optimality of the decision recommended by the advice itself; and the optimality of the decision based on advice relative to the decision which would have been made had the advice not been received. This distinction is necessary because people alter their advice-giving behaviour in anticipation of discounting on the part of the decision-maker [@CITATIONNEEDED; for a case in human-machine teaming see @azariaStrategicAdviceProvision2016], somewhat akin to starting negotiations with a higher demand than one is hoping to settle for. 
+
+A single piece of advice can be evaluated using its own properties and the properties of the advisor giving the advice. Furthermore, that evaluation can serve to update the properties of the advisor. A piece of advice's own properties will include its plausibility (e.g. participants in estimation tasks discount advice which is distant from their own initial estimates more heavily [@yanivReceivingOtherPeople2004]), while the properties of the advisor will include the advisor's trustworthiness ([see above](#three-factor-model-of-trust)). The updating of trust following experience of advice is likely to be largely in the domain of [ability](#ability), although other domains may be affected where the advice is particularly egregious. 
+
+## Updating advisor evaluations {-}
+
+While a single piece of advice must be taken on its own terms, people can construct relatively accurate estimates of advisors' advice when provided with feedback on the decisions they use the advice to make [@pescetelliUseMetacognitiveSignals2017; @sahCheapTalkCredibility2013; @yanivAdviceTakingDecision2000]. This likely happens as an analogue of reinforcement learning, where feedback allows an error signal to be used to update the estimate of the advisor's ability ($\hat{s}^{a}$) rather than one's own beliefs about the world, according to some learning rate ($\lambda$). 
+
+\begin{align}
+\text{this is wrong; need to check RL models for an analogue}\\
+\hat{s}_{t+1} = \hat{s}_{t} + |e^{a}_{t} - v|\cdot\lambda
+(\#eq:advisor-evaluation)
+\end{align}
 
 ## Advisor evaluation without feedback {-}
+
+Where feedback is not available, participants in experiments continue to demonstrate an ability to respond rationally to differences in advisor quality [@pescetelliUseMetacognitiveSignals2017]. This is evidently not done through access to the correct real-world values, because feedback providing those values is unavailable, and, were participants aware of those values themselves, it stands to reason they would have provided those values (and thus not require advice!). Pescetelli and Yeung [-@pescetelliUseMetacognitiveSignals2017] suggest the mechanism for this ability to discriminate between advisors in the absence of feedback is performing updates based on confidence-weighted agreement. 
+
+### Agreement {-}
+
+Consider first the non-weighted agreement case, where the advisor's estimate at time $t$ ($e^{a}_{t}$) and the decision-maker's estimate at time $t$ ($e^{d}_{t}$) are binary ($\in0,1$). The estimate of the advisor's ability ($\hat{s}^{a}$) is updated positively if the advisor and decision-maker agree, and negatively otherwise, according to the learning rate $\lambda$.
+
+\begin{align}
+\hat{s}_{t+1} = \hat{s}_{t} + (-2|e^{d}_{t}-e^{a}_{t}|+1)\dot\lambda
+(\#eq:advisor-agreement-binary)
+\end{align}
+
+### Confidence-weighted agreement {-}
+
+### Continuous estimate case {-}
 
 ## Homophily and echo-chambers {-}
 
