@@ -10,28 +10,24 @@ output:
 documentclass: book
 ---
 
-```{block type='savequote', quote_author='(ref:cicero-quote)', include=knitr::is_latex_output()}
-Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...
-
-There is no one who loves pain itself, who seeks after it and wants to have it, simply because it is pain...
-```
-(ref:cicero-quote) --- Cicero's *de Finibus Bonorum et Malorum*.
-
-<!-- 
-Notes for adding an opening quote in PDF output:
-i) add the reference for the quote with the chunk option quote_author="my author name",
-ii) include=knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex' means that these quotes are only included when output is latex (in HTML output, it would appear by the end of the previous page)
-iii) You can't use markdown syntax inside chunk options, so if you want to e.g. italicise a book name in the quote reference use a 'text reference': Create a named piece of text with '(ref:label-name) My text', then link to this in the chunk option with quote_author='(ref:label-name)'
--->
-
 # (PART) Psychology of advice {-}
 \minitoc <!-- this will include a mini table of contents-->
 
 # Psychological mechanisms of advisor evaluation {#chapter-advisor-evaluation}
 
-<!--
-The {#advisor-evaluation} text after the chapter declaration will allow us to link throughout the document back to the beginning of this chapter. Reference labels will automatically be generated if you don't specify them, as the lowercase title with spaces replaced by hypens (e.g. r-markdown-basics). 
--->
+Where feedback is unavailable, people may use their own sense of certainty as a yardstick for evaluating advice [@pescetelliRoleDecisionConfidence2018; @pescetelliUseMetacognitiveSignals2017]: advisors who agree when one is confident are perceived as more helpful; while those who disagree when one is confident are perceived as less helpful. Confidence serves as a proxy for objective feedback, and functions well in this role insofar as the judge has high metacognitive resolution (i.e. higher confidence is indicative of a greater probability of being correct).
 
-We're going to include footnotes ^[and not only because Nick hates them...].
+## Judge-advisor system
+
+## Table of experiments
+
+Advisors | Choice | Task | Feedback | Result
+---------|--------|------|----------|-------
+AiC vs AiU | Yes | Perceptual, binary (MATLAB) | No | Suggestive
+AiC vs AiU | Yes | Perceptual, binary | No | Inconclusive
+In/accurate| Yes | Perceptual, binary | No | Accuracy selected more often
+Low/High agreement| Yes | Perceptual, binary | No | Agreement selected more often
+Accurate vs Agreement | No | Estimation, continuous | Yes and No | Accurate preferred given feedback, agreement preferred without feedback
+
+<!-- This is where the maths for advisor quality estimation should go. How do we work out the quality of an advisor using individual bits of advice as evidence? Feedback, no feedback. -->
 

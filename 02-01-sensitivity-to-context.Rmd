@@ -12,4 +12,66 @@ documentclass: book
 
 # Sensitivity of advice-taking to context {#chapter-advice-taking-context}
 
-Actual advice-taking behaviour differs by context.
+<!-- 
+Here we discuss the evolutionary models and the results, which tell us that egocentric discounting can evolve in environments where various different abberations of typical experimental conditions are present. We argue that these may be baked in as hyperpriors (esp. since even agents who never experience deceit need to do discounting). We introduce the idea of flexible responding: while the hyperpriors might reduce ALL advice-taking, flexible behaviour may nevertheless mean that the reductions are stronger in some contexts than others. 
+-->
+
+Advice-taking is often overly-conservative as compared to the normative level of advice-taking for a given experimental design. I argue that participants' performances in advice-taking experiments reflect both the specifics of the experimental design and prior expectations about advice-taking situations. These prior expectations may be both learned, as where individuals who grow up in less stable environments show lower propensity to trust `reference?`!TODO, and inherited. Most useful for the current argument would be a demonstration that conservatism can emerge within a population even where detrimental advice is rarely experienced, and that this can thus produce individuals who exhibit conservatism without ever experiencing detrimental advice. This demonstration is presented in the form of evolutionary modelling.
+
+As discussed in the [previous chapter](#chapter-context), conservatism is optimal under some circumstances, and thus we expect that simulated agents allowed to evolve an advice-taking policy in those circumstances will evolve a conservative policy. I explored this tendency as a function of three plausible scenarios. The [first scenario](#models-scenario-1) is one in which agents occasionally give deliberately poor advice to their advisee, which represents situations where advisors’ interests may sometimes be contrary to judges’ interests, unbeknownst to the judges. In the [second scenario](#models-scenario-2), advice is simply noisier than the judge’s own initial decision, either because the judge is less competent at the task, less willing to exert the required effort for the task, or because the advice is communicated imperfectly. In the [third scenario](#models-scenario-3), agents belong to either a ‘cautious’ or a ‘confident’ group in how they express and interpret advice, which is a simple analogue of the observation that people’s expressions of confidence are idiosyncratic [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017]. In each of these three scenarios, it is hypothesised that some level of egocentric discounting will emerge as the dominant strategy, i.e., the mean population weighting for initial decisions versus advice will be greater than .50. 
+
+## General method
+
+Agent-based computational models of an evolutionary process were programmed in R [@rcoreteamLanguageEnvironmentStatistical2018] and run variously on a home computer and the Oxford Advanced Research Computing cluster [@richardsUniversityOxfordAdvanced2015]. The code is available at https://github.com/oxacclab/EvoEgoBias, and the specific data presented below are archived at !TODO.
+
+The models reported here use 1000 generations of 1000 agents which each make 30 decisions/generation on which they receive the advice of another agent. Decisions are either point estimation (Scenarios [1](#models-scenario-1) and [2](#models-scenario-2)) or categorical decision with confidence (Scenario [3](#models-scenario-3)). Each agent combines their own initial decision with the advice of another agent, with the relative weights of the initial decision and advice set by the agent’s egocentric bias parameter, to produce a final decision. Final decisions are evaluated by comparison with the objective answer, and an agent’s fitness is the sum of its performance over the 30 decisions of its lifetime.
+
+### Initial decisions
+
+The agents perform a value estimation (category estimation in Scenario 3) task. Agent $i$’s initial estimate for decision $t$ is the true value ($v_t$), plus some noise drawn from a normal distribution with mean 0 and standard deviation equal to the agent’s insensitivity parameter ($s^i$, which is itself drawn from a positive-clamped normal distribution with mean and standard deviation 10 when the agent is created).
+
+An agent's initial estimate ($e^i_t$) is thus:
+
+$$e^i_t = v_t + N(0, s^i)$$
+
+### Final decisions
+
+In the basic model from which other models inherit their decision procedure, agent $i$ produces a final estimate for decision $t$ as the average of the agent’s initial decision ($e^i_t$) and another agent’s advice ($a^j_t$), weighted by the agent's egocentric bias ($b^i$). The models typically change the value of $a^j_t$.
+
+An agent's final decision ($d^i_t$) is thus:
+
+$$d^i_t = \frac{e^i_t \cdot b^i + a^j_t \cdot (1 - b^i)}{2}$$
+
+
+Roulette wheel selection is used to bias reproduction in favour of agents performing best on the decisions, and reproducing agents pass on their egocentric bias to their offspring (Figure 3). Other agent features, e.g. decision-making accuracy, are randomised when they are created. In the present simulations, agents receive no feedback on decisions, and cannot learn about or discriminate between their advisors. The key outcome of interest in each simulation is whether the population evolves towards egocentric discounting as the dominant adaptive strategy.
+
+## Scenario 1: misleading advice {#models-scenario-1}
+
+In scenario 1, agents sometimes choose to offer misleading advice to their advisee. 
+
+### Method
+
+The true value ($v_t$) is fixed at 50 in this scenario. The agents do not learn about the true value over time, so a fixed and arbitrary value does not alter the results of the simulation. 
+
+### Results
+
+### Discussion
+
+## Scenario 2: noisy advice {#models-scenario-2}
+
+### Method
+
+### Results
+
+### Discussion
+
+## Scenario 3: confidence confusion {#models-scenario-3}
+
+### Method
+
+### Results
+
+### Discussion
+
+## General discussion
+

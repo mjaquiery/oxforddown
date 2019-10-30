@@ -14,4 +14,8 @@ documentclass: book
 
 # Conclusion {#chapter-conclusion}
 
+<!-- 
+We may also want to have chapters looking more into the choice-influence relationships, perhaps with experiments which examine both simultaneously. Additionally, we could perhaps look into framing effects for advice - anecdotally it's possible that, when asked to choose between two rewarding options, people prefer advisors who offer advice in terms of which option to take rather than which option to avoid, and vice-versa for negatively reinforcing options (c.f. Kahneman's framing effects/loss aversion/etc).
+-->
+
 I haven't wasted 3 years of my life and Nick's time.

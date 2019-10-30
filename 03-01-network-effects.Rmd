@@ -12,4 +12,6 @@ documentclass: book
 
 # Network effects of interaction {#chapter-network-effects}
 
+<!-- We may have some modelling to present along these lines. -->
+
 My models also suggest horrible things.

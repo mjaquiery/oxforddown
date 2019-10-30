@@ -12,5 +12,46 @@ documentclass: book
 
 # Psychology of source selection {#chapter-advisor-choice}
 
-Something something feedback.
+<!-- Presentation of the experiments (may want different subsections for each experiment and an extra one for the general discussion). -->
 
+## Experiment 1: Metacognitive-contingent advisors (Lab)
+
+### Method
+
+### Result
+
+### Discussion
+
+## Experiment 2: Metacognitive-contingent advisors
+ 
+### Method
+
+### Result
+
+### Discussion
+
+## Experiment 3: Advisor accuracy
+
+### Method
+
+### Result
+
+### Discussion
+
+## Experiment 4: Advisor agreement
+
+### Method
+
+### Result
+
+### Discussion
+
+## Experiment 5: Accuracy vs agreement (Date estimation)
+
+### Method
+
+### Result
+
+### Discussion
+
+## General discussion

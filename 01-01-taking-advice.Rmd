@@ -12,5 +12,4 @@ documentclass: book
 
 # Psychology of advice-taking {#chapter-advice-taking}
 
-Something something feedback.
-
+<!-- Here should be a detailed introduction. Niccolo's stuff about advice-taking, and then introduce my research on advisor selection. Maybe merge this with the previous section. -->

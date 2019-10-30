@@ -15,4 +15,6 @@ documentclass: book
 
 # Interaction of psychological processes across minds {#chapter-interacting-agents}
 
+<!-- Models suggest interactions between agents exascerbate problems, especially where source selection and info weighting combine. -->
+
 Models say this will go horribly wrong.

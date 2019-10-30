@@ -13,3 +13,4 @@ text/*.aux
 *.mlt*
 _main.*
 .httr-oauth
+references.bib

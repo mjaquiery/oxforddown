@@ -15,4 +15,10 @@ documentclass: book
 
 # Context of Advice {#chapter-context}
 
+<!-- here we present all that mathematical optimum stuff where Soll and Larrik cover the boundary conditions under which averaging is an optimum strategy vs when it is disadvantagenous. 
+
+We also discuss the general tendency to view egocentric discounting as a deviation from a normative strategy. 
+
+We introduce the idea of sensitivity to context, initially in terms of evolutionary adapatation, but also in terms of adaptive behaviour (flexbile response to dynamic environment) as a lead-in for the evolutionary modelling and then behavioural experiments. -->
+
 Optimal advice policy differs by context.

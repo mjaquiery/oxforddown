@@ -30,7 +30,7 @@ Advice is broadly defined as information which comes from a social source. Advic
 
 Advice occurs in the context of a decision, and forms a part of the information which is integrated during the decision-making process to produce a decision. To the extent that the decision reached differs from the decision that would have occurred had the advice not been presented, the advice has had an effect on the decision; to the extent that this difference changes the decision in a way consistent with the advice, the advice has been 'taken' (as opposed to 'rejected').
 
-It is tacitly implied by many operationalizations of advice-taking that the informational content of the advice determines the extent to which it is taken or rejected `citation needed`. Insofar as the identity of the advisor matters, it matters because it functions as a cue to the informational content of the advice. This is likely a major oversimplification, however, because in many real-world contexts advice-giving and advice-taking form part of a developing social relationship: being consulted for advice and having one's advice followed are inherently rewarding [@hertzIntrinsicValueSocial2018; @hertzNeuralComputationsUnderpinning2017]; and taking advice can serve as a (sometimes costly) social signal of valuing a relationship with a person or group [@byrneOstracismReducesReliance2016]. Furthermore, some authors have argued that people may perceive taking advice as sacrificing their independence or autonomy [@CITATIONNEEDED]. While this thesis follows previous literature in omitting to consider the wider social concerns influencing the taking of advice, it is nevertheless important to remember that the processes investigated herein take place in a variety of social contexts where complex social agents attempt to optimise over numerous goals over numerous timescales.
+It is tacitly implied by many operationalizations of advice-taking that the informational content of the advice determines the extent to which it is taken or rejected `citation needed`. Insofar as the identity of the advisor matters, it matters because it functions as a cue to the informational content of the advice. This is likely a major oversimplification, however, because in many real-world contexts advice-giving and advice-taking form part of a developing social relationship: being consulted for advice and having one's advice followed are inherently rewarding [@hertzIntrinsicValueSocial2018; @hertzNeuralComputationsUnderpinning2017]; and taking advice can serve as a (sometimes costly) social signal of valuing a relationship with a person or group [@byrneOstracismReducesReliance2016]. Furthermore, some authors have argued that people may perceive taking advice as sacrificing their independence or autonomy [@CITATIONNEEDED]!TODO. While this thesis follows previous literature in omitting to consider the wider social concerns influencing the taking of advice, it is nevertheless important to remember that the processes investigated herein take place in a variety of social contexts where complex social agents attempt to optimise over numerous goals over numerous timescales.
 
 ## Three-factor model of trust {-}
 
@@ -42,11 +42,11 @@ Ability captures the expertise of an advisor: their raw ability to perform the t
 
 ### Benevolence {-}
 
-Benevolence refers to the extent to which the advisor seeks to further the interests of the decision-maker. Where ability represents the absolute limit on the quality of advice, benevolence represents the extent to which the advice approaches this limit. The advice of even a renouned expert may be doubted if there is reason to believe their goal is to mislead, a vital lesson for medieval monarchs with their councils of politicking advisors. Experimental work has shown that psychology students relied more on the advice of their friends than on the advice of labelled experts [@CITATIONNEEDED], and that participants are more inclined to reject advice when uncertainty is attributed to malice rather than ignorance [@schulInfluencesDistrustTrust2015].
+Benevolence refers to the extent to which the advisor seeks to further the interests of the decision-maker. Where ability represents the absolute limit on the quality of advice, benevolence represents the extent to which the advice approaches this limit. The advice of even a renouned expert may be doubted if there is reason to believe their goal is to mislead, a vital lesson for medieval monarchs with their councils of politicking advisors. Experimental work has shown that psychology students relied more on the advice of their friends than on the advice of labelled experts [@CITATIONNEEDED]!TODO, and that participants are more inclined to reject advice when uncertainty is attributed to malice rather than ignorance [@schulInfluencesDistrustTrust2015].
 
 ### Integrity {-}
 
-Advisors with integrity exhibit adherence to principles which the decision-maker endorses. As with benevolence, integrity acts to determine the extent to which advice approaches the limit imposed by ability. While not mutually exclusive, integrity is typically important where relationships are less personal (e.g. we may place great trust in a General Practitioner because of their expertise in medical matters and their _integrity_ in adhering to a set of professional ethical and conduct requirements). `Some description of the research`[@CITATIONNEEDED]
+Advisors with integrity exhibit adherence to principles which the decision-maker endorses. As with benevolence, integrity acts to determine the extent to which advice approaches the limit imposed by ability. While not mutually exclusive, integrity is typically important where relationships are less personal (e.g. we may place great trust in a General Practitioner because of their expertise in medical matters and their _integrity_ in adhering to a set of professional ethical and conduct requirements). `Some description of the research`[@CITATIONNEEDED]!TODO
 
 ## Normative models of advice-taking {-}
 
@@ -84,7 +84,7 @@ In the course of this thesis `crossref needed`, I demonstrate that egocentric di
 
 ## Evaluation of advice {-}
 
-The value of advice, in informational terms, is measured in relation to the optimal decision. It is necessary to distinguish two perspectives on the value of advice: the optimality of the decision recommended by the advice itself; and the optimality of the decision based on advice relative to the decision which would have been made had the advice not been received. This distinction is necessary because people alter their advice-giving behaviour in anticipation of discounting on the part of the decision-maker [@CITATIONNEEDED; for a case in human-machine teaming see @azariaStrategicAdviceProvision2016], somewhat akin to starting negotiations with a higher demand than one is hoping to settle for. 
+The value of advice, in informational terms, is measured in relation to the optimal decision. It is necessary to distinguish two perspectives on the value of advice: the optimality of the decision recommended by the advice itself; and the optimality of the decision based on advice relative to the decision which would have been made had the advice not been received. This distinction is necessary because people alter their advice-giving behaviour in anticipation of discounting on the part of the decision-maker [@CITATIONNEEDED; for a case in human-machine teaming see @azariaStrategicAdviceProvision2016]!TODO, somewhat akin to starting negotiations with a higher demand than one is hoping to settle for. 
 
 A single piece of advice can be evaluated using its own properties and the properties of the advisor giving the advice. Furthermore, that evaluation can serve to update the properties of the advisor. A piece of advice's own properties will include its plausibility (e.g. participants in estimation tasks discount advice which is distant from their own initial estimates more heavily [@yanivReceivingOtherPeople2004]), while the properties of the advisor will include the advisor's trustworthiness ([see above](#three-factor-model-of-trust)). The updating of trust following experience of advice is likely to be largely in the domain of [ability](#ability), although other domains may be affected where the advice is particularly egregious. 
 
@@ -104,19 +104,30 @@ Where feedback is not available, participants in experiments continue to demonst
 
 ### Agreement {-}
 
-Consider first the non-weighted agreement case, where the advisor's estimate at time $t$ ($e^{a}_{t}$) and the decision-maker's estimate at time $t$ ($e^{d}_{t}$) are binary ($\in0,1$). The estimate of the advisor's ability ($\hat{s}^{a}$) is updated positively if the advisor and decision-maker agree, and negatively otherwise, according to the learning rate $\lambda$.
+Consider first the non-weighted agreement case, where the advisor's estimate at time $t$ ($e^{a}_{t}$) and the decision-maker's estimates ($e^d$) are binary ($\in0,1$). The estimate of the advisor's ability ($\hat{s}^{a}$) is updated positively if the advisor and decision-maker agree, and negatively otherwise, according to the learning rate $\lambda$.
 
 \begin{align}
-\hat{s}_{t+1} = \hat{s}_{t} + (-2|e^{d}_{t}-e^{a}_{t}|+1)\dot\lambda
+\hat{s}^a_{t+1} = \hat{s}^a_{t} + (-2 \text{ } |e^{d}_{t}-e^{a}_{t}|+1)\cdot\lambda
 (\#eq:advisor-agreement-binary)
 \end{align}
 
-### Confidence-weighted agreement {-}
+#### Confidence-weighted agreement {-}
 
-### Continuous estimate case {-}
+The updating of advice contingent on agreement may be weighted by confidence in the initial decision ($c^d$), such that agreement and disagreement are considered more informative about the quality of the advice when the decision with which they agree or disagree is more certain. 
+
+\begin{align}
+\hat{s}^a_{t+1} = \hat{s}^a_{t} + (-2 \text{ } |e^{d}_{t}-e^{a}_{t}|+1)\cdot c^d_t \cdot \lambda
+(\#eq:advisor-agreement-weighted-binary)
+\end{align}
+
+#### Continuous estimate case {-}
 
 ## Homophily and echo-chambers {-}
 
+Homophily is the ubiquitous phenomenon that individuals more closely connected to one another within a social network tend to be more similar to one another than would be expected by chance across numerous dimensions, from demographics to attitudes [@mcphersonBirdsFeatherHomophily2001]. Whether homophily in virtual social networks is responsible for increases in polarisation is debated. Proponents point to increases in polarisation (e.g. in politics: `Pew Research Center, 2014`!TODO), to empirical studies demonstrating homophily in virtual social networks [@cardosoTopicalHomophilyOnline2017; @colleoniEchoChamberPublic2014], and to studies examining selective exposure online [@kobayashiSELECTIVEEXPOSUREPOLITICAL2009], and to echo chambers: egregious examples of highly homophilous networks with pathological polarisation [@sunsteinRepublicCom2002; @sunsteinRepublicDividedDemocracy2018]. The empirical components of the argument are contested, with evidence that virtual social networks are less homogenous than offline social networks [and hence depolarising, @barberaHowSocialMedia2015], and that selective exposure is a somewhat dubious finding which does not show up clearly online [@garrettEchoChambersOnline2009; @garrettPoliticallyMotivatedReinforcement2009; @nelsonMythPartisanSelective2017; @searsSelectiveExposureInformation1967]. Modelling work demonstrates, however, that where there is a bias in assimilation of information, homophily exacerbates polarisation [@dandekarBiasedAssimilationHomophily2013]. Where polarisation in turn increases homophily, for example through selective exposure or avoidance, a self-reinforcing spiral emerges wherein social connections become increasingly homogenous and attitudes increasingly extreme [@songDynamicSpiralsPut2017]. 
+
 ## Source selection and information weighting {-}
+
+
 
 ## Context-dependency of epistemic processes {-}
