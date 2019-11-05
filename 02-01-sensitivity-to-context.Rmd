@@ -18,32 +18,61 @@ Here we discuss the evolutionary models and the results, which tell us that egoc
 
 Advice-taking is often overly-conservative as compared to the normative level of advice-taking for a given experimental design. I argue that participants' performances in advice-taking experiments reflect both the specifics of the experimental design and prior expectations about advice-taking situations. These prior expectations may be both learned, as where individuals who grow up in less stable environments show lower propensity to trust `reference?`!TODO, and inherited. Most useful for the current argument would be a demonstration that conservatism can emerge within a population even where detrimental advice is rarely experienced, and that this can thus produce individuals who exhibit conservatism without ever experiencing detrimental advice. This demonstration is presented in the form of evolutionary modelling.
 
-As discussed in the [previous chapter](#chapter-context), conservatism is optimal under some circumstances, and thus we expect that simulated agents allowed to evolve an advice-taking policy in those circumstances will evolve a conservative policy. I explored this tendency as a function of three plausible scenarios. The [first scenario](#models-scenario-1) is one in which agents occasionally give deliberately poor advice to their advisee, which represents situations where advisors’ interests may sometimes be contrary to judges’ interests, unbeknownst to the judges. In the [second scenario](#models-scenario-2), advice is simply noisier than the judge’s own initial decision, either because the judge is less competent at the task, less willing to exert the required effort for the task, or because the advice is communicated imperfectly. In the [third scenario](#models-scenario-3), agents belong to either a ‘cautious’ or a ‘confident’ group in how they express and interpret advice, which is a simple analogue of the observation that people’s expressions of confidence are idiosyncratic [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017]. In each of these three scenarios, it is hypothesised that some level of egocentric discounting will emerge as the dominant strategy, i.e., the mean population weighting for initial decisions versus advice will be greater than .50. 
+As discussed in the [previous chapter](#chapter-context), conservatism is optimal under some circumstances, and thus we expect that simulated agents allowed to evolve an advice-taking policy in those circumstances will evolve a conservative policy. I explored this tendency as a function of three plausible scenarios. The [first scenario](#models-scenario-1) is one in which agents occasionally give deliberately poor advice to their advisee, which represents situations where advisors’ interests may sometimes be contrary to judges’ interests, unbeknownst to the judges. In the [second scenario](#models-scenario-2), advice is simply noisier than the judge’s own initial estimate, either because the judge is less competent at the task, less willing to exert the required effort for the task, or because the advice is communicated imperfectly. In the [third scenario](#models-scenario-3), agents belong to either a ‘cautious’ or a ‘confident’ group in how they express and interpret advice, which is a simple analogue of the observation that people’s expressions of confidence are idiosyncratic [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017]. In each of these three scenarios, it is hypothesised that some level of egocentric discounting will emerge as the dominant strategy, i.e., the mean population weighting for initial estimates versus advice will be greater than .50. 
 
 ## General method
 
 Agent-based computational models of an evolutionary process were programmed in R [@rcoreteamLanguageEnvironmentStatistical2018] and run variously on a home computer and the Oxford Advanced Research Computing cluster [@richardsUniversityOxfordAdvanced2015]. The code is available at https://github.com/oxacclab/EvoEgoBias, and the specific data presented below are archived at !TODO.
 
-The models reported here use 1000 generations of 1000 agents which each make 30 decisions/generation on which they receive the advice of another agent. Decisions are either point estimation (Scenarios [1](#models-scenario-1) and [2](#models-scenario-2)) or categorical decision with confidence (Scenario [3](#models-scenario-3)). Each agent combines their own initial decision with the advice of another agent, with the relative weights of the initial decision and advice set by the agent’s egocentric bias parameter, to produce a final decision. Final decisions are evaluated by comparison with the objective answer, and an agent’s fitness is the sum of its performance over the 30 decisions of its lifetime.
+The models reported here use 1000 generations of 1000 agents which each make 30 decisions/generation on which they receive the advice of another agent. Decisions are either point estimation (Scenarios [1](#models-scenario-1) and [2](#models-scenario-2)) or categorical decision with confidence (Scenario [3](#models-scenario-3)). Each agent combines their own initial estimate with the advice of another agent, with the relative weights of the initial estimate and advice set by the agent’s egocentric bias parameter, to produce a final decision. Final decisions are evaluated by comparison with the objective answer, and an agent’s fitness is the sum of its performance over the 30 decisions of its lifetime.
 
-### Initial decisions
+### Initial estimates
 
-The agents perform a value estimation (category estimation in Scenario 3) task. Agent $i$’s initial estimate for decision $t$ is the true value ($v_t$), plus some noise drawn from a normal distribution with mean 0 and standard deviation equal to the agent’s insensitivity parameter ($s^i$, which is itself drawn from a positive-clamped normal distribution with mean and standard deviation 10 when the agent is created).
+The agents perform a value estimation (category estimation in Scenario 3) task. Agent $i$’s initial estimate $t$ is the true value ($v_t$), plus some noise drawn from a normal distribution with mean 0 and standard deviation equal to the agent’s insensitivity parameter ($s^i$, which is itself drawn from a positive-clamped normal distribution with mean and standard deviation 10 when the agent is created).
 
 An agent's initial estimate ($e^i_t$) is thus:
 
-$$e^i_t = v_t + N(0, s^i)$$
+\begin{align}
+e^i_t = v_t + N(0, s^i)
+(\#eq:models-initial-estimate)
+\end{align}
+
+### Advice 
+
+Each agent receives advice from another agent which it combines with its initial estimate to reach a final decision. The advice has a probability of being mutated in some fashion. The mutation depends upon the scenario and is described separately for each.
 
 ### Final decisions
 
-In the basic model from which other models inherit their decision procedure, agent $i$ produces a final estimate for decision $t$ as the average of the agent’s initial decision ($e^i_t$) and another agent’s advice ($a^j_t$), weighted by the agent's egocentric bias ($b^i$). The models typically change the value of $a^j_t$.
+In the basic model from which other models inherit their decision procedure, agent $i$ produces a final decision $t$ as the average of the agent’s initial estimate ($e^i_t$) and another agent’s advice ($a^i_t$), weighted by the agent's egocentric bias ($b^i$). The models typically change the value of $a^i_t$, which is typically a function of some other agent $j$'s initial estimate $e^j_t$.
 
 An agent's final decision ($d^i_t$) is thus:
 
-$$d^i_t = \frac{e^i_t \cdot b^i + a^j_t \cdot (1 - b^i)}{2}$$
+\begin{align}
+d^i_t = \frac{e^i_t \cdot b^i + a^i_t \cdot (1 - b^i)}{2}
+(\#eq:models-final-decision)
+\end{align}
 
+The final decisions in [Scenario 3](#models-scenario-3) are more complex, but follow a similar structure.
 
-Roulette wheel selection is used to bias reproduction in favour of agents performing best on the decisions, and reproducing agents pass on their egocentric bias to their offspring (Figure 3). Other agent features, e.g. decision-making accuracy, are randomised when they are created. In the present simulations, agents receive no feedback on decisions, and cannot learn about or discriminate between their advisors. The key outcome of interest in each simulation is whether the population evolves towards egocentric discounting as the dominant adaptive strategy.
+### Reproduction
+
+Roulette wheel selection is used to bias reproduction in favour of agents performing best on the decisions. Performance is determined by a fitness function which differs slightly between categorical and continuous decisions. For scenarios [1](#models-scenario-1) and [2](#models-scenario-2), which use continuous decisions, this fitness is obtained by subtracting the absolute difference between the final decision and the true value for each decision:
+
+\begin{align}
+u^i = - \sum^{30}_{t=1} |v_t - d_t^i|
+(\#eq:models-fitness-continous)
+\end{align}
+
+The selection algorithm proceeds as follows: The worst performance is subtracted from each agent’s fitness and 1 added to put fitness scores in a positive range. These scores are then continually multiplied by 10 until the lowest score is at least 10 to improve resolution. Each agent is then given a probability to reproduce equal to their share of the sum of all fitness scores:
+
+\begin{align}
+r^i = \frac{u^i}{\sum_{j=1}^{n}u^j}
+(\#eq:models-selection)
+\end{align}
+
+where $n$ is the number of agents and $u$ has undergone the transformations described above.
+
+Reproducing agents pass on their egocentric bias to their offspring. Other agent features, e.g. decision-making accuracy, are randomised when they are created. In the present simulations, agents receive no feedback on decisions, and cannot learn about or discriminate between their advisors. The key outcome of interest in each simulation is whether the population evolves towards egocentric discounting as the dominant adaptive strategy.
 
 ## Scenario 1: misleading advice {#models-scenario-1}
 
@@ -53,25 +82,95 @@ In scenario 1, agents sometimes choose to offer misleading advice to their advis
 
 The true value ($v_t$) is fixed at 50 in this scenario. The agents do not learn about the true value over time, so a fixed and arbitrary value does not alter the results of the simulation. 
 
+Advice in this scenario is either the advising agent's initial estimate ($e^j_t$), or an extreme answer in the opposite direction to the advising agent's initial estimate (i.e. lower than 50 if $e^j_t$ was above 50, and vice-versa). !TODO[describe what we actually do with this work; it has moved on a bit since transfer report]
+
 ### Results
 
+Where advice is always genuine, egocentric discounting does not emerge. Where advice is sometimes misleading, however, egocentric discounting emerges rapidly and remains stable throughout the rest of the stimulation. 
+
 ### Discussion
+
+As one might expect, where there is the potential for exploiting trust it is safer to trust less, even if this reduces some of the benefits which would be gained from trusting. Egocentric discounting may be a viable strategy, even if there is no difference in ability between advice-seekers and advice-givers, given social contexts where the interests of advice-seekers and advice-givers are not perfectly aligned.
 
 ## Scenario 2: noisy advice {#models-scenario-2}
 
+In this scenario, agents offer advice which is of slightly lower quality on average than their own intial decisions. This could reflect a difference in effort or in expertise.
+
 ### Method
+
+As with [Scenario 1](#models-scenario-1), the true value ($v_t$) is fixed at 50.
+
+Advice in this scenario has additional noise added:
+
+\begin{align}
+a^i_t = e^j_t + N(0,x)
+(\#eq:models-scenario-2-advice)
+\end{align}
+
+Where $x$ = 0 in the no-noise condition and 5 in the noise condition.
+
+Models were also run where a new decision was used as the basis for advice, rather than an initial estimate that some other agent would be using as a component in its own final decision:
+
+\begin{align}
+a^i_t = v_t + N(0, s^j + x)
+(\#eq:models-scenario-2-advice-duplicate)
+\end{align}
+
+but the results were the same.
 
 ### Results
 
+As before, egocentric discounting emerges rapidly in the active condition and remains stable throughout the rest of the simulation. 
+
 ### Discussion
+
+Where the advice is of worse quality on average, encoded here as additional variation, egocentric discounting tailors the relative weights of the estimates according to their average quality. As with situations in which an advice-seeker is more competent at making the relevant decision than their advisor, some measure of egocentric discounting is warranted in this scenario. It is worth noting that different competencies are not the only reason why advice may be systematically less valuable than initial decisions: difficulties in communicating the advice or different levels of conscientiousness in decision-making may also produce this effect.
 
 ## Scenario 3: confidence confusion {#models-scenario-3}
 
+While lackadaisical, incompetent, deliberately bad, or poorly communicated advice produces an obvious adaptive advantage for egocentric discounting, it is plausible that scenarios may exist where equally competent, wholly well-intentioned advice may still favour egocentric discounting. A common feature of advice is the communication of confidence, and this improves outcomes [@bahramiOptimallyInteractingMinds2010]. Notably, there are large and consistent individual differences in people’s expressions of confidence [@aisIndividualConsistencyAccuracy2016; @songRelatingInterindividualDifferences2011]. 
+
+In this scenario agents are equally competent at the task, and do their best to assist one another, but may be hampered by expressing their estimates and advice with different confidences. 
+
 ### Method
+
+The true value was drawn from a normal distribution around 50:
+
+\begin{align}
+v_t = N(50,1)
+(\#eq:models-scenario-3-true-value)
+\end{align}
+
+This allowed categorical answers which identified whether or not $v_t$ was greater than 50. Agents were equiprobably assigned a personal confidence factor ($c$) of 1 or 10. This was used to scale the difference between the advising agent's intial estimate and the category boundary to produce the advice:
+
+\begin{align}
+a^i_t = (e^j_t - 50\cdot c^j) + 50
+(\#eq:models-initial-decision)
+\end{align}
+
+Each agent then used the reciprocal of this process to translate advice back into its own confidence scale before integrating it with the initial estimate and arriving at a final decision:
+
+\begin{align}
+d^i_t = \frac{e^i_t \cdot b^i + (\frac{1}{c^i}(a^i_t - 50) + 50)\cdot (1 - b^i)}{2}
+(\#eq:models-initial-decision)
+\end{align}
+
+This process amounts to the outgoing advice being translated into the advising agent's confidence language, and incoming advice being translated into the advised agent's confidence language. Where these languages are the same, the resulting advice is understood equivalently by both agents, but where there are differences the advice will be of greater or lesser magnitude compared to the initial estimate. 
 
 ### Results
 
+Egocentric discounting again emerges in the condition where agents can have different confidence factors. The adaptiveness of egocentric discounting in this scenario arises because advice from a mismatched partner (e.g. one using a confidence scaling of 10 when the judge uses 1, or vice-versa) requires a different aggregation approach than advice from a matched partner. The application of an inappropriate aggregation approach results in misleading advice, so there is a pressure for a middle-of-the-road strategy whereby advice is counted, but not too much.
+
 ### Discussion
+
+Even where there is no intent to mislead, and no difference in basic ability, it is possible for egocentric discounting to emerge as an optimal strategy, purely because of differences in how agents communicate and understand estimates.
 
 ## General discussion
 
+The computational models show that egocentric discounting is an adaptive strategy in an array of plausible advice contexts: misleading advice, noisy advice, and different interpretations of confidence. While these models are necessarily limited in applicability to real life, they do demonstrate that egocentric discounting, while irrational for simple estimation problems with an objective answer and with advice that is not systematically better or worse than an individual’s own judgement, may be beneficial for many of the kinds of decision for which we have sought and used advice in everyday life throughout our evolution. 
+
+This argument invites attention to the advice-taking task as much as to the properties of the advisor: it predicts that egocentric discounting will be attenuated where the outcome of decisions affects judges as well as advisors [@ginoWeListenAdvice2008 observed this effect but attributed it to judges falling prey to the sunk costs fallacy]; where decisions rely more on objective than on subjective criteria [@vanswolForecastingAnotherEnjoyment2011]; where advisors and judges have opportunities to calibrate their confidence judgements with one another by completing training trials where they have to produce a shared decision with a shared confidence; and where incentives for judges and advisors are more closely aligned [@ginoAnxietyAdviceAbility2012; @sniezekImprovingJudgementPrepaid2004].
+
+Notably, the utility of these heuristics does not depend on malice, mistake, or miscommunication: inconsistency in the usage of confidence terminology can produce adaptive pressure for egocentric discounting. More generally, the results indicate that properties of the advice-giving milieu can influence advice-taking strategies.
+
+These models establish that it is plausible that people have deeply ingrained hyperpriors towards discounting advice. It is also possible, however, that people can flexibly respond to contexts, modulating their advice-taking appropriately. The voluminous experiments in advice taking discussed in the [introduction to this section](#context-of-advice) !TODO[that discussion?] can be seen as eliciting exactly this behaviour. In the next chapter I present new behavioural experiments which suggest that people do indeed modulate their advice-taking to the specifics of the context in which they are in. 
