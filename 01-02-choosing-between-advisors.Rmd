@@ -11,6 +11,7 @@ documentclass: book
 ---
 
 # Psychology of source selection {#chapter-advisor-choice}
+\minitoc
 
 <!-- Presentation of the experiments (may want different subsections for each experiment and an extra one for the general discussion). -->
 

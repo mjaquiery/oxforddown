@@ -152,7 +152,7 @@ Each agent then used the reciprocal of this process to translate advice back int
 
 \begin{align}
 d^i_t = \frac{e^i_t \cdot b^i + (\frac{1}{c^i}(a^i_t - 50) + 50)\cdot (1 - b^i)}{2}
-(\#eq:models-initial-decision)
+(\#eq:models-final-decision-categorical)
 \end{align}
 
 This process amounts to the outgoing advice being translated into the advising agent's confidence language, and incoming advice being translated into the advised agent's confidence language. Where these languages are the same, the resulting advice is understood equivalently by both agents, but where there are differences the advice will be of greater or lesser magnitude compared to the initial estimate. 

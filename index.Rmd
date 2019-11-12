@@ -8,7 +8,7 @@ title: |
 author: Matt Jaquiery
 college: Wolfson College
 degree: Doctor of Philosophy
-degreedate: Michaelmas 2021
+degreedate: Michaelmas 2020
 abstract: |
   `r paste(readLines("front-and-back-matter/_abstract.Rmd"), collapse = '\n  ')`
 acknowledgements: |
@@ -65,6 +65,11 @@ documentclass: book
 ```{r create_chunk_options, include=FALSE, eval=knitr::is_latex_output()}
 source('scripts_and_filters/create_chunk_options.R')
 ```
+
+```{r}
+knitr::opts_chunk$set(echo = F)
+```
+
 <!--
 Include the create_chunk_options chunk above at the top of your index.Rmd file
 This will include code to create additional chunk options (e.g. for adding author references to savequotes)

@@ -35,7 +35,7 @@ Here is an example of an entry in a **.bib** file:
 In this entry highlighed section, 'Shea2014' is the **citation identifier**.
 To default way to cite an entry in your text is with this syntax: `[@citation-identifier]`.
 
-So I might cite some things [@Shea2014; @Lottridge2012].
+So I might cite some things [@Shea2014].
 
 ### PDF output
 In PDF output, the bibliography is handled by the OxThesis LaTeX template.
@@ -71,7 +71,7 @@ You can install this add-in by typing `install.packages("citr")` in the R Consol
 
 ```{r citr, echo=FALSE, fig.cap="The `citr` add-in", out.width="80%", fig.align='center'}
 # include dynamic gif if output is HTML; otherwise screenshot
-if (knitr::opts_knit$get('rmarkdown.pandoc.to') == 'html'){
+if (knitr::opts_knit$get('rmarkdown.pandoc.to') == 'html') {
   knitr::include_graphics("https://raw.githubusercontent.com/crsh/citr/master/tools/images/addin_demo.gif")
 } else {
   knitr::include_graphics("figures/citr.png")
