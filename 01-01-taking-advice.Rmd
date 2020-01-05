@@ -1,9 +1,9 @@
 ---
 output:
-  bookdown::html_document2: default
-  bookdown::word_document2: default
   bookdown::pdf_document2:
     template: templates/brief_template.tex
+  bookdown::word_document2: default
+  bookdown::html_document2: default
 documentclass: book
 ---
 
@@ -13,37 +13,3 @@ documentclass: book
 
 ## Playground
 !TODO[remove playground]
-
-[#Playground](#Playground)
-[tbl](#tab:ex1_advisor)
-
-The advisors are virtual agents whose probability of agreeing with the participant’s decision varies as a function of the participant’s confidence and correctness in the initial decision phase. Table \ref@(tab:ex1_advisor) illustrates how this relationship functions, and shows that the overall correctness and agreement rates of the advisors is equivalent overall. Importantly, on largest minority of trials, the middle 40%, the advisors are exactly equivalent, meaning these trials can be compared directly without confounds arising from agreement rate and initial confidence.
-
-Table \label{tab:ex1_advisor}: Advisor advice profiles
- 
-```{r ex1_advisor} 
-
-library(kableExtra)
-library(tibble)
-
-tmp <- tribble(
-  ~` `, ~`  `, ~`Bias Sharing`, ~`Anti Bias`,
-  "Participant correct", "High (top 30%)", 80, 60,
-  "Participant correct", "Medium (middle 40%)", 70, 70,
-  "Participant correct", "Low (bottom 30%)", 60, 80,
-  "Participant incorrect", "Any", 30, 30,
-  "Total agreement", "Participant correct", 70, 70,
-  "Total agreement", "Participant incorrect", 30, 30
-)
-
-kable(tmp) %>%
-  kable_styling() %>%
-  column_spec(1, bold = T) %>%
-  row_spec(0, bold = F) %>%
-  collapse_rows(columns = 1, valign = "top") %>%
-  add_header_above(c(" ", 
-                     "Initial decision confidence", 
-                     "Probability of agreement (%)" = 2))
-
-```
-

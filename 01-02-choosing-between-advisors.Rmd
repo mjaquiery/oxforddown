@@ -50,12 +50,15 @@ wd <- setwd(exDirs[1])
 source("AdvisorChoice.R")
 setwd(wd)
 
+library(kableExtra)
+library(tibble)
+
 ```
 
 
 #### Participants
 
-`r nrow(participants)` participants ($M_{age}$ = `r round(mean(participants$age))` ±$SD$ `r round(sd(participants$age), 1)`, `r sum(tolower(participants$gender) == 'm')` male, `r sum(tolower(participants$gender) == 'f')` female, `r sum(tolower(participants$gender) != 'm' & tolower(participants$gender) != 'f')` other) recruited from the University of Oxford participant recruitment platforms took part in the experiment. An additional 2 participants attended experimental sessions but their data were not analysed. Participants were compensated for their time with either course credit for a psychology degree, or 10GBP. 
+`r nrow(participants)` participants (M~age~ = `r round(mean(participants$age))` ±SD `r round(sd(participants$age), 1)`, `r sum(tolower(participants$gender) == 'm')` male, `r sum(tolower(participants$gender) == 'f')` female, `r sum(tolower(participants$gender) != 'm' & tolower(participants$gender) != 'f')` other) recruited from the University of Oxford participant recruitment platforms took part in the experiment. An additional 2 participants attended experimental sessions but their data were not analysed. Participants were compensated for their time with either course credit for a psychology degree, or 10GBP. 
 
 #### Ethics
 
@@ -63,7 +66,7 @@ Ethical approval for the study was granted by the University of Oxford Medical S
 
 #### Procedure
 
-The experiment consisted of a judge-advisor system with a perceptual decision task (Figure \ref@(fig:ex1-paradigm)). Participants played the role of the judge, and the advisors were played by virtual agents whose answers depended upon the confidence with which the judge reported the initial decision. In the majority of trials (92%), participants were offered advice from virtual advisors. In one third of these trials (‘choice trials’), participants chose which advisor to receive advice from by clicking on their respective portraits appearing at the top and bottom of the screen. On the remaining two thirds of trials (‘forced trials’), participants were forced to take advice from one of the two advisors (equiprobably).  On these trials, the forced advisor’s portrait appeared at the top or bottom of the screen, with a red cross appearing in the other location, which was not selectable. On the remaining 8% of trials, participants received no advice and were given no opportunity to revise their initial decision. These ‘catch trials’ were included to encourage participants to attend to the initial decisions.
+The experiment consisted of a judge-advisor system with a perceptual decision task (Figure \@ref(fig:ex1-paradigm)). Participants played the role of the judge, and the advisors were played by virtual agents whose answers depended upon the confidence with which the judge reported the initial decision. In the majority of trials (92%), participants were offered advice from virtual advisors. In one third of these trials (‘choice trials’), participants chose which advisor to receive advice from by clicking on their respective portraits appearing at the top and bottom of the screen. On the remaining two thirds of trials (‘forced trials’), participants were forced to take advice from one of the two advisors (equiprobably).  On these trials, the forced advisor’s portrait appeared at the top or bottom of the screen, with a red cross appearing in the other location, which was not selectable. On the remaining 8% of trials, participants received no advice and were given no opportunity to revise their initial decision. These ‘catch trials’ were included to encourage participants to attend to the initial decisions.
 
 ```{r ex1-paradigm, fig.align='center', fig.cap="Experiment 1 procedure: The task began with a blank screen containing only a fixation cross and progress bar. Momentarily prior to the onset of the stimuli the fixation cross flickered. The stimuli, two rectangles containing approximately 200 dots each, appeared for 0.16s, one on either side of the fixation cross. Once the stimuli disappeared, a response-collection screen appeared and prompted the participant to indicate their initial decision and its confidence by selecting a point within one of two regions. The left region indicated a decision that the target was on the left, and increasingly-leftwards points within that region indicated increasing confidence in that decision. The right region indicated a decision that the target was on the right, and increasingly-rightwards points within that region indicated increasing confidence in that decision.\\\nNext, the participant was presented with a choice screen. The choice screen displayed two images, one at the top of the screen and one at the bottom. The images were one of the following: an advisor portrait, a silhouette, or a red cross. The red cross was not selectable, forcing participants to choose the other option. The silhouette offered no advice, and was only ever offered as a forced choice. Selecting an advisor image provided the participant with the opinion of that advisor on the trial.\\\nHaving heard the advice, the participant was again presented with the response-collection screen, with a yellow indicator marking their original response. A second (final) judgement was collected using this screen (except on catch trials), and the trial concluded.", out.width="80%", echo=F}
 knitr::include_graphics("figures/experiment_01_MATLAB/paradigm.jpg")
@@ -79,18 +82,13 @@ knitr::include_graphics("figures/experiment_01_MATLAB/questionnaire.jpg")
 
 Each participant attended the experiment individually, was welcomed and briefed on the experimental procedure, and had their informed consent recorded, before the experiment began. They were seated a comfortable distance in front of a 24’ (1440x900 resolution) computer screen in a small, quiet, and dimly-lit room. The experiment took place wholly on the computer, and lasted around 45 minutes.
 
-The experiment was programmed in MATLAB R2017b [@MATLAB2017] using the Psychtoolbox-3 package [@kleiner2007s], and data analysis was performed using R [@rcoreteamLanguageEnvironmentStatistical2018]. For a full list of packages and software environment information, see !TODO[figure out where to include this stuff. Appendix? Also link to a containerized version of this.]
+The experiment was programmed in MATLAB R2017b [@MATLAB2017] using the Psychtoolbox-3 package [@kleiner2007s]. 
 
 #### Advisor advice profiles
 
-The advisors are virtual agents whose probability of agreeing with the participant’s decision varies as a function of the participant’s confidence and correctness in the initial decision phase. Table \ref@(tab:ex1-advisor-profiles) illustrates how this relationship functions, and shows that the overall correctness and agreement rates of the advisors is equivalent overall. Importantly, on largest minority of trials, the middle 40%, the advisors are exactly equivalent, meaning these trials can be compared directly without confounds arising from agreement rate and initial confidence.
+The advisors are virtual agents whose probability of agreeing with the participant’s decision varies as a function of the participant’s confidence and correctness in the initial decision phase. Table \@ref(tab:ex1-advisor-profiles) illustrates how this relationship functions, and shows that the overall correctness and agreement rates of the advisors is equivalent overall. Importantly, on largest minority of trials, the middle 40%, the advisors are exactly equivalent, meaning these trials can be compared directly without confounds arising from agreement rate and initial confidence.
 
-Table \ref{tab:ex1-advisor-profiles}: Advisor advice profiles
- 
-```{r ex1-advisor-profiles} 
-
-library(kableExtra)
-library(tibble)
+```{r ex1-advisor-profiles, echo = F} 
 
 tmp <- tribble(
   ~` `, ~`  `, ~`Bias Sharing`, ~`Anti Bias`,
@@ -102,7 +100,7 @@ tmp <- tribble(
   "Total agreement", "Participant incorrect", 30, 30
 )
 
-kable(tmp, align = c('l', 'l', 'r', 'r')) %>%
+kable(tmp, caption = "Table \\label{tab:ex1-advisor-profiles}: Advisor advice profiles") %>%
   kable_styling() %>%
   column_spec(1, bold = T) %>%
   row_spec(0, bold = F) %>%
@@ -112,6 +110,49 @@ kable(tmp, align = c('l', 'l', 'r', 'r')) %>%
                      "Probability of agreement (%)" = 2))
 
 ```
+
+#### Analysis
+
+Data analysis was performed using R [@rcoreteamLanguageEnvironmentStatistical2018]. For a full list of packages and software environment information, see !TODO[figure out where to include this stuff. Appendix? Also link to a containerized version of this.]
+
+Bayes Factors (BF) are presented alongside p values and test statistics. A BF < 0.33 indicates decisive evidence in favour of the null hypothesis over the alternative hypothesis (with lower values being increasingly clear), BF > 3 indicates decisive evidence of the alterative over the null (with higher values being increasingly clear), and 0.33 <= BF <= 3 indicates there is insufficient evidence to reach a conclusion.
+
+Influence, the dependant variable in some analyses, is calculated as the extent to which the judge’s initial decision is revised in the direction of the advisor’s advice. The initial ($C_1$) and final ($C_2$) decisions are made on a scale stretching from -55 to +55 with zero excluded, where values <0 indicate a ‘left’ decision and values >0 indicate a ‘right’ decision, and greater magnitudes indicate increased confidence. Influence ($I$) is given for agreement trials by the shift towards the advice:
+
+\begin{align}
+I|\text{agree} = f(C_1) 
+\begin{cases}
+  C_2 - C_1 & C_1 > 0 \\
+  -C_2 + C_1 & C_1 < 0
+\end{cases}
+(\#eq:ex1-influence-agree)
+\end{align}
+
+And by the inverse of this for disagreement trials:
+
+\begin{align}
+I|\text{disagree} = -I|\text{agree}
+(\#eq:ex1-influence-disagree)
+\end{align}
+
+The confidence scale excludes 0, and thus the final decision can always be more extreme when moving against the direction of the initial answer than when moving further in the direction of the initial answer. A capped measure of influence was used to minimise biases arising from the natural asymmetry of the scale. This measure was calculated by truncating absolute influence values which were greater than the maximum influence which could have obtained had the final decision been a maximal response in the direction of the initial answer (Figure \@ref(fig:ex1-capping)).
+
+```{r ex1-capping, fig.align='center', fig.cap="Capping influence to avoid scale bias: In this example the judge’s initial response is 42, meaning that their final decision could be up to 13 points more confident or up to 97 points less confident. Any final decision which is more than 13 points less confident is therefore capped at 13 points less confident.", out.width="80%", echo=F}
+knitr::include_graphics("figures/experiment_01_MATLAB/capping.jpg")
+```
+
+The capped influence measure $I_\text{capped}$ is obtained by:
+
+\begin{align}
+I_\text{capped} = f(C_1) 
+\begin{cases}
+  \text{min}(I, 2C_1 - 55) & C_1 > 0 \\
+  \text{max}(I, 2C_1 + 55) & C_1 < 0
+\end{cases}
+(\#eq:ex1-influence-capping)
+\end{align}
+
+The explicit measure of trust is obtained using questionnaires. The questionnaires are delivered at 4 time points, and consist of 4 questions per advisor which are answered on a 1-100 scale.
 
 ### Result
 
