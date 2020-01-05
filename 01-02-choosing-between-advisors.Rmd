@@ -23,13 +23,39 @@ The literature on information exposure and evaluation indicates that people eval
 
 Pescetelli et al. [-@pescetelliRoleDecisionConfidence2018] used a judge-advisor system to demonstrate that judges are influenced to a greater extent by advisors who share their biases. Participants played the role of judge in a judge-advisor system, while the advisors were virtual agents whose advice-giving was dependent upon the confidence and correctness of the judges' initial decisions. The advisors were balanced for overall agreement with the judge and objective correctness of advice. We place participants in a similar paradigm in which they are given a choice between advisors, and hypothesise that they will more frequently seek advice from the _Bias Sharing_ advisor than from the _Anti Bias_ advisor.
 
+
+### Open science
+
+#### Preregistration
+
+The study was preregistered using AsPredicted.org. The preregistration document can be found at [https://aspredicted.org/ze3tn.pdf](https://aspredicted.org/ze3tn.pdf). 
+
+#### Open materials
+
+Experimental materials, including scripts required to run the experiments in MATLAB and scripts required to analyse the data in R, are available from the [GitHub repository](https://github.com/mjaquiery/nofeedback_trust). 
+
+The experimental design was adapted from Pescetelli et al. [-@pescetelliUseMetacognitiveSignals2017], and the major work in the design, as well as the experimental scripts, is due to Niccolo. The full list of changes to the final design can be seen in the commits to the project repository, which began as a fork of [Niccolo's work](https://github.com/chri4354/nofeedback_trust).
+
+#### Open data
+
+Anonymised study data can be found at !TODO[Use a sensible archive format for this study data, archive on OSF, and produce data dictionary]. A preloaded version of the data formatted appropriately for the R scripts is included in the [GitHub repository](https://github.com/mjaquiery/nofeedback_trust).
+
 ### Method
 
-The experimental design was adapted from Pescetelli et al., but the major work in the design, as well as the experimental scripts, belongs to Niccolo. The full list of changes from Niccolo's work to the final design can be seen in the commits to the [project repository](https://github.com/mjaquiery/nofeedback_trust), which began as a fork of [Niccolo's work](https://github.com/chri4354/nofeedback_trust).
+```{r load exp1 data, echo = F, include = F}
+
+# Run the analysis script for experiment 1 from the symlinked repository.
+exDirs <- c("repos/nofeedback_trust/AdvisorChoice/analysis/")
+wd <- setwd(exDirs[1])
+source("AdvisorChoice.R")
+setwd(wd)
+
+```
+
 
 #### Participants
 
-24 participants (Age mean = 21.75 ±SD 4.70, 5 male, 19 female, 0 other) recruited from the University of Oxford participant recruitment platforms took part in the experiment. An additional 2 participants attended experimental sessions but their data were not analysed. Participants were compensated for their time with either course credit for a psychology degree, or 10GBP. 
+`r nrow(participants)` participants ($M_{age}$ = `r round(mean(participants$age))` ±$SD$ `r round(sd(participants$age), 1)`, `r sum(tolower(participants$gender) == 'm')` male, `r sum(tolower(participants$gender) == 'f')` female, `r sum(tolower(participants$gender) != 'm' & tolower(participants$gender) != 'f')` other) recruited from the University of Oxford participant recruitment platforms took part in the experiment. An additional 2 participants attended experimental sessions but their data were not analysed. Participants were compensated for their time with either course credit for a psychology degree, or 10GBP. 
 
 #### Ethics
 
@@ -38,6 +64,11 @@ Ethical approval for the study was granted by the University of Oxford Medical S
 #### Procedure
 
 The experiment consisted of a judge-advisor system with a perceptual decision task (Figure 1). Participants played the role of the judge, and the advisors were played by virtual agents whose answers depended upon the confidence with which the judge reported the initial decision. In the majority of trials (92%), participants were offered advice from virtual advisors. In one third of these trials (‘choice trials’), participants chose which advisor to receive advice from by clicking on their respective portraits appearing at the top and bottom of the screen. On the remaining two thirds of trials (‘forced trials’), participants were forced to take advice from one of the two advisors (equiprobably).  On these trials, the forced advisor’s portrait appeared at the top or bottom of the screen, with a red cross appearing in the other location, which was not selectable. On the remaining 8% of trials, participants received no advice and were given no opportunity to revise their initial decision. These ‘catch trials’ were included to encourage participants to attend to the initial decisions.
+
+```{r, fig.align='center', fig.cap="Experiment 1 procedure: participants made initial judgements about which of two boxes of dots was more densely populated, chose an advisor from whom to get advice, and made a final judgement integrating their inital judgement and the advice. Judgements were made by inidcating both the side containing most dots and a confidence in that judgement.", out.width="80%", echo=F}
+knitr::include_graphics("figures/experiment_01_MATLAB/paradigm.jpg")
+```
+
 
 
 ### Result
