@@ -1,16 +1,18 @@
 ---
-#########################################
-# options for knitting a single chapter #
-#########################################
 output:
-  bookdown::html_document2: default
-  bookdown::word_document2: default
   bookdown::pdf_document2:
     template: templates/brief_template.tex
+    keep_tex: true
+  bookdown::word_document2: default
+  bookdown::html_document2: default
 documentclass: book
 ---
 
 ```{r setup, echo = F, include = F}
+options(
+  tinytex.verbose = TRUE
+  )
+
 knitr::opts_chunk$set(
   echo = F, warnings = F, messages = F
 )
@@ -107,7 +109,7 @@ The experiment was programmed in MATLAB R2017b [@MATLAB2017] using the Psychtool
 
 The advisors are virtual agents whose probability of agreeing with the participant’s decision varies as a function of the participant’s confidence and correctness in the initial decision phase. Table \@ref(tab:ex1-advisor-profiles) illustrates how this relationship functions, and shows that the overall correctness and agreement rates of the advisors is equivalent overall. Importantly, on largest minority of trials, the middle 40%, the advisors are exactly equivalent, meaning these trials can be compared directly without confounds arising from agreement rate and initial confidence.
 
-```{r ex1-advisor-profiles} 
+```{r ex1-advisor-profiles-r} 
 
 tmp <- tribble(
   ~` `, ~`  `, ~`Bias Sharing`, ~`Anti Bias`,
@@ -179,7 +181,7 @@ The explicit measure of trust is obtained using questionnaires. The questionnair
 
 `r nrow(participants) + 2` participants took part in the study. One participant was unable to complete the experiment due to technical difficulties. [Pre-registration](#ex1-os-prereg) of the study analysis stated that data would be collected from 24 participants, so the final (overbooked) subject tested was excluded from analysis. Descriptive statistics for the `r nrow(participants)` participants included in the analysis are presented in Table \@ref(tab:ex1-descriptives).
 
-```{r ex1-descriptives} 
+```{r ex1-descriptives-r} 
 
 tmp.conf <- bind_rows(
   # Mean confidence
@@ -406,24 +408,28 @@ tmp <- bind_rows(
            context = "Anti Bias advisor",
            target = c(.6, .7, .8, .7, .3, NA))
 ) %>%
-  num2str.tibble(isProportion = T)
+  num2str.tibble(isProportion = T) %>% 
+  bind_rows(tmp.conf)
 
 tmp %>%
-  bind_rows(tmp.conf) %>%
-  mutate_all(~ if_else(is.na(.), "-", .)) %>%
-  mutate(target = cell_spec(target, align = if_else(target == "-", 'c', 'r'))) %>%
+  mutate_all(~ if_else(is.na(.) | . == "NA", "-", .)) %>%
+  mutate_at(vars(-(stat:context), -target), 
+            ~ if_else(tmp$condition %in% c("Both", "All"), 
+                      cell_spec(., bold = T), .)) %>%
+  mutate(target = cell_spec(target, 
+                            align = if_else(target == "-", 'c', 'r'),
+                            bold = if_else(tmp$condition %in% c("Both", "All"),
+                                           T, F))) %>%
   select(stat, context, condition, target, everything()) %>%
   rename(` ` = stat, `  ` = context, `   ` = condition,
          Target = target, Mean = y, Low = ymin, High = ymax) %>%
   kable(caption = "Table \\label{tab:ex1-descriptives}: Descriptive statistics for Experiment 1",
-        align = c('l', 'l', 'l', 'r', 'r', 'r', 'r'),
+        align = c('l', 'l', 'l', 'r', 'r', 'r', 'r'), 
         escape = F) %>%
-  kable_styling() %>%
-  column_spec(1:2, bold = T) %>%
-  row_spec(c(3, 6, 12, 18, 21, 24, 27, 30), bold = T) %>%
+  column_spec(1:2, bold = T, width = "3.25cm") %>%
   collapse_rows(columns = 1:2, valign = "top") %>%
-  add_header_above(c(" " = 5, "95% Confidence interval" = 2))
-
+  add_header_above(c(" " = 5, "95% CI" = 2)) %>%
+  kable_styling()
 
 ```
 
@@ -486,7 +492,7 @@ The advisors differed in their advice-giving as a function of the judge’s init
 
 #### Advisor influence
 
-Previous work in our lab demonstrated that the agree-in-confidence advisor exerted greater influence on the judges’ final decisions than the agree-in-uncertainty advisor [@pescetelliUseMetacognitiveSignals2017]. Influence was examined with a 2x2x2 (Bias Sharing versus Anti Bias advisor; choice versus forced trials; agreement versus disagreement trials) ANOVA (Figure \@ref(fig:ex1-influence)). No main effect was found for advisor (F(1,23) = 0.28, p = .602, η2 = .001; MAiC = 5.24 [4.22, 6.27], MAiU = 5.03 [4.03, 6.02]), meaning that the previous finding was not replicated. As shown in Table \@ref(tab:ex1-influence), the only statistically significant effect was the main effect of agreement, with disagreement producing higher influence than agreement (Magree = 3.04 [2.39, 3.69], Mdisagree = 7.23 [6.11, 8.36]).
+Previous work in our lab demonstrated that the agree-in-confidence advisor exerted greater influence on the judges’ final decisions than the agree-in-uncertainty advisor [@pescetelliUseMetacognitiveSignals2017]. Influence was examined with a 2x2x2 (Bias Sharing versus Anti Bias advisor; choice versus forced trials; agreement versus disagreement trials) ANOVA (Figure \@ref(fig:ex1-influence)). No main effect was found for advisor !TODO[stats], meaning that the previous finding was not replicated. As shown in Table \@ref(tab:ex1-influence), the only statistically significant effect was the main effect of agreement, with disagreement producing higher influence than agreement !TODO[marginal means].
 
 ```{r ex1-influence, fig.align='center', fig.cap="Advisor influence: Influence of advice from each advisor by advisor, agreement, and trial type. Faint lines and indicate data from individual participants, while the dots indicate the mean proportion across all participants. Error bars give 95% confidence intervals. Note: vertical axis is truncated to show group differences more clearly, the theoretical maximum influence given the scale is 110. The minimum is 0 as shown.", out.width="80%"}
 

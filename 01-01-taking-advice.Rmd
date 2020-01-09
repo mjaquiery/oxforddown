@@ -2,6 +2,7 @@
 output:
   bookdown::pdf_document2:
     template: templates/brief_template.tex
+    keep_tex: true
   bookdown::word_document2: default
   bookdown::html_document2: default
 documentclass: book
@@ -13,3 +14,126 @@ documentclass: book
 
 ## Playground
 !TODO[remove playground]
+
+```{r opts, echo=F, include=F}
+options(
+  tinytex.verbose = TRUE
+  )
+
+knitr::opts_chunk$set(
+  echo = F, warnings = F, messages = F
+)
+
+library(tidyverse)
+library(kableExtra)
+
+theme_set(
+  theme_light() +
+    theme(
+      panel.background = element_blank(),
+      panel.border = element_blank(),
+      panel.grid.minor = element_blank(),
+      panel.grid.major = element_blank(),
+      axis.line = element_line(colour = "black"),
+      text = element_text(size = 14),
+      legend.position = "top"
+    )
+)
+```
+
+```{r copy tbl}
+
+tbl2str <- function(tbl, catOutput = T) {
+  s <- paste0('tribble(~', paste(names(tmp), collapse = ', ~'), ',')
+  for (r in 1:nrow(tmp)) {
+    s <- paste0(s, '\n')
+    for (c in 1:ncol(tmp)) {
+      s <- paste0(s, '"', tmp[r, c], 
+                  ifelse(r == nrow(tmp) && c == ncol(tmp), '"', '", '))
+    }
+  }
+  s <- paste0(s, ')')
+  
+  if (catOutput)
+    cat(s)
+  else
+    s
+}
+
+```
+
+```{r tbl1} 
+
+tmp <- tribble(
+  ~condition, ~y, ~ymin, ~ymax, ~stat, ~context, ~target,
+  "Bias Sharing", ".68", ".67", ".70", "Participant proportion correct", "Initial estimate", ".71", 
+  "Anti Bias", ".71", ".69", ".72", "Participant proportion correct", "Initial estimate", ".71", 
+  "Both", ".70", ".68", ".71", "Participant proportion correct", "Initial estimate", ".71", 
+  "Bias Sharing", ".70", ".69", ".71", "Participant proportion correct", "Final decision", "NA", 
+  "Anti Bias", ".73", ".72", ".75", "Participant proportion correct", "Final decision", "NA", 
+  "Both", ".72", ".71", ".72", "Participant proportion correct", "Final decision", "NA", 
+  "Low confidence", ".60", ".57", ".63", "Advisor-participant agreement rate", "Bias Sharing advisor", ".80", 
+  "Medium confidence", ".70", ".68", ".72", "Advisor-participant agreement rate", "Bias Sharing advisor", ".70", 
+  "High confidence", ".79", ".76", ".82", "Advisor-participant agreement rate", "Bias Sharing advisor", ".60", 
+  "Initial wrong", ".30", ".29", ".32", "Advisor-participant agreement rate", "Bias Sharing advisor", ".70", 
+  "Initial correct", ".69", ".68", ".71", "Advisor-participant agreement rate", "Bias Sharing advisor", ".30", 
+  "All", ".57", ".56", ".58", "Advisor-participant agreement rate", "Bias Sharing advisor", "NA", 
+  "Low confidence", ".79", ".75", ".82", "Advisor-participant agreement rate", "Anti Bias advisor", ".60", 
+  "Medium confidence", ".70", ".67", ".74", "Advisor-participant agreement rate", "Anti Bias advisor", ".70", 
+  "High confidence", ".64", ".60", ".67", "Advisor-participant agreement rate", "Anti Bias advisor", ".80", 
+  "Initial wrong", ".32", ".29", ".34", "Advisor-participant agreement rate", "Anti Bias advisor", ".70", 
+  "Initial wrong", ".71", ".69", ".73", "Advisor-participant agreement rate", "Anti Bias advisor", ".30", 
+  "All", ".59", ".57", ".61", "Advisor-participant agreement rate", "Anti Bias advisor", "NA", 
+  "Wrong", "19.1", "15.4", "22.7", "Mean initial confidence", "Initial judgement", "NA", 
+  "Correct", "22.8", "19.1", "26.5", "Mean initial confidence", "Initial judgement", "NA", 
+  "Both", "21.7", "18.0", "25.4", "Mean initial confidence", "Initial judgement", "NA", 
+  "Wrong", "18.2", "14.8", "21.6", "Mean final confidence", "Final decision", "NA", 
+  "Correct", "23.6", "20.0", "27.1", "Mean final confidence", "Final decision", "NA", 
+  "Both", "22.0", "18.6", "25.5", "Mean final confidence", "Final decision", "NA", 
+  "Bias Sharing", "26.1", "22.6", "29.6", "Mean final confidence", "Advisor agrees", "NA", 
+  "Anti Bias", "24.6", "21.2", "28.1", "Mean final confidence", "Advisor agrees", "NA", 
+  "Both", "22.0", "18.6", "25.5", "Mean final confidence", "Advisor agrees", "NA", 
+  "Bias Sharing", "16.6", "12.9", "20.2", "Mean final confidence", "Advisor disagrees", "NA", 
+  "Anti Bias", "18.3", "14.4", "22.3", "Mean final confidence", "Advisor disagrees", "NA", 
+  "Both", "22.0", "18.6", "25.5", "Mean final confidence", "Advisor disagrees", "NA"
+  )
+
+tmp %>%
+  # bind_rows(tmp.conf) %>%
+  mutate_all(~ if_else(. == "NA", "-", .)) %>%
+  mutate_at(vars(-(stat:context), -target), 
+            ~ if_else(tmp$condition %in% c("Both", "All"), 
+                      cell_spec(., bold = T), .)) %>%
+  mutate(target = cell_spec(target, 
+                            align = if_else(target == "-", 'c', 'r'),
+                            bold = if_else(tmp$condition %in% c("Both", "All"),
+                                           T, F))) %>%
+  select(stat, context, condition, target, everything()) %>%
+  rename(` ` = stat, `  ` = context, `   ` = condition,
+         Target = target, Mean = y, Low = ymin, High = ymax) %>%
+  kable(caption = "Table \\label{tab:ex1-descriptives}: Descriptive statistics for Experiment 1",
+        align = c('l', 'l', 'l', 'r', 'r', 'r', 'r'), 
+        escape = F) %>%
+  column_spec(1:2, bold = T, width = "3.25cm") %>%
+  collapse_rows(columns = 1:2, valign = "top") %>%
+  add_header_above(c(" " = 5, "95% CI" = 2)) %>%
+  kable_styling()
+```
+
+```{r}
+
+dt <- tibble(
+   Items = c("Item 1 has a name that is just too long", 
+             "Item 1 has a name that is just too long", 
+             "Item 3"),
+   Text_1 = c("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vehicula tempor ex. Morbi malesuada sagittis turpis, at venenatis nisl luctus a. ","In eu urna at magna luctus rhoncus quis in nisl. Fusce in velit varius, posuere risus et, cursus augue. Duis eleifend aliquam ante, a aliquet ex tincidunt in. ", "Vivamus venenatis egestas eros ut tempus. Vivamus id est nisi. Aliquam molestie erat et sollicitudin venenatis. In ac lacus at velit scelerisque mattis. "),
+   Text_2 = c("Duis posuere placerat magna, ac aliquam lorem viverra non. Ut ultrices tempus eros, quis sodales libero commodo non. In non neque ut lacus vestibulum dictum a quis ipsum. ", "Aenean ut justo interdum, laoreet enim nec, viverra eros. Donec vel pharetra nunc. Suspendisse vel ipsum ac lectus semper aliquam ac a orci. Suspendisse libero mauris, egestas semper auctor sit amet, tempor et orci. ", "Phasellus quis neque aliquet, finibus nunc eget, lacinia neque. Sed auctor lectus vel ex scelerisque commodo. ")
+)
+kable(dt, "latex", booktabs = T,
+      col.names = c("Item", "Short Title", "Very Very Very Very Very Very Long Title")) %>%
+  column_spec(1:3, width = "5cm") %>%
+  collapse_rows(columns = 1:2, valign = "top") %>%
+  add_header_above(c(" " = 1, "95% Confidence interval" = 2)) %>%
+  row_spec(3, bold = T) 
+  
+```
