@@ -31,6 +31,8 @@ theme_set(
       legend.position = "top"
     )
 )
+
+library(broom)
 ```
 
 # Psychology of source selection {#chapter-advisor-choice}
@@ -89,7 +91,7 @@ Ethical approval for the study was granted by the University of Oxford Medical S
 
 The experiment consisted of a judge-advisor system with a perceptual decision task (Figure \@ref(fig:ex1-paradigm)). Participants played the role of the judge, and the advisors were played by virtual agents whose answers depended upon the confidence with which the judge reported the initial decision. In the majority of trials (92%), participants were offered advice from virtual advisors. In one third of these trials (‘choice trials’), participants chose which advisor to receive advice from by clicking on their respective portraits appearing at the top and bottom of the screen. On the remaining two thirds of trials (‘forced trials’), participants were forced to take advice from one of the two advisors (equiprobably).  On these trials, the forced advisor’s portrait appeared at the top or bottom of the screen, with a red cross appearing in the other location, which was not selectable. On the remaining 8% of trials, participants received no advice and were given no opportunity to revise their initial decision. These ‘catch trials’ were included to encourage participants to attend to the initial decisions.
 
-```{r ex1-paradigm, fig.align='center', fig.cap="Experiment 1 procedure: The task began with a blank screen containing only a fixation cross and progress bar. Momentarily prior to the onset of the stimuli the fixation cross flickered. The stimuli, two rectangles containing approximately 200 dots each, appeared for 0.16s, one on either side of the fixation cross. Once the stimuli disappeared, a response-collection screen appeared and prompted the participant to indicate their initial decision and its confidence by selecting a point within one of two regions. The left region indicated a decision that the target was on the left, and increasingly-leftwards points within that region indicated increasing confidence in that decision. The right region indicated a decision that the target was on the right, and increasingly-rightwards points within that region indicated increasing confidence in that decision.\\\nNext, the participant was presented with a choice screen. The choice screen displayed two images, one at the top of the screen and one at the bottom. The images were one of the following: an advisor portrait, a silhouette, or a red cross. The red cross was not selectable, forcing participants to choose the other option. The silhouette offered no advice, and was only ever offered as a forced choice. Selecting an advisor image provided the participant with the opinion of that advisor on the trial.\\\nHaving heard the advice, the participant was again presented with the response-collection screen, with a yellow indicator marking their original response. A second (final) judgement was collected using this screen (except on catch trials), and the trial concluded.", out.width="80%"}
+```{r ex1-paradigm, fig.align='center', fig.cap="Experiment 1 procedure: The task began with a blank screen containing only a fixation cross and progress bar. Momentarily prior to the onset of the stimuli the fixation cross flickered. The stimuli, two rectangles containing approximately 200 dots each, appeared for 0.16s, one on either side of the fixation cross. Once the stimuli disappeared, a response-collection screen appeared and prompted the participant to indicate their initial decision and its confidence by selecting a point within one of two regions. The left region indicated a decision that the target was on the left, and increasingly-leftwards points within that region indicated increasing confidence in that decision. The right region indicated a decision that the target was on the right, and increasingly-rightwards points within that region indicated increasing confidence in that decision.\\\nNext, the participant was presented with a choice screen. The choice screen displayed two images, one at the top of the screen and one at the bottom. The images were one of the following: an advisor portrait, a silhouette, or a red cross. The red cross was not selectable, forcing participants to choose the other option. The silhouette offered no advice, and was only ever offered as a forced choice. Selecting an advisor image provided the participant with the opinion of that advisor on the trial.\\\nHaving heard the advice, the participant was again presented with the response-collection screen, with a yellow indicator marking their original response. A second (final) judgement was collected using this screen (except on catch trials), and the trial concluded.", out.width="100%"}
 knitr::include_graphics("figures/experiment_01_MATLAB/paradigm.jpg")
 ```
 
@@ -97,7 +99,7 @@ Each participant completed 363 trials (51 practice trials over 2 blocks + 12 x 2
 
 After each block participants were told what percentage of the (final) answers they had provided were correct and allowed to take a short, self-paced break. Prior to the first experimental block, after the final experimental block, and after the 4th and 8th experimental blocks, participants were presented with a questionnaire (Figure \@ref(fig:ex1-questionnaire)). The questionnaire contained 4 questions for each advisor. The questions asked for the judge’s assessment of the advisor’s likeability, trustworthiness, influence, and ability to do the task. The questions presented before the first experimental block were worded prospectively (e.g. ‘How much are you going to like this person?’ as opposed to ‘How much do you like this person?’). Answers were provided by moving a sliding scale below the advisor’s portrait towards the right for more favourable responses (marked ‘extremely’) or towards the left for less favourable responses (marked ‘not at all’).
 
-```{r ex1-questionnaire, fig.align='center', fig.cap="Experiment 1 advisor questionnaire: Participants rated advisors on a number of different dimensions.", out.width="80%"}
+```{r ex1-questionnaire, fig.align='center', fig.cap="Experiment 1 advisor questionnaire: Participants rated advisors on a number of different dimensions.", out.width="100%"}
 knitr::include_graphics("figures/experiment_01_MATLAB/questionnaire.jpg")
 ```
 
@@ -158,7 +160,7 @@ I|\text{disagree} = -I|\text{agree}
 
 The confidence scale excludes 0, and thus the final decision can always be more extreme when moving against the direction of the initial answer than when moving further in the direction of the initial answer. A capped measure of influence was used to minimise biases arising from the natural asymmetry of the scale. This measure was calculated by truncating absolute influence values which were greater than the maximum influence which could have obtained had the final decision been a maximal response in the direction of the initial answer (Figure \@ref(fig:ex1-capping)).
 
-```{r ex1-capping, fig.align='center', fig.cap="Capping influence to avoid scale bias: In this example the judge’s initial response is 42, meaning that their final decision could be up to 13 points more confident or up to 97 points less confident. Any final decision which is more than 13 points less confident is therefore capped at 13 points less confident.", out.width="80%"}
+```{r ex1-capping, fig.align='center', fig.cap="Capping influence to avoid scale bias: In this example the judge’s initial response is 42, meaning that their final decision could be up to 13 points more confident or up to 97 points less confident. Any final decision which is more than 13 points less confident is therefore capped at 13 points less confident.", out.width="100%"}
 knitr::include_graphics("figures/experiment_01_MATLAB/capping.jpg")
 ```
 
@@ -437,13 +439,12 @@ The descriptive statistics demonstrate the contingent agreement of the advisors,
 
 Participants’ revisions to their confidence were mostly in the direction of the advice, symmetrical across left and right responses, and usually relatively small, especially in agreement trials (Figure \@ref(fig:ex1-confidence)).
 
-```{r ex1-confidence, fig.align='center', fig.cap="Initial vs final confidence: Influence of the advisors is evident in the deviation from the dashed y = x line. Points lying below the line indicate a more leftward response from initial to final judgement. Points above the line indicate a more rightward response in the final judgement. The further away from the y = x line, the greater the change from initial to final judgement. Separate plots show agreement vs disagreement trials (between the advisor and judge), and separate colours indicate whether the judge's final decision was correct or incorrect.\\\n The shaded area indicates the boundary for the symmetrical influence measure. Points outside this area are truncated by moving them vertically until they meet the grey area.", out.width="80%"}
-suppressMessages(
-  graph.confidence +
+```{r ex1-confidence, fig.align='center', fig.cap="Initial vs final confidence: Influence of the advisors is evident in the deviation from the dashed y = x line. Points lying below the line indicate a more leftward response from initial to final judgement. Points above the line indicate a more rightward response in the final judgement. The further away from the y = x line, the greater the change from initial to final judgement. Separate plots show agreement vs disagreement trials (between the advisor and judge), and separate colours indicate whether the judge's final decision was correct or incorrect.\\\n The shaded area indicates the boundary for the symmetrical influence measure. Points outside this area are truncated by moving them vertically until they meet the grey area.", out.width="100%"}
+
+graph.confidence +
   labs(title = NULL, subtitle = NULL) +
   scale_y_continuous(limits = c(-60, 60), expand = c(0, 0)) +
   scale_x_continuous(limits = c(-60, 60), expand = c(0, 0))
-)
 
 ```
 
@@ -451,14 +452,16 @@ suppressMessages(
 
 We hypothesised that the participants would display different pick rates for the Bias Sharing advisor versus the Anti Bias advisor. This hypothesis was evaluated by calculating the proportion of choice trials on which each participant picked the Bias Sharing advisor, and then testing these values as a one-sample t-test against the null hypothesis that the pick rates would be 0.5. No support was found for this hypothesis (`r cat(md.ttest(participants$aicPickRate, mu = .5, labels = "M~P(BiasSharing)~"))`; Figure \@ref(fig:ex1-selection)), although the Bayesian test indicated that the data were not sufficient to conclude that no effect was present. There was considerable variability across participants in the overall pick rate for the Bias Sharing advisor (range = [`r range(participants$aicPickRate) %>% num2str(isProportion = T) %>% paste(collapse = ", ")`]).
 
-```{r ex1-selection, fig.align='center', fig.cap="Advisor selection: Proportion of the time each participant picked the Bias Sharing advisor. Faint lines and dots indicate data from individual participants, while the large dot indicates the mean proportion across all participants. The dashed reference line indicates picking both advisors equally, as would be expected by chance. Error bars give 95% confidence intervals.", out.width="80%"}
+```{r ex1-selection, fig.align='center', fig.cap="Advisor selection: Proportion of the time each participant picked the Bias Sharing advisor. Faint lines and dots indicate data from individual participants, while the large dot indicates the mean proportion across all participants. The dashed reference line indicates picking both advisors equally, as would be expected by chance. Error bars give 95\\% confidence intervals.", out.width="100%"}
 
-tmp <- melt(participants[,c("participantId","aicPickRate.lowConf","aicPickRate.medConf","aicPickRate.highConf")],
-            id.vars = 'participantId')
-levels(tmp$variable) <- c('Low', 'Medium', 'High')
-tmp$participantId <- as.factor(tmp$participantId)
-
-ggplot(tmp, aes(x = variable, y = value)) +
+melt(participants[,c("participantId","aicPickRate.lowConf","aicPickRate.medConf","aicPickRate.highConf")],
+            id.vars = 'participantId') %>%
+  mutate(variable = recode(variable, 
+                           "aicPickRate.lowConf" = 'Low', 
+                           "aicPickRate.medConf" = 'Medium', 
+                           "aicPickRate.highConf" = 'High'),
+         participantId = as.factor(participantId)) %>%
+  ggplot(aes(x = variable, y = value)) +
   geom_hline(linetype = "dashed", color = "black", yintercept = .5, size = 1) +
   # Confidence categories
   geom_line(aes(group = factor(participantId)), alpha = 0.25) +
@@ -494,7 +497,7 @@ The advisors differed in their advice-giving as a function of the judge’s init
 
 Previous work in our lab demonstrated that the agree-in-confidence advisor exerted greater influence on the judges’ final decisions than the agree-in-uncertainty advisor [@pescetelliUseMetacognitiveSignals2017]. Influence was examined with a 2x2x2 (Bias Sharing versus Anti Bias advisor; choice versus forced trials; agreement versus disagreement trials) ANOVA (Figure \@ref(fig:ex1-influence)). No main effect was found for advisor !TODO[stats], meaning that the previous finding was not replicated. As shown in Table \@ref(tab:ex1-influence), the only statistically significant effect was the main effect of agreement, with disagreement producing higher influence than agreement !TODO[marginal means].
 
-```{r ex1-influence, fig.align='center', fig.cap="Advisor influence: Influence of advice from each advisor by advisor, agreement, and trial type. Faint lines and indicate data from individual participants, while the dots indicate the mean proportion across all participants. Error bars give 95% confidence intervals. Note: vertical axis is truncated to show group differences more clearly, the theoretical maximum influence given the scale is 110. The minimum is 0 as shown.", out.width="80%"}
+```{r ex1-influence, fig.align='center', fig.cap="Advisor influence: Influence of advice from each advisor by advisor, agreement, and trial type. Faint lines and indicate data from individual participants, while the dots indicate the mean proportion across all participants. Error bars give 95\\% confidence intervals. Note: vertical axis is truncated to show group differences more clearly, the theoretical maximum influence given the scale is 110. The minimum is 0 as shown.", out.width="100%"}
 
 trials %>% 
   select(participantId, advisorId, cor1, choice, agree, influence) %>%
@@ -523,25 +526,119 @@ trials %>%
 ```
 
 ```{r ex1-influence-anova} 
-tmp <- anova.influence$ANOVA %>%
-  mutate(`F` = num2str(`F`),
-         p = num2str(p, precision = 3, isProportion = T),
-         `p<.05` = if_else(`p<.05` == "", "", "$\\text{*}$"),
-         ges = num2str(ges, precision = 3, isProportion = T))
-rownames(tmp) <- NULL
+kableANOVA(anova.influence$ANOVA, 
+           caption = "Table \\label{tab:ex1-influence}: ANOVA of Advisor influence in Experiment 1")
+```
 
-tmp %>%
-  select(Effect,
-         `$F$` = F,
-         `$p$` = p,
-         ` ` = `p<.05`,
-         `$\\eta^2$` = ges) %>%
-  kable(caption = "Table \\label{tab:ex1-influence}: ANOVA of Advisor influence in Experiment 1",
-        align = c('l', 'r', 'r', 'c', 'r'),
+##### Advisor influence on medium confidence trials
+
+The agree-in-confidence and agree-in-uncertainty advisors differed by design in the frequency with which they agree with the participant as a function of the participant’s confidence in their initial estimate. To control for the effects of initial confidence on influence, the above analysis was repeated using only those trials on which the initial estimate was correct and given with medium confidence. Two participants were missing data in this analysis: one participant had zero mid-confidence choice trials in which the agree-in-confidence advisor disagreed with them; and the other had zero mid-confidence choice trials in which the agree-in-uncertainty advisor disagreed with them. These participants were removed from this analysis. As before, the only effect which was statistically significant was agreement. 
+
+The low number of trials in some of the intersections meant the some participants had to be dropped. The analysis was rerun with forced trials only, !TODO[stats] 
+
+```{r ex1-influence-medconf-anova}
+dropIds <- participants.influence.medConf %>%
+  filter(is.nan(value)) %>% 
+  pull(participantId)
+
+tmp <- participants.influence.medConf %>% 
+  filter(!(participantId %in% dropIds)) %>%
+  mutate(participantId = factor(participantId))
+
+tmp.aov <- ezANOVA(data = tmp,
+                   dv = value, 
+                   wid = participantId,
+                   within = c('AiC', 'agree', 'hasChoice'),
+                   return_aov = T)
+
+tmp.aov$ANOVA %>%
+  kableANOVA(caption = "Table \\label{tab:ex1-influence-medconf}: ANOVA of Advisor influence on medium confidence trials in Experiment 1")
+```
+
+#### Subjective assessment of advisors
+
+Participants answered questionnaires about their trust in the advisors at four time points during the experiment. We hypothesised that this subjective trust measure would change over the course of the experiment, with the agree-in-confidence advisor becoming more preferred over time. As indicated by Table \@ref{tab:ex1-subjective-assessment}, however, no such effects were found: subjective assessments of the advisors did not differ post-experiment.
+
+```{r ex1-subjective-assessment}
+
+tmp <- questionnaires %>% 
+  mutate_if(is.list, unlist) %>%
+  filter(timePoint %in% range(timePoint)) %>%
+  group_by(questionTextShort, adviceType, timePoint, questionText) 
+  
+x <- tmp %>%
+  do(
+    y = mean_cl_normal(.$answer)
+  ) %>%
+  unnest(y)
+
+tmp <- tmp %>%
+  group_by(questionTextShort, timePoint) %>% 
+  group_nest() %>%
+  mutate(
+    t = map(data, ~ t.test(answer ~ adviceType, data = .x, paired = T)),
+    b = map(data, ~ ttestBF(formula = answer ~ adviceType, 
+                            data = as.data.frame(.x))),
+    test = map(t, ~ tidy(.x)),
+    bf = map(b, ~ exp(.x@bayesFactor$bf))
+  ) %>%
+  unnest(test, bf) %>%
+  select(-data, -t) %>%
+  left_join(x, by = c('questionTextShort', 'timePoint'))
+  
+tmp <- tmp %>%
+  filter(adviceType == min(adviceType)) %>%
+  rename(y.bs = y, ymin.bs = ymin, ymax.bs = ymax) %>%
+  select(-adviceType) %>%
+  left_join(tmp %>% filter(adviceType != min(adviceType)),
+            by = c("questionTextShort", "timePoint", "estimate", "bf",
+                   "statistic", "p.value", "parameter", "conf.low", 
+                   "conf.high", "method", "alternative", "questionText"))
+
+# Print table 
+tmp.print <- tmp %>%
+  mutate(timePoint = factor(timePoint, labels = c("Pre-experiment",
+                                                  "Post-experiment")),
+         sig = p.value < .05,
+         questionText = str_replace(questionText,
+                                    '(accurate|like|influenced|trustworthy)',
+                                    '\\\\textbf{\\1}')) %>%
+  select(timePoint, questionText, y.bs, ymin.bs, ymax.bs, 
+         y, ymin, ymax, bf, estimate, p.value, sig) %>%
+  mutate(
+    p.value = num2str(p.value, precision = 3, isProportion = T),
+    bf = num2str(bf),
+    sig = if_else(sig == T, "$*$", "")
+  ) %>%
+  mutate_if(is.numeric, num2str, precision = 1) %>%
+  rename(
+    ` ` = timePoint,
+    Question = questionText,
+    Mean = y.bs, Low = ymin.bs, High = ymax.bs,
+    ` Mean ` = y, ` Low ` = ymin, ` High ` = ymax,
+    BF = bf, `$t$` = estimate, `$p$` = p.value, `  ` = sig
+  )
+
+names(tmp.print)[str_detect(names(tmp.print), '$t$')] <- 
+  paste0('$t$(', tmp$parameter[1], ')')
+names(tmp.print)[str_detect(names(tmp.print), 'Question')] <-
+  paste0('Question', footnote_marker_alphabet(1))
+
+
+tmp.print %>%
+  arrange(` `) %>%
+  mutate(
+    ` ` = cell_spec(` `, angle = 90)
+  ) %>%
+  kable(caption = "Table \\label{tab:ex1-subjective-assessment-t}: Questionnaire responses pre- and post-experiment",
+        align = c('l', 'l', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'c'),
         escape = F) %>%
-  kable_styling() %>%
-  column_spec(1, bold = T)
-
+  collapse_rows(columns = 1, valign = 'top') %>%
+  column_spec(2, width = "7em") %>%
+  add_header_above(c(" " = 3, "95% CI" = 2, " " = 1, "95% CI" = 2, " " = 4)) %>%
+  add_header_above(c(" " = 2, "Bias sharing" = 3, "Anti bias" = 3, " " = 4)) %>%
+  footnote(alphabet_title = "", alphabet = "Emphasis added.")
+  
 ```
 
 ### Discussion {#ex1-d}
