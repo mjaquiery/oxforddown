@@ -17,6 +17,11 @@ documentclass: book
 \adjustmtc 
 <!-- For PDF output, we must include this LaTeX command after unnumbered headings, otherwise the numbers in the mini table of contents will be incorrect -->
 
+!TODO[Style notes:
+* Graphs:
+    * Continuous axes which show theoretical limits should have expand = c(0, 0), axes which do not show those limits should have some expansion
+]
+
 <!-- this adds an image in gitbook output --> 
 <img src="figures/cover.png" width="315" height="445" alt="Cover image" align="right" style="margin: 0 1em 0 1em" />
 

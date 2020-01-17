@@ -7,6 +7,7 @@
 % Modified by Sam Evans (sam@samuelevansresearch.org), 2007
 % Modified by John McManigle (john@oxfordechoes.com), 2015
 % Modified by Ulrik Lyngs (ulrik.lyngs@cs.ox.ac.uk), 2018, for use with R Markdown
+% Modified by Matt Jaquiery (matt.jaquiery@psy.ox.ac.uk), 2020
 %
 % Ulrik Lyngs, 25 Nov 2018: Following John McManigle, broad permissions are granted to use, modify, and distribute this software
 % as specified in the MIT License included in this distribution's LICENSE file.
@@ -107,6 +108,14 @@ $endif$
 % Uncomment this if you want equation numbers per section (2.3.12), instead of per chapter (2.18):
 %\numberwithin{equation}{subsection}
 
+
+%MJ Jan 2020: preregistration image
+% https://tex.stackexchange.com/a/139150
+\DeclareRobustCommand{\prereg}{%
+  \begingroup\normalfont
+  \includegraphics[height=\baselineskip]{figures/preregistered.png}%
+  \endgroup
+}
 
 %%%%% THESIS / TITLE PAGE INFORMATION
 % Everybody needs to complete the following:
