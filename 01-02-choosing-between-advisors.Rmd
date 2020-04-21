@@ -8,7 +8,7 @@ output:
 documentclass: book
 ---
 
-```{r setup, echo = F, include = F}
+```{r setup 01-02, echo = F, include = F}
 options(
   tinytex.verbose = TRUE
   )
@@ -612,7 +612,7 @@ tmp.print <- tmp %>%
   select(timePoint, questionText, y.bs, ymin.bs, ymax.bs, 
          y, ymin, ymax, bf, estimate, p.value, sig) %>%
   mutate(
-    p.value = num2str(p.value, precision = 3, isProportion = T),
+    p.value = prop2str(p.value),
     bf = num2str(bf),
     sig = if_else(sig == T, "$*$", "")
   ) %>%
@@ -683,7 +683,7 @@ ggplot(participants.byBlock, aes(x = agreeRateDifference.block3,
   geom_smooth(method = 'lm', formula = y ~ x, fullrange = T, level = .99, 
               color = "black", linetype = "dashed", fill = "grey", 
               alpha = 0.2) +
-  geom_annotate(label = txt, colour = 'black', 
+  annotate(geom = 'label', label = txt, colour = 'black', 
             size = 5, x = .15, y = .1) +
   labs(x = "Block 3 Bias Sharing agreement rate difference",
        y = "P(Bias Sharing chosen | Block > 3)") +
@@ -743,7 +743,9 @@ ggplot(tmp, aes(x = agreeRateDifference.binary,
                position = position_dodge(dw)) +
   # points with a nudge on the x axis (must be after axis is categorical)
   geom_point(aes(x = as.numeric(agreeRateDifference.binary) - (dw / 4)), 
-             position = position_dodge(dw), size = 1.5, alpha = .8) +
+             position = position_jitterdodge(dodge.width = dw, 
+                                             jitter.width = dw / 4), 
+             size = 1.5, alpha = .8) +
   scale_color_discrete(name = 'Most picked in block 3:') +
   scale_y_continuous(limits = c(0, 1)) + 
   labs(x = "Relative advisor agreement in block 3",
@@ -806,7 +808,7 @@ ggplot(agreementCoefs, aes(x = block, y = coef)) +
   geom_point(size = 5) +
   geom_smooth(method = 'lm', aes(x = as.numeric(block)), alpha = 0.2, 
               colour = "black") +
-  annotate(geom = 'text', x = agreementCoefs$block[1], 
+  annotate(geom = 'label', x = agreementCoefs$block[1], 
            y = min(agreementCoefs$coef), label = txt,
            hjust = 'left') +
   labs(x = "Block",
@@ -885,13 +887,13 @@ questionnaires %>%
   ggplot(aes(x = aicPickRate, y = answer)) +
   geom_smooth(method = 'lm', aes(colour = sig), fullrange = T) + 
   geom_point() + 
-  geom_text(aes(label = equation, x = 0.1, y = 95), 
+  geom_label(aes(label = equation, x = 0.1, y = 95), 
             data = coefs, hjust = 'left') +
   facet_wrap(~questionTextShort) +
   scale_y_continuous(limits = c(0, 100), expand = c(0,0)) +
   scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
   scale_colour_manual(values = c('black', 'blue'), name = 'p < .05') +
-  # coord_fixed(1/100) + 
+  # coord_fixed(1/100) +
   labs(legend = NULL,
        x = 'p(Bias Sharing advisor selected)',
        y = "Questionnaire response") +
@@ -938,7 +940,7 @@ tmp %>%
   ggplot(aes(x = aicPickRate, y = difference)) +
   geom_smooth(method = 'lm', aes(colour = sig), fullrange = T) + 
   geom_point() + 
-  geom_text(aes(label = equation, x = 0.1, y = 95), 
+  geom_label(aes(label = equation, x = 0.1, y = 95), 
             data = coefs, hjust = 'left') +
   facet_wrap(~questionTextShort) +
   scale_y_continuous() +
@@ -952,7 +954,76 @@ tmp %>%
 
 ```
 
+```{r}
+tmp <- questionnaires %>% 
+  as_tibble() %>%
+  filter(timePoint == 4) %>%
+  mutate(advisorId = unlist(advisorId)) %>%
+  select(participantId, advisorId, questionTextShort, answer) %>%
+  group_by(participantId, advisorId, questionTextShort) %>%
+  summarise(answer = mean(answer)) %>%
+  pivot_wider(names_from = questionTextShort, values_from = answer)
+```
+
+There was a strong correlation between trustworthiness and accuracy ($r$ = `r prop2str(cor(tmp$Trustworthy, tmp$Accurate), minPrefix = NA)`), and thus it was probable that the variance in the questionnaire responses explained by advisor preference was principally driven by this shared component. This was borne out by nested multiple regression Table \@ref{tab:ex1-questionnaires-additive-variance-explained-t}, which demonstrated that a model using accuracy to predict advisor preference was not significantly improved by including trustworthiness.
+
+```{r ex1-questionnaires-additive-variance-explained-r}
+
+kableModelComparison(list(equation.1, equation.2, equation.3, equation.4),
+                     caption = "Table \\label{tab:ex1-questionnaires-additive-variance-explained-t}: Iterative model comparison predicting advisor choice from questionnaire scores")
+
+```
+
+#### Subjective and objective measures of influence
+
+```{r}
+
+tmp <- participants[,c('participantId', 'aicInfluence', 'aiuInfluence')]
+tmp <- melt(tmp, id.vars = c('participantId'), value.name = 'influence', variable.name = 'advisor')
+levels(tmp$advisor) <- c(adviceTypes$AiC, adviceTypes$AiU)
+for (p in 1:dim(tmp)[1]) {
+  tmp$influence.Q[p] <- 
+    questionnaires$answer[
+      which(
+        questionnaires$participantId == tmp$participantId[p]
+        & questionnaires$questionNumber == questionnaireDimensions$influence
+        & questionnaires$adviceType == tmp$advisor[p]
+        & questionnaires$timePoint == 4
+        )
+      ]
+}
+
+equations <- NULL
+for (i in 1:2) {
+  equation <- lm(influence.Q ~ influence, data = tmp[which(tmp$advisor == i),])
+  s <- summary(equation)
+  equationText <- paste0(
+    lmToStr(equation, c('x'), roundTo = 2),
+    '; p ', lteq(prop2str(s$coefficients[2, 4], minPrefix = NA)),
+    '; R^2adj ', lteq(prop2str(s$adj.r.squared, minPrefix = NA))
+    )
+  equations <- rbind(equations, data.frame(advisor = i, str = equationText))
+}
+equations$advisor <- factor(equations$advisor)
+
+```
+
+Measures of influence were obtained in two distinct ways: through a self-report questionnaire and through observation of behaviour. To the extent that participants have an insight into their behaviour, these measures should correlate positively with one another. This proved to be the case (using the post-experiment responses for simplicity) for both the agree-in-confidence advisor and the agree-in-uncertainty advisor, as shown in Figure \@ref{fig:ex1-subjective-objective-influence}.
+
+```{r ex1-subjective-objective-influence, fig.align='center', fig.cap="Behavioural and self-report measures of influence: scatterplot showing correlations between influence as measured by the change in confidence following advice vs self-report.", out.width="100%"}
+ggplot(tmp, aes(x = influence, y = influence.Q, color = advisor)) +
+  geom_point() +
+  geom_smooth(method = 'lm', aes(fill = advisor), alpha = 0.1, fullrange = T) +
+  scale_color_discrete(name = 'Advisor', labels = c('Bias Sharing', 'Anti Bias')) +
+  scale_fill_discrete(name = 'Advisor', labels = c('Bias Sharing', 'Anti Bias')) +
+  labs(x = 'Behavioural influence',
+       y = '"How much are you influenced by\nthe opinions of this person?"') +
+  geom_label(x = 10, aes(y = 30 + 20 * (advisor == 1), label = str), data = equations) 
+```
+
 ### Discussion {#ex1-d}
+
+
 
 ## Online experiments {#ex-online}
 

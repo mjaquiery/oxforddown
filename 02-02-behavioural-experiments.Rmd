@@ -10,6 +10,29 @@ output:
 documentclass: book
 ---
 
+```{r setup 02-02, echo = F, include = F}
+
+knitr::opts_chunk$set(
+  echo = F, warnings = F, messages = F
+)
+
+library(ggplot2)
+
+theme_set(
+  theme_light() +
+    theme(
+      panel.background = element_blank(),
+      panel.border = element_blank(),
+      panel.grid.minor = element_blank(),
+      panel.grid.major = element_blank(),
+      axis.line = element_line(colour = "black"),
+      text = element_text(size = 14),
+      legend.position = "top"
+    )
+)
+
+```
+
 # Behavioural responses to advice contexts {#chapter-context-benevolence}
 
 <!-- 
@@ -134,17 +157,23 @@ Participants performed as expected, decreasing the error between the midpoint of
 
 ```{r, fig.align='center', fig.cap="Mean answer error for initial estimates and final decisions. Faint lines show means for individual participants collapsed across trials, while boxplots, violins, and the heavy dashed line show aggregate participant means.", out.width="80%", echo=F}
 
-ggplot(aggregate(responseError ~ 
-                   responseMarker + decision + pid,
-                 decisions, mean), 
-       aes(x = decision, y = responseError)) +
-  geom_violin(alpha = .25, colour = NA, aes(fill = decision)) +
-  geom_boxplot(fill = NA, outlier.color = NA) +
-  geom_line(alpha = .25, aes(group = pid)) + 
+tmp <- decisions %>%
+  select(pid, decision, responseError) %>%
+  group_by(pid, decision) %>%
+  summarise(responseError = mean(responseError)) %>%
+  pivot_wider(names_from = decision, values_from = responseError) %>%
+  mutate(improved = last < first) %>%
+  pivot_longer(cols = c(first, last), 
+               names_to = "decision", 
+               values_to = "responseError")
+
+ggplot(tmp, aes(x = decision, y = responseError)) +
+  geom_violin(fill = NA, size = 2) +
   stat_summary(geom = "line", fun.y = mean,
-               aes(group = 1, linetype = "mean"), size = 1.5) +
-  scale_linetype_manual(values = c("dashed")) +
-  scale_color_discrete(guide = 'none') + 
+               aes(group = 1, linetype = "mean"), size = 1) +
+  geom_line(alpha = .5, aes(group = pid, colour = improved)) + 
+  scale_linetype_manual(name = "", values = c("solid")) +
+  scale_color_discrete(name = "", labels = c("deteriorated", "improved")) +
   labs(x = "decision", 
        y = "|target - response marker centre| (years)")
 
