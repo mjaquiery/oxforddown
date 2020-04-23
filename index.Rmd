@@ -66,8 +66,8 @@ documentclass: book
 source('scripts_and_filters/create_chunk_options.R')
 ```
 
-```{r}
-knitr::opts_chunk$set(echo = F)
+```{r, echo = F, include = F}
+source('scripts_and_filters/general_setup.R')
 ```
 
 <!--

@@ -22,6 +22,19 @@ documentclass: book
     * Continuous axes which show theoretical limits should have expand = c(0, 0), axes which do not show those limits should have some expansion
 ]
 
+!TODO[update evo models to use this terminology]
+$a_{i,t}$ - advice agent $i$ receives at time $t$
+$b_{i,t}$ - bias of agent $i$ at time $t$
+$c_{i,t}^{I/A/F}$ - agent $i$'s confidence in their initial/advisory/final estimate at time $t$
+$e_{i,t}^{I/A/F}$ - agent $i$'s initial/advisory/final estimate at time $t$
+$i$, $j$ - agent identifiers
+$s_{i,t}$ - sensitivity of agent $s$ at time $t$
+$u_i$ - fitness/utility of agent $i$
+$v$ - true value in the world
+$\lambda$ - learning rate
+$\omega_{i,t}$ - weighting for agent $i$'s estimate at time $t$
+
+
 <!-- this adds an image in gitbook output --> 
 <img src="figures/cover.png" width="315" height="445" alt="Cover image" align="right" style="margin: 0 1em 0 1em" />
 
@@ -43,7 +56,7 @@ Advice is broadly defined as information which comes from a social source. Advic
 
 Advice occurs in the context of a decision, and forms a part of the information which is integrated during the decision-making process to produce a decision. To the extent that the decision reached differs from the decision that would have occurred had the advice not been presented, the advice has had an effect on the decision; to the extent that this difference changes the decision in a way consistent with the advice, the advice has been 'taken' (as opposed to 'rejected').
 
-It is tacitly implied by many operationalizations of advice-taking that the informational content of the advice determines the extent to which it is taken or rejected `citation needed`. Insofar as the identity of the advisor matters, it matters because it functions as a cue to the informational content of the advice. This is likely a major oversimplification, however, because in many real-world contexts advice-giving and advice-taking form part of a developing social relationship: being consulted for advice and having one's advice followed are inherently rewarding [@hertzIntrinsicValueSocial2018; @hertzNeuralComputationsUnderpinning2017]; and taking advice can serve as a (sometimes costly) social signal of valuing a relationship with a person or group [@byrneOstracismReducesReliance2016]. Furthermore, some authors have argued that people may perceive taking advice as sacrificing their independence or autonomy [@CITATIONNEEDED]!TODO. While this thesis follows previous literature in omitting to consider the wider social concerns influencing the taking of advice, it is nevertheless important to remember that the processes investigated herein take place in a variety of social contexts where complex social agents attempt to optimise over numerous goals over numerous timescales.
+It is tacitly implied by many operationalizations of advice-taking that the informational content of the advice determines the extent to which it is taken or rejected `citation needed`. Insofar as the identity of the advisor matters, it matters because it functions as a cue to the informational content of the advice. This is likely a major oversimplification, however, because in many real-world contexts advice-giving and advice-taking form part of a developing social relationship: being consulted for advice and having one's advice followed are inherently rewarding [@hertzIntrinsicValueSocial2018; @hertzNeuralComputationsUnderpinning2017]; and taking advice can serve as a (sometimes costly) social signal of valuing a relationship with a person or group [@byrneOstracismReducesReliance2016]. Furthermore, some authors have argued that people may perceive taking advice as sacrificing their independence or autonomy !TODO[@CITATIONNEEDED]. While this thesis follows previous literature in omitting to consider the wider social concerns influencing the taking of advice, it is nevertheless important to remember that the processes investigated herein take place in a variety of social contexts where complex social agents attempt to optimise over numerous goals over numerous timescales.
 
 ## Three-factor model of trust {-}
 
@@ -83,7 +96,14 @@ The key insight is to observe that the error is drawn from a normal distribution
 
 Observe that this formulation is true no matter the value of $N$. On average, it is always better to have more estimates than fewer. This suggests that, even in the situation where there are only two estimates (the decision-maker's and the advisor's), the best policy will be to incorporate both estimates into the final decision.
 
-The variance of the normal distribution from which errors are derived ($\sigma^{2}_{i}$) is, in the example above, drawn from a normal distribution itself ($\sigma^{2}_{i} \sim \mathcal{N}(\mu=0,\,\text{sd}^{2})$meaning that it is also cancelled out on average over repeated samples). Where few estimates are taken, weighting those estimates by the variance of the error distributions will increase the accuracy of the estimates in proportion to the difference between the variances. Many experimental implementations of this model avoid weighting issues by calibrating decision-makers and advisors to be equally accurate on average ($\sigma^{2}_{\text{decision-maker}}=\sigma^{2}_{\text{advisor}}$). The result of this constraint is that the optimal policy is simply to average all estimates together.
+The variance of the normal distribution from which errors are derived ($\sigma^{2}_{i}$) is, in the example above, drawn from a normal distribution itself ($\sigma^{2}_{i} \sim \mathcal{N}(\mu=0,\,\text{sd}^{2})$meaning that it is also cancelled out on average over repeated samples). Where few estimates are taken, weighting those estimates by the variance of the error distributions will increase the accuracy of the estimates in proportion to the difference between the variances:
+
+$$e^F = \frac{\frac1N \sum_{i}^{N} \omega_i e_i^I}{\sum_i^N \omega_i}$$
+Where $\omega_i$ is $1/\sigma^2_i$.
+
+Many experimental implementations of this model avoid weighting issues by calibrating decision-makers and advisors to be equally accurate on average ($\sigma^{2}_{\text{decision-maker}}=\sigma^{2}_{\text{advisor}}$). The result of this constraint is that the optimal policy is simply to average all estimates together:
+
+$$e^F = \frac{1}{N}\sum_i^N e_i^I \approx v$$
 
 [^symmetrical-distribution]: The normal distribution is well-supported by empirical evidence, but note that any symmetrical distribution around 0 will lead to the same conclusion.
 
@@ -95,49 +115,9 @@ Explanations for egocentric discounting are usually framed in terms of personal-
 
 In the course of this thesis `crossref needed`, I demonstrate that egocentric discounting may be a stable metastrategy which protects against exploitation, carelessness, incompetence, and miscommunication. From this perspective, the normative model pertains to a particular instantiation of a problem with questionable ecological validity given the typical ethology of advice-taking in humans. While such considerations affect the conclusions one draws from egocentric discounting relative to the normative model, they do not detract substantially from the practice of using the normative model as an optimum 'set point' from which to evaluate advice-taking behaviour.
 
-## Evaluation of advice {-}
-
-The value of advice, in informational terms, is measured in relation to the optimal decision. It is necessary to distinguish two perspectives on the value of advice: the optimality of the decision recommended by the advice itself; and the optimality of the decision based on advice relative to the decision which would have been made had the advice not been received. This distinction is necessary because people alter their advice-giving behaviour in anticipation of discounting on the part of the decision-maker [@CITATIONNEEDED; for a case in human-machine teaming see @azariaStrategicAdviceProvision2016]!TODO, somewhat akin to starting negotiations with a higher demand than one is hoping to settle for. 
-
-A single piece of advice can be evaluated using its own properties and the properties of the advisor giving the advice. Furthermore, that evaluation can serve to update the properties of the advisor. A piece of advice's own properties will include its plausibility (e.g. participants in estimation tasks discount advice which is distant from their own initial estimates more heavily [@yanivReceivingOtherPeople2004]), while the properties of the advisor will include the advisor's trustworthiness ([see above](#three-factor-model-of-trust)). The updating of trust following experience of advice is likely to be largely in the domain of [ability](#ability), although other domains may be affected where the advice is particularly egregious. 
-
-## Updating advisor evaluations {-}
-
-While a single piece of advice must be taken on its own terms, people can construct relatively accurate estimates of advisors' advice when provided with feedback on the decisions they use the advice to make [@pescetelliUseMetacognitiveSignals2017; @sahCheapTalkCredibility2013; @yanivAdviceTakingDecision2000]. This likely happens as an analogue of reinforcement learning, where feedback allows an error signal to be used to update the estimate of the advisor's ability ($\hat{s}^{a}$) rather than one's own beliefs about the world, according to some learning rate ($\lambda$). 
-
-\begin{align}
-\text{this is wrong; need to check RL models for an analogue}\\
-\hat{s}_{t+1} = \hat{s}_{t} + |e^{a}_{t} - v|\cdot\lambda
-(\#eq:advisor-evaluation)
-\end{align}
-
-## Advisor evaluation without feedback {-}
-
-Where feedback is not available, participants in experiments continue to demonstrate an ability to respond rationally to differences in advisor quality [@pescetelliUseMetacognitiveSignals2017]. This is evidently not done through access to the correct real-world values, because feedback providing those values is unavailable, and, were participants aware of those values themselves, it stands to reason they would have provided those values (and thus not require advice!). Pescetelli and Yeung [-@pescetelliUseMetacognitiveSignals2017] suggest the mechanism for this ability to discriminate between advisors in the absence of feedback is performing updates based on confidence-weighted agreement. 
-
-### Agreement {-}
-
-Consider first the non-weighted agreement case, where the advisor's estimate at time $t$ ($e^{a}_{t}$) and the decision-maker's estimates ($e^d$) are binary ($\in0,1$). The estimate of the advisor's ability ($\hat{s}^{a}$) is updated positively if the advisor and decision-maker agree, and negatively otherwise, according to the learning rate $\lambda$.
-
-\begin{align}
-\hat{s}^a_{t+1} = \hat{s}^a_{t} + (-2 \text{ } |e^{d}_{t}-e^{a}_{t}|+1)\cdot\lambda
-(\#eq:advisor-agreement-binary)
-\end{align}
-
-#### Confidence-weighted agreement {-}
-
-The updating of advice contingent on agreement may be weighted by confidence in the initial decision ($c^d$), such that agreement and disagreement are considered more informative about the quality of the advice when the decision with which they agree or disagree is more certain. 
-
-\begin{align}
-\hat{s}^a_{t+1} = \hat{s}^a_{t} + (-2 \text{ } |e^{d}_{t}-e^{a}_{t}|+1)\cdot c^d_t \cdot \lambda
-(\#eq:advisor-agreement-weighted-binary)
-\end{align}
-
-#### Continuous estimate case {-}
-
 ## Homophily and echo-chambers {-}
 
-Homophily is the ubiquitous phenomenon that individuals more closely connected to one another within a social network tend to be more similar to one another than would be expected by chance across numerous dimensions, from demographics to attitudes [@mcphersonBirdsFeatherHomophily2001]. Whether homophily in virtual social networks is responsible for increases in polarisation is debated. Proponents point to increases in polarisation (e.g. in politics: `Pew Research Center, 2014`!TODO), to empirical studies demonstrating homophily in virtual social networks [@cardosoTopicalHomophilyOnline2017; @colleoniEchoChamberPublic2014], and to studies examining selective exposure online [@kobayashiSELECTIVEEXPOSUREPOLITICAL2009], and to echo chambers: egregious examples of highly homophilous networks with pathological polarisation [@sunsteinRepublicCom2002; @sunsteinRepublicDividedDemocracy2018]. The empirical components of the argument are contested, with evidence that virtual social networks are less homogenous than offline social networks [and hence depolarising, @barberaHowSocialMedia2015], and that selective exposure is a somewhat dubious finding which does not show up clearly online [@garrettEchoChambersOnline2009; @garrettPoliticallyMotivatedReinforcement2009; @nelsonMythPartisanSelective2017; @searsSelectiveExposureInformation1967]. Modelling work demonstrates, however, that where there is a bias in assimilation of information, homophily exacerbates polarisation [@dandekarBiasedAssimilationHomophily2013]. Where polarisation in turn increases homophily, for example through selective exposure or avoidance, a self-reinforcing spiral emerges wherein social connections become increasingly homogenous and attitudes increasingly extreme [@songDynamicSpiralsPut2017]. 
+Homophily is the ubiquitous phenomenon that individuals more closely connected to one another within a social network tend to be more similar to one another than would be expected by chance across numerous dimensions, from demographics to attitudes [@mcphersonBirdsFeatherHomophily2001]. Whether homophily in virtual social networks is responsible for increases in polarisation is debated. Proponents point to increases in polarisation (e.g. in politics: !TODO[`Pew Research Center, 2014`]), to empirical studies demonstrating homophily in virtual social networks [@cardosoTopicalHomophilyOnline2017; @colleoniEchoChamberPublic2014], and to studies examining selective exposure online [@kobayashiSELECTIVEEXPOSUREPOLITICAL2009], and to echo chambers: egregious examples of highly homophilous networks with pathological polarisation [@sunsteinRepublicCom2002; @sunsteinRepublicDividedDemocracy2018]. The empirical components of the argument are contested, with evidence that virtual social networks are less homogenous than offline social networks [and hence depolarising, @barberaHowSocialMedia2015], and that selective exposure is a somewhat dubious finding which does not show up clearly online [@garrettEchoChambersOnline2009; @garrettPoliticallyMotivatedReinforcement2009; @nelsonMythPartisanSelective2017; @searsSelectiveExposureInformation1967]. Modelling work demonstrates, however, that where there is a bias in assimilation of information, homophily exacerbates polarisation [@dandekarBiasedAssimilationHomophily2013]. Where polarisation in turn increases homophily, for example through selective exposure or avoidance, a self-reinforcing spiral emerges wherein social connections become increasingly homogenous and attitudes increasingly extreme [@songDynamicSpiralsPut2017]. 
 
 ## Source selection and information weighting {-}
 

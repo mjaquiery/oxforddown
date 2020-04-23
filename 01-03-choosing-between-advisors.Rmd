@@ -2,7 +2,7 @@
 output:
   bookdown::pdf_document2:
     template: templates/brief_template.tex
-    keep_tex: true
+    keep_tex: false
   bookdown::word_document2: default
   bookdown::html_document2: default
 documentclass: book

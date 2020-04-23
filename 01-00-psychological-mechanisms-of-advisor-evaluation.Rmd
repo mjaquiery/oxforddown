@@ -2,7 +2,6 @@
 output:
   bookdown::pdf_document2:
     template: templates/brief_template.tex
-    keep_tex:  true
   bookdown::word_document2: default
   bookdown::html_document2: default
 documentclass: book
@@ -15,7 +14,129 @@ documentclass: book
 
 Where feedback is unavailable, people may use their own sense of certainty as a yardstick for evaluating advice [@pescetelliRoleDecisionConfidence2018; @pescetelliUseMetacognitiveSignals2017]: advisors who agree when one is confident are perceived as more helpful; while those who disagree when one is confident are perceived as less helpful. Confidence serves as a proxy for objective feedback, and functions well in this role insofar as the judge has high metacognitive resolution (i.e. higher confidence is indicative of a greater probability of being correct).
 
-## Judge-advisor system {-}
+## Use of advice {-}
+
+[Normative models of advice taking](#normative-models-of-advice-taking) state that averaging estimates minimises errors. As discussed at length in [Section III](#context-of-advice), the assumptions underlying the normative model do not always hold in the real world. The performance of the normative model can be characterised according to differences between the advisor and the decision-maker on ability and bias !TODO[soll and larick, soll and ? citations; how does PAR relate to what's going on here?]. Recall that the normative model states that advice should contribute to the final decision in proportion to the ability of the advisor compared to the decision-maker.
+
+$$e_i^F = \frac{\omega_i e_i^I + \omega_j e_j^I}{2}$$
+
+Where agent $i$ is the decision-maker and agent $j$ is the advisor. This weighting can be simplified to be expressed only in terms of the decision-maker's weighting of the advisor because the two are constrained to sum to 1 by virtue of being relative to one another:
+
+$$
+\begin{align}
+\omega_i + \omega_j &= 1\\
+\omega_j &= 1 - \omega_i\\
+\therefore e_i^F &= \frac{(1-\omega_j) e_i^I + \omega_j a_i}{2}
+\end{align}
+$$
+
+Where $a_i$ is the advice received (i.e. agent $j$'s initial estimate - $a_i \equiv e_j^I$). In the normative model, the weighting is equivalent to the ratio of variance of the errors made by each agent:
+
+$$
+\omega_j = \frac{\sigma^2_j}{\sigma^2_j + \sigma^2_i}
+$$
+
+The normative model thus represents weighting by relative ability. Precise knowledge of the ability of others relative to oneself is rarely available in the real world, however, and, as discussed in [Section III](#context-of-advice), other assumptions concerning the trustworthiness or interpretability of advice may be violated.
+
+The normative model can be adapted to provide a more psychologically-realistic account of advice usage by substituting the [three factor model of trust](#three-factor-model-of-trust) into the equations in place of the ability variable. We start with the statement within the three factor model that trust ($\omega$) is proportional to ability ($a$), benevolence ($b$), and integrity ($g$).
+
+$$\text{trust} \propto \text{ability} + \text{benvolence} + \text{integrity}$$
+
+We can thus replace the measure of accuracy in the normative model with the measure of trust in order to calculate the relative weighting:
+
+$$
+\omega_j = \frac{\text{trust}_j}{\text{trust}_j + \text{trust}_i}
+$$
+
+At this point we may question whether the variable $\text{trust}_i$ is a meaningful property or simply an artefact of mathematical symbol manipulation. Mathematically it provides a fixed point against which trustworthiness of advisors can be measured, allowing for scaling weightings meaningfully across different advisors in different decisions. In real world terms, while it is generally unlikely that $\text{benevolence}_i$ and $\text{integrity}_i$ will be anything less than maximal, perceptions of one's own ability ($\text{ability}_i$) are likely to allow for others to exceed it. I make no strong claims on the relationship between trust and its component variables other than proportionality, and within this conception it is meaningful to consider weighting as a property of trust in another's judgement relative to one's own, adjusted in some manner for the perception of that other's benevolence and integrity. If the concept of self-trust still appears untenable, note that $\text{trust}_i$ can be replaced with a constant without compromising the equations.
+
+We thus return to the normative model of advice-taking, but with an alternative derivation of the weighting between advice and intial estimate:
+
+$$e_i^F = \frac{(1-\omega_j) e_i^I + \omega_j a_i}{2}$$
+
+### Critique of the aggregation model
+
+This conception of advice-taking as a weighted aggregation process between an initial estimate and advice underpins both the modelling and the experiments presented in this thesis. It is thus worth taking a little space to highlight areas in which this model is known to depart from reality.
+
+#### Generality beyond judge-advisor systems
+
+Firstly, the model is an idealised situation approximated by the [experimental method](#judge-advisor-system): a decision-maker makes an explicit initial estimate, then receives advice, then makes an explicit final decision. Yaniv !TODO[it may have been Rader, or someone else] showed that preventing decision-makers from making initial decisions resulted in very different advice weighting, suggesting that this may be a model of a specific scenario rather than of advice integration per se. The model presented here could in principle explain an integration process where an initial estimate can only be made after the advice is known, but empically performs poorly. At best, it could be argued that pre-exposure to the advice either anchors the initial estimate (thus moving $e_i^I$ systematically closer to $a_i$), or that having to trust advice because one cannot make one's own decision inflates the weighting of the advisor.
+
+#### Multiple advisory estimates
+
+Secondly, the model does not perform well when multiple advisors are consulted. The normative model, and the psychological derivative, predicts that a decision-maker's estimate ought to be weighted in conjunction with the other estimates. In other words, as the number of advisory estimates increases, the weight of the initial estimate should decrease. Research !TODO[@CITATION_NEEDED] shows that this does not happen: the weight of the initial estimate stays relatively constant while the weights of the advisor estimates are reduced. If a decision-maker were to average evenly their initial estimate with an advisor estimate ($\omega_i = .5$; $\omega_j = .5$), adding an extra advisor estimate would result in the weights of the advice being halved while the weight of the initial decision remained constant ($\omega_i = .5$; $\omega_{j \neq i} = .25$).
+
+#### Individual trial data
+
+The model is supported by patterns in averages. Analysis of individual trials shows that the aggregate patterns of advice-taking appear to be roughly distributed between an averaging strategy and a picking strategy !TODO[@CITATION_NEEDED someone on pick vs average, maybe soll?]. The model, derived from these patterns, approximates the contribution of an individual trial to the overall average rather than the actual advice-taking strategy on any given trial. 
+
+### Justification for use of the aggregation model
+
+The criticisms above are important, but they do not invalidate the model for use in the present project. Here we seek to establish how differences in advice taking manifest according to properties of advisors. These differences are well characterised by the model, especially in the judge-advisor system used for the experiments. All models are wrong !TODO[cite George Box], and inclusion of a more complex model capable of handling the cases outlined above would require greatly increased complexity for relatively little gain in explanatory power. For studying the questions at hand, the psychological model is an appropriate and useful approximation of human behaviour.
+
+## Updating advisor weights {-}
+
+The weights assigned to the advisors (relative to the decision-maker themself) are subject to change as the result of experience. This experience can be exogenous or endogenous to the decision-making task. In the exogenous case, advisors may be labelled in a particular way !TODO[cite some experiments manipulating advisor labelling] or have some summary of their performance displayed !TODO[cite some experiments showing advisor performance data as a prompt]. Endogenous experience refers to the information that advice on a given trial carries about the trustworthiness of an advisor. Exogenous experience is relatively straightforward, but endogenous experience requires some explanation.
+
+Endogenous experience of advice means that the weighting of an advisor is in part dependent upon the past advice offered by that advisor. As each piece of advice is evaluated, the overall weighting of the advisor is updated accordingly. For clarity, two simplifiying assumptions are made in the explanation below. 
+
+Firstly, while it is probable that properties of the advice are used to inform the dimensions of ability, integrity, and benevolence simultaneously, the examples below will deal with ability in isolation. Another project could explore in detail how experience of advice on any given trial updates an advisor's position in 3-dimensional trust space in a Bayesian manner according to the relative certainties about each dimension. This would capture the task of assigning blame for erroneous advice (e.g. was it unintentionally poor - a failure of ability - or deliberately misleading - a failure of benevolence?). Such an undertaking is beyond the scope of this project.
+
+Secondly, it is assumed that advice is judged on its own merit as an estimate rather than on its usefulness as advice. The former means that advice is assessed in terms of the optimality of the decision recommended by the advice itself. The latter assesses advice based on the optimality of the decision based on advice relative to the optimality of the decision which *would have been made had the advice not been received*. There is some evidence that people alter their advice-giving behaviour in anticipation of discounting on the part of the decision-maker !TODO[@CITATIONNEEDED; for a case in human-machine teaming see @azariaStrategicAdviceProvision2016], somewhat akin to starting negotiations with a higher demand than one is hoping to settle for. There is no evidence as yet as to whether decision-makers anticipate and adjust for this adjustment on the part of the advisor. 
+
+For the questions considered here, conclusions obtained under these simplifying assumptions are likely to hold even when the additional complexity is restored. The effects in the real world of interactivity between trust dimensions and game theoretic adjustments in the giving and interpretation of advice are likely to be small in comparison to general effects of advisor updating. 
+
+### Evaluation of advice {-}
+
+A single piece of advice can be evaluated using its own properties and the properties of the advisor giving the advice. Furthermore, that evaluation can serve to update the properties of the advisor. A piece of advice's own properties will include its plausibility (e.g. participants in estimation tasks discount advice which is distant from their own initial estimates more heavily [@yanivReceivingOtherPeople2004]), while the properties of the advisor will include the advisor's trustworthiness ([see above](#use-of-advice)). The updating of trust following experience of advice is likely to be largely in the domain of [ability](#ability), although other domains may be affected where the advice is particularly egregious. 
+
+## Updating advisor evaluations {-}
+
+While a single piece of advice must be taken on its own terms, people can construct relatively accurate estimates of advisors' advice when provided with feedback on the decisions they use the advice to make [@pescetelliUseMetacognitiveSignals2017; @sahCheapTalkCredibility2013; @yanivAdviceTakingDecision2000]. This likely happens as an analogue of reinforcement learning, where feedback allows an error signal to be used to update the estimate of the advisor's ability ($\hat{s}^{a}$) rather than one's own beliefs about the world, according to some learning rate ($\lambda$). 
+
+\begin{align}
+\text{this is wrong; need to check RL models for an analogue}\\
+\hat{s}_{t+1} = \hat{s}_{t} + |e^{a}_{t} - v|\cdot\lambda
+(\#eq:advisor-evaluation)
+\end{align}
+
+### Criticism of the advisor evalutation model
+
+#### Ecological validity
+
+While many experiments have established the existence reinforcement learning in humans and other animals, it is unclear whether reinforcement learning operates in the social domain in which advising takes place. It is not obvious that there are many situations in the course of everyday relationships which can be characterised by the rapid advice-feedback cycle required to learn about advisor ability in the manner modelled above. 
+
+!TODO[who wrote this paper] argued in a review that a wide variety of social phenomena could be explained via reinforcement learning processes. Additionally, Heyes and colleagues have argued that social learning is wholly explicable in terms of general reinforcement learning processes !TODO[@CITATION_NEEDED]. Reinforcement learning in the social domain operates on the basis of rapid feedback, just as in the non-social domain. Below, the advisor evaluation model is extended to cases where objective feedback is not available by substituting the decision-maker's confidence for objective feedback. While not foolproof, the method allows better-than-average approximation of the quality of advisors.
+
+## Advisor evaluation without feedback {-}
+
+Where feedback is not available, participants in experiments continue to demonstrate an ability to respond rationally to differences in advisor quality [@pescetelliUseMetacognitiveSignals2017]. This is evidently not done through access to the correct real-world values, because feedback providing those values is unavailable, and, were participants aware of those values themselves, it stands to reason they would have provided those values (and thus not require advice!). Pescetelli and Yeung [-@pescetelliUseMetacognitiveSignals2017] suggest the mechanism for this ability to discriminate between advisors in the absence of feedback is performing updates based on confidence-weighted agreement. 
+
+### Agreement {-}
+
+Consider first the non-weighted agreement case, where the advisor's estimate at time $t$ ($e^{a}_{t}$) and the decision-maker's estimates ($e^d$) are binary ($\in0,1$). The estimate of the advisor's ability ($\hat{s}^{a}$) is updated positively if the advisor and decision-maker agree, and negatively otherwise, according to the learning rate $\lambda$.
+
+\begin{align}
+\hat{s}^a_{t+1} = \hat{s}^a_{t} + (-2 \text{ } |e^{d}_{t}-e^{a}_{t}|+1)\cdot\lambda
+(\#eq:advisor-agreement-binary)
+\end{align}
+
+#### Confidence-weighted agreement {-}
+
+The updating of advice contingent on agreement may be weighted by confidence in the initial decision ($c^d$), such that agreement and disagreement are considered more informative about the quality of the advice when the decision with which they agree or disagree is more certain. 
+
+\begin{align}
+\hat{s}^a_{t+1} = \hat{s}^a_{t} + (-2 \text{ } |e^{d}_{t}-e^{a}_{t}|+1)\cdot c^d_t \cdot \lambda
+(\#eq:advisor-agreement-weighted-binary)
+\end{align}
+
+#### Continuous estimate case {-}
+
+## Measuring advice-taking
+
+### Judge-advisor system {-}
+
+
 
 ## Table of experiments {-}
 
