@@ -15,7 +15,29 @@ documentclass: book
 # Conclusion {#chapter-conclusion}
 
 <!-- 
-We may also want to have chapters looking more into the choice-influence relationships, perhaps with experiments which examine both simultaneously. Additionally, we could perhaps look into framing effects for advice - anecdotally it's possible that, when asked to choose between two rewarding options, people prefer advisors who offer advice in terms of which option to take rather than which option to avoid, and vice-versa for negatively reinforcing options (c.f. Kahneman's framing effects/loss aversion/etc).
+We may also want to have chapters looking more into the choice-influence relationships, perhaps with experiments which examine both simultaneously. Additionally, we could perhaps look into framing effects for advice - anecdotally it's possible that, when asked to choose between two rewarding options, people prefer advisors who offer advice in terms of which option to take rather than which option to avoid, and vice-versa for negatively reinforcing options (c.f. Kahneman's framing effects/loss aversion/etc.).
 -->
 
 I haven't wasted 3 years of my life and Nick's time.
+
+* I've demonstrated that the structure of information networks may be partially dependent upon psychological mechanisms of advisor evaluation. 
+
+* I've provided some evidence for a model of advisor evaluation in the absence of feedback and demonstrated how that model produces adverse network effects. 
+
+* I've shown how the information environment can affect advice taking, and I've provided and reviewed empirical evidence that humans can alter advice-taking flexibly depending on these contextual factors. 
+
+* I've modelled how the psychological mechanisms create an information network structure, and how that information network structure might use the flexibility to context to change advisor evaluation processes. 
+
+* I've demonstrated how those changes might attenuate or exacerbate the formation of pathological network structures. 
+
+## Open questions
+
+* People's social networks constrain whom they can receive advice from. Within these constraints, source selection processes operate to evaluate the relative (and absolute?) trustworthiness of each (or the most salient?) members. Is trustworthiness (or at least the ability component) modelled discretely for different domains, or is it unitary?  
+    * Perhaps a matter of association with a particular concept?  
+    * Quite possible associative processes drive source selection rather than direct comparisons.  
+    
+* Relative magnitude of advice from selected individuals in a social network vs. adverts/web searches/consulting experts.
+
+* Frequency of advice-seeking as characterised in the thesis.
+
+* Why do people lump group advice together before discounting - this seems idiotic even with the adapativeness of discounting...

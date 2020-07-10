@@ -1,36 +1,14 @@
 ---
-#########################################
-## options for knitting a single chapter #
-#########################################
 output:
-  bookdown::html_document2: default
-  bookdown::word_document2: default
   bookdown::pdf_document2:
     template: templates/brief_template.tex
+  bookdown::word_document2: default
+  bookdown::html_document2: default
 documentclass: book
 ---
 
 ```{r setup 02-02, echo = F, include = F}
-
-knitr::opts_chunk$set(
-  echo = F, warnings = F, messages = F
-)
-
-library(ggplot2)
-
-theme_set(
-  theme_light() +
-    theme(
-      panel.background = element_blank(),
-      panel.border = element_blank(),
-      panel.grid.minor = element_blank(),
-      panel.grid.major = element_blank(),
-      axis.line = element_line(colour = "black"),
-      text = element_text(size = 14),
-      legend.position = "top"
-    )
-)
-
+source('scripts_and_filters/general_setup.R')
 ```
 
 # Behavioural responses to advice contexts {#chapter-context-benevolence}
@@ -41,7 +19,9 @@ Present behavioural experiments in which we show sensitivity to both the advisor
 
 ## Benevolence of the advisor population
 
-The evolutionary models discussed [in the last chapter](#chapter-advice-taking-context) demonstrated that optimal advice-taking strategies depend in part upon the advice one receives being a genuine effort to help. Difference in benevolence, or the extent to which the interests of the advisor and the judge overlap, have been shown to affect levels of advice-taking. !TODO showed that, where advisors were paid contingent upon the quality of the final decision, advice-taking was higher than where advisors were paid a flat fee for providing advice. !TODO[lit review stuff - inc. Behrens/Hunt? social decision making]
+!TODO[Make sure to report in brief/as post mortem the results for the in/out group studies and the early direct benevolence experiments, and point readers to the full details.]
+
+The evolutionary models discussed [in the last chapter](#chapter-advice-taking-context) demonstrated that optimal advice-taking strategies depend in part upon the advice one receives being a genuine effort to help. Difference in benevolence, or the extent to which the interests of the advisor and the judge overlap, have been shown to affect levels of advice-taking. !TODO[@CITATION_NEEDED] showed that, where advisors were paid contingent upon the quality of the final decision, advice-taking was higher than where advisors were paid a flat fee for providing advice. !TODO[lit review stuff - inc. Behrens/Hunt? social decision making]
 
 Advice-taking can be contingent on the properties of the advice, or on the properties of the advisor. In order to maximise the value of advice while minimising the potential exposure to exploitation, advice-taking should be contingent on a combination of these factors. Where advice is plausible it should be weighted relatively equally, whether it comes from an advisor who is sometimes misleading or not, but where advice is more implausible it should only be trusted when it comes from an advisor who is never misleading. 
 
@@ -51,7 +31,7 @@ To explore whether people's behaviour matches this pattern, participants were re
 
 #### Procedure
 
-The procedure for these experiments follows the dates estimation task, described [previously](!TODO). Additionally, in this version, participants had to provide an assessment of the honesty of each advisory estimate they received before they could integrate it into their final decision.
+The procedure for these experiments follows the dates estimation task, described [previously](!TODO[link properly]). Additionally, in this version, participants had to provide an assessment of the honesty of each advisory estimate they received before they could integrate it into their final decision.
 
 ```{r, fig.align='center', fig.cap="Advice honesty rating: participants rated advice on a three-point scale according to whether they thought the advice was deceptive or honest.", out.width="80%", echo=F}
 knitr::include_graphics("figures/advice-honesty-rating.png")
@@ -324,4 +304,26 @@ The key difficulty in conducting behavioural experiments to test the effects of 
 
 We train people in two contexts, in both of which they receive advice with confidence from one of two advisors and see feedback on their final answers. In the first context, all the advice is well calibrated, and both advisors use either high or low confidence distributions. In the second context, one advisor uses a high and the other a low confidence distribution. Participants are then tested with a brief exposure to an advisor whose confidence distribution is drawn from the middle of the scale. Where participants are unprepared for different confidence mappings (the first context), they will treat the new advisor like the old advisors - considering the advice as high- or low-confidence (and weighting it accordingly) depending on whether it is high or low for the advisors' distributions. Where participants are prepared for different confidence mappings (the second context), they will treat the new advice as medium confidence, and weight it accordingly. 
 
-There will be a difference in the weight on advice in the probe trials between contexts: WoA will be highest where both trianing advisors have a low-confidence distribution, middling where they have different distributions, and lowest where they both have a high-confidence distribution.
+There will be a difference in the weight on advice in the probe trials between contexts: WoA will be highest where both training advisors have a low-confidence distribution, middling where they have different distributions, and lowest where they both have a high-confidence distribution.
+
+### Individuality as a cue to confidence
+
+#### Method
+
+#### Results
+
+### Identifiability of advice
+
+#### Method
+
+#### Results
+
+## General discussion
+
+The results of the direct benevolence experiments show that people are sensitive to the motivations of their advisors, and exercise appropriate caution where those motivations may mean the advice is misleading. They also demonstrate that, even where advice is considered trustworthy, it is discounted when coming from a less trusted advisor. Together with existing literature on the effects of advisor expertise, this supports the idea from the models that advice-taking can be fleixbly adjusted according to the context. 
+
+The results of the confidence mapping experiments were less conclusive. We were unable to produce a manipulation which was sufficiently clear and strong to produce observable effects. It is plausible that people are sensitive to their knowledge of an advisor's confidence mapping, but it is also plausible that this degree of flexibility is beyond most people, and that simple heuristics (e.g. relying on cultural norms about the meanings of metacognitive terms !TODO[cite Bang, Heyes, et al. on cultural metacognition]) are used instead of complex calculations. The lack of flexibility on the timescale of a behavioural experiment does not, of course, negate the possibility of flexibility on the timescale of a human interpersonal relationship (perhaps there are a certain number of people whose confidence mappings we can track, a la Dunbar's number). Nor does it negate the possibility of an evolutionary or cultural-evolutionary mechanism baking in advice discounting as a protection against unknown confidence mapping, although it is questionable whether advice has been occuring in human societies for long enough to allow the former to take place. 
+
+We have a plausbile explanation of egocentric which only relies on rational responses to environmental effects. These effects are ubiquitous, and thus a ubiquitous egocentric bias prior to engaging with the specifics of a situation makes sense. It is entirely plausible that experiments showing egocentric discounting behaviour fail to overcome the hyperpriors held by participants that taking advice is risky for various reasons.
+
+We saw in the previous section that people are sensitive to the quality of advice and advisors, and will curate their information environments based on that sensitivity. We have seen in this section how the properties of the information environment can change people's sensitivity to advice. !TODO[If we have time, it'd be neat to see if we can get people's selection rates for advisors to recover after the advisors have been lying to them, showing that that how we curate information environment (source selection) also depends on the existing information environment properties.]

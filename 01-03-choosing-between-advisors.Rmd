@@ -8,7 +8,7 @@ output:
 documentclass: book
 ---
 
-```{r setup 01-02, echo = F, include = F}
+```{r setup 01-03, echo = F, include = F}
 options(
   tinytex.verbose = TRUE
   )
@@ -40,7 +40,65 @@ library(broom)
 
 <!-- Presentation of the experiments (may want different subsections for each experiment and an extra one for the general discussion). -->
 
-## Experiment 1: Metacognitive-contingent advisers (Lab) {#ex1}
+Mostly we run dots tasks for similarity with Niccolo's stuff, but for the accuracy vs agreement we run dots + dates because we want to show that this 'summary finding' is valid for both tasks.
+
+## Advisor accuracy {#ac-acc}
+
+### Method {#ac-acc-m}
+
+### Result {#ac-acc-r}
+
+#### Dots Task {#ac-acc-r-dots}
+
+### Discussion {#ac-acc-d}
+
+Where feedback is provided on advisors' performance, participants prefer high accuracy advisors to low accuracy advisors.
+
+## Advisor agreement {#ac-agr}
+
+### Method {#ac-agr-m}
+
+### Result {#ac-agr-r}
+
+#### Dots Task {#ac-agr-r-dots}
+
+### Discussion {#ac-agr-d}
+
+Where feedback is provided on advisors' performance, participants prefer high agreement advisors to low agreement advisors.
+
+## Accuracy vs. agreement (Date estimation) {#ac-ava}
+
+### Method {#ac-ava-m}
+
+### Result {#ac-ava-r}
+
+#### Dots Task {#ac-ava-r-dots}
+
+#### Dates Task {#ac-ava-r-dates}
+
+### Discussion {#ac-ava-d}
+
+!TODO[This is really the critical test - can we show the same crossover pattern with feedback that we saw in Taking Advice]
+
+## Confidence-contingent advice {#ac-cca}
+
+### Online study {#ac-cca-online}
+
+#### Method {#ac-cca-online-m}
+
+#### Result {#ac-cca-online-r}
+
+##### Dots Task {#ac-cca-r-dots}
+
+##### Dates Task {#ac-cca-r-dates}
+
+### Lab study {#ac-cca-lab}
+
+\OpenScience{prereg} https://aspredicted.org/ze3tn.pdf
+
+\OpenScience{materials} https://github.com/mjaquiery/nofeedback_trust
+
+\OpenScience{data} !TODO[Use a sensible archive format for this study data, archive on OSF, and produce data dictionary]
 
 Pescetelli et al. [-@pescetelliRoleDecisionConfidence2018] showed that, in the absence of objective feedback, advice was more influential coming from an advisor who agrees with a participant when that participant is confident (_Bias Sharing_) than coming from an advisor who agrees with a participant when that participant is unconfident (_Anti Bias_). This provides evidence of a metacognitive sensitivity in the tracking of advice and the updating of advisor utility. Here we investigate whether these effects show up in the domain of advisor selection.
 
@@ -48,27 +106,7 @@ The literature on information exposure and evaluation indicates that people eval
 
 Pescetelli et al. [-@pescetelliRoleDecisionConfidence2018] used a judge-advisor system to demonstrate that judges are influenced to a greater extent by advisers who share their biases. Participants played the role of judge in a judge-advisor system, while the advisers were virtual agents whose advice-giving was dependent upon the confidence and correctness of the judges' initial decisions. The advisers were balanced for overall agreement with the judge and objective correctness of advice. We place participants in a similar paradigm in which they are given a choice between advisers, and hypothesise that they will more frequently seek advice from the _Bias Sharing_ advisor than from the _Anti Bias_ advisor.
 
-### Open science {#ex1-os}
-
-#### Preregistration {#ex1-os-prereg}
-
-The study was preregistered using AsPredicted.org. The preregistration document can be found at [https://aspredicted.org/ze3tn.pdf](https://aspredicted.org/ze3tn.pdf). The analyses are presented following the structure of the preregistered document where possible. All preregistered analyses are reported, and marked with the preregistration+ symbol: \prereg{} 
-
-The preregistration+ symbol was developed by the Center for Open Science to increase visibility of open scholarship practices in journal articles, and the symbol is used in this thesis according to the rules given by the Centre (https://osf.io/tvyxz/wiki/1.%20View%20the%20Badges/).
-
-Where analyses do not form part of the preregistration, they are reported after the preregistered analyses, or are clearly designated as exploratory in the text.
-
-#### Open materials {#ex1-os-materials}
-
-Experimental materials, including scripts required to run the experiments in MATLAB and scripts required to analyse the data in R, are available from the [GitHub repository](https://github.com/mjaquiery/nofeedback_trust). 
-
-The experimental design was adapted from Pescetelli et al. [-@pescetelliUseMetacognitiveSignals2017], and the major work in the design, as well as the experimental scripts, is due to Niccolo. The full list of changes to the final design can be seen in the commits to the project repository, which began as a fork of [Niccolo's work](https://github.com/chri4354/nofeedback_trust).
-
-#### Open data {#ex1-os-data}
-
-Anonymised study data can be found at !TODO[Use a sensible archive format for this study data, archive on OSF, and produce data dictionary]. A preloaded version of the data formatted appropriately for the R scripts is included in the [GitHub repository](https://github.com/mjaquiery/nofeedback_trust).
-
-### Method {#ex1-m}
+#### Method {#ac-cca-lab-m}
 
 ```{r load exp1 data, include = F}
 
@@ -83,15 +121,11 @@ library(tibble)
 
 ```
 
-#### Participants {#ex1-m-participants}
+##### Participants {#ex1-m-participants}
 
 `r nrow(participants)` participants (M~age~ = `r round(mean(participants$age))` ±SD `r round(sd(participants$age), 1)`, `r sum(tolower(participants$gender) == 'm')` male, `r sum(tolower(participants$gender) == 'f')` female, `r sum(tolower(participants$gender) != 'm' & tolower(participants$gender) != 'f')` other) recruited from the University of Oxford participant recruitment platforms took part in the experiment. An additional 2 participants attended experimental sessions but their data were not analysed. Participants were compensated for their time with either course credit for a psychology degree, or 10GBP. 
 
-#### Ethics {#ex1-m-ethics}
-
-Ethical approval for the study was granted by the University of Oxford Medical Sciences Interdivisional Research Ethics Committee (Ref: R55382/RE001).
-
-#### Procedure {#ex1-m-procedure}
+##### Procedure {#ex1-m-procedure}
 
 The experiment consisted of a judge-advisor system with a perceptual decision task (Figure \@ref(fig:ex1-paradigm)). Participants played the role of the judge, and the advisers were played by virtual agents whose answers depended upon the confidence with which the judge reported the initial decision. In the majority of trials (92%), participants were offered advice from virtual advisers. In one third of these trials (‘choice trials’), participants chose which advisor to receive advice from by clicking on their respective portraits appearing at the top and bottom of the screen. On the remaining two thirds of trials (‘forced trials’), participants were forced to take advice from one of the two advisers (equiprobably).  On these trials, the forced advisor’s portrait appeared at the top or bottom of the screen, with a red cross appearing in the other location, which was not selectable. On the remaining 8% of trials, participants received no advice and were given no opportunity to revise their initial decision. These ‘catch trials’ were included to encourage participants to attend to the initial decisions.
 
@@ -111,7 +145,7 @@ Each participant attended the experiment individually, was welcomed and briefed 
 
 The experiment was programmed in MATLAB R2017b [@MATLAB2017] using the Psychtoolbox-3 package [@kleiner2007s]. 
 
-#### Advisor advice profiles {#ex1-m-profiles}
+##### Advisor advice profiles {#ex1-m-profiles}
 
 The advisers are virtual agents whose probability of agreeing with the participant’s decision varies as a function of the participant’s confidence and correctness in the initial decision phase. Table \@ref(tab:ex1-advisor-profiles) illustrates how this relationship functions, and shows that the overall correctness and agreement rates of the advisers is equivalent overall. Importantly, on largest minority of trials, the middle 40%, the advisers are exactly equivalent, meaning these trials can be compared directly without confounds arising from agreement rate and initial confidence.
 
@@ -138,13 +172,13 @@ kable(tmp, caption = "Table \\label{tab:ex1-advisor-profiles}: Experiment 1 advi
 
 ```
 
-#### Analysis {#ex1-m-analysis}
+##### Analysis {#ex1-m-analysis}
 
 Data analysis was performed using R [@rcoreteamLanguageEnvironmentStatistical2018]. For a full list of packages and software environment information, see !TODO[figure out where to include this stuff. Appendix? Also link to a containerized version of this.]
 
 Bayes Factors (BF) are presented alongside p values and test statistics. A BF < 0.33 indicates decisive evidence in favour of the null hypothesis over the alternative hypothesis (with lower values being increasingly clear), BF > 3 indicates decisive evidence of the alternative over the null (with higher values being increasingly clear), and 0.33 <= BF <= 3 indicates there is insufficient evidence to reach a conclusion.
 
-##### Capped influence {#ex1-m-analysis-influence}
+###### Capped influence {#ex1-m-analysis-influence}
 
 Influence, the dependant variable in some analyses, is calculated as the extent to which the judge’s initial decision is revised in the direction of the advisor’s advice. The initial ($C_1$) and final ($C_2$) decisions are made on a scale stretching from -55 to +55 with zero excluded, where values <0 indicate a ‘left’ decision and values >0 indicate a ‘right’ decision, and greater magnitudes indicate increased confidence. Influence ($I$) is given for agreement trials by the shift towards the advice:
 
@@ -183,9 +217,9 @@ I_\text{capped} = f(C_1)
 
 The explicit measure of trust is obtained using questionnaires. The questionnaires are delivered at 4 time points, and consist of 4 questions per advisor which are answered on a 1-100 scale.
 
-### Result {#ex1-r}
+#### Result {#ac-cca-lab-r}
 
-#### Descriptive statistics {#ex1-r-descriptives}
+##### Descriptive statistics {#ex1-r-descriptives}
 
 `r nrow(participants) + 2` participants took part in the study. One participant was unable to complete the experiment due to technical difficulties. [Pre-registration](#ex1-os-prereg) of the study analysis stated that data would be collected from 24 participants, so the final (overbooked) subject tested was excluded from analysis. Descriptive statistics for the `r nrow(participants)` participants included in the analysis are presented in Table \@ref(tab:ex1-descriptives).
 
@@ -454,7 +488,7 @@ graph.confidence +
 
 ```
 
-#### \prereg{} Advisor selection
+##### \OpenScience{prereg} Advisor selection
 
 We hypothesised that the participants would display different pick rates for the Bias Sharing advisor versus the Anti Bias advisor. This hypothesis was evaluated by calculating the proportion of choice trials on which each participant picked the Bias Sharing advisor, and then testing these values as a one-sample t-test against the null hypothesis that the pick rates would be 0.5. No support was found for this hypothesis (`r cat(md.ttest(participants$aicPickRate, mu = .5, labels = "M~P(BiasSharing)~"))`; Figure \@ref(fig:ex1-selection)), although the Bayesian test indicated that the data were not sufficient to conclude that no effect was present. There was considerable variability across participants in the overall pick rate for the Bias Sharing advisor (range = [`r range(participants$aicPickRate) %>% num2str(isProportion = T) %>% paste(collapse = ", ")`]).
 
@@ -495,11 +529,11 @@ melt(participants[,c("participantId","aicPickRate.lowConf","aicPickRate.medConf"
 
 ```
 
-##### \prereg{} Advisor selection on medium-confidence trials
+###### \OpenScience{prereg} Advisor selection on medium-confidence trials
 
 The advisers differed in their advice-giving as a function of the judge’s initial confidence. In trials where the judge’s initial decision was made with medium confidence, however, the advisers were equal on judge confidence and agreement rate. Comparing selection rates for these trials alone revealed a clear preference for the Bias Sharing advisor (`r cat(md.ttest(participants$aicPickRate.medConf, mu = .5, labels = "M~P(BiasSharing)~"))`; Figure \@ref(fig:ex1-selection) "Medium" confidence category), although the Bayesian analysis again indicated an insensitive result, albeit in the hypothesised direction.
 
-#### \prereg{} Advisor influence {#ex1-influence}
+##### \OpenScience{prereg} Advisor influence {#ex1-influence}
 
 Previous work in our lab demonstrated that the agree-in-confidence advisor exerted greater influence on the judges’ final decisions than the agree-in-uncertainty advisor [@pescetelliUseMetacognitiveSignals2017]. Influence was examined with a 2x2x2 (Bias Sharing versus Anti Bias advisor; choice versus forced trials; agreement versus disagreement trials) ANOVA (Figure \@ref(fig:ex1-influence-r)). No main effect was found for advisor !TODO[stats], meaning that the previous finding was not replicated. As shown in Table \@ref(tab:ex1-influence-t), the only statistically significant effect was the main effect of agreement, with disagreement producing higher influence than agreement !TODO[marginal means].
 
@@ -536,7 +570,7 @@ kableANOVA(anova.influence$ANOVA,
            caption = "Table \\label{tab:ex1-influence-t}: ANOVA of Advisor influence in Experiment 1")
 ```
 
-##### \prereg{} Advisor influence on medium confidence trials
+###### \OpenScience{prereg} Advisor influence on medium confidence trials
 
 The agree-in-confidence and agree-in-uncertainty advisers differed by design in the frequency with which they agree with the participant as a function of the participant’s confidence in their initial estimate. To control for the effects of initial confidence on influence, the above analysis was repeated using only those trials on which the initial estimate was correct and given with medium confidence. Two participants were missing data in this analysis: one participant had zero mid-confidence choice trials in which the agree-in-confidence advisor disagreed with them; and the other had zero mid-confidence choice trials in which the agree-in-uncertainty advisor disagreed with them. These participants were removed from this analysis. As before, the only effect which was statistically significant was agreement. 
 
@@ -561,7 +595,7 @@ tmp.aov$ANOVA %>%
   kableANOVA(caption = "Table \\label{tab:ex1-influence-medconf}: ANOVA of Advisor influence on medium confidence trials in Experiment 1")
 ```
 
-#### \prereg{} Subjective assessment of advisers
+##### \OpenScience{prereg} Subjective assessment of advisers
 
 Participants answered questionnaires about their trust in the advisers at four time points during the experiment. We hypothesised that this subjective trust measure would change over the course of the experiment, with the agree-in-confidence advisor becoming more preferred over time. As indicated by Table \@ref{tab:ex1-subjective-assessment}, however, no such effects were found: subjective assessments of the advisers did not differ post-experiment.
 
@@ -647,15 +681,15 @@ tmp.print %>%
   
 ```
 
-#### \prereg{} Sensitivity to the manipulation
+##### \OpenScience{prereg} Sensitivity to the manipulation
 
 Finally, we planned to investigate the hypothesis that participants’ choice of advisor would be sensitive to the differential agreement strategies of the advisers, e.g. participants might preferentially select the advisor with the greater likelihood of agreement given their initial confidence. This was investigated by testing the participants’ mean bias sharing advisor pick rate in low- versus high-confidence trials. Pick rates did not differ (`r cat(md.ttest(participants$aicPickRate.lowConf, participants$aicPickRate.highConf, paired = T, labels = c('M~low confidence~', 'M~high confidence~')))`); Figure \@ref{fig:ex1-selection}).
 
-#### Exploratory analyses
+##### Exploratory analyses
 
 Below are reported analyses which were not part of the preregistration, but which were pursued to gain a greater insight into the behaviour of participants in the experiment. 
 
-#### Effect of initial agreement
+##### Effect of initial agreement
 
 ```{r ex1-initial-agreement-equation}
 
@@ -816,7 +850,7 @@ ggplot(agreementCoefs, aes(x = block, y = coef)) +
 
 ```
 
-#### Capped influence measure
+##### Capped influence measure
 
 ```{r ex1-influence-capping}
 
@@ -849,7 +883,7 @@ kableANOVA(anova.influence.capped$ANOVA,
            caption = "Table \\label{tab:ex1-influence-cap-rates-t}: ANOVA of Advisor influence with capped values in Experiment 1")
 ```
 
-#### Subjective assessment and choice of advisors
+##### Subjective assessment and choice of advisors
 
 We did not observe the hypothesized preference for the agree-in-confidence advisor, either as measured by pick rate or by questionnaire response. Nevertheless, it was possible to examine the relationship between the behavioural measure of pick rate and the self-reported questionnaire answers by examining the extent to which participants who picked the agree-in-confidence advisor more frequently rated that advisor more favourably. Questionnaire answers did not evolve systematically over the duration of the experiment, so the analysis was conducted on the final (post-experiment) answers. Correlations (Figure \@ref{fig:ex1-questionnaire-choice}) indicated that the hypothesized effect was present for the questionnaire dimensions of accuracy and trustworthiness, but not for influence or likeability.
 
@@ -974,7 +1008,7 @@ kableModelComparison(list(equation.1, equation.2, equation.3, equation.4),
 
 ```
 
-#### Subjective and objective measures of influence
+##### Subjective and objective measures of influence
 
 ```{r}
 
@@ -1021,62 +1055,10 @@ ggplot(tmp, aes(x = influence, y = influence.Q, color = advisor)) +
   geom_label(x = 10, aes(y = 30 + 20 * (advisor == 1), label = str), data = equations) 
 ```
 
-### Discussion {#ex1-d}
+### Discussion {#ac-cca-d}
 
-
-
-## Online experiments {#ex-online}
-
-The remaining experiments in this thesis were conducted online. The general methodology and background information is detailed here, and deviations from it for specific experiments are highlighted in the relevant sections for the reports of each of the individual experiments. 
-
-### Open science {#ex-online-os}
-
-#### Preregistration {#ex-online-os-prereg}
-
-#### Open materials {#ex-online-os-materials}
-
-#### Open data {#ex-online-os-data}
-
-### Method {#ex-online-m}
-
-#### Participant recruitment {#ex-online-m-participants}
-
-#### Ethics {#ex-online-m-ethics}
-
-#### Procedure {#ex-online-m-procedure}
-
-#### Analysis {#ex-online-m-analysis}
-
-## Experiment 2: Metacognitive-contingent advisers {#ex2}
-
-### Method {#ex2-m}
-
-### Result {#ex2-r}
-
-### Discussion {#ex2-d}
-
-## Experiment 3: Advisor accuracy {#ex3}
-
-### Method {#ex3-m}
-
-### Result {#ex3-r}
-
-### Discussion {#ex3-d}
-
-## Experiment 4: Advisor agreement {#ex4}
-
-### Method {#ex4-m}
-
-### Result {#ex4-r}
-
-### Discussion {#ex4-d}
-
-## Experiment 5: Accuracy vs. agreement (Date estimation) {#ex5}
-
-### Method {#ex5-m}
-
-### Result {#ex5-r}
-
-### Discussion {#ex5-d}
+The data are pretty equivocal here: there's no particularly solid reason for thinking that participants select Bias Sharing advisors more frequently than Anti Bias advisors.
 
 ## General discussion
+
+The patterns observed for advice taking are also evident in advisor selection. Modelling work !TODO[lots of citations for this] indicates that biased source selection can dramatically reshape communication networks and create echo chamber effects where accurate but unpaletable information is ignored. Empirical research on source selection behaviour has found relatively little indication that people behave this way in the real world !TODO[source selection experiments citations], but here we are at least able to demonstrate in principle a psychological mechanism which could drive biased source selection. Furthermore, the mechanisms which produce biased source selection are rational and appropriate given the information available to participants.

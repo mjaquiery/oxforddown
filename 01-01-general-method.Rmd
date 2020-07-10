@@ -95,9 +95,9 @@ knitr::include_graphics("figures/methods/dates-binary.jpg")
 
 ### Advisor advice profiles {#m-profiles}
 
-The advisers are virtual agents whose probability of agreeing with the participant’s decision varies as a function of the participant’s confidence and correctness in the initial decision phase. Table \@ref(tab:ex1-advisor-profiles) illustrates how this relationship functions, and shows that the overall correctness and agreement rates of the advisers is equivalent overall. Importantly, on largest minority of trials, the middle 40%, the advisers are exactly equivalent, meaning these trials can be compared directly without confounds arising from agreement rate and initial confidence.
+The advisers are virtual agents whose probability of agreeing with the participant’s decision varies as a function of the participant’s confidence and correctness in the initial decision phase. Table \@ref(tab:m-advisor-profiles) illustrates how this relationship functions, and shows that the overall correctness and agreement rates of the advisers is equivalent overall. Importantly, on largest minority of trials, the middle 40%, the advisers are exactly equivalent, meaning these trials can be compared directly without confounds arising from agreement rate and initial confidence.
 
-```{r ex1-advisor-profiles-r} 
+```{r m-advisor-profiles-r} 
 library(tidyverse)
 library(kableExtra)
 tmp <- tribble(
@@ -110,7 +110,7 @@ tmp <- tribble(
   "Total agreement", "Participant incorrect", 30, 30
 )
 
-kable(tmp, caption = "Table \\label{tab:ex1-advisor-profiles}: Experiment 1 advisor advice profiles") %>%
+kable(tmp, caption = "Table \\label{tab:m-advisor-profiles}: Experiment 1 advisor advice profiles") %>%
   kable_styling() %>%
   column_spec(1, bold = T) %>%
   row_spec(0, bold = F) %>%
@@ -141,7 +141,7 @@ Data analysis was performed using R [@rcoreteamLanguageEnvironmentStatistical201
 
 Bayes Factors (BF) are presented alongside p values and test statistics. A BF < 0.33 indicates decisive evidence in favour of the null hypothesis over the alternative hypothesis (with lower values being increasingly clear), BF > 3 indicates decisive evidence of the alternative over the null (with higher values being increasingly clear), and 0.33 <= BF <= 3 indicates there is insufficient evidence to reach a conclusion.
 
-### Capped influence {#ex1-m-analysis-influence}
+### Capped influence {#m-analysis-influence}
 
 Influence, the dependant variable in some analyses, is calculated as the extent to which the judge’s initial decision is revised in the direction of the advisor’s advice. The initial ($C_1$) and final ($C_2$) decisions are made on a scale stretching from -55 to +55 with zero excluded, where values <0 indicate a ‘left’ decision and values >0 indicate a ‘right’ decision, and greater magnitudes indicate increased confidence. Influence ($I$) is given for agreement trials by the shift towards the advice:
 
@@ -151,19 +151,19 @@ I|\text{agree} = f(C_1)
   C_2 - C_1 & C_1 > 0 \\
   -C_2 + C_1 & C_1 < 0
 \end{cases}
-(\#eq:ex1-influence-agree)
+(\#eq:m-influence-agree)
 \end{align}
 
 And by the inverse of this for disagreement trials:
 
 \begin{align}
 I|\text{disagree} = -I|\text{agree}
-(\#eq:ex1-influence-disagree)
+(\#eq:m-influence-disagree)
 \end{align}
 
-The confidence scale excludes 0, and thus the final decision can always be more extreme when moving against the direction of the initial answer than when moving further in the direction of the initial answer. A capped measure of influence was used to minimise biases arising from the natural asymmetry of the scale. This measure was calculated by truncating absolute influence values which were greater than the maximum influence which could have obtained had the final decision been a maximal response in the direction of the initial answer (Figure \@ref(fig:ex1-capping)).
+The confidence scale excludes 0, and thus the final decision can always be more extreme when moving against the direction of the initial answer than when moving further in the direction of the initial answer. A capped measure of influence was used to minimise biases arising from the natural asymmetry of the scale. This measure was calculated by truncating absolute influence values which were greater than the maximum influence which could have obtained had the final decision been a maximal response in the direction of the initial answer (Figure \@ref(fig:m-capping)).
 
-```{r ex1-capping, fig.align='center', fig.cap="Capping influence to avoid scale bias: In this example the judge’s initial response is 42, meaning that their final decision could be up to 13 points more confident or up to 97 points less confident. Any final decision which is more than 13 points less confident is therefore capped at 13 points less confident.", out.width="100%"}
+```{r m-capping, fig.align='center', fig.cap="Capping influence to avoid scale bias: In this example the judge’s initial response is 42, meaning that their final decision could be up to 13 points more confident or up to 97 points less confident. Any final decision which is more than 13 points less confident is therefore capped at 13 points less confident.", out.width="100%"}
 knitr::include_graphics("figures/experiment_01_MATLAB/capping.jpg")
 ```
 
@@ -185,7 +185,7 @@ The explicit measure of trust is obtained using questionnaires. The questionnair
 
 ### Open science {#os-introduction}
 
-_Nullius in verba_ ("take nobody's word for it") is written in stone above the entrance to the Royal Society's library. This fundamental principle of science, that it proceeds on evidence rather than assertion, has frequently been forgotten in practice. Concerns about sloppy, self-deluding, or outright fradulent science have existed since at least the time of Bacon. The modern open science movement in psychology dates from the early 2010s. Simmons et al. demonstrated how easily false positive results could emerge from unconstrained researcher degrees of freedom in analysis [@simmonsFalsePositivePsychologyUndisclosed2011], Nosek and colleagues published a roadmap for improving the structure and function of academic research and publishing [@nosekScientificUtopiaOpening2012; @nosekScientificUtopiaII2012], and the Open Science Collaboration began [@collaborationEstimatingReproducibilityPsychological2015]. In the years following, a deluge of papers, movements, and practical changes have emerged. The meaning of open science varies within each subdiscipline, and this section outlines how the experiments comprising this thesis have been conducted in a reproducible and transparent manner.
+_Nullius in verba_ ("take nobody's word for it") is written in stone above the entrance to the Royal Society's library. This fundamental principle of science, that it proceeds on evidence rather than assertion, has frequently been forgotten in practice. Concerns about sloppy, self-deluding, or outright fradulent science have existed since at least the time of Bacon. The modern open science movement in psychology dates from the early 2010s. Simmons et al. demonstrated how easily false positive results could emerge from unconstrained researcher degrees of freedom in analysis [@simmonsFalsePositivePsychologyUndisclosed2011], Nosek and colleagues published a roadmap for improving the structure and function of academic research and publishing [@nosekScientificUtopiaOpening2012; @nosekScientificUtopiaII2012], and the Open Science Collaboration began [@collaborationEstimatingReproducibilityPsychological2015]. In the years following, a deluge of papers, movements, and practical changes have emerged. The meaning of open science varies within each sub-discipline, and this section outlines how the experiments comprising this thesis have been conducted in a reproducible and transparent manner.
 
 ### Badges {#os-badges}
 
@@ -204,3 +204,7 @@ A foundational principle of science is that findings can be reproduced by other 
 #### \OpenScience{data} Open data {#os-data}
 
 Theories are the output of science as a whole, but data are the output of any individual study. Sharing data directly allows other scientists to check and extend the data analysis conducted, to reuse the data in meta-analyses, and to repurpose the data for other investigations. This increases the robustness of the results, and increases the efficiency of science as a whole. The links accompanying the open data badge point to online storage where the data can be obtained for a study, along with appropriate metadata.
+
+### Thesis workflow
+
+This thesis is written in RMarkdown, with the data fetched and analysed at the time the document is produced using the publically available pipeline - the entire document can be reproduced locally using the source code in an appropriate environment. A Docker environment copying the environment used to produce this document is available at !TODO[the containerisation thing]

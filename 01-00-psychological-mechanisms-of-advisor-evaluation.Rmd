@@ -11,6 +11,7 @@ documentclass: book
 \minitoc <!-- this will include a mini table of contents-->
 
 # Psychological mechanisms of advisor evaluation {#chapter-advisor-evaluation}
+\adjustmtc 
 
 Where feedback is unavailable, people may use their own sense of certainty as a yardstick for evaluating advice [@pescetelliRoleDecisionConfidence2018; @pescetelliUseMetacognitiveSignals2017]: advisors who agree when one is confident are perceived as more helpful; while those who disagree when one is confident are perceived as less helpful. Confidence serves as a proxy for objective feedback, and functions well in this role insofar as the judge has high metacognitive resolution (i.e. higher confidence is indicative of a greater probability of being correct).
 
@@ -18,41 +19,52 @@ Where feedback is unavailable, people may use their own sense of certainty as a 
 
 [Normative models of advice taking](#normative-models-of-advice-taking) state that averaging estimates minimises errors. As discussed at length in [Section III](#context-of-advice), the assumptions underlying the normative model do not always hold in the real world. The performance of the normative model can be characterised according to differences between the advisor and the decision-maker on ability and bias !TODO[soll and larick, soll and ? citations; how does PAR relate to what's going on here?]. Recall that the normative model states that advice should contribute to the final decision in proportion to the ability of the advisor compared to the decision-maker.
 
-$$e_i^F = \frac{\omega_i e_i^I + \omega_j e_j^I}{2}$$
+\begin{align}
+e_i^F = \frac{\omega_i e_i^I + \omega_j e_j^I}{2}
+(\#eq:m-weight-constraint)
+\end{align}
 
 Where agent $i$ is the decision-maker and agent $j$ is the advisor. This weighting can be simplified to be expressed only in terms of the decision-maker's weighting of the advisor because the two are constrained to sum to 1 by virtue of being relative to one another:
 
-$$
 \begin{align}
 \omega_i + \omega_j &= 1\\
 \omega_j &= 1 - \omega_i\\
 \therefore e_i^F &= \frac{(1-\omega_j) e_i^I + \omega_j a_i}{2}
+(\#eq:m-simplify-weights)
 \end{align}
-$$
+
 
 Where $a_i$ is the advice received (i.e. agent $j$'s initial estimate - $a_i \equiv e_j^I$). In the normative model, the weighting is equivalent to the ratio of variance of the errors made by each agent:
 
-$$
+\begin{align}
 \omega_j = \frac{\sigma^2_j}{\sigma^2_j + \sigma^2_i}
-$$
+(\#eq:m-weight-by-variance)
+\end{align}
 
 The normative model thus represents weighting by relative ability. Precise knowledge of the ability of others relative to oneself is rarely available in the real world, however, and, as discussed in [Section III](#context-of-advice), other assumptions concerning the trustworthiness or interpretability of advice may be violated.
 
 The normative model can be adapted to provide a more psychologically-realistic account of advice usage by substituting the [three factor model of trust](#three-factor-model-of-trust) into the equations in place of the ability variable. We start with the statement within the three factor model that trust ($\omega$) is proportional to ability ($a$), benevolence ($b$), and integrity ($g$).
 
-$$\text{trust} \propto \text{ability} + \text{benvolence} + \text{integrity}$$
+\begin{align}
+\text{trust} \propto \text{ability} + \text{benvolence} + \text{integrity}
+(\#eq:m-three-factor)
+\end{align}
 
 We can thus replace the measure of accuracy in the normative model with the measure of trust in order to calculate the relative weighting:
 
-$$
+\begin{align}
 \omega_j = \frac{\text{trust}_j}{\text{trust}_j + \text{trust}_i}
-$$
+(\#eq:m-weight-by-trust)
+\end{align}
 
 At this point we may question whether the variable $\text{trust}_i$ is a meaningful property or simply an artefact of mathematical symbol manipulation. Mathematically it provides a fixed point against which trustworthiness of advisors can be measured, allowing for scaling weightings meaningfully across different advisors in different decisions. In real world terms, while it is generally unlikely that $\text{benevolence}_i$ and $\text{integrity}_i$ will be anything less than maximal, perceptions of one's own ability ($\text{ability}_i$) are likely to allow for others to exceed it. I make no strong claims on the relationship between trust and its component variables other than proportionality, and within this conception it is meaningful to consider weighting as a property of trust in another's judgement relative to one's own, adjusted in some manner for the perception of that other's benevolence and integrity. If the concept of self-trust still appears untenable, note that $\text{trust}_i$ can be replaced with a constant without compromising the equations.
 
-We thus return to the normative model of advice-taking, but with an alternative derivation of the weighting between advice and intial estimate:
+We thus return to the normative model of advice-taking, but with an alternative derivation of the weighting between advice and initial estimate:
 
-$$e_i^F = \frac{(1-\omega_j) e_i^I + \omega_j a_i}{2}$$
+\begin{align}
+e_i^F = \frac{(1-\omega_j) e_i^I + \omega_j a_i}{2}
+(\#eq:simplified-decision)
+\end{align}
 
 ### Critique of the aggregation model
 

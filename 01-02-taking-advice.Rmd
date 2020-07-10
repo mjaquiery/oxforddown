@@ -13,6 +13,7 @@ source('scripts_and_filters/general_setup.R')
 
 # Psychology of advice-taking {#chapter-advice-taking}
 \minitoc
+\adjustmtc 
 
 <!-- Here should be a detailed introduction. Niccolo's stuff about advice-taking, and then introduce my research on advisor selection. Maybe merge this with the previous section. -->
 
@@ -20,17 +21,57 @@ The model of advisor evaluation [described earlier](#advisor-evaluation-without-
 
 When objective feedback is unavailable, people can still demonstrate a greater dependence upon advice from more as opposed to less accurate advisors. !TODO[Mini lit review, Niccolo's stuff, maybe prior stuff - check Niccolo's thesis for references]. This is a consequence of agreement: where the base probability of being correct is greater than chance, the independent estimates of people who are more accurate will agree more often (leading to 100% agreement on the correct answer for two independent decision-makers of perfect accuracy). In the absence of feedback, therefore, agreement can be used as a proxy for accuracy, as formalised in the model.
 
-The role of agreement is demonstrated clearly in experiments where the objective accuracy of advisors is balanced, but the agreement rates of the advisors is varied. !TODO[cite Niccolo @CITATION_NEEDED]. Pescetelli and Yeung demonstrated that advice is more influential from advisors who tend to agree with a participant more frequently when objective feedback is not provided. This is despite the fact that advice is more influential when it disagrees with the participant's initial estimate.^[This is partly due to the nature of the judge-advisor system: there is always room for disagreement to be more extreme than agreement, because agreement is bounded by the participant's intial estimate.] These data suggest that people may be using agreement as a proxy for accuracy, although they may simply prefer agreement over disagreement when there is no accuracy cost to be paid. I report the results of an experiment in which an agreeing advisor was compared with an accurate advisor under conditions of feedback or no feedback. Results indicated that, as predicted by the models, participants preferred the accurate advisor when feedback was provided and the agreeing advisor when feedback was witheld.
+The role of agreement is demonstrated clearly in experiments where the objective accuracy of advisors is balanced, but the agreement rates of the advisors is varied. !TODO[cite Niccolo @CITATION_NEEDED]. Pescetelli and Yeung demonstrated that advice is more influential from advisors who tend to agree with a participant more frequently when objective feedback is not provided. This is despite the fact that advice is more influential when it disagrees with the participant's initial estimate.^[This is partly due to the nature of the judge-advisor system: there is always room for disagreement to be more extreme than agreement, because agreement is bounded by the participant's initial estimate.] These data suggest that people may be using agreement as a proxy for accuracy, although they may simply prefer agreement over disagreement when there is no accuracy cost to be paid. I report the results of an experiment in which an agreeing advisor was compared with an accurate advisor under conditions of feedback or no feedback. Results indicated that, as predicted by the models, participants preferred the accurate advisor when feedback was provided and the agreeing advisor when feedback was withheld.
+
+Pescetelli and Yeung developed a [more sophisticated model](#confidence-weighted-agreement) of advisor evaluation in which the increase in trust gained when an advisor agreed with the decision-maker was contingent upon the confidence of the decision-maker's initial estimate. Intuitively, if I am highly certain that I am correct on a given question, an advisor who disagrees with me is likely to be incorrect, whereas one who agrees with me is likely to be correct. Provided confidence is indicative of the objective probability of being correct, as confidence in the initial decision increases it more closely approximates objective feedback for the purposes of evaluating advice. 
+
+!TODO[detailed account of Niccolo's evidence for the confidence-weighted model]. I report the results of experiments designed to replicate Pescetelli and Yeung's results, which do not provide clear evidence for this mechanism.
 
 !TODO[move this section to a discussion somewhere?] An alternative explanation for the data is that disagreeing advice is more surpising when it comes from an advisor who usually agrees, and that it is its increased salience increases its influence rather than increased trust in the advisor. If that were the case then the same ought to be true for agreeing advice from a disagreeing advisor, and this is not the case !TODO[Do we have/can we produce evidence for this? Perhaps look at our participants where advisors disagree with them by chance more than e.g. 70% of the time and check for increased influence on agreement trials vs advisors who disagree less than 70% of the time]. 
 
-## Accuracy? 
+## Accuracy? !TODO[check Niccolo covered this]
 
-## Agreement?
+## Agreement? !TODO[check Niccolo covered this]
 
-## Accuracy vs Agreement
+## Accuracy vs Agreement {#ai-ava}
 
+\OpenScience{prereg} https://osf.io/fgmdw
 
+\OpenScience{data} !TODO[OSFify data for these studies]
 
-## Confidence-contingent advice
+\OpenScience{materials} https://github.com/oxacclab/ExploringSocialMetacognition/blob/master/ACv2/index.html
 
+ACv2/coreAnalysis_v0.0.21
+ACv2/coreAnalysis_v1.0.1
+
+The study reported here is a preregistered replication of a pilot study which produced the same results. Data, analysis script, and analysis for the pilot study are also available at !TODO[OSFify pilot data/analysis stuff].
+
+### Method {#ai-ava-m}
+
+### Results {#ai-ava-r}
+
+### Discussion {#ai-ava-d}
+
+In consistent with previous studies, these results show that people are more influenced by accurate advice over advice which simply agrees with their own opinions where feedback is available. When feedback is not available, people have only their own opinions against which to validate advice, and are thus more influenced by agreeing advice. Intuitively, we expect the initial estimate to be the participant's "best guess" for the correct answer, and thus the closer the advice is to this guess (i.e. the stronger the agreement), the more likely that advice is to be correct. 
+
+We deliberately violated an assumption which may be generally true in real life, that the advice is sufficiently independent as to convey at least some information regarding the correct answer. Had we told participants that the agreeing advisor would agree with them no matter what they the participants said, the participants may have disregarded the advice. 
+
+We have shown that the agreement/accuracy distinction generalises to a continuous estimation decision rather than a categorical perceptual decision. We have illustrated that, even where they would have performed objectively better by preferring accurate over agreeing advice, participants were not able to detect the more accurate advice without objective feedback. These findings support the model of advisor evaluation put forward here.
+
+## Confidence-contingent advice {#ai-cca}
+
+\OpenScience{data} !TODO[OSFify data for these studies]
+
+\OpenScience{materials} https://github.com/oxacclab/ExploringSocialMetacognition/blob/master/ACv2/index.html
+
+ACv2/withConfidence_coreAnalysis_v0.0.1
+
+!TODO[This experiment is kinda crappy and failed its manipulation. Can we run a version which does its job properly and provide actual evidence for/against the confidence modulation?]
+
+### Method {#ai-cc-m}
+
+### Results {#ai-cc-r}
+
+### Discussion {#ai-cca-d}
+
+Participants appeared to pay more attention to the advice than the advisor. In other words, participants distinguished between individual pieces of advice but did not translate these distinctions into distinctions between advisors. This study thus provided no evidence in favour of the confidence-weighting adjustement to the agreement model. 
