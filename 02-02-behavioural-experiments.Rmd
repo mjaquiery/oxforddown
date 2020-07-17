@@ -185,9 +185,10 @@ tmp <- AdvisedTrial %>%
   spread(advisor0questionnaireHonestyLabel, woa) %>%
   dplyr::filter_all(all_vars(!is.na(.)))
 
-r <- md.ttest(tmp$Deceptive, tmp$Honest, 
-              c('*M*|deceptive', '*M*|honest'),
-              paired = T)
+r <- "!TODO[fix ttest]"
+# r <- md.ttest(tmp$Deceptive, tmp$Honest, 
+#               c('*M*|deceptive', '*M*|honest'),
+#               paired = T)
 
 ```
 
@@ -205,8 +206,9 @@ tmp <- AdvisedTrial %>%
   dplyr::filter_all(all_vars(!is.na(.)))
   
 
-r <- md.ttest(tmp$inGroup, tmp$outGroup, 
-              c("*M*|inGroup", "*M*|outGroup"), paired = T)
+r <- "!TODO[fix ttest]"
+# r <- md.ttest(tmp$inGroup, tmp$outGroup, 
+#               c("*M*|inGroup", "*M*|outGroup"), paired = T)
 
 ```
 
@@ -220,26 +222,26 @@ The details of the data are best presented in a combined figure.
 
 ```{r, fig.align='center', fig.cap="Influence of advice by advisor according to participants\' perception of advice honesty. Faint lines show means for individual participants (missing segments indicate the participant rated no advice from that advisor with the designated category). Violins, box plots, and heavy dashed lines aggregate means for all participants.", out.width="80%", echo=F}
 
-AdvisedTrial %>%
-  group_by(pid, advisor0idDescription, advisor0questionnaireHonestyLabel) %>%
-  summarise(woa = mean(advisor0woa)) %>% 
-  ggplot(aes(x = advisor0questionnaireHonestyLabel, y = woa)) +
-  geom_violin(colour = NA, alpha = .25, 
-              aes(fill = advisor0questionnaireHonestyLabel)) +
-  geom_boxplot(outlier.colour = NA, fill = NA, 
-               aes(group = advisor0questionnaireHonestyLabel)) +
-  geom_line(alpha = .25, aes(group = pid)) + 
-  stat_summary(geom = "line", fun.y = mean,
-               aes(group = 1, linetype = "mean"), size = 1.5) +
-  scale_y_continuous(limits = c(0, 1)) +
-  scale_fill_discrete(name = "Advice rating") + 
-  scale_linetype_manual(name = "", values = c("dashed")) + 
-  facet_wrap(~advisor0idDescription) +
-  labs(x = 'Advice Honesty Rating',
-       y = 'Weight on Advice') +
-  theme(
-    legend.position = "top"
-  )
+# AdvisedTrial %>%
+#   group_by(pid, advisor0idDescription, advisor0questionnaireHonestyLabel) %>%
+#   summarise(woa = mean(advisor0woa)) %>% 
+#   ggplot(aes(x = advisor0questionnaireHonestyLabel, y = woa)) +
+#   geom_violin(colour = NA, alpha = .25, 
+#               aes(fill = advisor0questionnaireHonestyLabel)) +
+#   geom_boxplot(outlier.colour = NA, fill = NA, 
+#                aes(group = advisor0questionnaireHonestyLabel)) +
+#   geom_line(alpha = .25, aes(group = pid)) + 
+#   stat_summary(geom = "line", fun.y = mean,
+#                aes(group = 1, linetype = "mean"), size = 1.5) +
+#   scale_y_continuous(limits = c(0, 1)) +
+#   scale_fill_discrete(name = "Advice rating") + 
+#   scale_linetype_manual(name = "", values = c("dashed")) + 
+#   facet_wrap(~advisor0idDescription) +
+#   labs(x = 'Advice Honesty Rating',
+#        y = 'Weight on Advice') +
+#   theme(
+#     legend.position = "top"
+#   )
 
 ```
 

@@ -51,23 +51,23 @@ Ethical approval for the studies in the thesis was granted by the University of 
 
 Participants visited the Uniform Resource Locator for the study by following a link from Prolific using their own device (Figure \@ref(fig:m-participant-experience)). Early studies only supported computers, but later studies included support for tablets and smartphones. After viewing an information sheet describing the study and giving their consent to participate, participants began the study proper. The study introduced the software to the participant interactively, demonstrating the decision-making task and how responses could be made. Next, participants were given a block of practice trials to familiarise them with the decision-making task. Participants were then introduced to advice, and given a block of practice trials in which they received advice. The core experimental blocks followed the practice with advice. Finally, debrief questions were presented and feedback provided concerning the participant's performance, including a stable link to the feedback and a payment code. The participant entered the payment code into the Prolific platform and their participantion was at an end.
 
-```{r m-participant-experience, fig.align='center', fig.cap="Participant pathway through the studies. Participants used their own devices to complete the study, which was presented on a website written in HTML, CSS, and JavaScript. The data were saved on the server using PHP.", out.width="100%"}
+```{r m-participant-experience, fig.align='center', fig.caption="Participant pathway through the studies.  Participants used their own devices to complete the study, which was presented on a website written in HTML, CSS, and JavaScript. The data were saved on the server using PHP.", out.width="100%"}
 knitr::include_graphics("figures/methods/participant-experience.jpg")
 ```
 
 On each trial, participants were faced with a decision-making task for which they offered an initial estimate. They then received advice (on some trials they were able to choose which of two advisors would provide this advice). They then made a final decision. On feedback trials, they received feedback on their final decision. The schematic for this trial structure is shown for the Dots Task in Figure \@ref(fig:m-trial).
 
-```{r m-trial, fig.align='center', fig.cap="Trial structure of the Dots Task: in the initial estimate phase, participants saw two boxes of dots presented simultaneously for 300ms. Participants then reported whether there were more dots on in the left or the right box, and how confident they were in this decision. Participants then received advice, sometimes being offered the choice of which advisor would provide the advice. The advice was displayed for 2000ms before participants could submit a final decision, again reporting which box they believe contained more dots and their confidence in their decision. On feedback trials, feedback was presented by redisplaying the correct box while showing the other box as empty.", out.width="100%"}
+```{r m-trial, fig.align='center', fig.caption="Trial structure of the Dots Task.  In the initial estimate phase, participants saw two boxes of dots presented simultaneously for 300ms. Participants then reported whether there were more dots on in the left or the right box, and how confident they were in this decision. Participants then received advice, sometimes being offered the choice of which advisor would provide the advice. The advice was displayed for 2000ms before participants could submit a final decision, again reporting which box they believe contained more dots and their confidence in their decision.  On feedback trials, feedback was presented by redisplaying the correct box while showing the other box as empty.", out.width="100%"}
 knitr::include_graphics("figures/methods/dots-structure.jpg")
 ```
 
 !TODO[Check feedback duration and style in image caption]
 
-#### Perceptual decision (Dots Task)
+#### Perceptual decision (Dots Task) {#m-p-dots}
 
 Stimuli in the Dots Task consisted of two boxes arranged to the left and right of a fixation cross (Figure \@ref(fig:m-dots)). These boxes were briefly and simultaneously filled with an array of non-overlapping dots, and the participant was instructed to indentify the box with the most dots. The number of dots was exactly determined by the difficulty of the trial: the box with the !TODO[check this description] least dots had 200 - the difficulty, while the box with the most had 200 + the difficulty. The dots did not move during the presentation of the stimulus. There was thus an objectively correct answer to the question which, given enough time, could be precisely determined from the stimulus.
 
-```{r m-dots, fig.align='center', fig.cap="Dots Task stimulus.", out.width="100%"}
+```{r m-dots, fig.align='center', fig.caption="Dots Task stimulus.", out.width="100%"}
 knitr::include_graphics("figures/methods/dots.jpg")
 ```
 
@@ -77,19 +77,21 @@ After each block participants were told what percentage of the final decisions t
 
 #### Estimation (Dates Task)
 
-##### Continuous
+##### Rationale
+
+##### Continuous {#m-p-dates-c}
 
 
 
-```{r m-dates, fig.align='center', fig.cap="Dates Task with continuous responses.", out.width="100%"}
+```{r m-dates, fig.align='center', fig.caption="Dates Task with continuous responses.", out.width="100%"}
 knitr::include_graphics("figures/methods/dates.jpg")
 ```
 
-##### Binary
+##### Binary {#m-p-dates-b}
 
 
 
-```{r m-dates-binary, fig.align='center', fig.cap="Dates Task with binary responses.", out.width="100%"}
+```{r m-dates-binary, fig.align='center', fig.caption="Dates Task with binary responses.", out.width="100%"}
 knitr::include_graphics("figures/methods/dates-binary.jpg")
 ```
 
@@ -163,7 +165,7 @@ I|\text{disagree} = -I|\text{agree}
 
 The confidence scale excludes 0, and thus the final decision can always be more extreme when moving against the direction of the initial answer than when moving further in the direction of the initial answer. A capped measure of influence was used to minimise biases arising from the natural asymmetry of the scale. This measure was calculated by truncating absolute influence values which were greater than the maximum influence which could have obtained had the final decision been a maximal response in the direction of the initial answer (Figure \@ref(fig:m-capping)).
 
-```{r m-capping, fig.align='center', fig.cap="Capping influence to avoid scale bias: In this example the judge’s initial response is 42, meaning that their final decision could be up to 13 points more confident or up to 97 points less confident. Any final decision which is more than 13 points less confident is therefore capped at 13 points less confident.", out.width="100%"}
+```{r m-capping, fig.align='center', fig.caption="Capping influence to avoid scale bias.  In this example the judge’s initial response is 42, meaning that their final decision could be up to 13 points more confident or up to 97 points less confident. Any final decision which is more than 13 points less confident is therefore capped at 13 points less confident.", out.width="100%"}
 knitr::include_graphics("figures/experiment_01_MATLAB/capping.jpg")
 ```
 

@@ -9,46 +9,222 @@ documentclass: book
 ---
 
 ```{r setup 01-03, echo = F, include = F}
-options(
-  tinytex.verbose = TRUE
-  )
-
-knitr::opts_chunk$set(
-  echo = F, warnings = F, messages = F
-)
-
-library(ggplot2)
-
-theme_set(
-  theme_light() +
-    theme(
-      panel.background = element_blank(),
-      panel.border = element_blank(),
-      panel.grid.minor = element_blank(),
-      panel.grid.major = element_blank(),
-      axis.line = element_line(colour = "black"),
-      text = element_text(size = 14),
-      legend.position = "top"
-    )
-)
-
-library(broom)
+source('scripts_and_filters/general_setup.R')
 ```
 
 # Psychology of source selection {#chapter-advisor-choice}
 \minitoc
 
+<!-- Here should be a detailed introduction. Niccolo's stuff about advice-taking, and then introduce my research on advisor selection. Maybe merge this with the previous section. -->
+
+The model of advisor evaluation [described earlier](#advisor-evaluation-without-feedback) requires empirical support. The model of advisor evaluation with feedback is well supported by data which indicate that, given objective feedback, people can use the feedback to learn about the trustworthiness of advisors. The [extent to which advice is taken](#!TODO[link to measures of advice in method]) is commonly used as a measure of a participant's trust in an advisor, on the argument that the participant seeks to maximise task performance and task performance is maximised by taking more advice from more trustworthy advisors. !TODO[Mini lit review - advisor accuracy training with feedback (Yaniv?), Niccolo and Nick's feedback stuff]. Overall, this means that people prefer more accurate advice over less accurate advice.
+
+When objective feedback is unavailable, people can still demonstrate a greater dependence upon advice from more as opposed to less accurate advisors. !TODO[Mini lit review, Niccolo's stuff, maybe prior stuff - check Niccolo's thesis for references]. This is a consequence of agreement: where the base probability of being correct is greater than chance, the independent estimates of people who are more accurate will agree more often (leading to 100% agreement on the correct answer for two independent decision-makers of perfect accuracy). In the absence of feedback, therefore, agreement can be used as a proxy for accuracy, as formalised in the model.
+
+The role of agreement is demonstrated clearly in experiments where the objective accuracy of advisors is balanced, but the agreement rates of the advisors is varied. !TODO[cite Niccolo @CITATION_NEEDED]. Pescetelli and Yeung demonstrated that advice is more influential from advisors who tend to agree with a participant more frequently when objective feedback is not provided. This is despite the fact that advice is more influential when it disagrees with the participant's initial estimate.^[This is partly due to the nature of the judge-advisor system: there is always room for disagreement to be more extreme than agreement, because agreement is lower-bounded by the participant's initial estimate.] These data suggest that people may be using agreement as a proxy for accuracy, although they may simply prefer agreement over disagreement when there is no accuracy cost to be paid. I report the results of an experiment in which an agreeing advisor was compared with an accurate advisor under conditions of feedback or no feedback. Results indicated that, as predicted by the models, participants preferred the accurate advisor when feedback was provided and the agreeing advisor when feedback was withheld.
+
+Pescetelli and Yeung developed a [more sophisticated model](#confidence-weighted-agreement) of advisor evaluation in which the increase in trust gained when an advisor agreed with the decision-maker was contingent upon the confidence of the decision-maker's initial estimate. Intuitively, if I am highly certain that I am correct on a given question, an advisor who disagrees with me is likely to be incorrect, whereas one who agrees with me is likely to be correct. Provided confidence is indicative of the objective probability of being correct, as confidence in the initial decision increases it more closely approximates objective feedback for the purposes of evaluating advice. 
+
+!TODO[detailed account of Niccolo's evidence for the confidence-weighted model]. I report the results of experiments designed to extend Pescetelli and Yeung's results to the domain of advisor influence.
+
+!TODO[move this section to a discussion somewhere?] An alternative explanation for the data is that disagreeing advice is more surpising when it comes from an advisor who usually agrees, and that it is its increased salience increases its influence rather than increased trust in the advisor. If that were the case then the same ought to be true for agreeing advice from a disagreeing advisor, and this is not the case !TODO[Do we have/can we produce evidence for this? Perhaps look at our participants where advisors disagree with them by chance more than e.g. 70% of the time and check for increased influence on agreement trials vs advisors who disagree less than 70% of the time]. 
+
 <!-- Presentation of the experiments (may want different subsections for each experiment and an extra one for the general discussion). -->
 
-Mostly we run dots tasks for similarity with Niccolo's stuff, but for the accuracy vs agreement we run dots + dates because we want to show that this 'summary finding' is valid for both tasks.
 
-## Advisor accuracy {#ac-acc}
+## Accuracy? !TODO[check Niccolo covered this] {#ac-acc}
 
-### Method {#ac-acc-m}
+Pescetelli and Yeung !TODO[cite new paper] demonstrated that more accurate advisors are more influential (regardless of the presence of feedback) in a lab-based perceptual decision-making task. We attempted to extend this finding to the domain of advisor selection in two online tasks: a 'Dots Task' requiring similar perceptual decision-making to the task used by Pescetelli and Yeung, and an estimation-based 'Dates Task'.
 
-### Result {#ac-acc-r}
+The ability to distinguish between accurate advisors in these experiments is important because they relate directly to the phenomenon we are attempting to explain: rational advice-seeking behaviour in the absence of feedback.
 
-#### Dots Task {#ac-acc-r-dots}
+### Dots Task {#ac-acc-dots}
+
+```{r include = F}
+
+select_experiment(
+  project = 'dotstask',
+  function(x) filter(x, study == 'Accuracy', version == '120 practice trials')
+)
+
+.dropEnv <- new.env()
+tada('dotstask', package = 'esmData', envir = .dropEnv)
+.dropEnv$dotstask <- .dropEnv$dotstask %>% 
+  filter(study == 'Accuracy', version != '120 practice trials')
+
+.dropEnv$DROP_P <- sum(.dropEnv$dotstask %>% 
+                         filter(table == 'AdvisedTrial') %>% 
+                         pull(N))
+
+```
+
+#### Open scholarship practices
+
+\OpenScience{prereg} `r unique(dotstask$preregistration)`
+
+\OpenScience{data} !TODO[OSFify data for these studies]
+
+\OpenScience{materials} https://github.com/oxacclab/ExploringSocialMetacognition/blob/9932543c62b00bd96ef7ddb3439e6c2d5bdb99ce/AdvisorChoice/index.html
+
+##### Unanalysed data
+
+Several early versions of this experiment were run where bugs in the experiment code made the results unreliable. The earliest versions contained a bug where advisors instructed to agree with a participant instead provided advice identifying the correct answer. Other versions had a bug in the staircasing code used to titrate the difficulty of the task was converging on too high a value (74% initial decision accuracy as opposed to 71%). Once the staircasing bug was fixed, two more experiments were run, one with 60 practice trials in which participants did not quite reach the desired accuracy before the beginning of the main experiment, and one with 120 practice trials which constitutes the data analysed below. Overall, `r .dropEnv$.DROP_P` participants' data was collected in these excluded versions and not included in analysis. While not useful for the hypothesis of this experiment, the excluded data can be used for analysing responses to advice, provided care is taken with the very early versions to ensure advice is interpreted correctly.
+
+#### Method {#ac-acc-dots-m}
+
+!TODO[clarify any methodological differences from the main methods chapter]
+
+##### Advisor profiles
+
+The two advisor profiles (Table \@ref(tab:ac-acc-dots-m-profiles)) used in the experiment were High accuracy and Low accuracy. The High accuracy advisor was correct 80% of the time while the Low accuracy advisor was correct 20% of the time. The advisor profiles were not balanced for overall agreement rates.
+
+```{r ac-acc-dots-m-profiles} 
+
+pCor <- .71
+agr <- matrix(c(.8, .2, .6, .4), 2, 2)
+
+tmp <- tribble(
+  ~` `, ~`High accuracy`, ~`Low accuracy`,
+  "Participant correct", agr[1, 1], agr[1, 2],
+  "Participant incorrect", agr[2, 1], agr[2, 2],
+  "Total agreement", sum(agr[, 1] * c(pCor, 1 - pCor)), sum(agr[, 2] * c(pCor, 1 - pCor))
+) %>% 
+  prop2str()
+
+kable(tmp, caption = "Table \\label{tab:ac-acc-dots-m-profiles}: Advisor advice profiles for Dots task Agreement experiment") %>%
+  kable_styling() %>%
+  column_spec(1, bold = T) %>%
+  row_spec(0, bold = F) %>%
+  collapse_rows(columns = 1, valign = "top") %>%
+  add_header_above(c(" ", 
+                     "Probability of agreement (%)" = 2))
+
+```
+
+#### Results {#ac-acc-dots-r}
+
+##### Exclusions
+
+##### Task performance
+
+##### Mainpulation checks
+
+##### \OpenScience{prereg} Hypothesis test
+
+```{r ac-acc-dots-r-graph, fig.caption="Participants' pick rate for the advisors in the Choice phase of the experiment.  The shaded area shows a density plot of the individual participants' pick rates, shown by semi-transparent dots."}
+library(ggridges)
+
+tmp <- trials %>% 
+  filter(hasChoice) %>%
+  group_by(pid) %>%
+  summarise(pChooseHigh = sum(adviceType == 5) / sum(adviceType %in% c(5,6)))
+
+ggplot(tmp, aes(x = pChooseHigh, y = '')) +
+  geom_density_ridges() +
+  geom_point(aes(y = .75), alpha = .25, 
+             position = position_jitter(0, .1)) +
+  scale_x_continuous(limits = c(0, 1)) +
+  labs(y = 'Density', x = 'p(Choose High accuracy advisor)') +
+  theme(axis.ticks.length.y = unit(0, 'points'))
+
+# caption <- "Participants' pick rate for the advisors in the Choice phase of the experiment. The shaded area shows a density plot of the individual participants' pick rates, shown by semi-transparent dots."
+
+.T <- tmp %>%
+  pull(pChooseHigh) %>%
+  md.ttest(y = .5, labels = c('*M*$_{choose High agreement}$'))
+
+```
+
+`r .T`
+
+### Dates Task {#ac-acc-dates}
+
+```{r include = F}
+
+rm(list = ls())
+
+# Load the study data
+select_experiment(
+  project = 'datequiz',
+  function(x) filter(x, study == 'accuracyDates', manipulationOK)
+)
+
+
+.dropEnv <- new.env()
+tada('datequiz', package = 'esmData', envir = .dropEnv)
+.dropEnv$datequiz <- .dropEnv$datequiz %>% 
+  filter(study == 'accuracyDates', !manipulationOK)
+
+.dropEnv$DROP_V <- paste0(unique(.dropEnv$datequiz$version), collapse = ', ')
+.dropEnv$DROP_P <- sum(.dropEnv$datequiz %>% 
+                         filter(table == 'AdvisedTrial') %>% 
+                         pull(N))
+
+```
+
+#### Open scholarship practices
+
+\OpenScience{prereg} `r unique(datequiz$preregistration)`
+
+\OpenScience{data} !TODO[OSFify data for these studies]
+
+\OpenScience{materials} https://github.com/oxacclab/ExploringSocialMetacognition/blob/master/ACBin/acc.html
+
+##### Unanalysed data
+
+Early versions of this experiment (`r .dropEnv$.DROP_V`) included a bug which prevented feedback from being shown during the familiarisation phase even to participants in the Feedback condition. The `r .dropEnv$.DROP_P` participants whose data was collected in these versions is not included in analysis. These participants could theoretically be included in the No feedback condition regardless of their condition label in the data, but this is not done here.
+
+
+#### Method {#ac-acc-dates-m}
+
+This study used the [Binary version](#m-p-dates-b) of the Dates Task. 
+
+#### Results {#ac-acc-dates-r}
+
+##### Exclusions
+
+##### Task performance
+
+##### Mainpulation checks
+
+##### \OpenScience{prereg} Hypothesis test
+
+```{r ac-acc-dates-r-graph, fig.caption="Participants' pick rate for the advisors in the Choice phase of the experiment.  The shaded area shows a density plot of the individual participants' pick rates, shown by semi-transparent dots."}
+library(ggridges)
+
+tmp <- AdvisedTrial %>% 
+  filter(advisorChoice == T) %>%
+  group_by(pid) %>%
+  summarise(pChooseHigh = mean(advisor0idDescription == 'highAccuracy'))
+
+# Add in feedback condition
+tmp <- left_join(
+  tmp,
+  AdvisedTrial %>% 
+    group_by(pid) %>% 
+    summarise(feedbackCondition = case_when(any(feedback == 1) ~ 'Feedback', 
+                                            T ~ 'No feedback')),
+  by = 'pid'
+) %>% 
+  mutate_if(is.character, factor)
+
+ggplot(tmp, aes(x = pChooseHigh, y = feedbackCondition)) +
+  geom_density_ridges() +
+  geom_point(aes(y = as.numeric(feedbackCondition) - .25), alpha = .25, 
+             position = position_jitter(0, .15)) +
+  scale_x_continuous(limits = c(0, 1)) +
+  labs(y = 'Feedback condition', x = 'p(Choose High accuracy advisor)') +
+  theme(axis.ticks.length.y = unit(0, 'points'))
+
+# caption <- "Participants' pick rate for the advisors in the Choice phase of the experiment. The shaded area shows a density plot of the individual participants' pick rates, shown by semi-transparent dots."
+
+.T <- tmp %>%
+  pull(pChooseHigh) %>%
+  md.ttest(y = .5, labels = c('*M*$_{choose High agreement}$'))
+
+```
+
+`r .T`
 
 ### Discussion {#ac-acc-d}
 
@@ -111,7 +287,7 @@ Pescetelli et al. [-@pescetelliRoleDecisionConfidence2018] used a judge-advisor 
 ```{r load exp1 data, include = F}
 
 # Run the analysis script for experiment 1 from the symlinked repository.
-exDirs <- c("repos/nofeedback_trust/AdvisorChoice/analysis/")
+exDirs <- c("G:/Documents/University/Programming/nofeedback_trust_matt/AdvisorChoice/analysis/")
 wd <- setwd(exDirs[1])
 source("AdvisorChoice.R")
 setwd(wd)
@@ -600,6 +776,7 @@ tmp.aov$ANOVA %>%
 Participants answered questionnaires about their trust in the advisers at four time points during the experiment. We hypothesised that this subjective trust measure would change over the course of the experiment, with the agree-in-confidence advisor becoming more preferred over time. As indicated by Table \@ref{tab:ex1-subjective-assessment}, however, no such effects were found: subjective assessments of the advisers did not differ post-experiment.
 
 ```{r ex1-subjective-assessment}
+library(broom)
 
 tmp <- questionnaires %>% 
   mutate_if(is.list, unlist) %>%
