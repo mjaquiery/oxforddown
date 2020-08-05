@@ -13,6 +13,7 @@ rm(list = ls())
 
 
 # Libraries ---------------------------------------------------------------
+# Load libraries which are widely shared by the chapter files
 
 library(tidyverse)  # Pipes, tidyselectors, string manipulation, data wrangling, etc.
 library(kableExtra) # Pretty formatting of output tables

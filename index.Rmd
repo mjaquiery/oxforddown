@@ -19,7 +19,9 @@ abbreviations: "front-and-back-matter/abbreviations" # path to .tex file with ab
 #######################
 ## bibliography path ##
 #######################
-bibliography: bibliography/references.bib
+bibliography: 
+  - references.bib
+  - bibliography/references.bib
 bibliography-heading-in-pdf: Works Cited
 
 #####################
@@ -36,7 +38,7 @@ mini-toc: true  # mini-table of contents at start of each chapter? (this just pr
 mini-lot: false  # mini-list of tables by start of each chapter?
 mini-lof: false  # mini-list of figures by start of each chapter?
 params:
-  corrections: false # set false to stop applying blue background to blocks of corrections
+  corrections: true # set false to stop applying blue background to blocks of corrections
 
 #####################
 ## output options  ##
