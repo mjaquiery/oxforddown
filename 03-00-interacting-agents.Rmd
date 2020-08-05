@@ -17,7 +17,7 @@ documentclass: book
 
 <!-- Models suggest interactions between agents exascerbate problems, especially where source selection and info weighting combine. -->
 
-!TODO[extend the simulation/agreement-effects-analysis stuff a bit and it will fill this chapter out well.]
+\mccorrect{!TODO[extend the simulation/agreement-effects-analysis stuff a bit and it will fill this chapter out well.]}
 
 * Even when biases don't change (Niccolo covered that), source selection on the basis of agreement is inherently pathological.  
   - This is true whether or not confidence weights updating. 

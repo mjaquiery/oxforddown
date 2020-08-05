@@ -15,23 +15,28 @@ source('scripts_and_filters/general_setup.R')
 \minitoc
 \adjustmtc 
 
-<!-- Some kind of introduction to this section about how and why we go back to looking at influence rather than advisor choice. More sensitive? Closer replication? -->
+<!-- Some kind of introduction to this section about how and why we go back to looking at influence rather than advisor choice.
+More sensitive?
+Closer replication?
+-->
 
 
-## Agreement? !TODO[check Niccolo covered this]
+## Agreement?
+\mccorrect{!TODO[check Niccolo covered this]}
 
 ## Accuracy vs Agreement {#ai-ava}
 
 \OpenScience{prereg} https://osf.io/fgmdw
 
-\OpenScience{data} !TODO[OSFify data for these studies]
+\OpenScience{data} \mccorrect{!TODO[OSFify data for these studies]}
 
 \OpenScience{materials} https://github.com/oxacclab/ExploringSocialMetacognition/blob/master/ACv2/index.html
 
 ACv2/coreAnalysis_v0.0.21
 ACv2/coreAnalysis_v1.0.1
 
-The study reported here is a preregistered replication of a pilot study which produced the same results. Data, analysis script, and analysis for the pilot study are also available at !TODO[OSFify pilot data/analysis stuff].
+The study reported here is a preregistered replication of a pilot study which produced the same results.
+Data, analysis script, and analysis for the pilot study are also available at \mccorrect{!TODO[OSFify pilot data/analysis stuff]}.
 
 ### Method {#ai-ava-m}
 
@@ -39,21 +44,26 @@ The study reported here is a preregistered replication of a pilot study which pr
 
 ### Discussion {#ai-ava-d}
 
-In consistent with previous studies, these results show that people are more influenced by accurate advice over advice which simply agrees with their own opinions where feedback is available. When feedback is not available, people have only their own opinions against which to validate advice, and are thus more influenced by agreeing advice. Intuitively, we expect the initial estimate to be the participant's "best guess" for the correct answer, and thus the closer the advice is to this guess (i.e. the stronger the agreement), the more likely that advice is to be correct. 
-
-We deliberately violated an assumption which may be generally true in real life, that the advice is sufficiently independent as to convey at least some information regarding the correct answer. Had we told participants that the agreeing advisor would agree with them no matter what they the participants said, the participants may have disregarded the advice. 
-
-We have shown that the agreement/accuracy distinction generalises to a continuous estimation decision rather than a categorical perceptual decision. We have illustrated that, even where they would have performed objectively better by preferring accurate over agreeing advice, participants were not able to detect the more accurate advice without objective feedback. These findings support the model of advisor evaluation put forward here.
+In consistent with previous studies, these results show that people are more influenced by accurate advice over advice which simply agrees with their own opinions where feedback is available.
+When feedback is not available, people have only their own opinions against which to validate advice, and are thus more influenced by agreeing advice.
+Intuitively, we expect the initial estimate to be the participant's "best guess" for the correct answer, and thus the closer the advice is to this guess (i.e.
+the stronger the agreement), the more likely that advice is to be correct.
+We deliberately violated an assumption which may be generally true in real life, that the advice is sufficiently independent as to convey at least some information regarding the correct answer.
+Had we told participants that the agreeing advisor would agree with them no matter what they the participants said, the participants may have disregarded the advice.
+We have shown that the agreement/accuracy distinction generalises to a continuous estimation decision rather than a categorical perceptual decision.
+We have illustrated that, even where they would have performed objectively better by preferring accurate over agreeing advice, participants were not able to detect the more accurate advice without objective feedback.
+These findings support the model of advisor evaluation put forward here.
 
 ## Confidence-contingent advice {#ai-cca}
 
-\OpenScience{data} !TODO[OSFify data for these studies]
+\OpenScience{data} \mccorrect{!TODO[OSFify data for these studies]}
 
 \OpenScience{materials} https://github.com/oxacclab/ExploringSocialMetacognition/blob/master/ACv2/index.html
 
 ACv2/withConfidence_coreAnalysis_v0.0.1
 
-!TODO[This experiment is kinda crappy and failed its manipulation. Can we run a version which does its job properly and provide actual evidence for/against the confidence modulation?]
+\mccorrect{!TODO[This experiment is kinda crappy and failed its manipulation.
+Can we run a version which does its job properly and provide actual evidence for/against the confidence modulation?]}
 
 ### Method {#ai-cc-m}
 
@@ -61,4 +71,6 @@ ACv2/withConfidence_coreAnalysis_v0.0.1
 
 ### Discussion {#ai-cca-d}
 
-Participants appeared to pay more attention to the advice than the advisor. In other words, participants distinguished between individual pieces of advice but did not translate these distinctions into distinctions between advisors. This study thus provided no evidence in favour of the confidence-weighting adjustement to the agreement model. 
+Participants appeared to pay more attention to the advice than the advisor.
+In other words, participants distinguished between individual pieces of advice but did not translate these distinctions into distinctions between advisors.
+This study thus provided no evidence in favour of the confidence-weighting adjustement to the agreement model.
