@@ -11,6 +11,7 @@ documentclass: book
 ---
 
 # Real-world network effects {#chapter-real-networks}
+\adjustmtc 
 
 <!-- Hopefully we'll have the chance to examine some social network data and do some comparisons between our models and those structures. 
 

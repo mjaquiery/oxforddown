@@ -12,6 +12,7 @@ source('scripts_and_filters/general_setup.R')
 ```
 
 # Behavioural experiment method {#chapter-behavioural-experiment-method}
+\adjustmtc 
 
 <!-- The behavioural experiments all have similar methodology, so it makes sense to dedicate a chapter to detailing it and then summarise and explain deviances/specifics when reporting each individual experiment.
 -->
@@ -130,6 +131,10 @@ knitr::include_graphics("figures/methods/dates.jpg")
 ```{r m-dates-binary, fig.align='center', fig.caption="Dates Task with binary responses.", out.width="100%"}
 knitr::include_graphics("figures/methods/dates-binary.jpg")
 ```
+
+##### Development
+
+\mccorrect{!TODO[In some amount of detail TBD describe the process of coming up with questions (trawling general knowledge sites, eventually settling on a few timelines inc. Wikipedia, Oxford thingy; questions 1850-1950; rounds of getting participant answers + conf intervals; questions 1900-2000; answers + conf intervals)]}
 
 ### Advisor advice profiles {#m-profiles}
 

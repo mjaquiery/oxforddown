@@ -1,0 +1,308 @@
+---
+output:
+  bookdown::pdf_document2:
+    template: templates/brief_template.tex
+  bookdown::word_document2: default
+  bookdown::html_document2: default
+documentclass: book
+
+bibliography: 
+  - references.bib
+  - bibliography/references.bib
+bibliography-heading-in-pdf: Works Cited
+params:
+  corrections: true 
+---
+
+```{r setup 01-02, echo = F, include = F}
+source('scripts_and_filters/general_setup.R')
+library(BayesFactor)
+library(magrittr) # for %$% exploding pipe operator
+```
+
+# Psychology of advice-taking {#chapter-advice-taking}
+\adjustmtc 
+
+<!-- 
+Here should be a detailed introduction.
+Niccolo's stuff about advice-taking, and then demonstrate similar results in my Dates Task.
+-->
+
+## \mccorrect{!TODO[Cite Niccolo's best paper on his thesis advice-use experiments]}
+
+\mccorrect{!TODO[Describe Niccolo's stuff, especially why accuracy vs agreement might be a good target for replication with a new experimental design.]}
+
+## Extending results to the Dates task
+
+### Introduction {#ai-ava-i}
+
+\mccorrect{!TODO[Why the dates task? Generalising to a new kind of task. Quicker, more realistic in some ways, more fun]}
+
+\mccorrect{!TODO[Why agreeing vs accurate advisors? It's a distillation of the core insight from Niccolo's work.]}
+
+```{r include = F}
+
+rm(list = ls()); source('scripts_and_filters/general_setup.R')
+
+# Load the study data
+select_experiment(
+  project = 'datequiz',
+  function(x) filter(x, study == 'datesStudy', version == 'v1-0-1')
+)
+
+
+.dropEnv <- new.env()
+tada('datequiz', package = 'esmData', envir = .dropEnv)
+.dropEnv$datequiz <- .dropEnv$datequiz %>% 
+  filter(study == 'datesStudy', version != 'v1-0-1')
+
+.dropEnv$DROP_V <- paste0(unique(.dropEnv$datequiz$version), collapse = ', ')
+.dropEnv$DROP_P <- sum(.dropEnv$datequiz %>% 
+                         filter(table == 'AdvisedTrial') %>% 
+                         pull(N))
+
+# Version of which the analysed version is a replication
+.prevStudy <- new.env()
+select_experiment(
+  'datequiz', 
+  function(x) filter(x, study == 'datesStudy', version == 'v0-0-21'), 
+  envir = .prevStudy
+)
+
+for (E in c(.GlobalEnv, .prevStudy)) {
+  E$AdvisedTrial <- annotate_responses(E$AdvisedTrial)
+  E$Trial <- annotate_responses(E$Trial)
+}
+
+```
+
+#### Open scholarship practices
+
+\indent\indent\OpenScience{prereg} `r unique(datequiz$preregistration)`
+
+\OpenScience{data} \mccorrect{!TODO[OSFify data for these studies]}
+
+\OpenScience{materials} https://github.com/oxacclab/ExploringSocialMetacognition/blob/f90b6f9266a901211a4ddb7b5ee1de1c74e8df57/ACv2/index.html
+
+##### Unanalysed data
+
+This branch of experiments was the core of the date task. 
+As such, most experimentation and piloting happened on this branch, meaning that there were many versions of the study where data were collected for which analysis is not included here (`r .dropEnv$DROP_V`). 
+\mccorrect{!TODO[Explain the non-analysed versions.]}
+Overall, data were collected from `r .dropEnv$DROP_P` participants across all of these versions.
+
+The study reported here is a preregistered replication of a pilot study (v0-0-21) which produced the same results.
+Data, analysis script, and analysis for the pilot study are also available at \mccorrect{!TODO[OSFify pilot data/analysis stuff]}.
+
+#### Method {#ai-ava-m}
+
+This study used the continuous version of the Dates Task ([§Estimation (Dates Task) - Continuous](#m-p-dates-c)).
+
+#### Results {#ai-ava-r}
+
+##### Exclusions
+
+```{r}
+nMaxOutliers <- 2
+zThresh <- 3
+
+for (E in c(.GlobalEnv, .prevStudy)) {
+  E$exclusions <- tibble(pid = unique(E$AdvisedTrial$pid)) %>%
+    mutate(
+      `Attention check` = map_lgl(pid, ~ 
+                                    !all(E$Trial$responseCorrect[E$Trial$pid == .]) |
+                                    any(E$Trial$responseMarkerWidth[E$Trial$pid == .] != 1)
+      ),
+      `Unfinished` = map_lgl(pid, ~ !(. %in% E$`debrief-advisors`$pid))
+    )
+  
+  do_exclusions(E$exclusions, envir = E)
+  
+  E$nMaxTrials <- E$AdvisedTrial %>% 
+    group_by(pid) %>% 
+    summarise(n = n(), .groups = 'drop') %>% 
+    pull(n) %>% 
+    max()
+  
+  E$AdvisedTrial <- E$AdvisedTrial %>% 
+    mutate(.z = scale(timeEnd)) %>%
+    filter(abs(.z) < zThresh) %>% 
+    select(-.z)
+  
+  E$exclusions <- E$exclusions %>% 
+    mutate(
+      `Too many outlying trials` = 
+        map_lgl(pid, ~ E$AdvisedTrial %>% 
+                  filter(pid == .x) %>%
+                  summarise(n = n(), .groups = 'drop') %>% 
+                  pull(n) < (E$nMaxTrials - nMaxOutliers)),
+      # if participants were already dropped don't mark them here
+      `Too many outlying trials` = if_else(!(pid %in% E$AdvisedTrial$pid),
+                                           F, `Too many outlying trials`)
+    )
+  
+  do_exclusions(E$exclusions, envir = E, backup = F)
+}
+
+```
+
+Participants' data could be excluded from analysis where they fail attention checks, fail to complete the entire experiment, or have more than `r nMaxOutliers` outlying trials. Outlying trials are calculated after excluding participants who failed to complete the experiment, and are defined as trials for which the total trial time was greater than `r zThresh` standard deviations away from the mean of all trials from all participants.
+
+A browser compatibility issue in this study meant that any participants completing the study using the Safari family of browsers had to be excluded because the advice was not presented appropriately. 
+
+```{r}
+
+exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
+exclusions %>% 
+  summarise(across(where(is.logical), sum)) %>%
+  mutate(`Total remaining` = length(unique(AdvisedTrial$pid)))
+
+```
+
+##### Task performance
+
+##### Mainpulation checks
+
+##### \OpenScience{prereg} Hypothesis test
+
+```{r ai-ava-r-graph, fig.caption="Dates task advisor influence for high accuracy/agreement advisors.  Shows the influence of the advice of the advisors. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph."}
+
+for (E in c(.GlobalEnv, .prevStudy)) {
+  
+  E$tmp <- E$AdvisedTrial %>% 
+    filter(advisor0actualType == "disagreeReflected") %>%
+    group_by(pid, advisor0idDescription) %>%
+    select(c(matches('(influence|woa)'), group_vars(.))) %>%
+    summarise_all(mean)
+  
+  # Add in feedback condition
+  if (identical(E, .GlobalEnv)) {
+    E$tmp <- left_join(
+      E$tmp,
+      E$AdvisedTrial %>% 
+        group_by(pid) %>% 
+        summarise(feedbackCondition = case_when(any(feedback == 1) ~ 'Feedback', 
+                                                T ~ 'No feedback'),
+                  .groups = 'drop'),
+      by = 'pid'
+    )
+  } else {
+    E$tmp <- left_join(
+      E$tmp,
+      E$AdvisedTrial %>% 
+        nest(d = -pid) %>% 
+        mutate(
+          feedbackCondition = map_lgl(d, ~ !all(is.na(.$timeFeedbackOn))),
+          feedbackCondition = if_else(feedbackCondition, 'Feedback', 'No feedback')
+        ) %>%
+        select(-d),
+      by = 'pid'
+    )
+  }
+  
+  E$tmp <- E$tmp %>% 
+    ungroup() %>%
+    mutate_if(is.character, factor) %>%
+    mutate(`Feedback condition` = feedbackCondition)
+}
+
+bf <- tmp %>% 
+  nest(d = -c(feedbackCondition, `Feedback condition`)) %>%
+  mutate(
+    bf = map(d, ~ select(., pid, advisor0idDescription, advisor0WOA) %>%
+               pivot_wider(names_from = advisor0idDescription, values_from = advisor0WOA) %>%
+               filter_if(is.numeric, ~ !is.na(.)) %$%
+               ttestBF(x = Accurate, y = Agreeing, data = ., paired = T))
+  ) 
+
+bf$BF <- sapply(1:nrow(bf), function(i) bf2str(exp(bf$bf[[i]]@bayesFactor$bf)))
+
+
+dw <- .1
+
+ggplot(tmp, aes(x = advisor0idDescription, y = advisor0WOA, 
+                colour = `Feedback condition`, fill = `Feedback condition`)) +
+  geom_line(aes(group = pid), alpha = .25) +
+  geom_split_violin(aes(x = nudge(advisor0idDescription, dw),
+                        group = advisor0idDescription), width = .9,
+               colour = NA) +
+  geom_split_violin(aes(x = nudge(advisor0idDescription, dw),
+                        group = advisor0idDescription,
+                        fill = `Feedback condition`), 
+                    colour = 'black', alpha = 0, width = .9, 
+                    linetype = 'dashed', size = 1,
+                    data = .prevStudy$tmp) +
+  geom_boxplot(outlier.shape = NA, size = 1, width = dw/2,
+               aes(x = nudge(advisor0idDescription, dw), 
+                   group = advisor0idDescription),
+               colour = 'black') +
+  geom_segment(x = 1, xend = 2, y = 1.05, yend = 1.05, colour = 'black') +
+  geom_label(y = 1.05, x = 1.5, colour = 'black', fill = 'white', 
+             aes(label = paste0('BF = ', BF)), data = bf) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, length.out = 6), expand = expansion(add = c(0, 0.1))) +
+  facet_grid(~`Feedback condition`) +
+  labs(x = 'Advisor advice profile', y = 'Influence of advice')
+
+.T.fb <- tmp %>%
+  filter(feedbackCondition == 'Feedback') %>%
+  select(pid, advisor0idDescription, advisor0WOA) %>%
+  pivot_wider(names_from = advisor0idDescription, values_from = advisor0WOA) %>%
+  filter_if(is.numeric, ~ !is.na(.)) %$%
+  md.ttest(x = Accurate, y = Agreeing, 
+           labels = c('*M*$_{Accurate|Feedback}$', '*M*$_{Agreeing|Feedback}$'), 
+           paired = T)
+
+.T.Nfb <- tmp %>%
+  filter(feedbackCondition != 'Feedback') %>%
+  select(pid, advisor0idDescription, advisor0WOA) %>%
+  pivot_wider(names_from = advisor0idDescription, values_from = advisor0WOA) %>%
+  filter_if(is.numeric, ~ !is.na(.)) %$%
+  md.ttest(x = Accurate, y = Agreeing, 
+           labels = c('*M*$_{Accurate|¬Feedback}$', '*M*$_{Agreeing|¬Feedback}$'), 
+           paired = T)
+
+```
+
+`r .T.fb`
+
+
+`r .T.Nfb`
+
+
+#### Questionnaires
+
+### Discussion {#ai-ava-d}
+
+\mccorrect{!TODO[Add a focus about how results tie in with Niccolo's, and the usefulness of the study implementation in the advisor choice stuff to come.]}
+
+\mccorrect{!TODO[Some discussion of limitations of this method (unless already discussed in General Method): no control over participant error rates, difficult task, inconsistent presentation for an individual (e.g. solid knowledge of an obscure date)]}
+
+In consistent with previous studies, these results show that people are more influenced by accurate advice over advice which simply agrees with their own opinions where feedback is available.
+When feedback is not available, people have only their own opinions against which to validate advice, and are thus more influenced by agreeing advice.
+Intuitively, we expect the initial estimate to be the participant's "best guess" for the correct answer, and thus the closer the advice is to this guess (i.e. the stronger the agreement), the more likely that advice is to be correct.
+We deliberately violated an assumption which may be generally true in real life, that the advice is sufficiently independent as to convey at least some information regarding the correct answer.
+Had we told participants that the agreeing advisor would agree with them no matter what they the participants said, the participants may have disregarded the advice.
+We have shown that the agreement/accuracy distinction generalises to a continuous estimation decision rather than a categorical perceptual decision.
+We have illustrated that, even where they would have performed objectively better by preferring accurate over agreeing advice, participants were not able to detect the more accurate advice without objective feedback.
+These findings support the model of advisor evaluation put forward here.
+
+## Confidence-contingent advice {#ai-cca}
+
+\indent\indent\OpenScience{data} \mccorrect{!TODO[OSFify data for these studies]}
+
+\OpenScience{materials} https://github.com/oxacclab/ExploringSocialMetacognition/blob/master/ACv2/index.html
+
+ACv2/withConfidence_coreAnalysis_v0.0.1
+
+\mccorrect{!TODO[This experiment is kinda crappy and failed its manipulation.
+Can we run a version which does its job properly and provide actual evidence for/against the confidence modulation?]}
+
+### Method {#ai-cc-m}
+
+### Results {#ai-cc-r}
+
+### Discussion {#ai-cca-d}
+
+Participants appeared to pay more attention to the advice than the advisor.
+In other words, participants distinguished between individual pieces of advice but did not translate these distinctions into distinctions between advisors.
+This study thus provided no evidence in favour of the confidence-weighting adjustement to the agreement model.

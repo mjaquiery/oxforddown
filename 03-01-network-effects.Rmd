@@ -11,6 +11,7 @@ documentclass: book
 ---
 
 # Network effects of interaction {#chapter-network-effects}
+\adjustmtc 
 
 <!-- We may have some modelling to present along these lines. -->
 

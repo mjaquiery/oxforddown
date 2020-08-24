@@ -12,6 +12,7 @@ source('scripts_and_filters/general_setup.R')
 ```
 
 # Behavioural responses to advice contexts {#chapter-context-benevolence}
+\adjustmtc 
 
 <!-- 
 Present behavioural experiments in which we show sensitivity to both the advisor and the advice, and discuss the relatively high levels of advice-taking (hard task!), and how the results support the impressions gleaned from the evolutionary models: context matters in advice-taking, and discounting may be a feature of vigilant conservatism (hyperprior for deceit).

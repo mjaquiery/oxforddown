@@ -18,6 +18,7 @@ params:
 \minitoc <!-- this will include a mini table of contents-->
 
 # Context of Advice {#chapter-context}
+\adjustmtc 
 
 <!-- here we present all that mathematical optimum stuff where Soll and Larrik cover the boundary conditions under which averaging is an optimum strategy vs when it is disadvantagenous. 
 

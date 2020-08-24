@@ -43,7 +43,8 @@ knitr::knit_hooks$set(quote_author = function(before, options, envir) {
   }
 })
 
-#' Caption figures with a short caption (up to \newline) and longer caption thereafter
+#' Caption figures with a short caption (up to double-space) and longer caption thereafter
+#' Convert any double-spaces to \newline
 #' Matt Jaquiery
 knitr::opts_hooks$set(
   fig.caption = function(options) {
@@ -81,6 +82,92 @@ theme_set(
       axis.line = element_line(colour = 'black'),
       axis.ticks = element_line(colour = 'black'),
       text = element_text(size = 14),
-      legend.position = 'top'
+      legend.position = 'top',
+      strip.text = element_text(colour = 'black')
     )
 )
+
+broken_axis <- theme(axis.line.y = element_line(arrow = arrow(ends = 'both', length = unit(6, 'points'), type = 'closed')))
+broken_axis_top <- theme(axis.line.y = element_line(arrow = arrow(ends = 'last', length = unit(6, 'points'), type = 'closed')))
+broken_axis_bottom <- theme(axis.line.y = element_line(arrow = arrow(ends = 'first', length = unit(6, 'points'), type = 'closed')))
+
+# For prettyMD ------------------------------------------------------------
+
+# Here is a bunch of stuff for plotting etc. which should eventually go in prettyMD
+
+#' GGplot2 helper function to get offset x coordinates to the left or right
+#' depending on whether the x coordinate is to the left or right.
+#' @param x vector of x coordinates (typically factors)
+#' @param amount amount to nudge in the appropriate direction
+#' @param direction to nudge. 'outwards' is towards the extremes, 'inwards' is towards the centre.
+nudge <- function(x, amount, direction = 'outwards') {
+  x <- as.numeric(x) 
+  dir <- if (direction == 'outwards') 1 else -1
+  x + sign(x - mean(range(x, na.rm = T))) * dir * amount
+}
+
+#' Adapted from https://stackoverflow.com/a/45614547 
+#' The split violin shows only one half of the violin plot, 
+#' specifically the left half for group = 1 and the right half for group = 2
+GeomSplitViolin <- ggproto("GeomSplitViolin", GeomViolin, 
+                           draw_group = function(self, data, ..., draw_quantiles = NULL) {
+                             data <- transform(data, xminv = x - violinwidth * width * (x - xmin), xmaxv = x + violinwidth * width * (xmax - x))
+                             grp <- data[1, "group"]
+                             newdata <- plyr::arrange(transform(data, x = if (grp %% 2 == 1) xminv else xmaxv), if (grp %% 2 == 1) y else -y)
+                             newdata <- rbind(newdata[1, ], newdata, newdata[nrow(newdata), ], newdata[1, ])
+                             newdata[c(1, nrow(newdata) - 1, nrow(newdata)), "x"] <- data[1, "x"]
+                             
+                             if (length(draw_quantiles) > 0 & !scales::zero_range(range(data$y))) {
+                               stopifnot(all(draw_quantiles >= 0), all(draw_quantiles <=
+                                                                         1))
+                               quantiles <- ggplot2:::create_quantile_segment_frame(data, draw_quantiles)
+                               aesthetics <- data[rep(1, nrow(quantiles)), setdiff(names(data), c("x", "y")), drop = FALSE]
+                               aesthetics$alpha <- rep(1, nrow(quantiles))
+                               both <- cbind(quantiles, aesthetics)
+                               quantile_grob <- GeomPath$draw_panel(both, ...)
+                               ggplot2:::ggname("geom_split_violin", grid::grobTree(GeomPolygon$draw_panel(newdata, ...), quantile_grob))
+                             }
+                             else {
+                               ggplot2:::ggname("geom_split_violin", GeomPolygon$draw_panel(newdata, ...))
+                             }
+                           })
+
+geom_split_violin <- function(mapping = NULL, data = NULL, stat = "ydensity", position = "identity", ..., 
+                              draw_quantiles = NULL, trim = TRUE, scale = "area", na.rm = FALSE, 
+                              show.legend = NA, inherit.aes = TRUE) {
+  layer(data = data, mapping = mapping, stat = stat, geom = GeomSplitViolin, 
+        position = position, show.legend = show.legend, inherit.aes = inherit.aes, 
+        params = list(trim = trim, scale = scale, draw_quantiles = draw_quantiles, na.rm = na.rm, ...))
+}
+
+
+# For esmData -------------------------------------------------------------
+
+# This stuff might belong better in esmData
+
+#' Go through the workspace and remove excluded pids from all tbls with a pid 
+#' field, creating backups along the way
+#' @param exclusions tbl with a pid column and n>1 logical columns where TRUE indicates that a participant is excluded for columnName reason
+#' @param envir environment in which to do modifications
+#' @param backup whether to back up previous version of objects as all.[objectName]
+do_exclusions <- function(exclusions, envir = .GlobalEnv, backup = T) {
+  # Prepare excluded pid list
+  exclusions$excluded <- exclusions %>% select(-pid) %>% apply(1, any)
+  pids <- exclusions$pid[!exclusions$excluded]
+  
+  for (o in ls(envir = envir)) {
+    if (o == 'exclusions') next()
+    if (str_starts(o, 'all\\.')) next()
+    obj <- get(o, envir = envir)
+    if ('pid' %in% names(obj)) {
+      if (backup & paste0('all.', o) %in% ls(envir = envir)) {
+        warning(paste0('all.', o, ' already exists: overwriting.'))
+      }
+      if (backup) {
+        assign(paste0('all.', o), obj, envir = envir)
+      }
+      obj <- obj[obj$pid %in% pids, ]
+      assign(o, obj, envir = envir)
+    }
+  }
+}

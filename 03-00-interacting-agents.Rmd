@@ -14,6 +14,7 @@ documentclass: book
 \minitoc <!-- this will include a mini table of contents-->
 
 # Interaction of psychological processes across minds {#chapter-interacting-agents}
+\adjustmtc 
 
 <!-- Models suggest interactions between agents exascerbate problems, especially where source selection and info weighting combine. -->
 

@@ -108,6 +108,7 @@ If a decision-maker were to average evenly their initial estimate with an adviso
 The model is supported by patterns in averages.
 Analysis of individual trials shows that the aggregate patterns of advice-taking appear to be roughly distributed between an averaging strategy and a picking strategy \mccorrect{!TODO[CITE someone on pick vs average, maybe soll?]}.
 The model, derived from these patterns, approximates the contribution of an individual trial to the overall average rather than the actual advice-taking strategy on any given trial.
+
 ### Justification for use of the aggregation model
 
 The criticisms above are important, but they do not invalidate the model for use in the present project.
@@ -140,6 +141,7 @@ There is some evidence that people alter their advice-giving behaviour in antici
 There is no evidence as yet as to whether decision-makers anticipate and adjust for this adjustment on the part of the advisor.
 For the questions considered here, conclusions obtained under these simplifying assumptions are likely to hold even when the additional complexity is restored.
 The effects in the real world of interactivity between trust dimensions and game theoretic adjustments in the giving and interpretation of advice are likely to be small in comparison to general effects of advisor updating.
+
 ### Evaluation of advice {-}
 
 A single piece of advice can be evaluated using its own properties and the properties of the advisor giving the advice.
@@ -147,6 +149,7 @@ Furthermore, that evaluation can serve to update the properties of the advisor.
 A piece of advice's own properties will include its plausibility (e.g.
 participants in estimation tasks discount advice which is distant from their own initial estimates more heavily [@yanivReceivingOtherPeople2004]), while the properties of the advisor will include the advisor's trustworthiness ([see above](#use-of-advice)).
 The updating of trust following experience of advice is likely to be largely in the domain of [ability](#ability), although other domains may be affected where the advice is particularly egregious.
+
 ## Updating advisor evaluations {-}
 
 While a single piece of advice must be taken on its own terms, people can construct relatively accurate estimates of advisors' advice when provided with feedback on the decisions they use the advice to make [@pescetelliUseMetacognitiveSignals2017; @sahCheapTalkCredibility2013; @yanivAdviceTakingDecision2000].
@@ -168,7 +171,7 @@ argued in a review that a wide variety of social phenomena could be explained vi
 Additionally, Heyes and colleagues have argued that social learning is wholly explicable in terms of general reinforcement learning processes \mccorrect{!TODO CITE}.
 Reinforcement learning in the social domain operates on the basis of rapid feedback, just as in the non-social domain.
 Below, the advisor evaluation model is extended to cases where objective feedback is not available by substituting the decision-maker's confidence for objective feedback.
-While not foolproof, the method allows better-than-average approximation of the quality of advisors.
+While not foolproof, the method allows better-than-average approximation of the quality of advisors provided several plausible assumptions are met \mccorrect{!TODO[Discuss assumptions somewhere: independence of errors, better-than-chance accuracy, trying to help, rough metacognitive calibration/resolution]}.
 
 ## Advisor evaluation without feedback {-}
 
@@ -203,6 +206,8 @@ The updating of advice contingent on agreement may be weighted by confidence in 
 
 
 ## Table of experiments {-}
+
+\mccorrect{This is now outdated. Update or remove?}
 
 Advisors | Choice | Task | Feedback | Result
 ---------|--------|------|----------|-------

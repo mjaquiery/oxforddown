@@ -11,6 +11,7 @@ documentclass: book
 ---
 
 # Sensitivity of advice-taking to context {#chapter-advice-taking-context}
+\adjustmtc 
 
 <!-- 
 Here we discuss the evolutionary models and the results, which tell us that egocentric discounting can evolve in environments where various different abberations of typical experimental conditions are present.
