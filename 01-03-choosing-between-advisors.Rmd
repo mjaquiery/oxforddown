@@ -34,7 +34,7 @@ My research on advisor selection.
 
 The model of advisor evaluation described earlier ([§Advisor evaluation without feedback](#advisor-evaluation-without-feedback)) requires empirical support.
 The model of advisor evaluation with feedback is well supported by data which indicate that, given objective feedback, people can use the feedback to learn about the trustworthiness of advisors.
-The extent to which advice is taken ([§Measures of advice](#\mccorrect{!TODO[link to measures of advice in method]})) is commonly used as a measure of a participant's trust in an advisor, on the argument that the participant seeks to maximise task performance and task performance is maximised by taking more advice from more trustworthy advisors.
+The extent to which advice is taken ([§General method - Analysis - Dependent variables - Weight on Advice](#m-analysis-dv-woa)) is commonly used as a measure of a participant's trust in an advisor, on the argument that the participant seeks to maximise task performance and task performance is maximised by taking more advice from more trustworthy advisors.
 \mccorrect{!TODO[Mini lit review - advisor accuracy training with feedback (Yaniv?), Niccolo and Nick's feedback stuff]}.
 Overall, this means that people prefer more accurate advice over less accurate advice.
 
@@ -56,10 +56,9 @@ Pescetelli and Yeung developed a more sophisticated model of advisor evaluation 
 Intuitively, if I am highly certain that I am correct on a given question, an advisor who disagrees with me is likely to be incorrect, whereas one who agrees with me is likely to be correct.
 Provided confidence is indicative of the objective probability of being correct, as confidence in the initial decision increases it more closely approximates objective feedback for the purposes of evaluating advice.
 \mccorrect{!TODO[detailed account of Niccolo's evidence for the confidence-weighted model]}.
-I report the results of experiments designed to extend Pescetelli and Yeung's results to the domain of advisor influence.
+I report the results of experiments designed to extend Pescetelli and Yeung's results to the domain of advisor influence, using two different decision-making tasks.
 
-\mccorrect{!TODO[move this section to a discussion somewhere?]} An alternative explanation for the data is that disagreeing advice is more surpising when it comes from an advisor who usually agrees, and that it is its increased salience increases its influence rather than increased trust in the advisor.
-If that were the case then the same ought to be true for agreeing advice from a disagreeing advisor, and this is not the case \mccorrect{!TODO[Do we have/can we produce evidence for this? Perhaps look at our participants where advisors disagree with them by chance more than e.g. 70% of the time and check for increased influence on agreement trials vs advisors who disagree less than 70% of the time]}.
+
 <!-- Presentation of the experiments (may want different subsections for each experiment and an extra one for the general discussion).
 -->
 
@@ -89,6 +88,8 @@ tada('dotstask', package = 'esmData', envir = .dropEnv)
 .dropEnv$DROP_P <- sum(.dropEnv$dotstask %>% 
                          filter(table == 'AdvisedTrial') %>% 
                          pull(N))
+
+trials <- annotate_responses(trials)
 
 ```
 
@@ -146,6 +147,67 @@ kable(tmp, caption = "Table \\label{tab:ac-acc-dots-m-profiles}: Advisor advice 
 
 ##### Exclusions
 
+```{r}
+nMaxOutliers <- 2
+zThresh <- 3
+accuracyRange <- c(.6, .85)
+minTrialsPerCategory <- 12
+preRegParticipants <- 50
+
+tmp <- trials %>% 
+  nest(d = -pid) %>%
+  mutate(d = map_dbl(d, ~ mean(.$initialAnswerCorrect)))
+
+exclusions <- tibble(pid = unique(trials$pid)) %>%
+  mutate(
+    `Accuracy too low` = pid %in% filter(tmp, d < accuracyRange[1])$pid,
+    `Accuracy too high` = pid %in% filter(tmp, d > accuracyRange[2])$pid
+  )
+
+tmp <- trials %>% 
+  filter(!practice) %>%
+  nest(d = c(-pid, -confidenceCategory)) %>%
+  mutate(n = map_int(d, nrow)) %>%
+  select(-d) %>%
+  pivot_wider(names_from = confidenceCategory, 
+              names_prefix = "cc", 
+              values_from = n) %>%
+  mutate(
+    anyNA = is.na(cc0) | is.na(cc1) | is.na(cc2),
+    lowest = pmin(cc0, cc1, cc2, na.rm = T)
+  )
+
+exclusions <- exclusions %>% 
+  mutate(
+    `Missing confidence categories` = pid %in% filter(tmp, anyNA)$pid,
+    `Skewed confidence categories` = pid %in% filter(tmp, lowest < minTrialsPerCategory)$pid
+  )
+  
+do_exclusions(exclusions)
+
+tmp <- trials %>% nest(d = -pid) %>% rowid_to_column() %>% filter(rowid > preRegParticipants)
+
+exclusions <- exclusions %>% mutate(`Too many participants` = pid %in% tmp$pid)
+
+do_exclusions(exclusions, backup = F)
+
+```
+
+Participants' data could be excluded from analysis where they have an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, do not have trials in all confidence categories, have fewer than `r minTrialsPerCategory` trials in each confidence category, or have completed the experiment after the preregistered amount of data has already been collected. 
+
+```{r}
+
+exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
+n <- ncol(exclusions)
+exclusions %>% 
+  summarise(across(where(is.logical), sum)) %>%
+  mutate(`Total remaining` = length(unique(trials$pid))) %>% 
+  pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
+  kable(caption = "Table \\label{tab:ac-acc-dots-exclusions}: Participant exclusions for Dots task Accuracy experiment") %>%
+  row_spec((n - 1):n, bold = T)
+
+```
+
 ##### Task performance
 
 ##### Mainpulation checks
@@ -153,8 +215,6 @@ kable(tmp, caption = "Table \\label{tab:ac-acc-dots-m-profiles}: Advisor advice 
 ##### Advisor influence
 
 ```{r ac-acc-dots-r-influence-graph, fig.caption="Dot task advisor influence for in/accurate advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-200, 99].", fig.width = 4, fig.height = 6}
-
-trials <- annotate_responses(trials)
 
 tmp <- trials %>% 
   filter(typeName == "force", adviceType %in% c(5,6)) %>% 
@@ -193,15 +253,13 @@ ggplot(tmp, aes(x = adviceTypeName, y = adviceInfluence,
   geom_label(y = 105, x = 1.5, colour = 'black', fill = 'white', 
              aes(label = paste0('BF = ', bf))) +
   scale_y_continuous(limits = c(-50, 110), breaks = seq(-50, 100, length.out = 6)) +
-  scale_colour_discrete(h.start = 90) +
-  scale_fill_discrete(h.start = 90) +
   facet_grid(~`Feedback condition`) +
   labs(x = 'Advisor advice profile', y = 'Influence of advice') +
   broken_axis_bottom
 
 ```
 
-##### \OpenScience{prereg} Hypothesis test
+##### \OpenScience{prereg} Hypothesis test {#ac-acc-dots-r-h}
 
 ```{r ac-acc-dots-r-graph, fig.caption="Dot task advisor choice for in/accurate advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line.", fig.width=4, fig.height=6}
 
@@ -209,15 +267,16 @@ tmp <- trials %>%
   filter(hasChoice) %>%
   group_by(pid) %>%
   summarise(pChooseHigh = sum(adviceType == 5) / sum(adviceType %in% c(5,6)),
-            .groups = 'drop')
+            .groups = 'drop') %>%
+  mutate(`Feedback condition` = 'No feedback')
 
 bf <- ttestBF(pull(tmp, pChooseHigh), mu = .5)
 
 ggplot(tmp, aes(x = '', y = pChooseHigh)) +
   geom_hline(yintercept = .5, linetype = 'dashed') +
   geom_violindot(size_dots = .4) +
-  # annotate(geom = 'segment', x = .5, xend = 1.5, y = 1.05, yend = 1.05, colour = 'black') +
-  annotate(geom = 'label', label = paste0('BF vs chance\n', num2str(exp(bf@bayesFactor$bf))),
+  geom_violinhalf(aes(fill = `Feedback condition`, colour = `Feedback condition`)) +
+  annotate(geom = 'label', label = paste0('BF vs chance\n', bf2str(exp(bf@bayesFactor$bf))),
            x = 1, y = 1.05) +
   scale_y_continuous(limits = c(0, 1.1), breaks = seq(0, 1, length.out = 5)) +
   labs(y = 'p(Choose High accuracy advisor)', x = '') +
@@ -229,7 +288,8 @@ ggplot(tmp, aes(x = '', y = pChooseHigh)) +
 
 ```
 
-`r .T`
+Participants selected the High accuracy advisor at a rate greater than would be expected if their choosing were random (`r .T`).
+The modal choice remained at chance level (.5), but almost all participants manifesting a preference preferred the High accuracy advisor.
 
 ### Dates Task {#ac-acc-dates}
 
@@ -253,6 +313,8 @@ tada('datequiz', package = 'esmData', envir = .dropEnv)
 .dropEnv$DROP_P <- sum(.dropEnv$datequiz %>% 
                          filter(table == 'AdvisedTrial') %>% 
                          pull(N))
+
+AdvisedTrial <- annotate_responses(AdvisedTrial)
 
 ```
 
@@ -279,6 +341,47 @@ This study used the binary version of the Dates Task ([§Estimation (Dates Task)
 
 ##### Exclusions
 
+```{r}
+maxTrialRT <- 60000   # trials take < 1 minute
+minTrials <- 11       # at least 11 trials completed
+minChangeRate <- .1   # some advice taken on 10%+ of trials
+minKeyTrials <- 10    # exactly 10 key trials
+
+AdvisedTrial <- AdvisedTrial %>% filter(timeEnd <= maxTrialRT)
+
+exclusions <- AdvisedTrial %>% 
+  nest(d = -pid) %>%
+  mutate(
+    `Too few trials` = map_lgl(d, ~ nrow(.) < minTrials),
+    `Insufficient advice taking` = 
+      map_lgl(d, ~ (mutate(
+        ., 
+        x = responseAnswerSide != responseAnswerSideFinal |
+          responseConfidence != responseConfidenceFinal) %>%
+          pull(x) %>% mean()) < minChangeRate),
+    `Too few choice trials` = map_lgl(d, ~ sum(!is.na(.$advisorChoice)) < minKeyTrials)
+  ) %>% 
+  select(-d)
+
+do_exclusions(exclusions)
+
+```
+
+Individual trials were screened to remove those that took longer than `r maxTrialRT/1000`s to complete. Participants were then excluded for having fewer than `r minTrials` trials remaining, fewer than `r minKeyTrials` trials on which they had a choice of advisor, or for giving the same initial and final response on more than `r (1 - minChangeRate) * 100`% of trials. 
+
+```{r}
+
+exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
+n <- ncol(exclusions)
+exclusions %>% 
+  summarise(across(where(is.logical), sum)) %>%
+  mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
+  pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
+  kable(caption = "Table \\label{tab:ac-acc-dates-exclusions}: Participant exclusions for Dates task Accuracy experiment") %>%
+  row_spec((n - 1):n, bold = T)
+
+```
+
 ##### Task performance
 
 ##### Mainpulation checks
@@ -286,8 +389,6 @@ This study used the binary version of the Dates Task ([§Estimation (Dates Task)
 ##### Advisor influence
 
 ```{r ac-acc-dates-r-influence-graph, fig.caption="Date task advisor influence for in/accurate advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-200, 99]."}
-
-AdvisedTrial <- annotate_responses(AdvisedTrial)
 
 tmp <- AdvisedTrial %>% 
   filter(is.na(advisorChoice)) %>%
@@ -338,6 +439,7 @@ ggplot(tmp, aes(x = advisor0idDescription, y = advisor0Influence,
   geom_label(y = 155, x = 1.5, colour = 'black', fill = 'white', 
              aes(label = paste0('BF = ', BF)), data = bf) +
   scale_y_continuous(limits = c(-50, 160), breaks = seq(-50, 150, length.out = 6)) +
+  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
   facet_grid(~`Feedback condition`) +
   labs(x = 'Advisor advice profile', y = 'Influence of advice') +
   broken_axis
@@ -359,7 +461,7 @@ tmp <- left_join(
   tmp,
   AdvisedTrial %>% 
     group_by(pid) %>% 
-    summarise(feedbackCondition = case_when(any(feedback == 1) ~ 'Feedback', 
+    summarise(`Feedback condition` = case_when(any(feedback == 1) ~ 'Feedback', 
                                             T ~ 'No feedback'),
               .groups = 'drop'),
   by = 'pid'
@@ -367,40 +469,46 @@ tmp <- left_join(
   mutate_if(is.character, factor)
 
 bf <- tmp %>% 
-  nest(d = -feedbackCondition) %>%
+  nest(d = -`Feedback condition`) %>%
   mutate(bf = map(d, ~ pull(., pChooseHigh) %>% 
                         ttestBF(mu = .5))) 
 bf$bf <- sapply(1:nrow(bf), function(i) num2str(exp(pull(bf, bf)[[i]]@bayesFactor$bf)))
 
-bf.comp <- ttestBF(formula = pChooseHigh ~ feedbackCondition, data = tmp) %>%
+bf.comp <- ttestBF(formula = pChooseHigh ~ `Feedback condition`, data = tmp) %>%
   .@bayesFactor %>% .$bf %>% exp() %>% num2str()
 
-ggplot(tmp, aes(x = feedbackCondition, y = pChooseHigh)) +
+ggplot(tmp, aes(x = `Feedback condition`, y = pChooseHigh)) +
   geom_hline(yintercept = .5, linetype = 'dashed') +
   geom_violindot(size_dots = .4) +
+  geom_violinhalf(aes(fill = `Feedback condition`, colour = `Feedback condition`)) +
   geom_label(aes(label = paste0('BF vs chance\n', bf)), y = 1.1, data = bf) +
   annotate(geom = 'segment', x = 1, xend = 2, y = 1.2, yend = 1.2) +
   annotate(geom = 'label', x = 1.5, y = 1.2, label = paste0('BF = ', bf.comp)) +
   scale_y_continuous(limits = c(0, 1.2), breaks = seq(0, 1, length.out = 5)) +
+  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
   labs(y = 'p(Choose High accuracy advisor)', x = '') +
   theme(axis.line.x = element_blank(), axis.ticks.x = element_blank())
 
 .T.fb <- tmp %>%
-  filter(feedbackCondition == 'Feedback') %>%
+  filter(`Feedback condition` == 'Feedback') %>%
   pull(pChooseHigh) %>%
   md.ttest(y = .5, labels = c('*M*$_{Feedback}$'))
 
 .T.Nfb <- tmp %>%
-  filter(feedbackCondition != 'Feedback') %>%
+  filter(`Feedback condition` != 'Feedback') %>%
   pull(pChooseHigh) %>%
   md.ttest(y = .5, labels = c('*M*$_{No feedback}$'))
 
 ```
 
-`r .T.fb`
+In the No feedback condition the mean of the distribution of participant picking preferences between the advisors was equivalent to chance (`r .T.Nfb`).
+This is a different result to that observed in the Dots task [§Dots task - Results - Hypothesis test](#ac-acc-dots-r-h), which also had no feedback.
+Preferences were quite evenly distributed across the full range of directions and strengths, with a slight numerical advantage for the Low accuracy advisor.
 
-
-`r .T.Nfb`
+In the Feedback condition the mean of the distribution of selection rates was clearly different from chance. 
+The High accuracy advisor was preferred by more participants, and preferred more strongly (`r .T.fb`).
+The modal selection strategy was to select the High accuracy advisor at every opportunity.
+This indicates that participants could identify the more accurate advisor when feedback was provided and preferred to receive advice from that advisor.
 
 ### Discussion {#ac-acc-d}
 
@@ -410,9 +518,9 @@ Where feedback is not provided, people may need substantially more experience to
 ## Agreement \mccorrect{!TODO[check Niccolo covered this]} {#ac-agr}
 
 Pescetelli and Yeung \mccorrect{!TODO[cite new paper]} demonstrated that advisors who agree \mccorrect{!TODO[somewhere we need to talk about what we mean by agreement, how Niccolo defined it, how we define it (varies between binary/continuous tasks), etc.]} more frequently are more influential (regardless of the presence of feedback) in a lab-based perceptual decision-making task.
-We attempted to extend this finding to the domain of advisor selection in two online tasks: a 'Dots Task' requiring similar perceptual decision-making to the task used by Pescetelli and Yeung, and an estimation-based 'Dates Task'.
 
-The ability to distinguish between accurate advisors in these experiments is important because they relate directly to the phenomenon we are attempting to explain: rational advice-seeking behaviour in the absence of feedback.
+There were differences in how participants selected the advisors between the Dots task (which has no feedback) and the No feedback condition of the Dates task for High versus Low accuracy advisors.
+We may expect more pronounced effects in the absence of feedback when contrasting High versus Low agreement advisors, because we expect that agreement is the driving force behind the accuracy differences where feedback is not provided.
 
 ### Dots Task {#ac-agr-dots}
 
@@ -424,6 +532,8 @@ select_experiment(
   project = 'dotstask',
   function(x) filter(x, study == 'Agreement')
 )
+
+trials <- annotate_responses(trials)
 
 ```
 
@@ -484,6 +594,67 @@ kable(tmp, caption = "Table \\label{tab:ac-agr-dots-m-profiles}: Advisor advice 
 
 ##### Exclusions
 
+```{r}
+nMaxOutliers <- 2
+zThresh <- 3
+accuracyRange <- c(.6, .85)
+minTrialsPerCategory <- 12
+preRegParticipants <- 50
+
+tmp <- trials %>% 
+  nest(d = -pid) %>%
+  mutate(d = map_dbl(d, ~ mean(.$initialAnswerCorrect)))
+
+exclusions <- tibble(pid = unique(trials$pid)) %>%
+  mutate(
+    `Accuracy too low` = pid %in% filter(tmp, d < accuracyRange[1])$pid,
+    `Accuracy too high` = pid %in% filter(tmp, d > accuracyRange[2])$pid
+  )
+
+tmp <- trials %>% 
+  filter(!practice) %>%
+  nest(d = c(-pid, -confidenceCategory)) %>%
+  mutate(n = map_int(d, nrow)) %>%
+  select(-d) %>%
+  pivot_wider(names_from = confidenceCategory, 
+              names_prefix = "cc", 
+              values_from = n) %>%
+  mutate(
+    anyNA = is.na(cc0) | is.na(cc1) | is.na(cc2),
+    lowest = pmin(cc0, cc1, cc2, na.rm = T)
+  )
+
+exclusions <- exclusions %>% 
+  mutate(
+    `Missing confidence categories` = pid %in% filter(tmp, anyNA)$pid,
+    `Skewed confidence categories` = pid %in% filter(tmp, lowest < minTrialsPerCategory)$pid
+  )
+  
+do_exclusions(exclusions)
+
+tmp <- trials %>% nest(d = -pid) %>% rowid_to_column() %>% filter(rowid > preRegParticipants)
+
+exclusions <- exclusions %>% mutate(`Too many participants` = pid %in% tmp$pid)
+
+do_exclusions(exclusions, backup = F)
+
+```
+
+Participants' data could be excluded from analysis where they have an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, do not have trials in all confidence categories, have fewer than `r minTrialsPerCategory` trials in each confidence category, or finish the experiment after `r preRegParticipants` participants have already submitted data which passed the other exclusion tests. 
+
+```{r}
+
+exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
+n <- ncol(exclusions)
+exclusions %>% 
+  summarise(across(where(is.logical), sum)) %>%
+  mutate(`Total remaining` = length(unique(trials$pid))) %>% 
+  pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
+  kable(caption = "Table \\label{tab:ac-agr-dots-exclusions}: Participant exclusions for Dots task Agreement experiment") %>%
+  row_spec((n - 1):n, bold = T)
+
+```
+
 ##### Task performance
 
 ##### Mainpulation checks
@@ -491,8 +662,6 @@ kable(tmp, caption = "Table \\label{tab:ac-agr-dots-m-profiles}: Advisor advice 
 ##### Advisor influence
 
 ```{r ac-agr-dots-r-influence-graph, fig.caption="Dot task advisor influence for high/low agreement advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-200, 99].", fig.width = 4, fig.height = 6}
-
-trials <- annotate_responses(trials)
 
 tmp <- trials %>% 
   filter(typeName == "force", adviceType %in% c(7,8)) %>% 
@@ -531,8 +700,6 @@ ggplot(tmp, aes(x = adviceTypeName, y = adviceInfluence,
   geom_label(y = 105, x = 1.5, colour = 'black', fill = 'white', 
              aes(label = paste0('BF = ', bf))) +
   scale_y_continuous(limits = c(-50, 110), breaks = seq(-50, 100, length.out = 6)) +
-  scale_colour_discrete(h.start = 90) +
-  scale_fill_discrete(h.start = 90) +
   facet_grid(~`Feedback condition`) +
   labs(x = 'Advisor advice profile', y = 'Influence of advice') +
   broken_axis
@@ -547,14 +714,16 @@ tmp <- trials %>%
   filter(hasChoice) %>%
   group_by(pid) %>%
   summarise(pChooseHigh = sum(adviceType == 7) / sum(adviceType %in% c(7,8)),
-            .groups = 'drop')
+            .groups = 'drop') %>%
+  mutate(`Feedback condition` = 'No feedback')
 
 bf <- ttestBF(pull(tmp, pChooseHigh), mu = .5)
 
 ggplot(tmp, aes(x = '', y = pChooseHigh)) +
   geom_hline(yintercept = .5, linetype = 'dashed') +
   geom_violindot(size_dots = .4) +
-  annotate(geom = 'label', label = paste0('BF vs chance\n', num2str(exp(bf@bayesFactor$bf))),
+  geom_violinhalf(aes(fill = `Feedback condition`, colour = `Feedback condition`)) +
+  annotate(geom = 'label', label = paste0('BF vs chance\n', bf2str(exp(bf@bayesFactor$bf))),
            x = 1, y = 1.05) +
   scale_y_continuous(limits = c(0, 1.1), breaks = seq(0, 1, length.out = 5)) +
   labs(y = 'p(Choose High agreement advisor)', x = '') +
@@ -566,7 +735,9 @@ ggplot(tmp, aes(x = '', y = pChooseHigh)) +
 
 ```
 
-`r .T`
+The results were the same as those for the Dots task with High versus Low accuracy advisors.
+The High agreement advisor was preferred at a rate greater than that expected by chance (`r .T`).
+The modal preference remained at chance, although, as in the accuracy experiment, almost all participants who manifested a preference preferred the High agreement advisor.
 
 ### Dates Task {#ac-agr-dates}
 
@@ -590,6 +761,8 @@ tada('datequiz', package = 'esmData', envir = .dropEnv)
 .dropEnv$DROP_P <- sum(.dropEnv$datequiz %>% 
                          filter(table == 'AdvisedTrial') %>% 
                          pull(N))
+
+AdvisedTrial <- annotate_responses(AdvisedTrial)
 
 ```
 
@@ -615,6 +788,47 @@ This study used the binary version of the Dates Task ([§Estimation (Dates Task)
 
 ##### Exclusions
 
+```{r}
+maxTrialRT <- 60000   # trials take < 1 minute
+minTrials <- 11       # at least 11 trials completed
+minChangeRate <- .1   # some advice taken on 10%+ of trials
+minKeyTrials <- 10    # exactly 10 key trials
+
+AdvisedTrial <- AdvisedTrial %>% filter(timeEnd <= maxTrialRT)
+
+exclusions <- AdvisedTrial %>% 
+  nest(d = -pid) %>%
+  mutate(
+    `Too few trials` = map_lgl(d, ~ nrow(.) < minTrials),
+    `Insufficient advice taking` = 
+      map_lgl(d, ~ (mutate(
+        ., 
+        x = responseAnswerSide != responseAnswerSideFinal |
+          responseConfidence != responseConfidenceFinal) %>%
+          pull(x) %>% mean()) < minChangeRate),
+    `Too few choice trials` = map_lgl(d, ~ sum(!is.na(.$advisorChoice)) < minKeyTrials)
+  ) %>% 
+  select(-d)
+
+do_exclusions(exclusions)
+
+```
+
+Individual trials were screened to remove those that took longer than `r maxTrialRT/1000`s to complete. Participants were then excluded for having fewer than `r minTrials` trials remaining, fewer than `r minKeyTrials` trials on which they had a choice of advisor, or for giving the same initial and final response on more than `r (1 - minChangeRate) * 100`% of trials. 
+
+```{r}
+
+exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
+n <- ncol(exclusions)
+exclusions %>% 
+  summarise(across(where(is.logical), sum)) %>%
+  mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
+  pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
+  kable(caption = "Table \\label{tab:ac-agr-dates-exclusions}: Participant exclusions for Dates task Agreement experiment") %>%
+  row_spec((n - 1):n, bold = T)
+
+```
+
 ##### Task performance
 
 ##### Mainpulation checks
@@ -622,8 +836,6 @@ This study used the binary version of the Dates Task ([§Estimation (Dates Task)
 ##### Advisor influence
 
 ```{r ac-agr-dates-r-influence-graph, fig.caption="Date task advisor influence for high/low agreement advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-200, 99]."}
-
-AdvisedTrial <- annotate_responses(AdvisedTrial)
 
 tmp <- AdvisedTrial %>% 
   filter(is.na(advisorChoice)) %>%
@@ -674,6 +886,7 @@ ggplot(tmp, aes(x = advisor0idDescription, y = advisor0Influence,
   geom_label(y = 155, x = 1.5, colour = 'black', fill = 'white', 
              aes(label = paste0('BF = ', BF)), data = bf) +
   scale_y_continuous(limits = c(-50, 160), breaks = seq(-50, 150, length.out = 6)) +
+  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
   facet_grid(~`Feedback condition`) +
   labs(x = 'Advisor advice profile', y = 'Influence of advice') +
   broken_axis
@@ -700,7 +913,8 @@ tmp <- left_join(
               .groups = 'drop'),
   by = 'pid'
 ) %>% 
-  mutate_if(is.character, factor)
+  mutate_if(is.character, factor) %>%
+  mutate(`Feedback condition` = feedbackCondition)
 
 bf <- tmp %>% 
   nest(d = -feedbackCondition) %>%
@@ -714,10 +928,12 @@ bf.comp <- ttestBF(formula = pChooseHigh ~ feedbackCondition, data = tmp) %>%
 ggplot(tmp, aes(x = feedbackCondition, y = pChooseHigh)) +
   geom_hline(yintercept = .5, linetype = 'dashed') +
   geom_violindot(size_dots = .4) +
+  geom_violinhalf(aes(fill = `Feedback condition`, colour = `Feedback condition`)) +
   geom_label(aes(label = paste0('BF vs chance\n', bf)), y = 1.1, data = bf) +
   annotate(geom = 'segment', x = 1, xend = 2, y = 1.2, yend = 1.2) +
   annotate(geom = 'label', x = 1.5, y = 1.2, label = paste0('BF = ', bf.comp)) +
   scale_y_continuous(limits = c(0, 1.2), breaks = seq(0, 1, length.out = 5)) +
+  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
   labs(y = 'p(Choose High agreement advisor)', x = '') +
   theme(axis.line.x = element_blank(), axis.ticks.x = element_blank())
 
@@ -733,14 +949,20 @@ ggplot(tmp, aes(x = feedbackCondition, y = pChooseHigh)) +
 
 ```
 
-`r .T.fb`
+Consistent with the result from the Dots task, in the No feedback condition participants' preferences for receiving advice from the High agreement advisor were greater than chance (`r .T.Nfb`).
+The modal preference was to select the High agreement advisor on every Choice trial, and although some participants still showed a preference for hearing advice from the Low agreement advisor, preferences for the High agreement advisor were generally stronger and more frequent.
 
-
-`r .T.Nfb`
+In the Feedback condition, the mean of the participants' selection rates was equivalent to random picking (`r .T.fb`).
+This is consistent with a strategy which attempts to maximise the accuracy of final decisions, because neither advisor would help with this task systematically. 
+The null result here does indicate, however, that there is no strong and clear preference for agreement over and above its accuracy benefits.
 
 ### Discussion {#ac-agr-d}
 
 Where feedback is provided on advisors' performance, participants prefer high agreement advisors to low agreement advisors.
+
+\mccorrect{re: influence - 
+An alternative explanation for the data is that the 'offbrand' advice selected for analysis was more surprising when coming from the advisor who usually agrees, and that this increased salience increased its influence rather than increased trust in the advisor.}
+If that were the case then the same ought to be true for agreeing advice from a disagreeing advisor, and this is not the case \mccorrect{!TODO[Do we have/can we produce evidence for this? Perhaps look at our participants where advisors disagree with them by chance more than e.g. 70% of the time and check for increased influence on agreement trials vs advisors who disagree less than 70% of the time]}.
 
 ## Accuracy vs. agreement (Date estimation) {#ac-ava}
 
@@ -770,6 +992,8 @@ tada('dotstask', package = 'esmData', envir = .dropEnv)
 .dropEnv$DROP_P <- sum(.dropEnv$dotstask %>% 
                          filter(table == 'participants') %>% 
                          pull(N))
+
+trials <- annotate_responses(trials)
 
 ```
 
@@ -804,6 +1028,67 @@ The advisor profiles were not balanced for overall agreement or accuracy rates.
 
 ##### Exclusions
 
+```{r}
+nMaxOutliers <- 2
+zThresh <- 3
+accuracyRange <- c(.6, .85)
+minTrialsPerCategory <- 12
+preRegParticipants <- 50
+
+tmp <- trials %>% 
+  nest(d = -pid) %>%
+  mutate(d = map_dbl(d, ~ mean(.$initialAnswerCorrect)))
+
+exclusions <- tibble(pid = unique(trials$pid)) %>%
+  mutate(
+    `Accuracy too low` = pid %in% filter(tmp, d < accuracyRange[1])$pid,
+    `Accuracy too high` = pid %in% filter(tmp, d > accuracyRange[2])$pid
+  )
+
+tmp <- trials %>% 
+  filter(!practice) %>%
+  nest(d = c(-pid, -confidenceCategory)) %>%
+  mutate(n = map_int(d, nrow)) %>%
+  select(-d) %>%
+  pivot_wider(names_from = confidenceCategory, 
+              names_prefix = "cc", 
+              values_from = n) %>%
+  mutate(
+    anyNA = is.na(cc0) | is.na(cc1) | is.na(cc2),
+    lowest = pmin(cc0, cc1, cc2, na.rm = T)
+  )
+
+exclusions <- exclusions %>% 
+  mutate(
+    `Missing confidence categories` = pid %in% filter(tmp, anyNA)$pid,
+    `Skewed confidence categories` = pid %in% filter(tmp, lowest < minTrialsPerCategory)$pid
+  )
+  
+do_exclusions(exclusions)
+
+tmp <- trials %>% nest(d = -pid) %>% rowid_to_column() %>% filter(rowid > preRegParticipants)
+
+exclusions <- exclusions %>% mutate(`Too many participants` = pid %in% tmp$pid)
+
+do_exclusions(exclusions, backup = F)
+
+```
+
+Participants' data could be excluded from analysis where they have an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, do not have trials in all confidence categories, have fewer than `r minTrialsPerCategory` trials in each confidence category, or finish the experiment after `r preRegParticipants` participants have already submitted data which passed the other exclusion tests. 
+
+```{r}
+
+exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
+n <- ncol(exclusions)
+exclusions %>% 
+  summarise(across(where(is.logical), sum)) %>%
+  mutate(`Total remaining` = length(unique(trials$pid))) %>% 
+  pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
+  kable(caption = "Table \\label{tab:ac-ava-dots-exclusions}: Participant exclusions for Dots task Accuracy vs Agreement experiment") %>%
+  row_spec((n - 1):n, bold = T)
+
+```
+
 ##### Task performance
 
 ##### Mainpulation checks
@@ -811,8 +1096,6 @@ The advisor profiles were not balanced for overall agreement or accuracy rates.
 ##### Advisor influence
 
 ```{r ac-ava-dots-r-influence-graph, fig.caption="Dot task advisor influence for high accuracy/agreement advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-200, 99].", fig.width = 4, fig.height = 6}
-
-trials <- annotate_responses(trials)
 
 tmp <- trials %>% 
   filter(typeName == "force", adviceType %in% c(9,10)) %>% 
@@ -851,8 +1134,6 @@ ggplot(tmp, aes(x = adviceTypeName, y = adviceInfluence,
   geom_label(y = 105, x = 1.5, colour = 'black', fill = 'white', 
              aes(label = paste0('BF = ', bf))) +
   scale_y_continuous(limits = c(-50, 110), breaks = seq(-50, 100, length.out = 6)) +
-  scale_colour_discrete(h.start = 90) +
-  scale_fill_discrete(h.start = 90) +
   facet_grid(~`Feedback condition`) +
   labs(x = 'Advisor advice profile', y = 'Influence of advice') +
   broken_axis
@@ -867,14 +1148,16 @@ tmp <- trials %>%
   filter(hasChoice) %>%
   group_by(pid) %>%
   summarise(pChooseAcc = sum(adviceType == 9) / sum(adviceType %in% c(9,10)),
-            .groups = 'drop')
+            .groups = 'drop') %>%
+  mutate(`Feedback condition` = 'No feedback')
 
 bf <- ttestBF(pull(tmp, pChooseAcc), mu = .5)
 
 ggplot(tmp, aes(x = '', y = pChooseAcc)) +
   geom_hline(yintercept = .5, linetype = 'dashed') +
   geom_violindot(size_dots = .4) +
-  annotate(geom = 'label', label = paste0('BF vs chance\n', num2str(exp(bf@bayesFactor$bf))),
+  geom_violinhalf(aes(fill = `Feedback condition`, colour = `Feedback condition`)) +
+  annotate(geom = 'label', label = paste0('BF vs chance\n', bf2str(exp(bf@bayesFactor$bf))),
            x = 1, y = 1.05) +
   scale_y_continuous(limits = c(0, 1.1), breaks = seq(0, 1, length.out = 5)) +
   labs(y = 'p(Choose High accuracy advisor)', x = '') +
@@ -897,7 +1180,7 @@ rm(list = ls()); source('scripts_and_filters/general_setup.R')
 # Load the study data
 select_experiment(
   project = 'datequiz',
-  function(x) filter(x, study == 'advisorChoice', replication)
+  f = function(x) filter(x, study == 'advisorChoice', replication)
 )
 
 
@@ -918,6 +1201,11 @@ select_experiment(
   function(x) filter(x, study == 'advisorChoice', version == 'v0-0-6'), 
   envir = .prevStudy
 )
+
+for (E in c(.GlobalEnv, .prevStudy)) {
+  E$AdvisedTrial <- annotate_responses(E$AdvisedTrial)
+}
+
 
 ```
 
@@ -943,6 +1231,53 @@ This study used the continuous version of the Dates Task ([§Estimation (Dates T
 #### Results {#ac-ava-dates-r}
 
 ##### Exclusions
+
+```{r}
+maxTrialRT <- 60000   # trials take < 1 minute
+minTrials <- 11       # at least 11 trials completed
+minChangeRate <- .1   # some advice taken on 10%+ of trials
+minKeyTrials <- 8     # 8 or more choice trials
+markerList <- c(7, 13, 21) # only acceptable marker width values
+
+AdvisedTrial <- AdvisedTrial %>% filter(timeEnd <= maxTrialRT)
+
+exclusions <- AdvisedTrial %>% 
+  nest(d = -pid) %>%
+  mutate(
+    `Too few trials` = map_lgl(d, ~ nrow(.) < minTrials),
+    `Insufficient advice taking` = 
+      map_lgl(
+        d, 
+        ~ (mutate(., x = responseEstimateLeft != responseEstimateLeftFinal) %>%
+             pull(x) %>% mean()) < minChangeRate
+      ),
+    `Too few choice trials` = map_lgl(d, ~ sum(!is.na(.$advisorChoice)) < minKeyTrials),
+    `Wrong markers` = 
+      map_lgl(d, ~ filter(., !(responseMarkerWidth %in% markerList) |
+                            !(responseMarkerWidthFinal %in% markerList)) %>% 
+                nrow() > 0),
+    `Non-numeric advice` = map_lgl(d, ~ any(is.na(.$advisor0adviceCentre)))
+  ) %>% 
+  select(-d)
+
+do_exclusions(exclusions)
+
+```
+
+Individual trials were screened to remove those that took longer than `r maxTrialRT/1000`s to complete. Participants were then excluded for having fewer than `r minTrials` trials remaining, fewer than `r minKeyTrials` trials on which they had a choice of advisor, or for giving the same initial and final response on more than `r (1 - minChangeRate) * 100`% of trials. Participants were also excluded for technical problems with the experiment and data: unexpected marker widths or having corrupt values for the advisors' advice.
+
+```{r}
+
+exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
+n <- ncol(exclusions)
+exclusions %>% 
+  summarise(across(where(is.logical), sum)) %>%
+  mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
+  pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
+  kable(caption = "Table \\label{tab:ac-ava-dates-exclusions}: Participant exclusions for Dates task Accuracy vs Agreement experiment") %>%
+  row_spec((n - 1):n, bold = T)
+
+```
 
 ##### Task performance
 
@@ -1012,6 +1347,7 @@ ggplot(tmp, aes(x = advisor0idDescription, y = advisor0Influence,
   geom_label(y = 45, x = 1.5, colour = 'black', fill = 'white', 
              aes(label = paste0('BF = ', BF)), data = bf) +
   scale_y_continuous(limits = c(-10, 50), breaks = seq(-10, 40, length.out = 6)) +
+  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
   facet_grid(~`Feedback condition`) +
   labs(x = 'Advisor advice profile', y = 'Influence of advice') +
   broken_axis
@@ -1039,7 +1375,8 @@ for (E in c(.GlobalEnv, .prevStudy)) {
                 .groups = 'drop'),
     by = 'pid'
   ) %>% 
-    mutate_if(is.character, factor)
+    mutate_if(is.character, factor) %>%
+    mutate(`Feedback condition` = feedbackCondition)
   
 }
 
@@ -1055,12 +1392,13 @@ bf.comp <- ttestBF(formula = pChooseAcc ~ feedbackCondition, data = tmp) %>%
 ggplot(tmp, aes(x = feedbackCondition, y = pChooseAcc)) +
   geom_hline(yintercept = .5, linetype = 'dashed') +
   geom_violindot(size_dots = .4)[[2]] + # dot half
-  geom_violinhalf(fill = 'grey85', size = 1) +
+  geom_violinhalf(aes(fill = `Feedback condition`, colour = `Feedback condition`)) +
   geom_violinhalf(linetype = 'dashed', size = 1, fill = NA, data = .prevStudy$tmp) +
   geom_label(aes(label = paste0('BF vs chance\n', bf)), y = 1.1, data = bf) +
   annotate(geom = 'segment', x = 1, xend = 2, y = 1.2, yend = 1.2) +
   annotate(geom = 'label', x = 1.5, y = 1.2, label = paste0('BF = ', bf.comp)) +
   scale_y_continuous(limits = c(0, 1.2), breaks = seq(0, 1, length.out = 5)) +
+  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
   labs(y = 'p(Choose High accuracy advisor)', x = '') +
   theme(axis.line.x = element_blank(), axis.ticks.x = element_blank())
 
@@ -1111,6 +1449,8 @@ tada('dotstask', package = 'esmData', envir = .dropEnv)
 .dropEnv$DROP_P <- sum(.dropEnv$dotstask %>% 
                          filter(table == 'participants') %>% 
                          pull(N))
+
+trials <- annotate_responses(trials)
 
 ```
 
@@ -1167,6 +1507,67 @@ kable(tmp, caption = "Table \\label{tab:ac-cca-dots-profiles}: Confidence-contin
 
 ##### Exclusions
 
+```{r}
+nMaxOutliers <- 2
+zThresh <- 3
+accuracyRange <- c(.6, .85)
+minTrialsPerCategory <- 12
+preRegParticipants <- 50
+
+tmp <- trials %>% 
+  nest(d = -pid) %>%
+  mutate(d = map_dbl(d, ~ mean(.$initialAnswerCorrect)))
+
+exclusions <- tibble(pid = unique(trials$pid)) %>%
+  mutate(
+    `Accuracy too low` = pid %in% filter(tmp, d < accuracyRange[1])$pid,
+    `Accuracy too high` = pid %in% filter(tmp, d > accuracyRange[2])$pid
+  )
+
+tmp <- trials %>% 
+  filter(!practice) %>%
+  nest(d = c(-pid, -confidenceCategory)) %>%
+  mutate(n = map_int(d, nrow)) %>%
+  select(-d) %>%
+  pivot_wider(names_from = confidenceCategory, 
+              names_prefix = "cc", 
+              values_from = n) %>%
+  mutate(
+    anyNA = is.na(cc0) | is.na(cc1) | is.na(cc2),
+    lowest = pmin(cc0, cc1, cc2, na.rm = T)
+  )
+
+exclusions <- exclusions %>% 
+  mutate(
+    `Missing confidence categories` = pid %in% filter(tmp, anyNA)$pid,
+    `Skewed confidence categories` = pid %in% filter(tmp, lowest < minTrialsPerCategory)$pid
+  )
+  
+do_exclusions(exclusions)
+
+tmp <- trials %>% nest(d = -pid) %>% rowid_to_column() %>% filter(rowid > preRegParticipants)
+
+exclusions <- exclusions %>% mutate(`Too many participants` = pid %in% tmp$pid)
+
+do_exclusions(exclusions, backup = F)
+
+```
+
+Participants' data could be excluded from analysis where they have an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, do not have trials in all confidence categories, have fewer than `r minTrialsPerCategory` trials in each confidence category, or finish the experiment after `r preRegParticipants` participants have already submitted data which passed the other exclusion tests. 
+
+```{r}
+
+exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
+n <- ncol(exclusions)
+exclusions %>% 
+  summarise(across(where(is.logical), sum)) %>%
+  mutate(`Total remaining` = length(unique(trials$pid))) %>% 
+  pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
+  kable(caption = "Table \\label{tab:ac-cca-dots-exclusions}: Participant exclusions for Dots task Confidence-contingent agreement experiment") %>%
+  row_spec((n - 1):n, bold = T)
+
+```
+
 ##### Task performance
 
 ##### Mainpulation checks
@@ -1174,8 +1575,6 @@ kable(tmp, caption = "Table \\label{tab:ac-cca-dots-profiles}: Confidence-contin
 ##### Advisor influence
 
 ```{r ac-cca-dots-r-influence-graph, fig.caption="Dot task advisor influence for bias sharing/anti-bias advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-200, 99].", fig.width = 4, fig.height = 6}
-
-trials <- annotate_responses(trials)
 
 tmp <- trials %>% 
   filter(typeName == "force", adviceType %in% c(3,4)) %>% 
@@ -1214,8 +1613,6 @@ ggplot(tmp, aes(x = adviceTypeName, y = adviceInfluence,
   geom_label(y = 105, x = 1.5, colour = 'black', fill = 'white', 
              aes(label = paste0('BF = ', bf))) +
   scale_y_continuous(limits = c(-50, 110), breaks = seq(-50, 100, length.out = 6)) +
-  scale_colour_discrete(h.start = 90) +
-  scale_fill_discrete(h.start = 90) +
   facet_grid(~`Feedback condition`) +
   labs(x = 'Advisor advice profile', y = 'Influence of advice') +
   broken_axis
@@ -1228,14 +1625,16 @@ ggplot(tmp, aes(x = adviceTypeName, y = adviceInfluence,
 tmp <- trials %>% 
   filter(hasChoice) %>%
   group_by(pid) %>%
-  summarise(pChooseBiasSharing = sum(adviceType == 3) / sum(adviceType %in% c(3,4)))
+  summarise(pChooseBiasSharing = sum(adviceType == 3) / sum(adviceType %in% c(3,4))) %>%
+  mutate(`Feedback condition` = 'No feedback')
 
 bf <- ttestBF(pull(tmp, pChooseBiasSharing), mu = .5)
 
 ggplot(tmp, aes(x = '', y = pChooseBiasSharing)) +
   geom_hline(yintercept = .5, linetype = 'dashed') +
   geom_violindot(size_dots = .4) +
-  annotate(geom = 'label', label = paste0('BF vs chance\n', num2str(exp(bf@bayesFactor$bf))),
+  geom_violinhalf(aes(fill = `Feedback condition`, colour = `Feedback condition`)) +
+  annotate(geom = 'label', label = paste0('BF vs chance\n', bf2str(exp(bf@bayesFactor$bf))),
            x = 1, y = 1.05) +
   scale_y_continuous(limits = c(0, 1.1), breaks = seq(0, 1, length.out = 5)) +
   labs(y = 'p(Choose Bias sharing advisor)', x = '') +

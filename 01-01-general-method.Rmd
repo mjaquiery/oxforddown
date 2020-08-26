@@ -112,6 +112,16 @@ Stimuli were continually adjusted throughout the experiment to maintain an initi
 There were a substantial number \mccorrect{!TODO[how many?]} of trials in the practice block so that participants could eliminate practice effects and thus experience a more stable objective difficulty during the core trial blocks.
 After each block participants were told what percentage of the final decisions they had provided were correct and allowed to take a short, self-paced break.
 
+##### Specific limitations
+
+The Dots task uses a perceptual decision with a high number of trials.
+This structure makes it plausible that participants respond to the advice primarily through simple reinforcement learning rather than through specific social processes thought to be at work in advice-taking and advisor evaluation.
+
+Whether or not the Dots task taps into social processes, both the task itself and the experimental structure are very different from most advice-taking and advisor evaluation in the real world. 
+Perceptual decisions are rarely the subject of advice, and thus the central task is an unusual one for joint decision-making.
+The amount of exposure to advisors also greatly exceeds that which would be obtained over a far longer period of time in most real world situations.
+This much greater level of exposure risks investing effects with artificial importance: while it is a strength of experimental designs to magnify the effects they aim to study we must not let such magnification blind us to the real relevance of these effects within the complex and dynamic context of real life.
+
 #### Estimation (Dates Task)
 
 ##### Rationale
@@ -135,6 +145,10 @@ knitr::include_graphics("figures/methods/dates-binary.jpg")
 ##### Development
 
 \mccorrect{!TODO[In some amount of detail TBD describe the process of coming up with questions (trawling general knowledge sites, eventually settling on a few timelines inc. Wikipedia, Oxford thingy; questions 1850-1950; rounds of getting participant answers + conf intervals; questions 1900-2000; answers + conf intervals)]}
+
+##### Specific limitations
+
+\mccorrect{!TODO[Some discussion of limitations of this method: no control over participant error rates, difficult task, inconsistent presentation for an individual (e.g. solid knowledge of an obscure date)]}
 
 ### Advisor advice profiles {#m-profiles}
 
@@ -166,13 +180,40 @@ kable(tmp, caption = "Table \\label{tab:m-advisor-profiles}: Experiment 1 adviso
 
 ```
 
+#### General limitations
+
+There are several limitations common to both task designs.
+The most obvious limitation is that the advisors are not organically-interacting humans.
+There are other ecological validity limitations in the presentation of advice, the structure of the experiment, and the absence of other cues.
+
+\mccorrect{!TODO[Other limitations that aren't wider ecological validity ones?]}
+
+The use of artificial advisors means that advice can be carefully specified, and the experiments can be run easily, cheaply, and quickly.
+Transparently artificial advisors may, however, limit the generalisability of the experimental results in two ways.
+Firstly, if different integration processes exist for social and non-social information, it is plausible that, for at least some participants, the advice information is perceived as non-social information.
+While social and non-social information processing would not invalidate any findings (because such a factor would be unlikely to be systematically related to manipulations of interest), they may harm the ability of experimental results to inform us about the processes by which social information is integrated.
+Secondly, artificial advisors may not trigger a number of human-centred processes such as equality bias [@mahmoodiEqualityBiasImpairs2015], meaning that effects revealed in these experiments may be much more difficult to observe in real human advice exchanges.
+
+The advice presented to participants in the experiments is specific and impersonal.
+During real-life advice-taking, advice is often provided within a discussion, with estimates accompanied by reasons and points responded interactively.
+Although studies have indicated that advice-taking behaviour remains similar where discussion is allowed [@libermanNaiveRealismCapturing2012; @minsonTwoTangoEffects2011], these experiments placed discussion within the context of advice exchanges over a decision made by both dyad members individually, and not with distinct roles for the advisor and judge as used in these experiments.
+
+Further ecological validity limitations arise from the structure of the experiment.
+The task presents a series of trials sequentially, with a rapid procession through each.
+This structure is intended to condense a real-world relationship with an advisor, built up over repeated interactions over time, into as narrow a time window as possible. 
+It is likely that this temporal compression does not fundamentally alter the processes of advisor evaluation and trust formation, but we have little positive evidence to support this supposition.
+
+The final major difference between real-life advice and the advice offered in these experiments is in the richness of the relationship between advisor and judge.
+In a real-life relationship there would be numerous other factors at play which may alter or overwhelm any advice-taking and advisor evaluation processes revealed by these experiments. 
+How well a person gets along with another could matter beyond simply increasing the perceived benevolence of the other, for example.
+
 ### Analysis {#m-analysis}
 
-#### Dependent variables
+#### Dependent variables {#m-analysis-dv}
 
 ##### Advisor choice
 
-##### Weight on Advice
+##### Weight on Advice {#m-analysis-dv-woa}
 
 #### Statistics
 

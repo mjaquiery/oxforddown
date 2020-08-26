@@ -141,6 +141,41 @@ geom_split_violin <- function(mapping = NULL, data = NULL, stat = "ydensity", po
 }
 
 
+#' Compare models within a anovaBF output to get relative likelihood
+#' @param x the BFBayesFactor object containing the results
+#' @param comparisons list of values for the comparisons. Values can be row
+#'   numbers or model strings. Pairs of values will be compared to one another;
+#'   individual values will be included directly (compared to null model).
+#' @return data frame with columns M1, M2, BF(M1,M2)
+marginalBF <- function(x, comparisons) {
+  ns <- rownames(x@bayesFactor)
+  getIndex <- function(i) if (i %in% ns) which(ns == i) else i
+  bf <- function(a, b) exp(a - b)
+  out <- NULL
+  for (comp in comparisons) {
+    if (length(comp) == 1) {
+      a <- getIndex(comp[1])
+      out <- rbind(out, data.frame(
+        M1 = ns[a],
+        M2 = x@denominator@longName,
+        BF.M1.M2 = exp(x@bayesFactor$bf[a])
+      ))
+    } else {
+      a <- getIndex(comp[1]); b <- getIndex(comp[2]);
+      out <- rbind(out, data.frame(
+        M1 = ns[a], 
+        M2 = ns[b],
+        BF.M1.M2 = bf(x@bayesFactor$bf[a], x@bayesFactor$bf[b])
+      ))
+    }
+    
+  }
+  if (!is.null(names(comparisons)))
+    rownames(out) <- names(comparisons)
+  out
+}
+
+
 # For esmData -------------------------------------------------------------
 
 # This stuff might belong better in esmData
