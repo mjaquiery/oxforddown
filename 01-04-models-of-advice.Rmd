@@ -1,0 +1,258 @@
+---
+output:
+  bookdown::pdf_document2:
+    template: templates/brief_template.tex
+    keep_tex: false
+  bookdown::word_document2: default
+  bookdown::html_document2: default
+documentclass: book
+editor_options: 
+  chunk_output_type: inline
+  
+bibliography: 
+  - references.bib
+  - bibliography/references.bib
+bibliography-heading-in-pdf: Works Cited
+params:
+  corrections: true 
+---
+
+```{r setup 01-04, echo = F, include = F}
+source('scripts_and_filters/general_setup.R')
+```
+
+# Modelling advice-taking behaviour {#chapter-advice-models}
+\adjustmtc 
+
+<!-- 
+Modelling work on advice-taking/source selection
+
+Descriptive modelling of data using multivariate regression
+- ML/decision-tree approach instead; could use some python for this
+- how good is an unweighted model that uses the biggest predictors?
+
+Advisor choice/advisor preference/advice usage as endpoints
+- advisor choice a softmax function of advisor preference
+-->
+
+First we put all the data into the workspace.
+
+```{r gather all data}
+
+select_experiment('datequiz')
+AdvisedTrial <- full_join(
+  AdvisedTrial,
+  AdvisedTrialWithConf,
+  by = names(AdvisedTrial)[names(AdvisedTrial) %in% names(AdvisedTrialWithConf)]
+)
+
+rm(advisors)
+
+select_experiment('dotstask')
+
+```
+
+Next we grab the data from the binary tasks. 
+This includes all the dotstask data and a small portion of the datequiz data.
+\mccorrect{!TODO[Later we can try to join them using an interoperable measure of influence.]}
+
+For what follows, we standardize initial estimate confidence and final decision confidence. 
+The initial estimate confidence is standardized using its own mean and standard deviation. 
+The final decision confidence is first oriented to the initial decision, meaning that it can take negative values where the endorsed answer switches from one side to the other.
+Increasingly negative values represent increasingly confident endorsement of the answer endorsed in the final decision.
+These final decision confidence values are then standardized using the mean and standard deviation from the initial estimate confidence. 
+This means that the final decision confidence readings are z-scores based on the distribution for initial estimate confidence.
+It also means some of the values are much higher or lower than would be expected from the initial estimate confidence distribution because the range of possible values is wider (because negative values are possible in the final decision confidence).
+
+```{r extract binary task data}
+df <- rbind(
+  AdvisedTrial %>% 
+    transmute(
+      pid,
+      number,
+      feedback = if_else(is.na(feedback), feedback, F),
+      advisor = advisor0idDescription,
+      study = 'dates',
+      confidenceIncrease = if_else(responseAnswerSide == responseAnswerSideFinal,
+                                   responseConfidenceFinal - responseConfidence,
+                                   responseConfidenceFinal + responseConfidence),
+      zConfidenceIncrease = scale(confidenceIncrease),
+      initialConfidenceFlat = responseConfidence,
+      finalConfidenceFlat = if_else(
+        responseAnswerSide == responseAnswerSideFinal,
+        responseConfidenceFinal,
+        -(responseConfidenceFinal + responseConfidence)
+      ),
+      zFinalConfidence = 
+        (finalConfidenceFlat - mean(responseConfidence, na.rm = T)) /
+        sd(responseConfidence, na.rm = T),
+      initialAnswer = responseAnswerSide,
+      # standardize initial confidence. We could use scale() but keep consistency with finalConfidence above.
+      zInitialConfidence = 
+        (responseConfidence - mean(responseConfidence, na.rm = T)) / 
+        sd(responseConfidence, na.rm = T),
+      advice = advisor0adviceSide
+    ),
+  trials %>% 
+    transmute(
+      pid,
+      number = id,
+      feedback,
+      advisor = advisor0type,
+      study = 'dots',
+      confidenceIncrease = if_else(initialAnswer == finalAnswer,
+                                   finalConfidence - initialConfidence,
+                                   finalConfidence + initialConfidence),
+      zConfidenceIncrease = scale(confidenceIncrease),
+      initialConfidenceFlat = initialConfidence,
+      finalConfidenceFlat = if_else(
+        initialAnswer == finalAnswer,
+        finalConfidence,
+        -(finalConfidence + initialConfidence)
+      ),
+      zFinalConfidence = 
+        (finalConfidenceFlat - mean(initialConfidence, na.rm = T)) /
+        sd(initialConfidence, na.rm = T),
+      initialAnswer,
+      # standardize initial confidence. We could use scale() but keep consistency with finalConfidence above.
+      zInitialConfidence = 
+        (initialConfidence - mean(initialConfidence, na.rm = T)) / 
+        sd(initialConfidence, na.rm = T),
+      advice = adviceSide
+    )
+) %>%
+  filter(across(.cols = everything(), .fns = ~ !is.na(.)))
+
+df <- df %>%
+  mutate(
+    disagree = initialAnswer != advice,
+    influence = if_else(disagree, zConfidenceIncrease, -zConfidenceIncrease),
+    noise = rnorm(n())
+  )
+
+df %>% pivot_longer(cols = c('zInitialConfidence', 'zFinalConfidence')) %>%
+  ggplot(aes(value, fill = name)) + 
+  geom_density(alpha = .5) +
+  facet_grid(feedback~disagree, labeller = label_both)
+
+```
+The distribution of advisor influence by agreement shows that final decision confidence in the initially-chosen answer is usually lower following disagreement from the advisor.
+This makes sense, and is to be expected. 
+There are also a reasonable number of trials on which disagreeing advice leads to a modest _increase_ in confidence.
+
+Following agreement by an advisor, final decision confidence sometimes increases quite dramatically, but usually changes are modest and somewhat likely to be negative. 
+Very dramatic negative shifts in confidence are rare following agreement.
+
+
+First, we run a simple multivariate linear regression predicting the final decision confidence of advice from initial estimate confidence and whether there is agreement between advice and initial estimate.
+
+```{r multivariate linear regression}
+
+library(lmerTest)
+
+m <- lmer(zFinalConfidence ~ zInitialConfidence * disagree * feedback + (1|pid), data = df)
+summary(m)
+
+```
+
+```{r}
+
+#' Plot the parameters of a linear model in a neat way
+forestPlot <- function(model) {
+  tmp <- summary(model) %>%
+    .$coefficients %>%
+    as.data.frame() %>%
+    rownames_to_column('Parameter') %>%
+    mutate(sig = if_else(`Pr(>|t|)` < .05, '*', ''))
+  
+  low = -ceiling(max(abs(tmp$Estimate + tmp$`Std. Error`)) * 1.1)
+  
+  ggplot(tmp, aes(
+    y = Parameter, 
+    x = Estimate, 
+    xmin = Estimate - `Std. Error`,
+    xmax = Estimate + `Std. Error`,
+    label = sig
+  )) +
+    geom_vline(xintercept = 0, linetype = 'dashed') +
+    geom_point() +
+    geom_errorbarh() +
+    geom_text(x = low) +
+    scale_x_continuous(limits = c(low, -low)) +
+    labs(caption = 'DV = standardized directional final decision confidence; * p < .05')
+}
+
+forestPlot(m)
+
+```
+
+Where the advisor disagrees with a participant, the participant's final decision confidence is substantially lower on average than the average for initial estimate confidence.
+There is also a small effect of initial confidence, indicating that a participant who is initially more confident is likely to retain that increased confidence in their final decision.
+The interaction between the parameters indicates that the retention of initial estimate confidence is largely cancelled out by disagreement from an advisor: there is a small net positive effect from initial confidence on final confidence even where the advisor disagrees.
+
+The presence of feedback on a trial is better regarded as a noisy proxy for feedback on previous trials than as contributing meaningfully to the final decision on any particular trial (because feedback happens _after_ the final decision has been made).
+Feedback slightly reduces the confidence of final decisions, and noticeably reduces the final confidence penalty from disagreeing advice.
+Slightly more initial confidence is retained into final decision confidence in feedback trials.
+
+Next, we can look at the effect of adding in parameters based on the historical interactions between the advisor and the participant.
+The two main effects we look at are the total amount of experience a participant has had with an advisor, and the agreement rate experienced in that time.
+
+```{r advice history predictors}
+
+dfh <- df %>%
+  nest(d = -c(pid, study)) %>%
+  mutate(d = map(d, ~ nest(., x = -advisor) %>%
+                   mutate(
+                     x = map(x, ~ arrange(., number) %>%
+                               rowid_to_column(var = 'nthWithAdvisor'))
+                   ) %>%
+                   unnest(cols = x))) %>%
+  unnest(cols = d) 
+
+dfh <- dfh %>% mutate(agreeRate = NA)
+
+for (n in 1:max(dfh$nthWithAdvisor)) {
+  dfh$agreeRate[dfh$nthWithAdvisor == n] <- dfh %>% 
+    filter(nthWithAdvisor <= n) %>%
+    nest(d = c(-pid, -advisor)) %>%
+    mutate(
+      x = map_dbl(d, ~ mean(!.$disagree)),
+      nth = map_int(d, ~ max(.$nthWithAdvisor))
+    ) %>%
+    filter(nth == n) %>%
+    pull(x)
+}
+
+dfh <- dfh %>%
+  mutate(
+    nthWithAdvisor = scale(nthWithAdvisor)
+  )
+
+```
+
+```{r models with history}
+
+mh <- lmer(zFinalConfidence ~ zInitialConfidence * disagree * feedback * nthWithAdvisor * agreeRate + (1|pid), data = dfh)
+summary(mh)
+
+forestPlot(mh)
+
+```
+
+Absent any effects, average final decision confidence is slightly higher than average initial estimate confidence in this model.
+As before, there is a pronounced effect of disagreement, with final confidence being notably lower following disagreement from the advisor, and a smaller effect whereby higher initial confidence increases final confidence.
+
+The two history parameters, total experience with advisor and experienced agreement rate, go in opposite directions. 
+The more experience a participant has had with an advisor, the higher their final confidence, while the greater the experienced agreement rate the lower the confidence. 
+These effects are small, but puzzling; both advisor experience and experience of agreement should go the same way, and we might expect small positive effects (to be later reversed by interaction with disagreement).
+The interaction between experience of agreement and disagreement is also peculiar: the reduction in confidence from disagreement is largely cancelled out in an advisor who agrees very frequently, suggesting that disagreeing advice from a advisor who usually agrees is less rather than more influential.
+The history parameters also interact with one another: the greater the experience with an advisor the greater the penalty to final confidence from increased experience of agreement.
+
+Overall, the largest effects in the model come from some quite complex 3- and 4-way interactions, suggesting a nuanced structure to the data which is not well-captured simple effects.
+This may be because the biggest changes take place under specific conditions, or it may be an effect of the law of small numbers (because specific overlaps in conditions take place much more rarely than main effects, allowing outliers to produce large coefficient estimates).
+Some comfort can be taken in noting that, while the standard errors of the complex interactions with large coefficients are larger than those with smaller coefficients, they are not dramatically larger, and thus the larger coefficients are very likely to be genuinely large.
+
+```{r}
+m <- lmer(zFinalConfidence ~ zInitialConfidence * disagree * feedback + (1 | pid), data = dfh)
+anova(m, mh)
+```

@@ -114,7 +114,7 @@ While not useful for the hypothesis of this experiment, the excluded data can be
 
 \mccorrect{!TODO[clarify any methodological differences from the main methods chapter]}
 
-##### Advisor profiles
+##### Advice profiles
 
 The two advisor profiles (Table \@ref(tab:ac-acc-dots-m-profiles)) used in the experiment were High accuracy and Low accuracy.
 The High accuracy advisor was correct 80% of the time while the Low accuracy advisor was correct 20% of the time.
@@ -126,20 +126,20 @@ pCor <- .71
 agr <- matrix(c(.8, .2, .6, .4), 2, 2)
 
 tmp <- tribble(
-  ~` `, ~`High accuracy`, ~`Low accuracy`,
-  "Participant correct", agr[1, 1], agr[1, 2],
-  "Participant incorrect", agr[2, 1], agr[2, 2],
-  "Total agreement", sum(agr[, 1] * c(pCor, 1 - pCor)), sum(agr[, 2] * c(pCor, 1 - pCor))
+  ~`Advisor`, ~`Participant correct`, ~`Participant incorrect`, ~`Overall`, ~`Overall accuracy`,
+  "High accuracy", agr[1, 1], agr[2, 1], sum(agr[,1] * c(pCor, 1 - pCor)), sum(agr[1,1] * pCor, (1 - agr[2,1]) * (1 - pCor)),
+  "Low accuracy", agr[1, 2], agr[2, 2], sum(agr[,2] * c(pCor, 1 - pCor)), sum(agr[1,2] * pCor, (1 - agr[2,2]) * (1 - pCor))
 ) %>% 
   prop2str()
 
-kable(tmp, caption = "Table \\label{tab:ac-acc-dots-m-profiles}: Advisor advice profiles for Dots task Agreement experiment") %>%
+kable(tmp, caption = "Table \\label{tab:ac-acc-dots-m-profiles}: Advisor advice profiles for Dots task Accuracy experiment") %>%
   kable_styling() %>%
   column_spec(1, bold = T) %>%
   row_spec(0, bold = F) %>%
   collapse_rows(columns = 1, valign = "top") %>%
   add_header_above(c(" ", 
-                     "Probability of agreement (%)" = 2))
+                     "Probability of agreement" = 3,
+                     " "))
 
 ```
 
@@ -214,7 +214,7 @@ exclusions %>%
 
 ##### Advisor influence
 
-```{r ac-acc-dots-r-influence-graph, fig.caption="Dot task advisor influence for in/accurate advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-200, 99].", fig.width = 4, fig.height = 6}
+```{r ac-acc-dots-r-influence-graph, fig.caption="Dot task advisor influence for in/accurate advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-100, 100].", fig.width = 4, fig.height = 6}
 
 tmp <- trials %>% 
   filter(typeName == "force", adviceType %in% c(5,6)) %>% 
@@ -254,8 +254,7 @@ ggplot(tmp, aes(x = adviceTypeName, y = adviceInfluence,
              aes(label = paste0('BF = ', bf))) +
   scale_y_continuous(limits = c(-50, 110), breaks = seq(-50, 100, length.out = 6)) +
   facet_grid(~`Feedback condition`) +
-  labs(x = 'Advisor advice profile', y = 'Influence of advice') +
-  broken_axis_bottom
+  labs(x = 'Advisor advice profile', y = 'Influence of advice')
 
 ```
 
@@ -337,6 +336,35 @@ These participants could theoretically be included in the No feedback condition 
 
 This study used the binary version of the Dates Task ([§Estimation (Dates Task) - Binary](#m-p-dates-b)).
 
+##### Advice profiles
+
+The High accuracy and Low accuracy advisor profiles issued binary advice (endorsing either the 'before' or 'after' column) probabilistically based on whether or not the participant had selected the correct column in their initial estimate. 
+The High accuracy advisor was agreed with the participant's initial estimate on 80% of the trials where the participant was correct, but only 20% of the trials on which the participant was incorrect, meaning that the High accuracy advisor was correct 80% of the time. 
+Using an analogous setup, the Low accuracy advisor was correct 59% of the time.
+The advisor profiles were not balanced for overall agreement rates because the agreement rate experienced by a participant depends upon the accuracy of that participant's initial estimates.
+
+```{r ac-acc-dates-m-profiles} 
+
+agr <- matrix(c(.8, .2, .59, .41), 2, 2)
+
+tmp <- tribble(
+  ~`Advisor`, ~`Participant correct`, ~`Participant incorrect`, ~`Overall accuracy`,
+  "High accuracy", agr[1, 1], agr[2, 1], agr[1, 1],
+  "Low accuracy", agr[1, 2], agr[2, 2], agr[2, 1]
+) %>% 
+  prop2str()
+
+kable(tmp, caption = "Table \\label{tab:ac-acc-dates-m-profiles}: Advisor advice profiles for Dates task Accuracy experiment") %>%
+  kable_styling() %>%
+  column_spec(1, bold = T) %>%
+  row_spec(0, bold = F) %>%
+  collapse_rows(columns = 1, valign = "top") %>%
+  add_header_above(c(" ", 
+                     "Probability of agreement (%)" = 2,
+                     " "))
+
+```
+
 #### Results {#ac-acc-dates-r}
 
 ##### Exclusions
@@ -388,7 +416,7 @@ exclusions %>%
 
 ##### Advisor influence
 
-```{r ac-acc-dates-r-influence-graph, fig.caption="Date task advisor influence for in/accurate advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-200, 99]."}
+```{r ac-acc-dates-r-influence-graph, fig.caption="Date task advisor influence for in/accurate advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-200, 200]."}
 
 tmp <- AdvisedTrial %>% 
   filter(is.na(advisorChoice)) %>%
@@ -553,18 +581,18 @@ There were no unanalysed data for this experiment.
 
 \mccorrect{!TODO[clarify any methodological differences from the main methods chapter]}
 
-##### Advisor profiles
+##### Advisce profiles
 
 ```{r ac-agr-dots-m-profiles-setup} 
 
 pCor <- .71
 agr <- matrix(c(.84, .61, .66, .17), 2, 2)
 
+
 tmp <- tribble(
-  ~` `, ~`High agreement`, ~`Low agreement`,
-  "Participant correct", agr[1, 1], agr[1, 2],
-  "Participant incorrect", agr[2, 1], agr[2, 2],
-  "Total agreement", sum(agr[, 1] * c(pCor, 1 - pCor)), sum(agr[, 2] * c(pCor, 1 - pCor))
+  ~`Advisor`, ~`Participant correct`, ~`Participant incorrect`, ~`Overall`, ~`Overall accuracy`,
+  "High accuracy", agr[1, 1], agr[2, 1], sum(agr[,1] * c(pCor, 1 - pCor)), sum(agr[1,1] * pCor, (1 - agr[2,1]) * (1 - pCor)),
+  "Low accuracy", agr[1, 2], agr[2, 2], sum(agr[,2] * c(pCor, 1 - pCor)), sum(agr[1,2] * pCor, (1 - agr[2,2]) * (1 - pCor))
 ) %>% 
   prop2str()
 
@@ -586,7 +614,8 @@ kable(tmp, caption = "Table \\label{tab:ac-agr-dots-m-profiles}: Advisor advice 
   row_spec(0, bold = F) %>%
   collapse_rows(columns = 1, valign = "top") %>%
   add_header_above(c(" ", 
-                     "Probability of agreement (%)" = 2))
+                     "Probability of agreement" = 3,
+                     " "))
 
 ```
 
@@ -661,7 +690,7 @@ exclusions %>%
 
 ##### Advisor influence
 
-```{r ac-agr-dots-r-influence-graph, fig.caption="Dot task advisor influence for high/low agreement advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-200, 99].", fig.width = 4, fig.height = 6}
+```{r ac-agr-dots-r-influence-graph, fig.caption="Dot task advisor influence for high/low agreement advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-100, 100].", fig.width = 4, fig.height = 6}
 
 tmp <- trials %>% 
   filter(typeName == "force", adviceType %in% c(7,8)) %>% 
@@ -784,6 +813,31 @@ These participants could theoretically be included in the No feedback condition 
 
 This study used the binary version of the Dates Task ([§Estimation (Dates Task) - Binary](#m-p-dates-b)).
 
+##### Advice profiles
+
+The High agreement and Low agreement advisor profiles issued binary advice (endorsing either the 'before' or 'after' column) probabilistically based on which column the participant had selected in their initial estimate and whether that was the correct answer. 
+
+```{r ac-agr-dates-m-profiles} 
+
+agr <- matrix(c(.9, .65, .75, .35), 2, 2)
+
+tmp <- tribble(
+  ~`Advisor`, ~`Participant correct`, ~`Participant incorrect`,
+  "High accuracy", agr[1, 1], agr[2, 1],
+  "Low accuracy", agr[1, 2], agr[2, 2],
+) %>% 
+  prop2str()
+
+kable(tmp, caption = "Table \\label{tab:ac-agr-dates-m-profiles}: Advisor advice profiles for Dates task Agreement experiment") %>%
+  kable_styling() %>%
+  column_spec(1, bold = T) %>%
+  row_spec(0, bold = F) %>%
+  collapse_rows(columns = 1, valign = "top") %>%
+  add_header_above(c(" ", 
+                     "Probability of agreement (%)" = 2))
+
+```
+
 #### Results {#ac-agr-dates-r}
 
 ##### Exclusions
@@ -835,7 +889,7 @@ exclusions %>%
 
 ##### Advisor influence
 
-```{r ac-agr-dates-r-influence-graph, fig.caption="Date task advisor influence for high/low agreement advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-200, 99]."}
+```{r ac-agr-dates-r-influence-graph, fig.caption="Date task advisor influence for high/low agreement advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-200, 200]."}
 
 tmp <- AdvisedTrial %>% 
   filter(is.na(advisorChoice)) %>%
@@ -960,14 +1014,16 @@ The null result here does indicate, however, that there is no strong and clear p
 
 Where feedback is provided on advisors' performance, participants prefer high agreement advisors to low agreement advisors.
 
+\mccorrect{At least in the Dates task the low agreement advice is probably more interesting - we already know what the high agreement advisor is going to say!}
+
 \mccorrect{re: influence - 
 An alternative explanation for the data is that the 'offbrand' advice selected for analysis was more surprising when coming from the advisor who usually agrees, and that this increased salience increased its influence rather than increased trust in the advisor.}
 If that were the case then the same ought to be true for agreeing advice from a disagreeing advisor, and this is not the case \mccorrect{!TODO[Do we have/can we produce evidence for this? Perhaps look at our participants where advisors disagree with them by chance more than e.g. 70% of the time and check for increased influence on agreement trials vs advisors who disagree less than 70% of the time]}.
 
 ## Accuracy vs. agreement (Date estimation) {#ac-ava}
 
-The High versus Low agreement advisor experiment showed that participants preferred to receive agreeing advice \mccorrect{when they did not receive feedback.}
-The advisors did not differ in their accuracy (by design), which meant that participants could not increase their performance by selecting one advisor over another.
+The High versus Low agreement advisor experiment showed that participants tended to prefer to receive agreeing advice when they did not receive feedback.
+The advisors did not differ in their accuracy (by design), which meant that participants could not increase their performance by selecting one advisor over another. 
 Here we introduce a discrepancy between advisors' objective performance (accuracy) and their subjective performance from the judge's perspective (agreement).
 By playing off accuracy against agreement we can explore whether participants continue to prefer agreement when there is a cost associated with agreement through a reduction in overall accuracy.
 We expect that participants provided with feedback will be able to identify the accurate advisor and ignore the agreeing advisor, while participants denied feedback will gravitate towards the agreeing advisor who, from their perspective, appears more accurate.
@@ -1018,11 +1074,32 @@ The `r .dropEnv$DROP_P` participants whose data was collected in these versions 
 
 \mccorrect{!TODO[clarify any methodological differences from the main methods chapter]}
 
-##### Advisor profiles
+##### Advice profiles
 
-The two advisor profiles used in the experiment were High accuracy and High agreement.
-The High accuracy advisor was correct 80% of the time (estimated agreement = `r (.8 * .71 + .2 * .29) * 100`%) while the High agreement advisor agreed with the participant 80% of the time (estimated accuracy = `r (.8 * .71 + .2 * .29) * 100`%). 
-The advisor profiles were not balanced for overall agreement or accuracy rates.
+The two advisor profiles used in the experiment were High accuracy and High agreement. The advisor profiles were not balanced for overall agreement or accuracy rates.
+
+```{r ac-ava-dots-m-profiles} 
+
+pCor <- .71
+agr <- matrix(c(.8, .2, .8, .8), 2, 2)
+
+tmp <- tribble(
+  ~`Advisor`, ~`Participant correct`, ~`Participant incorrect`, ~`Overall`, ~`Overall accuracy`,
+  "High accuracy", agr[1, 1], agr[2, 1], sum(agr[,1] * c(pCor, 1 - pCor)), sum(agr[1,1] * pCor, (1 - agr[2,1]) * (1 - pCor)),
+  "Low accuracy", agr[1, 2], agr[2, 2], sum(agr[,2] * c(pCor, 1 - pCor)), sum(agr[1,2] * pCor, (1 - agr[2,2]) * (1 - pCor))
+) %>% 
+  prop2str()
+
+kable(tmp, caption = "Table \\label{tab:ac-ava-dots-m-profiles}: Advisor advice profiles for Dots task Accuracy/agreement experiment") %>%
+  kable_styling() %>%
+  column_spec(1, bold = T) %>%
+  row_spec(0, bold = F) %>%
+  collapse_rows(columns = 1, valign = "top") %>%
+  add_header_above(c(" ", 
+                     "Probability of agreement" = 3,
+                     " "))
+
+```
 
 #### Results {#ac-ava-dots-r}
 
@@ -1095,7 +1172,7 @@ exclusions %>%
 
 ##### Advisor influence
 
-```{r ac-ava-dots-r-influence-graph, fig.caption="Dot task advisor influence for high accuracy/agreement advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-200, 99].", fig.width = 4, fig.height = 6}
+```{r ac-ava-dots-r-influence-graph, fig.caption="Dot task advisor influence for high accuracy/agreement advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-100, 100].", fig.width = 4, fig.height = 6}
 
 tmp <- trials %>% 
   filter(typeName == "force", adviceType %in% c(9,10)) %>% 
@@ -1228,6 +1305,13 @@ The v0-0-5 participants could be included in a study which was agnostic about ad
 
 This study used the continuous version of the Dates Task ([§Estimation (Dates Task) - Continuous](#m-p-dates-c)).
 
+##### Advice profiles
+
+The High accuracy and High agreement advisor profiles defined marker placements based on the timeline based on the correct answer and the participant's initial estimate respectively. 
+Both advice profiles provided 'on-brand' advice on 12/15 trials which was normally distributed around the target point with a standard deviation of 5 years.
+On the remaining 3/15 trials both advice profiles issued 'off-brand' advice which was both wrong and distant from the participant's initial estimate.
+These 'off-brand' trials allow the response to the advisors to be disentangled from the advisors' advice itself.
+
 #### Results {#ac-ava-dates-r}
 
 ##### Exclusions
@@ -1285,7 +1369,7 @@ exclusions %>%
 
 ##### Advisor influence
 
-```{r ac-ava-dates-r-influence-graph, fig.caption="Date task advisor influence for high accuracy/agreement advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The dotted outline indicates the distribution of participant means in the original experiment of which this experiment is a replication. The theoretical range for influence values is [-200, 99]."}
+```{r ac-ava-dates-r-influence-graph, fig.caption="Date task advisor influence for high accuracy/agreement advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The dotted outline indicates the distribution of participant means in the original experiment of which this experiment is a replication. The theoretical range for influence values is [-200, 200]."}
 
 for (E in c(.GlobalEnv, .prevStudy)) {
   E$AdvisedTrial <- annotate_responses(E$AdvisedTrial)
@@ -1474,11 +1558,11 @@ These participants' data could be included in an analysis which used a participa
 
 \mccorrect{!TODO[clarify any methodological differences from the main methods chapter]}
 
-##### Advisor profiles
+##### Advice profiles
 
 The two advisor profiles used in the experiment were Bias sharing and Anti-bias.
 The advisors are balanced for their overall accuracy and agreement rates, but the Bias sharing advisor agrees more frequently with participants when their initial estimate is correct and made with relatively high confidence.
-The Anti-bias advisor agrees more frequently with participants when their initial estimate is correct and made with relatively low confidence \@ref(tab:ac-cca-dots-profiles).
+The Anti-bias advisor agrees more frequently with participants when their initial estimate is correct and made with relatively low confidence (Table \@ref(tab:ac-cca-dots-profiles)).
 
 ```{r ac-cca-dots-profiles-r} 
 
@@ -1574,7 +1658,7 @@ exclusions %>%
 
 ##### Advisor influence
 
-```{r ac-cca-dots-r-influence-graph, fig.caption="Dot task advisor influence for bias sharing/anti-bias advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-200, 99].", fig.width = 4, fig.height = 6}
+```{r ac-cca-dots-r-influence-graph, fig.caption="Dot task advisor influence for bias sharing/anti-bias advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-100, 100].", fig.width = 4, fig.height = 6}
 
 tmp <- trials %>% 
   filter(typeName == "force", adviceType %in% c(3,4)) %>% 

@@ -211,27 +211,25 @@ How well a person gets along with another could matter beyond simply increasing 
 
 #### Dependent variables {#m-analysis-dv}
 
-##### Advisor choice
+##### Pick rate
+
+Pick rate provides a measure of source selection behaviour. 
+In most experiments there are some trials that offer participants a choice of which advisor they would like to hear from. 
+There are always two choices, and a choice must always be made. 
+The two choices are consistent within the experiment.
+Pick rate is the proportion of choice trials in which a specified advisor was chosen.
+
+A participant's pick rate is an aggregate over a number of trials, and expresses the observed probability of picking the specified advisor.
+The mentally represented preference for that advisor is not measured directly (if such a thing even exists), and cannot be determined from the observed pick rate without knowing the mapping function for each individual participant.
+Mapping functions (such as softmax \mccorrect{!TODO[cite something on this]}) produce stochastic choice behaviour from a preference marked on a continuous scale, and are typically sigmoid.
+The relationship between preference and pick rate is non-linear and idiosyncratic, but it is likely monotonic for all participants: the stronger the preference the higher the pick rate.
+Despite this monotonic relationship, it is important not to infer that one participant's preference for an advisor is stronger than another's on the basis of the former picking that advisor more frequently: it may be instead that, for the former participant, smaller differences in preference lead to more consistent picking behaviour.
 
 ##### Weight on Advice {#m-analysis-dv-woa}
 
-#### Statistics
+##### Influence
 
-##### Bayesian statistics
-
-##### Frequentist statistics
-
-##### Software
-
-Data analysis was performed using R [@rcoreteamLanguageEnvironmentStatistical2018].
-For a full list of packages and software environment information, see \mccorrect{!TODO[figure out where to include this stuff.
-Appendix?
-Also link to a containerized version of this.]}
-
-Bayes Factors (BF) are presented alongside p values and test statistics.
-A BF < 0.33 indicates decisive evidence in favour of the null hypothesis over the alternative hypothesis (with lower values being increasingly clear), BF > 3 indicates decisive evidence of the alternative over the null (with higher values being increasingly clear), and 0.33 <= BF <= 3 indicates there is insufficient evidence to reach a conclusion.
-
-### Capped influence {#m-analysis-influence}
+##### Capped influence {#m-analysis-dv-influence}
 
 Influence, the dependant variable in some analyses, is calculated as the extent to which the judge’s initial decision is revised in the direction of the advisor’s advice.
 The initial ($C_1$) and final ($C_2$) decisions are made on a scale stretching from -55 to +55 with zero excluded, where values <0 indicate a ‘left’ decision and values >0 indicate a ‘right’ decision, and greater magnitudes indicate increased confidence.
@@ -266,15 +264,88 @@ The capped influence measure $I_\text{capped}$ is obtained by:
 \begin{align}
 I_\text{capped} = f(C_1) 
 \begin{cases}
-  \text{min}(I, 2C_1 - 55) & C_1 > 0 \\
-  \text{max}(I, 2C_1 + 55) & C_1 < 0
+  \text{min}(I, 2C_1 - S_\text{max}) & C_1 > 0 \\
+  \text{max}(I, 2C_1 + S_\text{max}) & C_1 < 0
 \end{cases}
 (\#eq:ex1-influence-capping)
 \end{align}
 
-The explicit measure of trust is obtained using questionnaires.
-The questionnaires are delivered at 4 time points, and consist of 4 questions per advisor which are answered on a 1-100 scale.
+\mccorrect{!TODO[Check this equation and explain its terms]}
 
+#### Statistics
+
+Statistical analyses are conducted using a both Frequentist and Bayesian statistics.
+
+##### Frequentist statistics
+
+Frequentist statistics, often in psychology referred to simply as 'statistics', are a family of statistical tests which minimise the long-term error rates rates of the conclusions they invite.
+To perform one of these tests, the user first specifies a null hypothesis which the test will seek to reject.
+Next, the user selects a rate of false-positives that is acceptable, termed an alpha ($\alpha$).
+In psychology $\alpha$ is almost universally .05, meaning that 5% of results for tests where there is no true effect will be positives.
+The principle statistic of interest from these tests is the $p$-value: the chance that a sample equivalent to the user's sample would be as extreme or more extreme than the observed sample _assuming that the null hypothesis is true_.
+The $p$-value quantifies how expected the sample observations are where the null hypothesis is the model: its complement quantifies how surprising the data are given the null hypothesis is true.
+If the $p$-value is lower than the $\alpha$ the null hypothesis may be rejected on the reasoning that such an unlikely sample as the current one is more consistent with some other hypothesis.
+Where the null hypothesis is rejected the sample is labelled as being _significantly different_ from that expected from the null model, and this general feature of the difference is known as statistical significance.
+
+It is common practice when using frequentist statistics to set up experiments such that two, and only two hypotheses can possibly explain the data.
+One of these is deemed the null hypothesis and tested as described above.
+The other hypothesis is termed the 'alternate' hypothesis, and, if the null hypothesis is rejected, is accepted in place of the null hypothesis because there were only two possible explanations and the null hypothesis has been ruled out.
+
+Frequentist statistics are useful, better understood by psychologists than alternatives, and capable of delivering genuine insights when used correctly.
+A great many caveats surround their use and interpretation, however. 
+Frequentist statistics cannot express positive evidence for the null hypothesis (because the null hypothesis is an assumption of the tests): $p$-values are uniformly distributed among samples drawn from the null hypothesis [@murdochPValuesAreRandom2008] and so no argument can be made from any particular value that it constitutes more or less evidence for the null.
+Likewise, $p$-values below the chosen $\alpha$ cannot strictly be interpreted as expressing more or less evidence for the alternate hypothesis (or against the null hypothesis). 
+Frequentist statistics control long-term error rates rather than capturing relative likelihoods of theories, and thus the only legitimate inferences from a frequentist test are to accept or reject the null hypothesis.
+The uniform distribution of $p$-values under the null also means that repeated sampling from the null distribution without adjusting the $\alpha$ will increase the rate at which false-positive conclusions are drawn.
+This repeated sampling can happen in many ways such as running related tests on the same data, using slightly different data (e.g. by adjusting exclusions), and running tests at multiple time points in data collection (especially if a significant result terminates data collection).
+
+In this thesis a range of frequentist statistical tests are used, most frequently t-tests and analyses of variance (ANOVA).
+The $\alpha$ is always set at .05 unless otherwise stated.
+Null hypotheses are always the expected distribution if the effect being tested is nil.
+Where the level of influence exerted by two different advisors is studied, for example, the null hypothesis would be that there were no systematic differences in influence exerted by those advisors.
+
+##### Bayesian statistics
+
+Bayesian statistics consist in a statistical approach that attempts to capture the (posterior) likelihood of a hypothesis being true on the basis of its (prior) plausibility and the strength of the evidence.
+These tests are frequently adapted to quantify the relative likelihood of two competing hypotheses given their relative prior plausibilities and how consistent the observed evidence is with each theory.
+To perform these Bayesian statistical tests the user specifies the hypotheses to be compared, their relative likelihoods, and the evidence sampled.
+
+The principle statistic in Bayesian tests is the Bayes Factor (BF).
+BF quantifies the posterior likelihood of one hypothesis over another. 
+In the notation used here, BF always quantifies a more complex model over a simpler one: in the case of a Bayesian t-test it therefore quantifies the alternate hypothesis (in which there is an effect) over the null hypothesis (in which there is not an effect).
+The BF takes a value between 0 and infinity.
+Values below 1 indicate a greater likelihood for the simpler model, and that greater likelihood is given by 1/BF.
+Where BFs below 1 are reported in this manuscript the notation 1/BF is used to allow an intuitive reading of the strength of evidence in favour of the simpler model.
+
+Bayesian tests produce a continuous measure of relative likelihood which simply describes the data and prior beliefs. 
+In order to draw categorical inferences, thresholds are placed on this continuous outcome.
+Here these thresholds are 1/3 < BF < 3, meaning that a BF of less than 1/3 constitutes evidence in favour of the simpler model while a BF greater than 3 constitutes evidence in favour of the more complex model.
+These values are those suggested by \mccorrect{!TODO[CITE whoever has that neat little table. Jeffreys?]} as representing \mccorrect{!TODO[which word does the paper use?]} evidence in a given direction.
+Where the BF lies between these thresholds it is labelled as 'uninformative'.
+An uninformative result supports neither the simpler nor the more complex model, and indicates that the data are insufficient to distinguish the hypotheses.
+
+The Bayesian tests used here rely on the priors specified by the BayesFactor R package \mccorrect{!TODO[CITE BayesFactor]}.
+These priors govern the expected distributions of observed differences between samples where there is or is not a genuine effect creating systematic differences.
+The use of the same, weakly-informative priors for all tests means the approach used here is an 'objective Bayesian' approach.
+This objective Bayesian approach can be contrasted with a 'subjective Bayesian' approach in which the goal is to specify the exact amount of belief one should have in one hypothesis over another.
+Neither the objective nor subjective approach is clearly superior. 
+The subjective approach is used here because it is simpler.
+There is some risk that results will be a poor fit to reality because the priors are inappropriate, but this risk is fairly low and somewhat mitigated by the additional inclusion of frequentist statistics.
+
+##### Integrating statistical results
+
+In most cases, Bayesian and frequentist statistics produce the same conclusion \mccorrect{!TODO[pretty sure there's a paper which states/demonstrates this]}.
+Where this is not the case, results should be interpreted very cautiously: a significant frequentist test with an uninformative or null-favouring Bayesian test can indicate that the result may be a false-positive, while clear Bayesian support for the alternate hypothesis in the absence of a significant frequentist test can indicate that the priors in the Bayesian test are inappropriate. 
+
+Where null conclusions are to be drawn, i.e. the null hypothesis is to be retained, only Bayesian statistics can be considered informative. 
+In these cases Bayesian statistics will be interpreted, with the caveat that the safeguard of using two independent approaches to draw statistical conclusions has lapsed.
+
+##### Software
+
+Data analysis was performed using R [@rcoreteamLanguageEnvironmentStatistical2018].
+For a full list of packages and software environment information, see \mccorrect{!TODO[figure out where to include this stuff.
+Appendix?
+Also link to a containerized version of this.]}
 
 ## Open science approach {#open-science}
 
