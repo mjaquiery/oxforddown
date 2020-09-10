@@ -101,6 +101,8 @@ broken_axis_bottom <- theme(axis.line.y = element_line(arrow = arrow(ends = 'fir
 #' @param amount amount to nudge in the appropriate direction
 #' @param direction to nudge. 'outwards' is towards the extremes, 'inwards' is towards the centre.
 nudge <- function(x, amount, direction = 'outwards') {
+  if (!is.factor(x)) 
+    x <- factor(x)
   x <- as.numeric(x) 
   dir <- if (direction == 'outwards') 1 else -1
   x + sign(x - mean(range(x, na.rm = T))) * dir * amount
@@ -205,4 +207,58 @@ do_exclusions <- function(exclusions, envir = .GlobalEnv, backup = T) {
       assign(o, obj, envir = envir)
     }
   }
+}
+
+#' Return the name of an advice type profile
+#' @param advisorType vector of advisor types
+#' @return vector of type names
+advisor_profile_name <- function(advisorType) {
+  case_when(
+    advisorType == 3 ~ 'Bias sharing',
+    advisorType == 4 ~ 'Anti-bias',
+    advisorType == 5 ~ 'High accuracy',
+    advisorType == 6 ~ 'Low accuracy',
+    advisorType == 7 ~ 'High agreement',
+    advisorType == 8 ~ 'Low agreement',
+    advisorType == 9 ~ 'High accuracy',
+    advisorType == 10 ~ 'High agreement',
+    T ~ NA_character_
+  )
+}
+
+#' Return the name of an advice type profile for the Dates task data
+#' @param advisor0idDescription vector of advisor descriptions
+#' @return vector of nice names
+advisor_description_name <- function(advisor0idDescription) {
+  case_when(
+    advisor0idDescription == 3 ~ 'Bias sharing',
+    advisor0idDescription == 4 ~ 'Anti-bias',
+    advisor0idDescription == 'highAccuracy' ~ 'High accuracy',
+    advisor0idDescription == 'lowAccuracy' ~ 'Low accuracy',
+    advisor0idDescription == 7 ~ 'High agreement',
+    advisor0idDescription == 8 ~ 'Low agreement',
+    advisor0idDescription == 9 ~ 'High accuracy',
+    advisor0idDescription == 10 ~ 'High agreement',
+    T ~ NA_character_
+  )
+}
+
+
+# For new analysis package ------------------------------------------------
+
+#' Calculate the probability that confidence is greater than \code{quantiles}
+#' for each quantile. This is used to obtain data for plotting receiver operator
+#' characteristic curves.
+#' @param df tbl to duplicate
+#' @param quantiles vector of quantiles to use for subsetting
+p_conf <- function(df, quantiles) {
+  map(
+    quantiles, 
+    ~ transmute(
+      df, 
+      pConf = mean(Confidence > .),
+      Confidence = .
+    ) %>% 
+      unique()
+  )
 }

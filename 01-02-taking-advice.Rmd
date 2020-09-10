@@ -176,12 +176,14 @@ exclusions %>%
   summarise(across(where(is.logical), sum)) %>%
   mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
-  kable(caption = "Table \\label{tab:ai-ava-dates-exclusions}: Participant exclusions for Dates task advice influence experiment") %>%
+  kable(caption = "\\label{tab:ai-ava-dates-exclusions}Participant exclusions for Dates task advice influence experiment") %>%
   row_spec((n - 1):n, bold = T)
 
 ```
 
 ##### Task performance
+
+
 
 ##### Mainpulation checks
 
@@ -307,9 +309,9 @@ tmp <- rename(tmp,
 
 ```{r}
 
-kable(.BF, caption = "Table \\label{tab:ai-ava-dates-r-bf}: Bayesian ANOVA for Dates task advice influence experiment")
+kable(.BF, caption = "\\label{tab:ai-ava-dates-r-bf}Bayesian ANOVA for Dates task advice influence experiment")
 
-kableANOVA(.AOV$ANOVA, caption = "Table \\label{tab:ai-ava-dates-r-aov}: Frequentist ANOVA for Dates task advice influence experiment")
+kableANOVA(.AOV$ANOVA, caption = "\\label{tab:ai-ava-dates-r-aov}Frequentist ANOVA for Dates task advice influence experiment")
 
 ```
 
@@ -328,13 +330,13 @@ The experiments show that people can learn to disregard advice which provides su
 Where feedback is unavailable, people do not appear to distinguish between useful and supportive advice.
 These results are not wholly consistent with an account of advice-taking in which people use agreement to evaluate advisors in the absence of feedback.
 Under such an account, we would expect participants in the No feedback condition to have shown a greater susceptibility to advice from the Agreeing advisor, but this did not happen.
-The equivalence of the influence of the advisors in the No feedback condition may be a consequence of relatively high levels of advice influence overall, producing a ceiling effect (with the numerical advantage for the Agreeing advisor, as predicted by the theory).
+The equivalence of the influence of the advisors in the No feedback condition may be a consequence of relatively high levels of advice influence overall, producing a ceiling effect (the numerical advantage for the Agreeing advisor is as predicted by the theory).
 The relatively high levels of advice influence are a feature of the Dates task, a consequence of the difficulty of the questions for most participants.
 Another possible explanation for the equivalence of influence between the advisors is that participants may not have had enough exposure to the advisors to properly learn about the value of their advice. 
 The limitation on exposure is another feature of the Dates task: while the Dots task provides participants with many tens of trials in which to update their assessment of advisors, the Dates task provides a level of exposure more similar to normal social interaction (although not necessarily very similar).
 
-While not wholly consistent with the agreement-as-proxy account, the results were broadly consistent with previous work: participants systematically took more advice from the more accurate advisor. 
-The distinction between agreeing and accurate advice revealed by \mccorrect{Niccolo and Nick} generalises to a substantially different task which uses a different kind of decision and different level of exposure to advisors' advice.
+While not wholly consistent with the agreement-as-proxy account, the results were broadly consistent with previous work: participants systematically took more advice from the more accurate advisor. \mccorrect{Is that a fair summary? Seems only true in the feedback condition. Does that mean it really is consistent?}
+The distinction between agreeing and accurate advice revealed by \mccorrect{Niccolo and Nick - what distinction did they actually make?} generalises to a substantially different task which uses a different kind of decision and different level of exposure to advisors' advice.
 In the experiments which follow ([§Psychology of source selection](#chapter-advisor-choice)), both the Dots and Dates tasks are used to investigate differences in source selection behaviour.
 
 The design of this experiment deliberately violated an assumption which may be generally true in real life, that the advice is sufficiently independent as to convey at least some information regarding the correct answer.

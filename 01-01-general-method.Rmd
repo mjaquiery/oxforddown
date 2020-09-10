@@ -20,11 +20,13 @@ source('scripts_and_filters/general_setup.R')
 The behavioural experiments reported in this thesis share a common structure.
 This structure is detailed here to reduce repetition elsewhere in the thesis.
 Individual experiments have truncated methods sections in which the specific deviations from the general method are noted.
+
 ## General method {#gm}
 
 The experiments take place using a judge-advisor system.
 Participants give an **initial estimate** for a decision-making task, receive **advice**, and then provide a **final decision**.
 The advice is always computer-generated, although the specifics of the generating procedure vary between experiments.
+
 ### Participants {#m-participants}
 
 #### Recruitment
@@ -150,36 +152,6 @@ knitr::include_graphics("figures/methods/dates-binary.jpg")
 
 \mccorrect{!TODO[Some discussion of limitations of this method: no control over participant error rates, difficult task, inconsistent presentation for an individual (e.g. solid knowledge of an obscure date)]}
 
-### Advisor advice profiles {#m-profiles}
-
-The advisers are virtual agents whose probability of agreeing with the participant’s decision varies as a function of the participant’s confidence and correctness in the initial decision phase.
-Table \@ref(tab:m-advisor-profiles) illustrates how this relationship functions, and shows that the overall correctness and agreement rates of the advisers is equivalent overall.
-Importantly, on largest minority of trials, the middle 40%, the advisers are exactly equivalent, meaning these trials can be compared directly without confounds arising from agreement rate and initial confidence.
-
-```{r m-advisor-profiles-r} 
-library(tidyverse)
-library(kableExtra)
-tmp <- tribble(
-  ~` `, ~`  `, ~`Bias Sharing`, ~`Anti Bias`,
-  "Participant correct", "High (top 30%)", 80, 60,
-  "Participant correct", "Medium (middle 40%)", 70, 70,
-  "Participant correct", "Low (bottom 30%)", 60, 80,
-  "Participant incorrect", "Any", 30, 30,
-  "Total agreement", "Participant correct", 70, 70,
-  "Total agreement", "Participant incorrect", 30, 30
-)
-
-kable(tmp, caption = "Table \\label{tab:m-advisor-profiles}: Experiment 1 advisor advice profiles") %>%
-  kable_styling() %>%
-  column_spec(1, bold = T) %>%
-  row_spec(0, bold = F) %>%
-  collapse_rows(columns = 1, valign = "top") %>%
-  add_header_above(c(" ", 
-                     "Initial decision confidence", 
-                     "Probability of agreement (%)" = 2))
-
-```
-
 #### General limitations
 
 There are several limitations common to both task designs.
@@ -206,6 +178,39 @@ It is likely that this temporal compression does not fundamentally alter the pro
 The final major difference between real-life advice and the advice offered in these experiments is in the richness of the relationship between advisor and judge.
 In a real-life relationship there would be numerous other factors at play which may alter or overwhelm any advice-taking and advisor evaluation processes revealed by these experiments. 
 How well a person gets along with another could matter beyond simply increasing the perceived benevolence of the other, for example.
+
+### Advisor advice profiles {#m-profiles}
+
+\mccorrect{!TODO[Adjust this to talk more precisely about what agreement means in different contexts, and be a more general introduction to the idea of agreement, accuracy, and their relationship.]}
+
+The advisers are virtual agents whose probability of agreeing with the participant’s decision varies as a function of the participant’s confidence and correctness in the initial decision phase.
+Table \@ref(tab:m-advisor-profiles) illustrates how this relationship functions, and shows that the overall correctness and agreement rates of the advisers is equivalent overall.
+Importantly, on largest minority of trials, the middle 40%, the advisers are exactly equivalent, meaning these trials can be compared directly without confounds arising from agreement rate and initial confidence.
+
+```{r m-advisor-profiles-r} 
+library(tidyverse)
+library(kableExtra)
+tmp <- tribble(
+  ~` `, ~`  `, ~`Bias Sharing`, ~`Anti Bias`,
+  "Participant correct", "High (top 30%)", 80, 60,
+  "Participant correct", "Medium (middle 40%)", 70, 70,
+  "Participant correct", "Low (bottom 30%)", 60, 80,
+  "Participant incorrect", "Any", 30, 30,
+  "Total agreement", "Participant correct", 70, 70,
+  "Total agreement", "Participant incorrect", 30, 30
+)
+
+kable(tmp, caption = "\\label{tab:m-advisor-profiles}Confidence contingent agreement advisor advice profiles") %>%
+  kable_styling() %>%
+  column_spec(1, bold = T) %>%
+  row_spec(0, bold = F) %>%
+  collapse_rows(columns = 1, valign = "top") %>%
+  add_header_above(c(" ", 
+                     "Initial decision confidence", 
+                     "Probability of agreement (%)" = 2))
+
+```
+
 
 ### Analysis {#m-analysis}
 
