@@ -132,6 +132,7 @@ df <- df %>%
 
 df %>% pivot_longer(cols = c('zInitialConfidence', 'zFinalConfidence')) %>%
   ggplot(aes(value, fill = name)) + 
+  geom_vline(xintercept = 0, linetype = 'dashed') +
   geom_density(alpha = .5) +
   facet_grid(feedback~disagree, labeller = label_both)
 
@@ -142,6 +143,8 @@ There are also a reasonable number of trials on which disagreeing advice leads t
 
 Following agreement by an advisor, final decision confidence sometimes increases quite dramatically, but usually changes are modest and somewhat likely to be negative. 
 Very dramatic negative shifts in confidence are rare following agreement.
+
+<!-- Feedback effect may be participants being more cautious where evidence might appear that they are wrong -->
 
 
 First, we run a simple multivariate linear regression predicting the final decision confidence of advice from initial estimate confidence and whether there is agreement between advice and initial estimate.
@@ -239,6 +242,18 @@ forestPlot(mh)
 
 ```
 
+<!-- This suggests we trust advisors less when we have more agreement experience with them. Can we explore these further? Do we trust this analysis - can we visualise what it's doing? -->
+
+```{r}
+
+dfh %>% filter(nthWithAdvisor > -.9) %>%
+  ggplot(aes(x = agreeRate, y = zFinalConfidence, colour = disagree)) +
+  geom_point(alpha = .05) + 
+  geom_smooth(method = 'lm') +
+  facet_wrap(~study)
+
+```
+
 Absent any effects, average final decision confidence is slightly higher than average initial estimate confidence in this model.
 As before, there is a pronounced effect of disagreement, with final confidence being notably lower following disagreement from the advisor, and a smaller effect whereby higher initial confidence increases final confidence.
 
@@ -256,3 +271,28 @@ Some comfort can be taken in noting that, while the standard errors of the compl
 m <- lmer(zFinalConfidence ~ zInitialConfidence * disagree * feedback + (1 | pid), data = dfh)
 anova(m, mh)
 ```
+
+\mccorrect{Do we want to take a descriptive model like this and use it directly as a predictive model in the network modelling (or use machine learning/decision tree/heterogeneous models)? 
+Can we massage continuous dates task data to be compatible?
+Can we use a multilevel model with task[participant[trial]]] structure?}
+
+* Which parameters are important for making network agents display human-like psychology?  
+  * People choose in line with their experience (mostly)  
+    * Feedback is a big deal  
+    * Agreement less so?  
+  * Lots of variability within and between people  
+    * Individual differences are interesting - but what drives them/which dimensions matter?  
+  * What effects do all these have on the network structure?  
+    * Does heterogeneity lead to a stable network structure?  
+    * Do extremely opinionated individuals form 'echo chambers'?  
+      * Do they draw in others?  
+  * Other parameters such as  
+    * Choice availability  
+    * Hidden preference  
+      * How important is agree rate?  
+
+* Explore some of the parameters in these linear models  
+  * Visualise some of the raw data and the individual effects  
+
+* Individual differences might be able to be tracked with parameter-fitted decision-tree-type choice models between pick/average  
+
