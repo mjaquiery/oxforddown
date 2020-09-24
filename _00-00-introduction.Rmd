@@ -16,12 +16,14 @@ documentclass: book
 \adjustmtc 
 <!-- For PDF output, we must include this LaTeX command after unnumbered headings, otherwise the numbers in the mini table of contents will be incorrect -->
 
-\mccorrect{!TODO[Style notes:
-* Graphs:
-    * Continuous axes which show theoretical limits should have expand = c(0, 0), axes which do not show those limits should have some expansion
-]}
+\mccorrect{!TODO[Style notes]}: 
+
+* Graphs:  
+    * Continuous axes which show theoretical limits should have small expand, axes which do not show those limits should have arrowheads from broken_axis_*  
+
 
 \mccorrect{!TODO[update evo models to use this terminology]}
+
 $a_{i,t}$ - advice agent $i$ receives at time $t$  
 $b_{i,t}$ - bias of agent $i$ at time $t$  
 $c_{i,t}^{I/A/F}$ - agent $i$'s confidence in their initial/advisory/final estimate at time $t$  

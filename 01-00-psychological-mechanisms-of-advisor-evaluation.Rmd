@@ -125,7 +125,7 @@ For studying the questions at hand, the psychological model is an appropriate an
 
 The weights assigned to the advisors (relative to the decision-maker themself) are subject to change as the result of experience.
 This experience can be exogenous or endogenous to the decision-making task.
-In the exogenous case, advisors may be labelled in a particular way [@onkalEvaluatingExpertAdvice2017; @tostPowerCompetitivenessAdvice2012; @schultzeInabilityIgnoreUseless2017] or have some summary of their performance displayed [@ginoAnxietyAdviceAbility2012; @yanivAdviceTakingDecision2000:1].
+In the exogenous case, advisors may be labelled in a particular way [@onkalEvaluatingExpertAdvice2017; @tostPowerCompetitivenessAdvice2012; @schultzeInabilityIgnoreUseless2017] or have some summary of their performance displayed [@ginoAnxietyAdviceAbility2012; @yanivAdviceTakingDecision2000].
 Endogenous experience refers to the information that advice on a given trial carries about the trustworthiness of an advisor.
 Exogenous experience is relatively straightforward, but endogenous experience requires some explanation.
 

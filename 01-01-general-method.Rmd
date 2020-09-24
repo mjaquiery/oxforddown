@@ -232,6 +232,18 @@ Despite this monotonic relationship, it is important not to infer that one parti
 
 ##### Weight on Advice {#m-analysis-dv-woa}
 
+Weight on Advice, and its compliment Advice Taking, are commonly used to quantify the relative contributions of advice and initial estimates in making final decisions.
+It is obtained by dividing the amount an initial estimate was updated by the amount the advisor recommended adjusting the initial estimate.
+It thus expresses the amount the estimate changed as a proportion of the advised change.
+
+Formally, Weight on Advice is given by $(e^F - e^I)/(a - e^I)$ where $e^I$ and $e^F$ are the initial estimate and final decision, respectively, and $a$ is the advice.  
+
+Where the final answer moves away from advice (i.e. the final decision is further from the advice than the initial estimate), the value of Weight on Advice is negative, and where the adjustment towards advice exceeds the advice itself (i.e. the advice falls between the final decision and the initial estimate) the value of Weight on Advice is greater than 1. 
+These values are typically truncated to 0 and 1, respectively.
+
+In cases where the advice is exactly equal to the initial estimate, the denominator is equal to zero and the value for Weight on Advice is thus undefined. 
+Trials in which the advice is exactly equal to the initial estimate are consequently discarded when calculating Weight on Advice.
+
 ##### Influence
 
 ##### Capped influence {#m-analysis-dv-influence}
