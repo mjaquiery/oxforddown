@@ -36,14 +36,14 @@ The difference between the initial estimate and the final decision is taken as m
 
 In these experiments, the task performance for the advisor is usually as good or better than that of the judge.
 This performance structure can be well captured for most tasks with Gaussian answer + error distribution where the answer supplies the mean and the error supplies the variance. 
-When combining individual estimates from multiple distributions, optimal results are obtained by weighting the estimates according to the relative precision of their parent distributions [@sollStrategiesRevisingJudgment2009].
+When combining individual estimates from multiple distributions, optimal results are obtained by weighting the estimates according to the relative precision of their parent distributions  [@sollStrategiesRevisingJudgment2009; @bahramiOptimallyInteractingMinds2010]. This is analogous to multisensory integration [@ernstHumansIntegrateVisual2002; @kordingCausalInferenceMultisensory2007], and many other cognitive processes argued to be modelled on Bayesian integration, such as those listed in Section 2 of @colomboBayesianCognitiveScience2015.
 Where the performance of the advisor is higher than the judge, the advisor's error will be lower than the judge's, and thus the variance of the advisor's distribution will be narrower and therefore the precision of the advisor's distribution will be higher.
 When a judge combines their own estimate with that of an advisor who is at least as good, an optimal judge will weight the advisor's opinion at least as highly as their own. \mccorrect{!TODO[We'll have got a whole section on models of advice integration stuff, probably, so we can point to that here.]}
 The classic presentation of egocentric discounting is when, in these scenarios, the weight applied to the advice is lower than the optimal weight.
 
 Egocentric discounting is a robust phenomenon in advice-taking. 
 It is not a generic inability to combine estimates: people can accurately combine estimates that do not include their own opinion [@yanivExploitingWisdomOthers2012], even adjusting for differences in ability between advisors [@sollJudgmentalAggregationStrategies2011].
-Similarly, @troucheVigilantConservatismEvaluating2018 showed that discounting occurred _towards advice_ when that advice was labelled as the judge's initial estimate and vice-versa, suggesting that a person's own opinion has a privileged status.
+Similarly, @troucheVigilantConservatismEvaluating2018 showed that when advice and initial estimates were surreptitiously switched, participants discounted their own initial estimates in favour of advice, suggesting that a person's own opinion has a privileged status.
 
 In this chapter, I review the literature on egocentric discounting, with particular attention to manipulations that have been used and explanations that have been offered.
 I conclude the chapter by expounding an alternative perspective from which to view the phenomenon which, in my view, clarifies the phenomenon and opens the field for a wider range of effective explanations. 
@@ -56,7 +56,18 @@ These manipulations fit roughly into four categories: properties of the task, pr
 Many of the experiments detailed below have not looked at egocentric discounting itself, but have instead looked at changes to the weight given to advice in integrated decisions. 
 While egocentric discounting and advice weighting are inversely related, establishing the degree to which advice has been discounted requires a reference value from which its weighting has deviated.
 Many experiments do not calculate this normative value, nor even give sufficient details to establish a reference value, either an objective normative value or an expected value from the perspective of the participant.
-It should be borne in mind, therefore, that depending on the circumstances, very high or low levels of advice weighting might not correspond to very low or high levels of discounting: When @schultzeInabilityIgnoreUseless2017 provide participants with estimates from a random number generator, any level of advice weighting corresponds to negative egocentric discounting; and in many other experiments where expert advice is provided even weighting advice evenly corresponds to discounting.
+
+One obvious reference value is the case where equal weight is given to one’s own opinion and the advice received.
+This is often the value implicitly or explicitly stated. 
+However, equal weighting is only normatively prescribed if advice is exactly as reliable as one’s own initial estimate. 
+
+Nevertheless, it should be borne in mind, therefore, that depending on the circumstances, very high or low levels of advice weighting might not correspond to very low or high levels of discounting.
+When @schultzeInabilityIgnoreUseless2017 provide participants with advisory estimates from a random number generator, ascribing any weight at all to the advice is suboptimal.
+Conversely there are many experiments in which expert advice is provided, and in these experiments weighting advice evenly corresponds to egocentric discounting because the advisor's estimates are more accurate on average.
+
+As a consequence of the uncertainty about which normative weighting strategy is required by each experiment (and sometimes this strategy is different from the perspectives of the researcher and the participant), egocentric discounting is primarily examined here in terms of changes in advice weighting. 
+Where advice weighting diminishes, egocentric discounting is said to increase, without specific comment being possible on the exact level of discounting on display.
+In studies where normative strategies can be determined [e.g. @yanivAdviceTakingDecision2000], advice weighting is below that predicted by the normative strategy, indicating egocentric discounting.
 
 ### Task properties {#coa-ed-task}
 
@@ -69,7 +80,7 @@ The most prominent feature of the task which affects egocentric discounting is d
 @ginoEffectsTaskDifficulty2007 asked participants to estimate a person's weight from a clear (easy condition) or blurry (hard condition) picture, and saw less discounting on the hard task. 
 Likewise, @wangWhyDoesAdvice2018 used blurring to increase the difficulty of estimating the number of coins in a photograph of a jar and found that participants discounted less in the blurry compared to the clear condition.
 
-#### Judge's confidence
+#### Judge's confidence {#coa-ed-task-confidence}
 
 Wang & Du saw full mediation of their difficulty manipulation by participants' confidence on the task, while Gino and Moore saw only partial mediation. 
 Other studies have manipulated the judge's confidence through other mechanisms.
@@ -82,7 +93,7 @@ Using a similar methodology, but a different analytical approach, @moussaidSocia
 
 More complex task designs, in which reflection and discussion are encouraged, can reduce discounting.
 @minsonTwoTangoEffects2011 and @libermanNaiveRealismCapturing2012 asked dyads to take simultaneous roles as judge and advisor, providing initial estimates, exchanging advice during a discussion, and then providing final decisions on estimation tasks.
-Discounting was still evident in this process, as it was in @vanswolForecastingAnotherEnjoyment2011, which used a traditional Judge-Advisor System paradigm where advice was delivered face-to-face. 
+Discounting was reduced, but still evident in this process, as it was in @vanswolForecastingAnotherEnjoyment2011, which used a traditional Judge-Advisor System paradigm where advice was delivered face-to-face. 
 Liberman and colleagues did manage to eliminate discounting where, between exchanging advice and providing a final decision, participants produced a single mutually satisfactory collaborative judgement, and showed that the value of this collaborative judgement was itself improved by open-minded discussion over justifying estimates or exchanging bids.
 @schultzeInabilityIgnoreUseless2017 demonstrated that asking judges to selectively generate reasons why the advice might be correct or incorrect led to lower and higher levels of egocentric discounting respectively.
 
@@ -99,39 +110,63 @@ When judges are more confident, they tend to be less influenced by advice, and t
 #### Similarity of advice to the initial estimate
 
 A frequently-manipulated property of advice, and the most interesting in the context of the first part of this thesis, is the similarity of the advice to the initial estimate. 
-This is sometimes expressed as agreement or reasonableness of advice.
-The evidence on the effects of advice distance on advice influence is equivocal: some studies appear to demonstrate that advice is discounted more the further it is from the initial estimate, while other studies show a greater influence of more distant advice.
+This is sometimes expressed as agreement or reasonableness of advice.[^Note that the influence of advice that is perfectly in accord with an initial estimate is undefined when using [§Weight on Advice](#m-analysis-dv-woa) measures.]
+The evidence on the effects of advice distance on advice influence is equivocal.
+Some studies show that advice is less influential the further it is from the initial estimate, while other studies show a greater influence of more distant advice.
+Other studies have indicated that the relationship is quadratic: low weight is assigned to advice which is too near or far from the initial estimate, and a greater weight assigned to advice which is in the moderately distant.
 
+Several studies have provided evidence for a simple agreement effect whereby advice that is nearer to the initial estimate is more influential.
 @yanivReceivingOtherPeople2004 manipulated advice to be nearer to or further away from the initial estimate and saw that the influence of advice decreased as the advice was further from the initial estimate (although this pattern did not hold for low-expertise judges in one experiment).
 @minsonTwoTangoEffects2011 found that more distant advice was associated with less advice-taking behaviour once average distance between dyad members was controlled for, although their results were not expressed using standard advice-taking metrics.
 @yanivUsingAdviceMultiple2007 observed that advice closer to the initial estimate was also more influential when combining multiple pieces of advice simultaneously.
 
-@moussaidSocialInfluenceCollective2013 identified a three-zone structure to the influence of advice according to distance. 
-Similar advice fell into the 'confirmation zone', where opinion was unchanged but confidence increased; moderately distant advice fell into an 'influence zone' where averaging strategies come into play; and distant advice was generally ignored.
-Likewise, @schultzeEffectsDistanceInitial2015 showed in an elegant series of Judge-Advisor System experiments that relationships between egocentric discounting and advice distance were non-linear. 
-Advice was discounted heavily where it was close to the initial estimate, with discounting then dropping precipitously to a peak for middle-distance advice, after which it either remained stable or decreased slightly as the distance increased further.
-Schultze et al. also showed that confidence in final decisions was dramatically boosted by near advice, and that confidence gains decreased sharply with distance, consistent with Moussaïd et al.'s account.
-@hutterSeekingAdviceSampling2016 found consistently higher influence for advice that was further from the initial estimate both for single pieces of advice and for integrating multiple pieces of advice.
-Hütter & Ache used three discrete advice distances which may explain why they found monotonic increases in influence while Moussaïd et al. and Schultze et al. found U-shaped relationships: Hütter & Ache may not have sampled a broad enough swathe of the distance-space.
+The opposite effect was demonstrated by @hutterSeekingAdviceSampling2016. They found consistently higher influence for advice that was further from the initial estimate, both for single pieces of advice and for integrating multiple pieces of advice.
 
-The argument that close advice leads people to update their confidence rather than their judgement may offer an explanation of the more straightforward monotonic reduction in advice-taking with distance.
-This interpretation would be consistent with the results of @yanivUsingAdviceMultiple2007 if we assume that this confidence reduces advice influence ([§Task properties](#coa-ed-task)) and this reduction of influence disproportionately affects distant advice.
-@rollwageConfidenceDrivesNeural2020 argue that high-confidence decisions reduce the processing of disconfirmatory evidence, and such a process may explain the above phenomenon: near advice inflates confidence, which then disproportionately hampers the processing of far advice, leading to an apparent monotonic decrease in advice influence with distance.
-These mechanisms do not suffice to explain the results in @yanivReceivingOtherPeople2004, however, because there is only a single piece of advice which cannot be both near and far simultaneously.
-The @yanivReceivingOtherPeople2004 results stand as something of a mystery, especially because @schultzeEffectsDistanceInitial2015 obtained results consistent with their other results in an experiment designed to reproduce Yaniv's methodology as closely as possible.
+A non-linear, U-shaped relationship between advice distance and advice influence has been shown in other studies.
+@moussaidSocialInfluenceCollective2013 asked participants to estimate answers to a variety of questions and give confidence ratings, both before and after receiving another person's initial estimate as advice. 
+They identified a three-zone structure to the influence of advice according to the distance between the initial estimate and the advice. 
+Similar advice fell into the 'confirmation zone', where opinion was unchanged but confidence increased; moderately distant advice fell into an 'influence zone' where opinion changed to accommodate the advice; and distant advice was generally ignored.
+Likewise, @schultzeEffectsDistanceInitial2015 showed in an elegant series of Judge-Advisor System experiments that relationships between egocentric discounting and advice distance were U-shaped. 
+Advice was given very little weight where it was close to the initial estimate, with the weight then increasing precipitously to a peak for middle-distance advice, after which it either remained stable or decreased slightly as the distance increased further.
+Schultze et al. also showed that confidence in final decisions was dramatically boosted by near advice, and that confidence gains decreased sharply with distance, consistent with Moussaïd et al.'s account.
+
+Hütter & Ache used two discrete advice distances in each of their experiments, and thus could not demonstrate a U-shaped relationship with only two points.
+Hütter & Ache's results can be considered consistent with the studies demonstrating a U-shaped relationship, although there still remains a difficulty in integrating the results of these studies with those showing a monotonic decrease in advice weight by distance.
+This is consistent with the argument that high-confidence decisions reduce the processing of disconfirmatory evidence [@rollwageConfidenceDrivesNeural2020].
+This mechanism will function more effectively if there is a bias for processing nearby advice before more distant advice.
+
+This mechanisms can be extended to explain the results in @yanivReceivingOtherPeople2004 (in which there is only a single piece of advice) by allowing the updating of confidence and the adjustment of the estimate to be separate processes.
+If updating is a two-stage process wherein confidence is updated first, and then the updated confidence value is used to determine the extent to which the estimate is adjusted, we can reproduce the U-shaped relationship from two monotonic relationships.
+First, confidence is increased by nearby advice (and perhaps decreased by distant advice). 
+Second, advice is more influential the nearer it is to the initial estimate.
+This means that, for nearby advice, the judge's confidence is boosted by agreement, meaning that the ostensibly highly-influential nearby advice is subsequently assigned very little weight (because highly confident judges ascribe little weight to advice - [§Judge's confidence](#coa-ed-task-confidence)).
+For advice that lies at a middle distance, there is no boost to confidence and advice is somewhat influential. 
+At greater distances, while the judge's confidence in their own opinion might be reduced slightly, there is little potential influence in the advice.
+
+This unifying explanation is consistent with Moussaïd et al.'s demonstration that the effects of advice on confidence and estimate were somewhat separable.
+Nevertheless, it is somewhat unintuitive that the metacognitive effects of advice on confidence would happen prior to the cognitive effects of advice on estimate updating.
+The @yanivReceivingOtherPeople2004 results are also not wholly explained by this kind of process because @schultzeEffectsDistanceInitial2015 included an experiment designed to reproduce Yaniv's methodology as closely as possible, the results of which were inconsistent with Yaniv's.
 
 Related to the distance of advice is the reasonableness of advice, because where the judge has a somewhat reasonable estimate the distance serves as a reliable proxy for reasonableness.
-@ginoAnxietyAdviceAbility2012 included an experiment in which non-anxious participants heavily discounted unreasonably high and unreasonably low advice, while discounting reasonable advice at a rate typically seen in Judge-Advisor System experiments.
+@ginoAnxietyAdviceAbility2012 included an experiment in which (non-anxious) participants heavily discounted unreasonably high and unreasonably low advice, while discounting reasonable advice at a rate typically seen in Judge-Advisor System experiments.
 Similarly, @schultzeInabilityIgnoreUseless2017 saw judges discount wildly implausible advice more heavily, although it was still assigned some weight, even when labelled as coming from a random number generator.
+
+The level of agreement may act as a cue to the plausibility of both the advice and the initial estimate. 
+Somewhat counter-intuitively, this can lead to agreeing advice being assigned less weight than we might expect because of its bolstering of the confidence in the initial estimate.
+
 
 #### Solicitation of advice
 
 The extent to which advice is discounted may also be related to whether advice is wanted.
-@ginoEffectsTaskDifficulty2007 compared advice-taking behaviour across two experiments in which the only difference in design was that participants in one received advice automatically and participants in the other had the option of clicking a button to receive advice.
-@ginoEffectsTaskDifficulty2007 found that participants opt to receive advice on almost all trials, including in the easy condition, but found no differences in the extent to which advice was used between the compulsory and optional advice experiments.
+This is hard to disentangle from the effects of task difficulty, because people are more likely to seek advice when they find the task more difficult to do (and hence their confidence in their response is lower).
+
+@ginoEffectsTaskDifficulty2007 compared advice-taking behaviour across two experiments using a task in which participants had to estimate people's weight from photographs. In one of these experiments participants received advice automatically and in the other participants had the option of clicking a button to receive advice.
+Participants opted to receive advice on almost all trials, including in an easy condition, and no differences were found in the extent to which advice was used between the compulsory and optional advice experiments.
 The very high rates of advice seeking in the optional experiment suggest that participants in the compulsory advice experiment may have been very welcoming of the advice due to the difficulty of the task.
 @ginoWeListenAdvice2008 showed that more expensive advice was sought less frequently but used more heavily, that expensive advice was used more heavily than free advice even when both are compulsory, and that paid-for advice was used more heavily than when the same advice was given for free as the result of a coin-flip.
-In the real world, price is often an indicator of quality, albeit an imperfect one, and solicitation is likely to act as a proxy for confidence, which is again related to task difficulty: participants in the experiments may have taken more advice because they were less sure on the trials in which they sought advice.
+This study packaged questions together in blocks, and participants purchased advice for a whole block at once. 
+This procedure means that the solicitation of advice is decoupled from the difficulty of the question on a trial-by-trial basis, although it is still likely that those participants who found all the questions in a block more difficult were more likely to solicit advice.
+In the real world, price is often an indicator of quality, albeit an imperfect one, and solicitation is likely to act as a proxy for confidence, which is again related to task difficulty: participants in the experiments may have taken more advice because they were less sure on the blocks in which they sought advice.
 \mccorrect{!TODO[Michael and/or Naomi worked on seeking advice more when less confident? That's relevant here]}
 @hutterSeekingAdviceSampling2016 found that participants opted to see a large number of advisory estimates in a calorific content estimation task when allowed to sample ad lib, although the influence of the advice was low.
 
@@ -324,7 +359,7 @@ My view is most consistent with a Bayesian integration view in which advice is w
 I am thus content to observe the contest to provide proximal explanations for changes in the level of egocentric discounting, and only baulk at claims that egocentric discounting is 'irrational'.
 I suggest that, once egocentric discounting as a default is accepted, the adjustments in the level of discounting are almost all transparently rational.
 
-## Evidence
+### Evidence
 
 In the chapters that follow, I present evidence from computational agent-based evolutionary simulations and online human behavioural experiments to illustrate the plausibility of the claims made above. 
 The evolutionary simulations demonstrate that an array of plausible factors affecting the relative utility of advice can create an environment in which egocentric discounting is adaptive, and the behavioural experiments demonstrate that some of these factors can be responded to by individual humans by adjustments in behaviour.
