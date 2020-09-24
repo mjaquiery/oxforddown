@@ -256,7 +256,7 @@ p_conf <- function(df, quantiles) {
     quantiles, 
     ~ transmute(
       df, 
-      pConf = mean(Confidence > .),
+      pConf = mean(ConfidenceScore > .),
       Confidence = .
     ) %>% 
       unique()
