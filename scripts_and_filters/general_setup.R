@@ -235,12 +235,40 @@ advisor_description_name <- function(advisor0idDescription) {
     advisor0idDescription == 4 ~ 'Anti-bias',
     advisor0idDescription == 'highAccuracy' ~ 'High accuracy',
     advisor0idDescription == 'lowAccuracy' ~ 'Low accuracy',
-    advisor0idDescription == 7 ~ 'High agreement',
-    advisor0idDescription == 8 ~ 'Low agreement',
-    advisor0idDescription == 9 ~ 'High accuracy',
-    advisor0idDescription == 10 ~ 'High agreement',
+    advisor0idDescription == 'highAgreement' ~ 'High agreement',
+    advisor0idDescription == 'lowAgreement' ~ 'Low agreement',
+    advisor0idDescription == 'Accurate' ~ 'High accuracy',
+    advisor0idDescription == 'Agreeing' ~ 'High agreement',
     T ~ NA_character_
   )
+}
+
+#' Return a copy of x with the factors of x ordered how we want them to ensure
+#' consistency across plots
+#' @param x tbl whose factors should be reordered
+#' @return \code{x} with reordered factors
+order_factors <- function(x) {
+  #' Reorder a factor 
+  #' Logic is a bit twisted because R kept reversing factors even
+  #' when asked nicely not to
+  .f <- function(f) {
+    if (length(levels(f)) != 2)
+      return(f)
+    if (
+      all(str_detect(levels(f), c('^[hH]igh ?accuracy', 
+                                  '^[hH]igh ?agreement'))) ||
+      all(str_detect(levels(f), c('^[hH]igh', '^[lL]ow'))) ||
+      all(str_detect(levels(f), c('^[fF]inal', '^[iI]nitial'))) ||
+      all(str_detect(levels(f), c('^[fF]eedback', '^[nN]o'))) ||
+      all(str_detect(levels(f), c('^[cC]orrect', '^[iI]ncorrect'))) ||
+      all(str_detect(levels(f), c('^[aA]gree', '^[dD]isagree'))) ||
+      all(str_detect(levels(f), c('^[aA]s planned', '^[aA]nomalous'))) 
+    )
+      fct_rev(f)
+    else
+      f
+  }
+  mutate(x, across(.cols = where(is.factor), .f))
 }
 
 
