@@ -877,7 +877,7 @@ ggplot(tmp, aes(x = '', y = pChooseHigh)) +
 
 ```
 
-Participants selected the High accuracy advisor at a rate greater than would be expected if their choosing were random (`r .T`).
+As shown in Figure \@ref(fig:ac-acc-dots-r-graph), participants selected the High accuracy advisor at a rate greater than would be expected if their choosing were random (`r .T`).
 The modal choice remained at chance level (.5), but almost all participants manifesting a preference preferred the High accuracy advisor.
 
 ### Dates Task {#ac-acc-dates}
@@ -1405,7 +1405,7 @@ Familiarization %>%
 ```
 
 The individual participant data suggest that some participants may actually be porting their confidence from the initial estimate directly into the final decision, despite the fact that they have changed their mind (Figure \@ref(fig:ac-acc-dates-confidence-change-p)).
-Whereas in the Dots task the off-diagonal pattern in the aggregate data looked to be an artefact of combining data from individual participants with relatively little variation within their confidence responses placed at various points along the off-diagonal (Figure \@ref(fig:ac-acc-dots-confidence-change-p)), data from this task suggested that several participants were using a range of values for their final decisions and displaying a clear positive correlation between initial and final confidence.
+Whereas in the Dots task the off-diagonal pattern in the aggregate data looked to be an artefact of combining data from individual participants with relatively little variation within their confidence responses placed at various points along the off-diagonal (Figure \@ref(fig:ac-acc-dots-confidence-change)), data from this task suggested that several participants were using a range of values for their final decisions and displaying a clear positive correlation between initial and final confidence.
 
 This increased tendency for participants to response in this way on the Dates task may be a consequence of the layout of the response bars on the screen.
 In the Dots task, the bars were oriented horizontally, such that the extreme values for one were furthest away from extreme values for the other (Figure \@ref(fig:m-dots)). 
@@ -1676,8 +1676,8 @@ ggplot(tmp, aes(x = `Feedback condition`, y = pChooseHigh)) +
 ```
 
 In the No feedback condition the mean of the distribution of participant picking preferences between the advisors was equivalent to chance (`r .T.Nfb`).
-This is a different result to that observed in the Dots task §\@ref(ac-acc-dots-r-h), which also had no feedback.
-Preferences were quite evenly distributed across the full range of directions and strengths, with a slight numerical advantage for the Low accuracy advisor.
+This is a different result to that observed in the Dots task (§\@ref(ac-acc-dots-r-h)), which also had no feedback.
+Preferences were quite evenly distributed across the full range of directions and strengths, with a slight numerical advantage for the Low accuracy advisor (Figure \@ref(fig:ac-acc-dates-r-graph)).
 
 In the Feedback condition the mean of the distribution of selection rates was clearly different from chance. 
 The High accuracy advisor was preferred by more participants, and preferred more strongly (`r .T.fb`).
@@ -3136,7 +3136,7 @@ ggplot(tmp, aes(x = feedbackCondition, y = pChooseHigh)) +
 ```
 
 Consistent with the result from the Dots task, in the No feedback condition participants' preferences for receiving advice from the High agreement advisor were greater than chance (`r .T.Nfb`).
-The modal preference was to select the High agreement advisor on every Choice trial, and although some participants still showed a preference for hearing advice from the Low agreement advisor, preferences for the High agreement advisor were generally stronger and more frequent.
+The modal preference was to select the High agreement advisor on every Choice trial, and although some participants still showed a preference for hearing advice from the Low agreement advisor, preferences for the High agreement advisor were generally stronger and more frequent (Figure \@ref(fig:ac-agr-dates-r-graph)).
 
 In the Feedback condition, the mean of the participants' selection rates was equivalent to random picking (`r .T.fb`).
 This is consistent with a strategy which attempts to maximise the accuracy of final decisions, because neither advisor would help with this task systematically. 
@@ -4459,7 +4459,7 @@ ggplot(tmp, aes(x = feedbackCondition, y = pChooseAcc)) +
 ```
 
 Consistent with the result from the Dots task, in the No feedback condition participants' preferences for receiving advice from the High accuracy advisor were not different from chance (`r .T.Nfb`).
-Participant preferences in the No feedback condition were almost perfectly evenly distributed, both in terms of which advisor was preferred and the strength of that preference, in both the original study and the replication.
+Participant preferences in the No feedback condition were almost perfectly evenly distributed, both in terms of which advisor was preferred and the strength of that preference, in both the original study and the replication (Figure \@ref(fig:ac-ava-dates-r-graph)).
 
 In the Feedback condition, the mean of the participants' selection rates clearly favoured the High accuracy advisor (`r .T.fb`).
 This is consistent with a strategy which attempts to maximise the accuracy of final decisions. 
@@ -5132,7 +5132,7 @@ ggplot(tmp, aes(x = '', y = pChooseAcc)) +
 ```
 
 There was a strong tendency for participants to express no, or slight preferences between advisors (`r .T`).
-Intriguingly, almost all participants who expressed a stronger preference expressed it towards the Anti-bias advisor: in the direction counter to that hypothesised. 
+Intriguingly, almost all participants who expressed a stronger preference expressed it towards the Anti-bias advisor: in the direction counter to that hypothesised (Figure \@ref(fig:ac-cca-dots-r-graph)). 
 The statistics are not conclusive here because the experiment was terminated prematurely. 
 \mccorrect{The good thing about Bayes stats is we can quite happily go collect more data. Maybe we should do this because there's a chance we come out with a counter-to-expectations result here to do some talking and thinking about.}
 
@@ -5718,7 +5718,7 @@ tmp.aov$ANOVA %>%
 
 Participants answered questionnaires about their trust in the advisers at four time points during the experiment.
 We hypothesised that this subjective trust measure would change over the course of the experiment, with the agree-in-confidence advisor becoming more preferred over time.
-As indicated by Table \@ref{tab:ex1-subjective-assessment}, however, no such effects were found: subjective assessments of the advisers did not differ post-experiment.
+As indicated by Table \@ref(tab:ex1-subjective-assessment), however, no such effects were found: subjective assessments of the advisers did not differ post-experiment.
 
 ```{r ex1-subjective-assessment}
 library(broom)
@@ -5808,7 +5808,7 @@ tmp.print %>%
 Finally, we planned to investigate the hypothesis that participants’ choice of advisor would be sensitive to the differential agreement strategies of the advisers, e.g.
 participants might preferentially select the advisor with the greater likelihood of agreement given their initial confidence.
 This was investigated by testing the participants’ mean bias sharing advisor pick rate in low- versus high-confidence trials.
-Pick rates did not differ (`r cat(md.ttest(participants$aicPickRate.lowConf, participants$aicPickRate.highConf, paired = T, labels = c('M~low confidence~', 'M~high confidence~')))`); Figure \@ref{fig:ex1-selection}).
+Pick rates did not differ (`r cat(md.ttest(participants$aicPickRate.lowConf, participants$aicPickRate.highConf, paired = T, labels = c('M~low confidence~', 'M~high confidence~')))`); Figure \@ref(fig:ex1-selection)).
 
 ##### Exploratory analyses
 
@@ -5828,8 +5828,8 @@ kableLM(equation.ar,
 ```
 
 The hypothesised effect of the different advice-giving profiles of the advisers on their pick rates was not found, and we hypothesised that initial exposure to the advisers may have overshadowed information in subsequent blocks.
-To investigate this possibility, we examined the effect that agreement in the first experimental block had upon choices throughout the rest of the experiment (Figure \@ref{fig:ex1-initial-agreement}).
-A simple regression (Table \@ref{tab:ex1-initial-agreement-t}) indicated that the extent to which the Bias Sharing advisor agreed with the judge more frequently than the Anti Bias advisor in the first experimental block (Block 3) was a significant predictor of the preference for picking the Bias Sharing advisor in subsequent blocks.
+To investigate this possibility, we examined the effect that agreement in the first experimental block had upon choices throughout the rest of the experiment (Figure \@ref(fig:ex1-initial-agreement)).
+A simple regression (Table \@ref(tab:ex1-initial-agreement-t)) indicated that the extent to which the Bias Sharing advisor agreed with the judge more frequently than the Anti Bias advisor in the first experimental block (Block 3) was a significant predictor of the preference for picking the Bias Sharing advisor in subsequent blocks.
 
 ```{r ex1-initial-agreement, fig.align='center', fig.caption="Initial agreement and subsequent preference.  figure shows the relationship between the agreement rate of the Bias Sharing advisor in the first experimental block (relative to the Anti Bias advisor) and the proportion of the time the participant picked the Bias Sharing advisor in later blocks. The dashed line shows the best-fit regression line, with shaded 99\\% confidence intervals.", out.width="100%"}
 
@@ -5878,10 +5878,10 @@ p <- lteq(prop2str(comp$`Pr(>F)`[2]))
 
 ```
 
-This model (Table \@ref{tab:ex1-initial-agreement-pick-rate-t}) also fit the data well enough for interpretation, and represented an improvement on the previous model ($F$(`r comp$Res.Df[2]`, `r comp$Res.Df[1]`) = `r comp$F[2]`, $p$ `r p`).
+This model (Table \@ref(tab:ex1-initial-agreement-pick-rate-t)) also fit the data well enough for interpretation, and represented an improvement on the previous model ($F$(`r comp$Res.Df[2]`, `r comp$Res.Df[1]`) = `r comp$F[2]`, $p$ `r p`).
 Early agreement difference remained predictive, and relative pick rate in block 3 was also predictive.
 Finally, the interaction between these predictors was also important to the model, although the negative sign of the interaction beta ($\beta_3$ = `r round(equationSummary$coefficients[4, 1], 2)`) was unexpected, and required further exploration.
-Figure \@ref{fig:ex1-initial-agreement-pick-rate-mm} shows a marginal means plot for the interaction with the predictors collapsed to binary measurements using a mean split.
+Figure \@ref(fig:ex1-initial-agreement-pick-rate-mm) shows a marginal means plot for the interaction with the predictors collapsed to binary measurements using a mean split.
 
 ```{r ex1-initial-agreement-pick-rate-mm, fig.align='center', fig.caption="Initial agreement and preference predicting subsequent preference.  Figure shows the relationship between whether the agreement rate of the Bias Sharing advisor in the first experimental block (relative to the Anti Bias advisor) and the proportion of the time the participant picked the Bias Sharing advisor in later blocks, split by whether the participant picked the Bias Sharing or Anti Bias advisor more often in the first block. Splits are based on the sample means, and error bars give 95\\% confidence intervals.", out.width="100%"}
 
@@ -5949,11 +5949,11 @@ The theoretical mechanism by which judges evaluate advisor accuracy in the absen
 Thus, we would expect that, given preferences appear to be set by initial exposure to the advisors, those preferences would be more affected by high confidence agreement in block 3.
 This was tested using a regression model in which block 3 agree-in-confidence advisor agreement was used as a predictor split according to the three different levels of confidence.
 Several participants (`r nrow(participants.byBlock) - nrow(participants.ar)`) had no trials in block 3 for one or both advisors at one or more confidence levels; these participants were removed from the analysis.
-Neither the overall model fit nor any of the predictors in this model (Table \@ref{tab:ex1-initial-agreement-metacog}) were significant, but the low-confidence beta was substantially larger than the high- and medium-confidence betas.
+Neither the overall model fit nor any of the predictors in this model (Table \@ref(tab:ex1-initial-agreement-metacog)) were significant, but the low-confidence beta was substantially larger than the high- and medium-confidence betas.
 
 A prediction of the high weighting of initial exposure is that this weighting should drop off over time.
 This does not appear to be the case.
-Figure \@ref{fig:ex1-autoprediction-by-block} shows the regression coefficient for Bias Sharing advisor agreement in each block against the Bias Sharing overall pick proportion: no significant negative correlation was found between block number and the regression coefficient for relative agreement in that block predicting overall advisor preference.
+Figure \@ref(fig:ex1-autoprediction-by-block) shows the regression coefficient for Bias Sharing advisor agreement in each block against the Bias Sharing overall pick proportion: no significant negative correlation was found between block number and the regression coefficient for relative agreement in that block predicting overall advisor preference.
 
 ```{r ex1-autoprediction-by-block, fig.align='center', fig.caption="Block 3 agreement predicting pick rate in each block.  Figure shows the relationship between the agreement rate of the Bias Sharing advisor in the first experimental block (relative to the Anti Bias advisor) and the proportion of the time the participant picked the Bias Sharing advisor in each later block. Error bars give +/-1 standard error. Shaded area gives 95\\% confidence for the overall regression line.", out.width="100%"}
 
@@ -6008,9 +6008,9 @@ This result may simply be an artefact of the scale: although the scale extends e
 To redress this balance, a capped measure of influence (§\@ref(ex1-m-analysis-influence)) was used.
 Of the `r sum(!is.nan(trials$agree))` trials on which judges received advice, `r sum(trials$capped, na.rm = T)` trials (`r num2str(sum(trials$capped, na.rm = T) / sum(!is.nan(trials$agree)) * 100, precision = 1)`%) had their influence scores capped by this process.
 These trials were predominantly disagreement trials^[Agreement trials can have capped values if the final decision goes in the opposite direction to the advice.] (`r sum(trials$capped & !trials$agree, na.rm = T)`, `r num2str(sum(trials$capped & !trials$agree, na.rm = T) / sum(trials$capped, na.rm = T) * 100, precision = 1)`%).
-The mean number of trials adjusted for each participant was `r md.mean(participants$cappedTrials, label = "$M_{TrialsAdjusted}$")`, though the distribution was highly positively skewed and `r sum(participants$cappedTrials == 0)` participants had no trials adjusted this way (Figure \@ref{fig:ex1-influence-cap-rates}).
+The mean number of trials adjusted for each participant was `r md.mean(participants$cappedTrials, label = "$M_{TrialsAdjusted}$")`, though the distribution was highly positively skewed and `r sum(participants$cappedTrials == 0)` participants had no trials adjusted this way (Figure \@ref(fig:ex1-influence-cap-rates)).
 Analysis using the 2x2x2 (advice type/agreement/choice) ANOVA described above (§\@ref(ex1-influence)) no longer showed a significant effect of agreement.
-As before, neither interactions nor other main effects were significant (Table \@ref{tab:ex1-influence-cap-rates-t}).
+As before, neither interactions nor other main effects were significant (Table \@ref(tab:ex1-influence-cap-rates-t)).
 
 ```{r ex1-influence-cap-rates, fig.align='center', fig.caption="Advisor influence capping frequency.  Histogram showing the number of trials in which influence was capped for each participant.", out.width="100%"}
 
@@ -6032,7 +6032,7 @@ kableANOVA(anova.influence.capped$ANOVA,
 We did not observe the hypothesized preference for the agree-in-confidence advisor, either as measured by pick rate or by questionnaire response.
 Nevertheless, it was possible to examine the relationship between the behavioural measure of pick rate and the self-reported questionnaire answers by examining the extent to which participants who picked the agree-in-confidence advisor more frequently rated that advisor more favourably.
 Questionnaire answers did not evolve systematically over the duration of the experiment, so the analysis was conducted on the final (post-experiment) answers.
-Correlations (Figure \@ref{fig:ex1-questionnaire-choice}) indicated that the hypothesized effect was present for the questionnaire dimensions of accuracy and trustworthiness, but not for influence or likeability.
+Correlations (Figure \@ref(fig:ex1-questionnaire-choice)) indicated that the hypothesized effect was present for the questionnaire dimensions of accuracy and trustworthiness, but not for influence or likeability.
 
 ```{r ex1-questionnaire-choice, fig.align='center', fig.caption="Behavioural and self-report consistency.  Relationship between questionnaire response scores on each item and overall pick rate for the Bias Sharing advisor. Lines show best-fit linear model and shaded areas give 95\\% confidence intervals for the parameters.", out.width="100%"}
 
@@ -6083,7 +6083,7 @@ questionnaires %>%
 ```
 
 We supported this raw score analysis by comparing the pick rate for the Bias Sharing advisor (which is by construction comparative with the Anti Bias advisor) to a comparative version of the questionnaire responses obtained by subtracting scores for the Bias Sharing advisor from the equivalent score for the Anti Bias advisor.
-The results were highly similar (Figure \@ref{fig:ex1-questionnaire-choice-balanced}), with the explicit trust measures for the Bias Sharing advisor relative to the Anti Bias advisor correlating with the picking preference for the Bias Sharing advisor in the dimensions of accuracy and trustworthiness.
+The results were highly similar (Figure \@ref(fig:ex1-questionnaire-choice-balanced)), with the explicit trust measures for the Bias Sharing advisor relative to the Anti Bias advisor correlating with the picking preference for the Bias Sharing advisor in the dimensions of accuracy and trustworthiness.
 Again, neither influence nor likeability showed the effect.
 
 ```{r ex1-questionnaire-choice-balanced, fig.align='center', fig.caption="Behavioural and self-report consistency.  Relationship between questionnaire response scores on each item for the Bias Sharing advisor minus scores for the Anti Bias advisor and overall pick rate for the Bias Sharing advisor. Lines show best-fit linear model and shaded areas give 95\\% confidence intervals for the parameters.", out.width="100%"}
@@ -6149,7 +6149,7 @@ tmp <- questionnaires %>%
 ```
 
 There was a strong correlation between trustworthiness and accuracy ($r$ = `r prop2str(cor(tmp$Trustworthy, tmp$Accurate), minPrefix = NA)`), and thus it was probable that the variance in the questionnaire responses explained by advisor preference was principally driven by this shared component.
-This was borne out by nested multiple regression Table \@ref{tab:ex1-questionnaires-additive-variance-explained-t}, which demonstrated that a model using accuracy to predict advisor preference was not significantly improved by including trustworthiness.
+This was borne out by nested multiple regression Table \@ref(tab:ex1-questionnaires-additive-variance-explained-t), which demonstrated that a model using accuracy to predict advisor preference was not significantly improved by including trustworthiness.
 
 ```{r ex1-questionnaires-additive-variance-explained-r}
 
@@ -6194,7 +6194,7 @@ equations$advisor <- factor(equations$advisor)
 
 Measures of influence were obtained in two distinct ways: through a self-report questionnaire and through observation of behaviour.
 To the extent that participants have an insight into their behaviour, these measures should correlate positively with one another.
-This proved to be the case (using the post-experiment responses for simplicity) for both the agree-in-confidence advisor and the agree-in-uncertainty advisor, as shown in Figure \@ref{fig:ex1-subjective-objective-influence}.
+This proved to be the case (using the post-experiment responses for simplicity) for both the agree-in-confidence advisor and the agree-in-uncertainty advisor, as shown in Figure \@ref(fig:ex1-subjective-objective-influence).
 
 ```{r ex1-subjective-objective-influence, fig.align='center', fig.caption="Behavioural and self-report measures of influence.  Scatterplot showing correlations between influence as measured by the change in confidence following advice vs self-report.", out.width="100%"}
 ggplot(tmp, aes(x = influence, y = influence.Q, color = advisor)) +

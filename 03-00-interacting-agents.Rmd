@@ -20,7 +20,7 @@ documentclass: book
 
 \mccorrect{!TODO[extend the simulation/agreement-effects-analysis stuff a bit and it will fill this chapter out well.]}
 
-* Even when biases don't change (Niccolo covered that), source selection on the basis of agreement is inherently pathological.  
+* Even when biases don't change (Niccolo covered that), source selection on the basis of agreement is inherently pathological (unless judgements are uncorrelated).  
   - This is true whether or not confidence weights updating. 
 
 * Why should we care if it's not changing biases (i.e. opinions?)  

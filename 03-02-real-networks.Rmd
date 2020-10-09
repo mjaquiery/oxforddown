@@ -10,12 +10,12 @@ output:
 documentclass: book
 ---
 
-# Real-world network effects {#chapter-real-networks}
+# Network effects with heterogeneous agents {#chapter-hetero-networks}
 \adjustmtc 
 
-<!-- Hopefully we'll have the chance to examine some social network data and do some comparisons between our models and those structures. 
+<!-- 
 
-We may reach the conclusion that these processes are easy to prove in argument and show in modelling, but are pretty difficult to identify unambiguously in the real world. -->
+-->
 
 My models may not be good models.
 
