@@ -14,6 +14,15 @@ documentclass: book
 # Introduction {#chapter-introduction}
 
 \adjustmtc 
+<!-- This introduction should be more overarchingly theoretical 
+  - how do people think about trust, homophily, echo chambers 
+  - what kind of real-work issues are we interested in
+  - relating trust/etc. at network and individual levels (interactivity the key point of this thesis)
+    - network models not based on individual behaviour; individual behaviour rarely scaled up to network levels
+    - cite that neat paper on dynamics of population belief updating as a notable exception :)
+  
+-->
+
 <!-- For PDF output, we must include this LaTeX command after unnumbered headings, otherwise the numbers in the mini table of contents will be incorrect -->
 
 \mccorrect{!TODO[Style notes]}: 

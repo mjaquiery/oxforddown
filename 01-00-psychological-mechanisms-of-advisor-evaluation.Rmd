@@ -20,6 +20,10 @@ params:
 # Psychological mechanisms of advisor evaluation {#chapter-advisor-evaluation}
 \adjustmtc 
 
+<!--
+Include a bit of a review of stuff on source selection
+-->
+
 Where feedback is unavailable, people may use their own sense of certainty as a yardstick for evaluating advice [@pescetelliRoleDecisionConfidence2018; @pescetelliUseMetacognitiveSignals2017]: advisors who agree when one is confident are perceived as more helpful; while those who disagree when one is confident are perceived as less helpful.
 Confidence serves as a proxy for objective feedback, and functions well in this role insofar as the judge has high metacognitive resolution (i.e.
 higher confidence is indicative of a greater probability of being correct).
