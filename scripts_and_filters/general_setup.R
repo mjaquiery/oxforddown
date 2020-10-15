@@ -91,6 +91,11 @@ broken_axis <- theme(axis.line.y = element_line(arrow = arrow(ends = 'both', len
 broken_axis_top <- theme(axis.line.y = element_line(arrow = arrow(ends = 'last', length = unit(6, 'points'), type = 'closed')))
 broken_axis_bottom <- theme(axis.line.y = element_line(arrow = arrow(ends = 'first', length = unit(6, 'points'), type = 'closed')))
 
+simulation <- theme(
+  plot.background = element_rect(linetype = 'dashed', colour = 'black', size = 1),
+  plot.margin = margin(10, 10, 10, 10, 'pt')
+)
+
 # For prettyMD ------------------------------------------------------------
 
 # Here is a bunch of stuff for plotting etc. which should eventually go in prettyMD
