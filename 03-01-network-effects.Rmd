@@ -818,15 +818,15 @@ In models 0, 4, and 5, the median bias for the groups becomes quite similar, and
 ## Models with agents based on our experiments
 
 Each participant's data is run through a model which has the following structure:
-* $P(pick_i) = SoftMax(\frac{V_i}{Vi+Vj})$ where $V$ is the trust placed in an advisor and $_i$ and $_j$ are competing advisors.
-* $V_i^t = V_i^{t-1} + f(I^t,A^t)$ where $I^t$ and $A^t$ are the initial estimate and advice on trial $^t$.  
+* $P(pick_i) = \text{SoftMax}(\frac{V_i}{Vi+Vj})$ where $V$ is the trust placed in an advisor and $_i$ and $_j$ are competing advisors.
+* $V_i^t = V_i^{t-1} + f(I^t,A^t) - \tau$ where $I^t$ and $A^t$ are the initial estimate and advice on trial $^t$ and $\tau$ is a decay parameter indicating how much trust decays at each time step.  
 * $f(I, A, F) = \lambda(agree(I,A)\beta C)$ where $\lambda$ is the trust volatility, $\beta$ is the weight given to confidence, and $C$ is the confidence in the initial decision.  
-* $agree(I, A) = -1 + 2(sign(I)=sign(A))$
+* $\text{agree}(I, A) = -1 + 2(sign(I)=sign(A))$  
 * $F^t = I^t + V_i^t A^t$ where $F^t$ is the final decision on trial $^t$.  
 
 The final confidence judgement is scaled such that it lies between 0 (completely reversed decision) and 1 (completely sure), making its error roughly compatible with the error for picking. 
 The picking and confidence errors are averaged to give the prediction error on that trial. 
-All parameters ($\lambda$, $\beta$) will be fit to minimise prediction error over the available trials.
+All parameters ($\tau$, $\lambda$, $\beta$, and the $\text{SoftMax}$ temperature parameter) will be fit to minimise prediction error over the available trials.
 
 ```{r}
 
@@ -835,9 +835,53 @@ select_experiment('dotstask')
 trials <- trials %>% 
   mutate(uid = factor(paste0(studyId, studyVersion, ' p', pid)))
 
+# Take a subset for testing stuff
+d <- trials %>% 
+  nest(data = -uid) %>%
+  mutate(okay = map_lgl(data, ~ any(.$hasChoice, na.rm = T))) %>%
+  filter(okay) %>% 
+  slice_sample(n = 1) %>%
+  unnest(cols = data)
+
+# Format how the C++ code wants the data:
+# * @param trials a data frame of trials with 5 columns (names may vary):
+# * initialConfidence - initial confidence rating (standardized within participant)
+# * advisorIndex - index of the advisor chosen (0 or 1; NA if no choice made)
+# * choice0 - index of the first advisor offered in the choice (NA if no choice offered)
+# * choice1 - index of the second advisor offered in the choice (NA if no choice offered)
+# * advisorAgrees - whether the chosen advisor agrees (NA if no advice provided)
+# * confidenceShift - amount confidence shifted from initial to final judgement (standardized within participant)
+d <- d %>%
+  select(
+    uid,
+    initialConfidence, 
+    advisorId, 
+    choice0,
+    choice1,
+    advisorAgrees, 
+    advisorInfluenceRaw
+  ) %>%
+  nest(d = -uid) %>%
+  mutate(
+    d = map(d, ~mutate(
+      ., 
+      initialConfidence = scale(initialConfidence),
+      advisorIndex = as.numeric(factor(advisorId)) - 1, # C likes 0-indexing
+      across(
+        .cols = matches('choice[01]'), 
+        ~ as.numeric(factor(., levels = levels(factor(advisorId)))) -1
+      ),
+      advisorInfluenceRaw = scale(advisorInfluenceRaw)
+    ))
+  ) %>%
+  unnest(cols = d) %>%
+  select(-uid, -advisorId)
+
 # Let's have everyone run their data through a model where they are cumulatively 
 # updating their trust in an advisor and that is driving their p(pick) and also
 # their woa. 
+Rcpp::sourceCpp('scripts_and_filters/cpp/model-fit.cpp')
+
 
 
 ```
