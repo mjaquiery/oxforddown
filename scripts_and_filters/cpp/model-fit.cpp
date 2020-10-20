@@ -166,7 +166,7 @@ double rRand(bool allowNegative = TRUE) {
 
 
 double getMSE(NumericVector errors, LogicalVector testSetMask = LogicalVector::create(0)) {
-  if (verbose >= 3) {
+  if (g_verbose >= 3) {
     Rcpp::Rcout << "getMSE()" << std::endl;
   }
 	bool includeAll = testSetMask.size() == 1 && testSetMask[0] == 0;
