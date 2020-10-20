@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-int g_verbose = 5;
+int g_verbose = 4;
 int g_nAdvisors = 5;
 
 /**
