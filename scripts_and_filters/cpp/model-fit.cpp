@@ -166,6 +166,9 @@ double rRand(bool allowNegative = TRUE) {
 
 
 double getMSE(NumericVector errors, LogicalVector testSetMask = LogicalVector::create(0)) {
+  if (verbose >= 3) {
+    Rcpp::Rcout << "getMSE()" << std::endl;
+  }
 	bool includeAll = testSetMask.size() == 1 && testSetMask[0] == 0;
 
 	int len = errors.size();
@@ -246,7 +249,6 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 * Trust update model in which trust does not change from an initial value
 */
 double model0(double initialConf, bool advisorAgrees, Parameters params, int advisorIndex) {
-  Rcpp::Rcout << "UpdateModel 0";
 	return params.advisorTrust[advisorIndex];
 }
 
@@ -255,7 +257,6 @@ double model0(double initialConf, bool advisorAgrees, Parameters params, int adv
 * Trust update model in which trust changes based on agreement
 */
 double model1(double initialConf, bool advisorAgrees, Parameters params, int advisorIndex) {
-  Rcpp::Rcout << "UpdateModel 1";
 
 	int trust = params.advisorTrust[advisorIndex] - params.trustDecay;
 
@@ -270,7 +271,6 @@ double model1(double initialConf, bool advisorAgrees, Parameters params, int adv
 * Trust update model in which trust changes based on agreement, weighted by confidence
 */
 double model2(double initialConf, bool advisorAgrees, Parameters params, int advisorIndex) {
-  Rcpp::Rcout << "UpdateModel 2";
 
 	int trust = params.advisorTrust[advisorIndex] - params.trustDecay;
 
