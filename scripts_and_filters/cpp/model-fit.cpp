@@ -203,6 +203,8 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 		else {
 			errors.advisorChoice[t] = NA_REAL;
 		}
+		
+		errors.adviceWeight[t] = 0; continue;
 
 		// Estimate confidence shift
 		double shift = 0;
