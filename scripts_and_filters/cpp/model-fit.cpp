@@ -336,6 +336,11 @@ ModelResult findParams(ModelFun model, Trials trials, Parameters params,
 		// Update parameters using partial derivatives
 		NumericVector spread = spreadParams(testParams);
 		NumericVector gradients(spread.size());
+		if (g_verbose >= 3) 
+		  Rcout << "Calculating new params with partials" << std::endl;
+		// Temporarily silence logging
+		int verbose = g_verbose;  
+		g_verbose = 0;
 		for (int i = 0; i < spread.size(); i++) {
 			NumericVector partialParams = spread;
 
@@ -362,6 +367,7 @@ ModelResult findParams(ModelFun model, Trials trials, Parameters params,
 		}
 
 		testParams = gatherParams(spread);
+		g_verbose = verbose;  // Turn detailed logging back on
 	}
 
 	ModelResult out = { bestErrors, bestParams };
