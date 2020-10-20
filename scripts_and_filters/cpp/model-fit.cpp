@@ -372,7 +372,7 @@ ModelResult findParams(ModelFun model, Trials trials, Parameters params,
 }
 
 
-// [[export]]
+// [[Rcpp::export]]
 List gradientDescent(DataFrame trials, LogicalVector testSetMask = LogicalVector::create(0),
 	int nStartingLocations = 5, double learnRate = 0.05) {
 
