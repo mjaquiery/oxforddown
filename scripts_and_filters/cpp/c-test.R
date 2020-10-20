@@ -18,7 +18,7 @@ if (!require(Rcpp)) {
 Rcpp::sourceCpp('model-fit.cpp')
 
 x <- tibble(
-  initialConfidence = rep(0, 20),
+  initialConfidence = rep(0, sample(10:30)),
   advisorIndex = 0,
   choice0 = NA,
   choice1 = NA,
@@ -26,7 +26,7 @@ x <- tibble(
   advisorInfluenceRaw = .5
 )
 
-print('gradientDescent(x)')
+print(paste0('gradientDescent(x = ', nrow(x), ' x ', ncol(x), ' )'))
 gradientDescent(x)
 
 # Let's have everyone run their data through a model where they are cumulatively 
