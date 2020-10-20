@@ -190,6 +190,7 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 	// Perform the actual model
 	for (int t = 0; t < trialCount; t++) {
 	  
+	  Rcpp::Rcout << t << " ";
 		errors.advisorChoice[t] = 0; errors.adviceWeight[t] = 0; continue;
 	  
 	  if (g_verbose >= 5) {
