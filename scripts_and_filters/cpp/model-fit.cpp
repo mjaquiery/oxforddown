@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-int g_verbose = 3;
+int g_verbose = 4;
 int g_nAdvisors = 5;
 
 /**
@@ -191,8 +191,8 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 	// Perform the actual model
 	for (int t = 0; t < trialCount; t++) {
 	  
-	  Rcpp::Rcout << t << " ";
-		errors.advisorChoice[t] = 0; errors.adviceWeight[t] = 0; continue;
+	  if (g_verbose == 4)
+  	  Rcpp::Rcout << t << " ";
 	  
 	  if (g_verbose >= 5) {
   	  Rcpp::Rcout << "--- Starting trial " << t << " ---" << std::endl;
@@ -213,7 +213,6 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 			errors.advisorChoice[t] = NA_REAL;
 		}
 		
-
 		// Estimate confidence shift
 		double shift = 0;
 
@@ -222,24 +221,23 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 		// Update trust for advisor giving advice
 		int a = trials.advisorIndex[t];
 		if (!Rcpp::NumericVector::is_na(trials.advisorAgrees[t])) {
-		  Rcpp::Rcout << "shift1";
 			shift *= trials.advisorAgrees[t];
-			Rcpp::Rcout << ";shift2";
 			shift *= params.advisorTrust[a];
-			Rcpp::Rcout << ";curTrust";
 			double curTrust = params.advisorTrust[a];
 			// Update trust in advisor
-			Rcpp::Rcout << ";newTrust";
-			Rcpp::Rcout << ";mdl:" << model(0, false, params, a);
 			params.advisorTrust[a] = model(trials.initialConf[t] + minConf, trials.advisorAgrees[t], params, a);
-			Rcpp::Rcout << std::endl;
-			Rcpp::Rcout << "TrustUpdate: " << curTrust << " -> " << params.advisorTrust[a] << std::endl;
+			if (g_verbose >= 5)
+  			Rcpp::Rcout << "TrustUpdate: " << curTrust << " -> " << params.advisorTrust[a] << std::endl;
 		}
 		errors.adviceWeight[t] = shift - (double)trials.confidenceShift[t];
-		Rcpp::Rcout << "Errors: weight=" << errors.adviceWeight[t];
-		Rcpp::Rcout << "; choice="<< errors.advisorChoice[t] << std::endl;
+		if (g_verbose >= 5) {
+		  Rcpp::Rcout << "Errors: weight=" << errors.adviceWeight[t];
+		  Rcpp::Rcout << "; choice="<< errors.advisorChoice[t] << std::endl;
+		}
 	}
 
+	if (g_verbose >= 4)
+	  Rcpp::Rcout << std::endl << "Trials complete." << std::endl;
 	return errors;
 }
 
