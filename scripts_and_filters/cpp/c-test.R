@@ -56,7 +56,10 @@ d <- d %>%
         .cols = matches('choice[01]'), 
         ~ as.numeric(factor(., levels = levels(factor(advisorId)))) -1
       ),
-      advisorInfluenceRaw = scale(advisorInfluenceRaw)
+      advisorInfluenceRaw = scale(advisorInfluenceRaw),
+      # round for debugging
+      initialConfidence = round(initialConfidence, 4),
+      advisorInfluenceRaw = round(advisorInfluenceRaw, 4)
     ))
   ) %>%
   unnest(cols = d) %>%
