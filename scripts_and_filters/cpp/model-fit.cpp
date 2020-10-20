@@ -166,9 +166,9 @@ double rRand(bool allowNegative = TRUE) {
 
 
 double getMSE(NumericVector errors, LogicalVector testSetMask = LogicalVector::create(0)) {
-  if (g_verbose >= 3) {
-    Rcpp::Rcout << "getMSE" << std::endl;
-  }
+  //if (g_verbose >= 3) 
+  //  Rcpp::Rcout << "getMSE" << std::endl;
+  
 	bool includeAll = testSetMask.size() == 1 && testSetMask[0] == 0;
 
 	int len = errors.size();
@@ -239,8 +239,8 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 		}
 	}
 
-	if (g_verbose >= 4)
-	  Rcpp::Rcout << std::endl << "Trials complete." << std::endl;
+	//if (g_verbose >= 4)
+	//  Rcpp::Rcout << std::endl << "Trials complete." << std::endl;
 	return errors;
 }
 
