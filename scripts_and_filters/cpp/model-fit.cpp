@@ -182,7 +182,7 @@ double getMSE(NumericVector errors, LogicalVector testSetMask = LogicalVector::c
 
 ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 
-  bool verbose = true;
+  bool verbose = false;
   
 	int trialCount = trials.initialConf.size();
 	ModelError errors;
