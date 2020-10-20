@@ -205,7 +205,8 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 	    continue;
 	  
 		// If there is a choice, calculate the error on the choice
-		if (trials.hasChoice[t]) {
+		if (!Rcpp::NumericVector::is_na(trials.choice0[t]) & 
+        !Rcpp::NumericVector::is_na(trials.choice1[t])) {
       errors.advisorChoice[t] = 0;
 		}
 		else {
