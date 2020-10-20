@@ -1,6 +1,7 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
+int g_nAdvisors = 5;
 
 /**
 * @brief Take a set of trials, run gradient descent on them for a family of models,
@@ -48,7 +49,7 @@ struct Parameters {
 	double trustVolatility;
 	double pickVolatility;
 	double trustDecay;
-	NumericVector advisorTrust;
+	double advisorTrust[5];
 };
 
 /**
@@ -136,8 +137,7 @@ NumericVector spreadParams(Parameters params) {
 	);
 	// Add in the advisor trust variables
 	int outSize = out.size();
-	int nAdvisors = params.advisorTrust.size();
-	for (int a = 0; a < nAdvisors; a++)
+	for (int a = 0; a < g_nAdvisors; a++)
 		out[a + outSize] = params.advisorTrust[a];
 	return out;
 }
@@ -150,9 +150,7 @@ Parameters gatherParams(NumericVector params) {
 	out.trustDecay = params[3];
 	// Add in advisor trust variables
 	int nNonAdvisorParams = 4;
-	int nAdvisors = params.size() - nNonAdvisorParams;
-	out.advisorTrust = NumericVector::create(nAdvisors);
-	for (int a = 0; a < nAdvisors; a++)
+	for (int a = 0; a < g_nAdvisors; a++)
 		out.advisorTrust[a] = params[a + nNonAdvisorParams];
 	return out;
 }
@@ -362,8 +360,6 @@ List gradientDescent(DataFrame trials, LogicalVector testSetMask = LogicalVector
 	trialData.advisorAgrees = as<LogicalVector>(trials[3]);
 	trialData.confidenceShift = as<NumericVector>(trials[4]);
 
-	int nAdvisors = max(trialData.advisorIndex) + 1;
-
 	ModelFun modelFuns[3] = { model0, model1, model2 };
 	ModelResult modelResults[3];
 
@@ -377,7 +373,7 @@ List gradientDescent(DataFrame trials, LogicalVector testSetMask = LogicalVector
 			params.confWeight = rRand();
 			params.trustVolatility= rRand(FALSE);
 			params.trustDecay = rRand(FALSE);
-			for (int a = 0; a < nAdvisors; a++)
+			for (int a = 0; a < g_nAdvisors; a++)
 				params.advisorTrust[a] = rRand();
 
 			double bestMSE = INFINITY;
@@ -411,7 +407,7 @@ List gradientDescent(DataFrame trials, LogicalVector testSetMask = LogicalVector
 			modelResults[2].params.trustDecay)
 	);
 
-	for (int a = 0; a < nAdvisors; a++) {
+	for (int a = 0; a < g_nAdvisors; a++) {
 		char name[28];
 		sprintf(name, "trustVolatility[%d]", a);
 		models[name] = NumericVector::create(modelResults[0].params.advisorTrust[a],
