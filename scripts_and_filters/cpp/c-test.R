@@ -70,4 +70,16 @@ d <- d %>%
 # their woa. 
 Rcpp::sourceCpp('model-fit.cpp')
 
+x <- tibble(
+  initialConfidence = rep(0, 20),
+  advisorIndex = 0,
+  choice0 = NA,
+  choice1 = NA,
+  advisorAgrees = 1,
+  advisorInfluenceRaw = .5
+)
+
+print('gradientDescent(x)')
+gradientDescent(x)
+print('gradientDescent(d)')
 gradientDescent(d)

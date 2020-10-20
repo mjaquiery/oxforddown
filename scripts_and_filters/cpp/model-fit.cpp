@@ -37,7 +37,8 @@ List gradientDescent(DataFrame trials, LogicalVector testSetMask, int nStartingL
 struct Trials {
 	NumericVector initialConf;
 	NumericVector advisorIndex;
-	LogicalVector hasChoice;
+	NumericVector choice0;
+	NumericVector choice1;
 	LogicalVector advisorAgrees;
 	NumericVector confidenceShift;
 };
@@ -376,9 +377,10 @@ List gradientDescent(DataFrame trials, LogicalVector testSetMask = LogicalVector
 	Trials trialData;
 	trialData.initialConf = as<NumericVector>(trials[0]);
 	trialData.advisorIndex = as<NumericVector>(trials[1]);
-	trialData.hasChoice = as<LogicalVector>(trials[2]);
-	trialData.advisorAgrees = as<LogicalVector>(trials[3]);
-	trialData.confidenceShift = as<NumericVector>(trials[4]);
+	trialData.choice0 = as<NumericVector>(trials[2]);
+	trialData.choice1 = as<NumericVector>(trials[3]);
+	trialData.advisorAgrees = as<LogicalVector>(trials[4]);
+	trialData.confidenceShift = as<NumericVector>(trials[5]);
 
 	ModelFun modelFuns[3] = { model1, model0, model2 };
 	ModelResult modelResults[3];
