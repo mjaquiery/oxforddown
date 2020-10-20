@@ -191,9 +191,12 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 	// Perform the actual model
 	for (int t = 0; t < trialCount; t++) {
 
+	  if (Rcpp::NumericVector::is_na(trials.advisorIndex[t])) 
+	    continue;
+	  
 		// If there is a choice, calculate the error on the choice
 		if (trials.hasChoice[t]) {
-
+      errors.advisorChoice[t] = 0;
 		}
 		else {
 			errors.advisorChoice[t] = NA_REAL;
@@ -393,7 +396,7 @@ List gradientDescent(DataFrame trials, LogicalVector testSetMask = LogicalVector
 	);
 
 	for (int a = 0; a < nAdvisors; a++) {
-		char name[20];
+		char name[28];
 		sprintf(name, "trustVolatility[%d]", a);
 		models[name] = NumericVector::create(modelResults[0].params.advisorTrust[a],
 			modelResults[1].params.advisorTrust[a],

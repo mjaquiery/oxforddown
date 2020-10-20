@@ -7,10 +7,13 @@ if (!require(tidyverse)) {
 if (!require(esmData)) {
   if (!require(remotes)) install.packages('remotes')
   remotes::install_github('oxacclab/esmData', upgrade = F)
+  library(esmData)
 }
 if (!require(Rcpp)) {
   install.packages('Rcpp')
 }
+
+set.seed(20201020)
 
 # Load up some dots task data. Like all of it. Do need to check the ones where 
 select_experiment('dotstask')
