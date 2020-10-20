@@ -18,7 +18,7 @@ if (!require(Rcpp)) {
 Rcpp::sourceCpp('model-fit.cpp')
 
 x <- tibble(
-  initialConfidence = rep(0, sample(10:30)),
+  initialConfidence = rep(0, sample(10:30, 1)),
   advisorIndex = 0,
   choice0 = NA,
   choice1 = NA,
