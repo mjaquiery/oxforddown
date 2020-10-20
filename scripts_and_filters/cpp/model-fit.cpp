@@ -222,7 +222,7 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 			double curTrust = params.advisorTrust[a];
 			// Update trust in advisor
 			Rcpp::Rcout << ";newTrust";
-			Rcpp::Rcout << ";mdl:" << model(0, false, params, 0);
+			Rcpp::Rcout << ";mdl:" << model(0, true, params, 0);
 			params.advisorTrust[a] = model(trials.initialConf[t] + minConf, trials.advisorAgrees[t], params, a);
 			Rcpp::Rcout << std::endl;
 			Rcpp::Rcout << "TrustUpdate: " << curTrust << " -> " << params.advisorTrust[a] << std::endl;
