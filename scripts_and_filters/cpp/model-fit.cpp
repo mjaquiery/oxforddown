@@ -190,7 +190,7 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 
 	// Perform the actual model
 	for (int t = 0; t < trialCount; t++) {
-
+	Rcpp::Rcout << "Starting trial " << t << std::endl;
 	  if (Rcpp::NumericVector::is_na(trials.advisorIndex[t])) 
 	    continue;
 	  
@@ -206,17 +206,21 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 		double shift = 0;
 
 		shift = trials.initialConf[t] * params.confWeight;
+		Rcpp::Rcout << "InitialConf: " << trials.initialConf[t] << "; AdvisorAgrees:" << trials.advisorAgrees[t] << std::endl;
+		Rcpp::Rcout << "ConfShift: " << shift << std::endl;
 		// Update trust for advisor giving advice
 		int a = trials.advisorIndex[t];
+		Rcpp::Rcout << "AdvisorIndex: " << a << std::endl;
 		if (!Rcpp::NumericVector::is_na(trials.advisorAgrees[t])) {
 			shift *= trials.advisorAgrees[t];
 			shift *= params.advisorTrust[a];
-
+			Rcpp::Rcout << "TotalShift: " << shift << std::endl;
 			// Update trust in advisor
 			params.advisorTrust[a] = model(trials.initialConf[t] + minConf, trials.advisorAgrees[t], params, a);
 		}
-
+		Rcpp::Rcout << "AdvisorTrust: " << params.advisorTrust[a] << std::endl;
 		errors.adviceWeight[t] = shift - (double)trials.confidenceShift[t];
+		Rcpp::Rcout << "Error: " << errors.adviceWeight[t] << std::endl;
 	}
 
 	return errors;

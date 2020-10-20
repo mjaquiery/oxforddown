@@ -13,7 +13,7 @@ if (!require(Rcpp)) {
   install.packages('Rcpp')
 }
 
-set.seed(20201020)
+#set.seed(20201020)
 
 # Load up some dots task data. Like all of it. Do need to check the ones where 
 select_experiment('dotstask')
