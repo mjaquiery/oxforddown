@@ -166,9 +166,6 @@ double rRand(bool allowNegative = TRUE) {
 
 
 double getMSE(NumericVector errors, LogicalVector testSetMask = LogicalVector::create(0)) {
-  if (g_verbose >= 3) {
-    Rcout << "getMSE" << std::endl;
-  }
 	bool includeAll = testSetMask.size() == 1 && testSetMask[0] == 0;
 
 	int len = errors.size();
@@ -313,10 +310,10 @@ ModelResult findParams(ModelFun model, Trials trials, Parameters params,
 
 		// Perform the actual model
 		errors = doModel(model, trials, testParams);
-	  if (g_verbose >= 2) {
-	    Rcout << "... checking MSE" << std::endl;
-	  }
 		mse = getMSE(errors.adviceWeight, testSetMask);
+	  if (g_verbose >= 2) {
+	    Rcout << "MSE = " << mse << " vs " << bestMSE << std::endl;
+	  }
 
 		// Check for MSE improvement
 		if (bestMSE > mse) {
