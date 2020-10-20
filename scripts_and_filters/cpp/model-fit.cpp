@@ -166,16 +166,16 @@ double rRand(bool allowNegative = TRUE) {
 
 
 double getMSE(NumericVector errors, LogicalVector testSetMask = LogicalVector::create(0)) {
-  //if (g_verbose >= 3) 
-  //  Rcpp::Rcout << "getMSE" << std::endl;
-  
+  if (g_verbose >= 3) {
+    Rcout << "getMSE" << std::endl;
+  }
 	bool includeAll = testSetMask.size() == 1 && testSetMask[0] == 0;
 
 	int len = errors.size();
 	int n = 0;
 	double sumSq = 0;
 	for (int i = 0; i < len; i++) {
-		if (!Rcpp::NumericVector::is_na(errors[i])) {
+		if (!NumericVector::is_na(errors[i])) {
 			if (includeAll || testSetMask[i] > 0) {
 				sumSq += errors[i] * errors[i];
 				n++;
@@ -195,25 +195,25 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 	for (int t = 0; t < trialCount; t++) {
 	  
 	  if (g_verbose == 4)
-  	  Rcpp::Rcout << t << " ";
+  	  Rcout << t << " ";
 	  
 	  if (g_verbose >= 5) {
-  	  Rcpp::Rcout << "--- Starting trial " << t << " ---" << std::endl;
-  	  Rcpp::Rcout << "iC=" << trials.initialConf[t];
-  	  Rcpp::Rcout << "; Adv=" << trials.advisorIndex[t];
-  	  Rcpp::Rcout << "; Agr=" << trials.advisorAgrees[t];
-  	  Rcpp::Rcout << "; dC=" << trials.confidenceShift[t] << std::endl;
+  	  Rcout << "--- Starting trial " << t << " ---" << std::endl;
+  	  Rcout << "iC=" << trials.initialConf[t];
+  	  Rcout << "; Adv=" << trials.advisorIndex[t];
+  	  Rcout << "; Agr=" << trials.advisorAgrees[t];
+  	  Rcout << "; dC=" << trials.confidenceShift[t] << std::endl;
 	  }
-	  if (Rcpp::NumericVector::is_na(trials.advisorIndex[t])) 
+	  if (NumericVector::is_na(trials.advisorIndex[t])) 
 	    continue;
 	  
 		// If there is a choice, calculate the error on the choice
-		if (!Rcpp::NumericVector::is_na(trials.choice0[t]) & 
-        !Rcpp::NumericVector::is_na(trials.choice1[t])) {
-      errors.advisorChoice[t] = 0;
+		if (!NumericVector::is_na(trials.choice0[t]) & 
+        !NumericVector::is_na(trials.choice1[t])) {
+      errors.advisorChoice.push_back(0);
 		}
 		else {
-			errors.advisorChoice[t] = NA_REAL;
+			errors.advisorChoice.push_back(NA_REAL);
 		}
 		
 		// Estimate confidence shift
@@ -223,24 +223,24 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 		
 		// Update trust for advisor giving advice
 		int a = trials.advisorIndex[t];
-		if (!Rcpp::NumericVector::is_na(trials.advisorAgrees[t])) {
+		if (!NumericVector::is_na(trials.advisorAgrees[t])) {
 			shift *= trials.advisorAgrees[t];
 			shift *= params.advisorTrust[a];
 			double curTrust = params.advisorTrust[a];
 			// Update trust in advisor
 			params.advisorTrust[a] = model(trials.initialConf[t] + minConf, trials.advisorAgrees[t], params, a);
 			if (g_verbose >= 5)
-  			Rcpp::Rcout << "TrustUpdate: " << curTrust << " -> " << params.advisorTrust[a] << std::endl;
+  			Rcout << "TrustUpdate: " << curTrust << " -> " << params.advisorTrust[a] << std::endl;
 		}
-		errors.adviceWeight[t] = shift - (double)trials.confidenceShift[t];
+		errors.adviceWeight.push_back(shift - (double)trials.confidenceShift[t]);
 		if (g_verbose >= 5) {
-		  Rcpp::Rcout << "Errors: weight=" << errors.adviceWeight[t];
-		  Rcpp::Rcout << "; choice="<< errors.advisorChoice[t] << std::endl;
+		  Rcout << "Errors: weight=" << errors.adviceWeight[t];
+		  Rcout << "; choice="<< errors.advisorChoice[t] << std::endl;
 		}
 	}
 
-	//if (g_verbose >= 4)
-	//  Rcpp::Rcout << std::endl << "Trials complete." << std::endl;
+	if (g_verbose >= 4)
+	  Rcout << std::endl << "Trials complete." << std::endl;
 	return errors;
 }
 
@@ -300,22 +300,22 @@ ModelResult findParams(ModelFun model, Trials trials, Parameters params,
 	while (true) {
 	  
 	  if (g_verbose >= 2) {
-	    Rcpp::Rcout << "### New Params #######################" << std::endl;
-	    Rcpp::Rcout << "Conf weight: " << params.confWeight << std::endl;
-	    Rcpp::Rcout << "Pick volatility: " << params.pickVolatility << std::endl;
-	    Rcpp::Rcout << "Trust decay: " << params.trustDecay << std::endl;
-	    Rcpp::Rcout << "Trust volatility: " << params.trustVolatility << std::endl;
+	    Rcout << "### New Params #######################" << std::endl;
+	    Rcout << "Conf weight: " << params.confWeight << std::endl;
+	    Rcout << "Pick volatility: " << params.pickVolatility << std::endl;
+	    Rcout << "Trust decay: " << params.trustDecay << std::endl;
+	    Rcout << "Trust volatility: " << params.trustVolatility << std::endl;
 	    for (int i = 0; i < g_nAdvisors; i++) {
-	      Rcpp::Rcout << "Advisor Trust[" << i << "]: " << params.advisorTrust[i] << std::endl;
+	      Rcout << "Advisor Trust[" << i << "]: " << params.advisorTrust[i] << std::endl;
 	    }
-	    Rcpp::Rcout << "######################################" << std::endl;
+	    Rcout << "######################################" << std::endl;
 	  }
 
 		// Perform the actual model
 		errors = doModel(model, trials, testParams);
-	  //if (g_verbose >= 2) 
-	  //  Rcpp::Rcout << "... checking MSE" << std::endl;
-	  
+	  if (g_verbose >= 2) {
+	    Rcout << "... checking MSE" << std::endl;
+	  }
 		mse = getMSE(errors.adviceWeight, testSetMask);
 
 		// Check for MSE improvement
@@ -372,7 +372,7 @@ ModelResult findParams(ModelFun model, Trials trials, Parameters params,
 }
 
 
-// [[Rcpp::export]]
+// [[export]]
 List gradientDescent(DataFrame trials, LogicalVector testSetMask = LogicalVector::create(0),
 	int nStartingLocations = 5, double learnRate = 0.05) {
 
@@ -393,7 +393,7 @@ List gradientDescent(DataFrame trials, LogicalVector testSetMask = LogicalVector
 		int len = sizeof(modelFuns) / sizeof(modelFuns[0]);
 		for (int m = 0; m < len; m++) {
 		  if (g_verbose >= 1) {
-		    Rcpp::Rcout << "FITTING PARAMS FOR MODEL " << m << " (run " << i << ")" << std::endl;
+		    Rcout << "FITTING PARAMS FOR MODEL " << m << " (run " << i << ")" << std::endl;
 		  }
 		  
 			// Randomize starting parameters
