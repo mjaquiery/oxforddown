@@ -313,9 +313,9 @@ ModelResult findParams(ModelFun model, Trials trials, Parameters params,
 
 		// Perform the actual model
 		errors = doModel(model, trials, testParams);
-	  if (g_verbose >= 2) {
-	    Rcpp::Rcout << "... checking MSE" << std::endl;
-	  }
+	  //if (g_verbose >= 2) 
+	  //  Rcpp::Rcout << "... checking MSE" << std::endl;
+	  
 		mse = getMSE(errors.adviceWeight, testSetMask);
 
 		// Check for MSE improvement
