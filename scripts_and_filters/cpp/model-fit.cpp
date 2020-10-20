@@ -220,7 +220,7 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 			double curTrust = params.advisorTrust[a];
 			// Update trust in advisor
 			Rcpp::Rcout << ";newTrust";
-			Rcpp::Rcout << ";mdl:" << model(0, true, params, a);
+			Rcpp::Rcout << ";mdl:" << model(0, false, params, a);
 			params.advisorTrust[a] = model(trials.initialConf[t] + minConf, trials.advisorAgrees[t], params, a);
 			Rcpp::Rcout << std::endl;
 			Rcpp::Rcout << "TrustUpdate: " << curTrust << " -> " << params.advisorTrust[a] << std::endl;
@@ -290,6 +290,16 @@ ModelResult findParams(ModelFun model, Trials trials, Parameters params,
 
 	// Gradient descent
 	while (true) {
+	  
+	  Rcpp::Rcout << "### New Params ###" << std::endl;
+	  Rcpp::Rcout << "Conf weight: " << params.confWeight << std::endl;
+	  Rcpp::Rcout << "Pick volatility: " << params.pickVolatility << std::endl;
+	  Rcpp::Rcout << "Trust decay: " << params.trustDecay << std::endl;
+	  Rcpp::Rcout << "Trust volatility" << params.trustVolatility << std::endl;
+	  for (int i = 0; i < g_nAdvisors; i++) {
+	    Rcpp::Rcout << "Advisor Trust [" << i << "]" << params.advisorTrust[i] << std::endl;
+	  }
+	  Rcpp::Rcout << "##################" << std::endl;
 
 		// Perform the actual model
 		errors = doModel(model, trials, testParams);
@@ -364,7 +374,7 @@ List gradientDescent(DataFrame trials, LogicalVector testSetMask = LogicalVector
 	ModelResult modelResults[3];
 
 	for (int i = 0; i < nStartingLocations; i++) {
-		// Loop through the models and look for the paramters which give the lowest MSE after
+		// Loop through the models and look for the parameters which give the lowest MSE after
 		// undergoing gradient descent
 		int len = sizeof(modelFuns) / sizeof(modelFuns[0]);
 		for (int m = 0; m < len; m++) {
