@@ -65,6 +65,6 @@ d <- d %>%
 # Let's have everyone run their data through a model where they are cumulatively 
 # updating their trust in an advisor and that is driving their p(pick) and also
 # their woa. 
-Rcpp::sourceCpp('cpp/model-fit.cpp')
+Rcpp::sourceCpp('model-fit.cpp')
 
 gradientDescent(d)
