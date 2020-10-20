@@ -1,6 +1,7 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
+int g_verbose = 5;
 int g_nAdvisors = 5;
 
 /**
@@ -182,15 +183,13 @@ double getMSE(NumericVector errors, LogicalVector testSetMask = LogicalVector::c
 
 ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 
-  bool verbose = false;
-  
 	int trialCount = trials.initialConf.size();
 	ModelError errors;
 	double minConf = min(trials.initialConf); // used to prevent confidence z-scores being negative
 
 	// Perform the actual model
 	for (int t = 0; t < trialCount; t++) {
-	  if (verbose) {
+	  if (g_verbose >= 5) {
   	  Rcpp::Rcout << "--- Starting trial " << t << " ---" << std::endl;
   	  Rcpp::Rcout << "iC=" << trials.initialConf[t];
   	  Rcpp::Rcout << "; Adv=" << trials.advisorIndex[t];
@@ -297,15 +296,17 @@ ModelResult findParams(ModelFun model, Trials trials, Parameters params,
 	// Gradient descent
 	while (true) {
 	  
-	  Rcpp::Rcout << "### New Params ###" << std::endl;
-	  Rcpp::Rcout << "Conf weight: " << params.confWeight << std::endl;
-	  Rcpp::Rcout << "Pick volatility: " << params.pickVolatility << std::endl;
-	  Rcpp::Rcout << "Trust decay: " << params.trustDecay << std::endl;
-	  Rcpp::Rcout << "Trust volatility" << params.trustVolatility << std::endl;
-	  for (int i = 0; i < g_nAdvisors; i++) {
-	    Rcpp::Rcout << "Advisor Trust [" << i << "]" << params.advisorTrust[i] << std::endl;
+	  if (g_verbose >= 2) {
+	    Rcpp::Rcout << "### New Params #######################" << std::endl;
+	    Rcpp::Rcout << "Conf weight: " << params.confWeight << std::endl;
+	    Rcpp::Rcout << "Pick volatility: " << params.pickVolatility << std::endl;
+	    Rcpp::Rcout << "Trust decay: " << params.trustDecay << std::endl;
+	    Rcpp::Rcout << "Trust volatility: " << params.trustVolatility << std::endl;
+	    for (int i = 0; i < g_nAdvisors; i++) {
+	      Rcpp::Rcout << "Advisor Trust[" << i << "]: " << params.advisorTrust[i] << std::endl;
+	    }
+	    Rcpp::Rcout << "######################################" << std::endl;
 	  }
-	  Rcpp::Rcout << "##################" << std::endl;
 
 		// Perform the actual model
 		errors = doModel(model, trials, testParams);
@@ -376,7 +377,7 @@ List gradientDescent(DataFrame trials, LogicalVector testSetMask = LogicalVector
 	trialData.advisorAgrees = as<LogicalVector>(trials[3]);
 	trialData.confidenceShift = as<NumericVector>(trials[4]);
 
-	ModelFun modelFuns[3] = { model0, model1, model2 };
+	ModelFun modelFuns[3] = { model1, model0, model2 };
 	ModelResult modelResults[3];
 
 	for (int i = 0; i < nStartingLocations; i++) {
@@ -384,6 +385,10 @@ List gradientDescent(DataFrame trials, LogicalVector testSetMask = LogicalVector
 		// undergoing gradient descent
 		int len = sizeof(modelFuns) / sizeof(modelFuns[0]);
 		for (int m = 0; m < len; m++) {
+		  if (g_verbose >= 1) {
+		    Rcpp::Rcout << "FITTING PARAMS FOR MODEL " << m << " (run " << i << ")" << std::endl;
+		  }
+		  
 			// Randomize starting parameters
 			Parameters params;
 			params.confWeight = rRand();
