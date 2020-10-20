@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-int g_verbose = 4;
+int g_verbose = 3;
 int g_nAdvisors = 5;
 
 /**
@@ -189,6 +189,9 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 
 	// Perform the actual model
 	for (int t = 0; t < trialCount; t++) {
+	  
+		errors.advisorChoice[t] = 0; errors.adviceWeight[t] = 0; continue;
+	  
 	  if (g_verbose >= 5) {
   	  Rcpp::Rcout << "--- Starting trial " << t << " ---" << std::endl;
   	  Rcpp::Rcout << "iC=" << trials.initialConf[t];
@@ -207,7 +210,6 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 			errors.advisorChoice[t] = NA_REAL;
 		}
 		
-		errors.adviceWeight[t] = 0; continue;
 
 		// Estimate confidence shift
 		double shift = 0;
