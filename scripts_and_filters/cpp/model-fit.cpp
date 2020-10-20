@@ -182,17 +182,21 @@ double getMSE(NumericVector errors, LogicalVector testSetMask = LogicalVector::c
 
 ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 
+  bool verbose = true;
+  
 	int trialCount = trials.initialConf.size();
 	ModelError errors;
 	double minConf = min(trials.initialConf); // used to prevent confidence z-scores being negative
 
 	// Perform the actual model
 	for (int t = 0; t < trialCount; t++) {
-	  Rcpp::Rcout << "--- Starting trial " << t << " ---" << std::endl;
-	  Rcpp::Rcout << "iC=" << trials.initialConf[t];
-	  Rcpp::Rcout << "; Adv=" << trials.advisorIndex[t];
-	  Rcpp::Rcout << "; Agr=" << trials.advisorAgrees[t];
-	  Rcpp::Rcout << "; dC=" << trials.confidenceShift[t] << std::endl;
+	  if (verbose) {
+  	  Rcpp::Rcout << "--- Starting trial " << t << " ---" << std::endl;
+  	  Rcpp::Rcout << "iC=" << trials.initialConf[t];
+  	  Rcpp::Rcout << "; Adv=" << trials.advisorIndex[t];
+  	  Rcpp::Rcout << "; Agr=" << trials.advisorAgrees[t];
+  	  Rcpp::Rcout << "; dC=" << trials.confidenceShift[t] << std::endl;
+	  }
 	  if (Rcpp::NumericVector::is_na(trials.advisorIndex[t])) 
 	    continue;
 	  
