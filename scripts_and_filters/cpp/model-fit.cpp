@@ -214,10 +214,14 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 		// Update trust for advisor giving advice
 		int a = trials.advisorIndex[t];
 		if (!Rcpp::NumericVector::is_na(trials.advisorAgrees[t])) {
+		  Rcpp::Rcout << "shift1";
 			shift *= trials.advisorAgrees[t];
+			Rcpp::Rcout << ";shift2";
 			shift *= params.advisorTrust[a];
+			Rcpp::Rcout << ";curTrust";
 			double curTrust = params.advisorTrust[a];
 			// Update trust in advisor
+			Rcpp::Rcout << ";newTrust";
 			params.advisorTrust[a] = model(trials.initialConf[t] + minConf, trials.advisorAgrees[t], params, a);
 			Rcpp::Rcout << "TrustUpdate: " << curTrust << " -> " << params.advisorTrust[a] << std::endl;
 		}
