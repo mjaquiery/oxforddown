@@ -138,9 +138,8 @@ NumericVector spreadParams(Parameters params) {
 		params.trustDecay
 	);
 	// Add in the advisor trust variables
-	int outSize = out.size();
 	for (int a = 0; a < g_nAdvisors; a++)
-		out[a + outSize] = params.advisorTrust[a];
+		out.push_back(params.advisorTrust[a]);
 	return out;
 }
 
@@ -173,7 +172,7 @@ double getMSE(NumericVector errors, LogicalVector testSetMask = LogicalVector::c
 	double sumSq = 0;
 	for (int i = 0; i < len; i++) {
 		if (!NumericVector::is_na(errors[i])) {
-			if (includeAll || testSetMask[i] > 0) {
+			if (includeAll || (testSetMask[i] > 0)) {
 				sumSq += errors[i] * errors[i];
 				n++;
 			}
@@ -358,12 +357,12 @@ ModelResult findParams(ModelFun model, Trials trials, Parameters params,
 		// Normalise gradients
 		double gradSum = sum(gradients);
 		for (int i = 0; i < gradients.size(); i++) {
-			gradients[i] *= gradients[i] / gradSum;
+			gradients[i] = gradients[i] / gradSum;
 			// Update parameters
 			if (gradients[i] > 0)
-				spread[i] -= learnRate;
+				spread[i] -= learnRate * gradients[i];
 			else
-				spread[i] += learnRate;
+				spread[i] += learnRate * gradients[i];
 		}
 
 		testParams = gatherParams(spread);
@@ -402,6 +401,7 @@ List gradientDescent(DataFrame trials, LogicalVector testSetMask = LogicalVector
 			// Randomize starting parameters
 			Parameters params;
 			params.confWeight = rRand();
+			params.pickVolatility = rRand();
 			params.trustVolatility= rRand(FALSE);
 			params.trustDecay = rRand(FALSE);
 			for (int a = 0; a < g_nAdvisors; a++)
