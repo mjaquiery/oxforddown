@@ -26,10 +26,12 @@ int g_nAdvisors = 5;
 * @param nStartingLocations how many different starting locations should be tried for each model
 *
 * @param learnRate the learning rate for the models (size of the gradient descent steps)
+* 
+* @param verbosity set this increasingly high for increased logging output
 *
 * @return List(parameters, adviceWeightError, advisorChoiceError, MSE)
 */
-List gradientDescent(DataFrame trials, LogicalVector testSetMask, int nStartingLocations, double learnRate);
+List gradientDescent(DataFrame trials, LogicalVector testSetMask, int nStartingLocations, double learnRate, int verbosity);
 
 /**
  * Structure for storing information from the R dataframe
@@ -375,9 +377,16 @@ ModelResult findParams(ModelFun model, Trials trials, Parameters params,
 
 
 // [[Rcpp::export]]
-List gradientDescent(DataFrame trials, LogicalVector testSetMask = LogicalVector::create(0),
-	int nStartingLocations = 5, double learnRate = 0.05) {
+List gradientDescent(
+    DataFrame trials, 
+    LogicalVector testSetMask = LogicalVector::create(0),
+    int nStartingLocations = 5, 
+    double learnRate = 0.05,
+    int verbosity = 0
+) {
 
+  g_verbose = verbosity;
+  
 	Trials trialData;
 	trialData.initialConf = as<NumericVector>(trials[0]);
 	trialData.advisorIndex = as<NumericVector>(trials[1]);
@@ -440,7 +449,7 @@ List gradientDescent(DataFrame trials, LogicalVector testSetMask = LogicalVector
 
 	for (int a = 0; a < g_nAdvisors; a++) {
 		char name[28];
-		sprintf(name, "trustVolatility[%d]", a);
+		sprintf(name, "advisorTrust_%d", a);
 		models[name] = NumericVector::create(modelResults[0].params.advisorTrust[a],
 			modelResults[1].params.advisorTrust[a],
 			modelResults[2].params.advisorTrust[a]);

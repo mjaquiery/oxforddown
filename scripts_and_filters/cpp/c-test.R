@@ -84,4 +84,5 @@ d <- d %>%
   select(-uid, -advisorId)
 
 print('gradientDescent(d)')
-gradientDescent(d)
+mdl <- gradientDescent(d)
+mdl
