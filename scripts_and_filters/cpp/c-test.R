@@ -15,6 +15,24 @@ if (!require(Rcpp)) {
 
 #set.seed(20201020)
 
+Rcpp::sourceCpp('model-fit.cpp')
+
+x <- tibble(
+  initialConfidence = rep(0, sample(10:30, 1)),
+  advisorIndex = 0,
+  choice0 = NA,
+  choice1 = NA,
+  advisorAgrees = 1,
+  advisorInfluenceRaw = .5
+)
+
+print(paste0('gradientDescent(x = ', nrow(x), ' x ', ncol(x), ' )'))
+gradientDescent(x)
+
+# Let's have everyone run their data through a model where they are cumulatively 
+# updating their trust in an advisor and that is driving their p(pick) and also
+# their woa. 
+
 # Load up some dots task data. Like all of it. Do need to check the ones where 
 select_experiment('dotstask')
 trials <- trials %>% 
@@ -65,9 +83,6 @@ d <- d %>%
   unnest(cols = d) %>%
   select(-uid, -advisorId)
 
-# Let's have everyone run their data through a model where they are cumulatively 
-# updating their trust in an advisor and that is driving their p(pick) and also
-# their woa. 
-Rcpp::sourceCpp('model-fit.cpp')
-
-gradientDescent(d)
+print('gradientDescent(d)')
+mdl <- gradientDescent(d)
+mdl
