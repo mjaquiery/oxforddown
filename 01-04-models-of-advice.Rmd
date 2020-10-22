@@ -19,6 +19,8 @@ params:
 
 ```{r setup 01-04, echo = F, include = F}
 source('scripts_and_filters/general_setup.R')
+library(parallel)
+
 ```
 
 # Modelling advice-taking behaviour {#chapter-advice-models}
@@ -296,3 +298,158 @@ Can we use a multilevel model with task[participant[trial]]] structure?}
 
 * Individual differences might be able to be tracked with parameter-fitted decision-tree-type choice models between pick/average  
 
+## Models with agents based on our experiments
+
+Each participant's data is run through a model which has the following structure:
+* $P(pick_i) = \frac{e^{\rho V_i}}{e^{\rho Vi}+e^{\rho Vj}}$ softmax logistic compression where $V$ is the trust placed in an advisor and $_i$ and $_j$ are competing advisors and $\rho$ is the temperature parameter governing the consistency of picking based on differences in preference.
+* $V_i^t = V_i^{t-1} + f(I^t,A^t) - \tau$ where $I^t$ and $A^t$ are the initial estimate and advice on trial $^t$ and $\tau$ is a decay parameter indicating how much trust decays at each time step.  
+* $f(I, A, F) = \lambda(agree(I,A)\beta C)$ where $\lambda$ is the trust volatility, $\beta$ is the weight given to confidence, and $C$ is the confidence in the initial decision.  
+* $\text{agree}(I, A) = -1 + 2(sign(I)=sign(A))$  
+* $F^t = I^t + V_i^t A^t$ where $F^t$ is the final decision on trial $^t$.  
+
+The final confidence judgement is scaled such that it lies between 0 (completely reversed decision) and 1 (completely sure), making its error roughly compatible with the error for picking. 
+The picking and confidence errors are averaged to give the prediction error on that trial. 
+All parameters ($\tau$, $\lambda$, $\beta$, and the $\rho$ temperature parameter) will be fit to minimise prediction error over the available trials.
+
+```{r}
+# Let's have everyone run their data through a model where they are cumulatively 
+# updating their trust in an advisor and that is driving their p(pick) and also
+# their woa. 
+
+# Load up some dots task data. Like all of it. Do need to check the ones where 
+select_experiment('dotstask')
+trials <- trials %>% 
+  mutate(uid = factor(paste0(studyId, studyVersion, ' p', pid)))
+
+# Take a subset for testing stuff
+d <- trials %>% 
+  nest(data = -uid) %>%
+  mutate(okay = map_lgl(data, ~ any(.$hasChoice, na.rm = T))) %>%
+  filter(okay) %>% sample_n(16)
+
+# Format how the C++ code wants the data:
+# * @param trials a data frame of trials with 5 columns (names may vary):
+# * initialConfidence - initial confidence rating (standardized within participant)
+# * advisorIndex - index of the advisor chosen (0 or 1; NA if no choice made)
+# * choice0 - index of the first advisor offered in the choice (NA if no choice offered)
+# * choice1 - index of the second advisor offered in the choice (NA if no choice offered)
+# * advisorAgrees - whether the chosen advisor agrees (NA if no advice provided)
+# * confidenceShift - amount confidence shifted from initial to final judgement (standardized within participant)
+d <- d %>%
+  mutate(
+    data = map(data, ~select(
+      .,
+      initialConfidence, 
+      advisorId, 
+      choice0,
+      choice1,
+      advisorAgrees, 
+      advisorInfluenceRaw
+    ) %>%
+      mutate(
+        initialConfidence = scale(initialConfidence),
+        advisorIndex = as.numeric(factor(advisorId)) - 1, # C likes 0-indexing
+        across(
+          .cols = matches('choice[01]'), 
+          ~ as.numeric(factor(., levels = levels(factor(advisorId)))) -1
+        ),
+        advisorInfluenceRaw = scale(advisorInfluenceRaw)
+      ) %>% 
+      select(
+        initialConfidence,
+        advisorIndex,
+        choice0, 
+        choice1, 
+        advisorAgrees, 
+        advisorInfluenceRaw
+      ))
+  )
+
+# For speed we now divvy up the data into roughly equal chunks based on the 
+# number of cores available and run the model fitting in parallel on each.
+doGradDesc <- function(x) {
+  library(dplyr)
+  Rcpp::sourceCpp('scripts_and_filters/cpp/model-fit.cpp')
+  x %>% mutate(data = purrr::map(
+    data, 
+    ~gradientDescent(., nStartingLocations = 150L))
+  )
+}
+
+dList <- list()
+nCores <- detectCores() - 4
+nPerCore <- floor(nrow(d) / nCores)
+for (i in 1:nCores) {
+  rows <- (1 + (i - 1) * nPerCore):(i * nPerCore)
+  dList[[i]] <- d[rows, ] 
+}
+# Assign remainder
+for (i in 1:(nrow(d) %% nCores)) {
+  dList[[i]] <- rbind(dList[[i]], d[nrow(d) - (i - 1), ])
+}
+
+cl <- makeCluster(nCores)
+clusterExport(cl, "doGradDesc")
+dList <- parLapply(cl, dList, doGradDesc)
+stopCluster(cl)
+
+# rebuild d from dList
+d <- NULL
+for (x in dList)
+  d <- rbind(d, x)
+
+# Neaten up the data
+d <- d %>%
+  mutate(
+    MSE = map(data, ~ .[['MSE']]),
+    parameters = map(data, ~ .[['parameters']]),
+    data = map(data, ~ as_tibble(.[['trials']]))
+  )
+```
+
+We would like to know the C++ models are doing sensible things, so let's pick a participant and track their advisor preferences and how they relate to their advisor choices in the best-fitting version of the model.
+
+```{r}
+
+tmp <- slice_sample(d, n = 1) %>%
+  unnest(MSE) %>%
+  pivot_longer(
+    matches('Model[0-9]+'), 
+    names_to = 'model', 
+    names_pattern = "Model([0-9]+)",
+    values_to = 'MSE'
+  ) %>%
+  mutate(
+    model = as.numeric(model),
+    parameters = map2(parameters, model, ~as_tibble(.x) %>% 
+                        filter(model == .y) %>%
+                        select(-model)),
+    data = map2(data, model, ~pivot_longer(
+      .,
+      cols = matches('_model[0-9]+$'),
+      names_to = c('.value', 'model'),
+      names_pattern = '(.+)_model([0-9]+)'
+    ) %>%
+      filter(model == .y) %>%
+      rowid_to_column(var = "trial_id") %>%
+      select(-model))
+  )
+
+tmp <- tmp %>% 
+  unnest(cols = data) %>%
+  pivot_longer(
+    cols = matches('^advisorTrust[0-9]+$'),
+    names_to = 'Advisor',
+    names_pattern = '([0-9]+)$',
+    values_to = 'Trust'
+  ) %>%
+  filter(Advisor != 0)
+tmp %>%
+  ggplot(aes(x = trial_id, y = Trust)) +
+  geom_rug(colour = 'grey', length = unit(.06, 'npc'), sides = 't', data = filter(tmp, !is.na(choice0))) +
+  geom_rug(sides = 't', data = filter(tmp, advisorAgrees)) +
+  geom_line() +
+  geom_point(aes(colour = advisorAgrees)) +
+  facet_wrap(~paste0('M', model, 'A', Advisor), scales = 'free_y')
+
+```

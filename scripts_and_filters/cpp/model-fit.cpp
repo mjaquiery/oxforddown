@@ -29,7 +29,7 @@ int g_nAdvisors = 5;
 * 
 * @param verbosity set this increasingly high for increased logging output
 *
-* @return List(parameters, adviceWeightError, advisorChoiceError, MSE)
+* @return List(parameters, trials, MSE) where trials includes the advisor choice and advice weight errors on each trial
 */
 List gradientDescent(DataFrame trials, LogicalVector testSetMask, int nStartingLocations, double learnRate, int verbosity);
 
@@ -50,7 +50,7 @@ struct Trials {
  */
 struct Parameters {
 	double confWeight;
-	double trustVolatility;
+	double trustUpdateRate;
 	double pickVolatility;
 	double trustDecay;
 	double advisorTrust[5];
@@ -74,6 +74,11 @@ Parameters gatherParams(NumericVector params);
  * Model errors for picking and for final confidence change
  */
 struct ModelError {
+  NumericVector advisorTrust0;
+  NumericVector advisorTrust1;
+  NumericVector advisorTrust2;
+  NumericVector advisorTrust3;
+  NumericVector advisorTrust4;
 	NumericVector advisorChoice;
 	NumericVector adviceWeight;
 };
@@ -135,7 +140,7 @@ double rRand(bool allowNegative);
 NumericVector spreadParams(Parameters params) {
 	NumericVector out = NumericVector::create(
 		params.confWeight,
-		params.trustVolatility,
+		params.trustUpdateRate,
 		params.pickVolatility,
 		params.trustDecay
 	);
@@ -148,7 +153,7 @@ NumericVector spreadParams(Parameters params) {
 Parameters gatherParams(NumericVector params) {
 	Parameters out;
 	out.confWeight = params[0];
-	out.trustVolatility = params[1];
+	out.trustUpdateRate = params[1];
 	out.pickVolatility = params[2];
 	out.trustDecay = params[3];
 	// Add in advisor trust variables
@@ -158,7 +163,7 @@ Parameters gatherParams(NumericVector params) {
 	return out;
 }
 
-double rRand(bool allowNegative = TRUE) {
+double rRand(bool allowNegative = true) {
 	double r = (double)rand() / RAND_MAX;
 	if (!allowNegative)
 		return r;
@@ -192,6 +197,12 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 	// Perform the actual model
 	for (int t = 0; t < trialCount; t++) {
 	  
+	  errors.advisorTrust0.push_back(params.advisorTrust[0]);
+	  errors.advisorTrust1.push_back(params.advisorTrust[1]);
+	  errors.advisorTrust2.push_back(params.advisorTrust[2]);
+	  errors.advisorTrust3.push_back(params.advisorTrust[3]);
+	  errors.advisorTrust4.push_back(params.advisorTrust[4]);
+	  
 	  if (g_verbose == 4)
   	  Rcout << t << " ";
 	  
@@ -208,7 +219,17 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 		// If there is a choice, calculate the error on the choice
 		if (!NumericVector::is_na(trials.choice0[t]) & 
         !NumericVector::is_na(trials.choice1[t])) {
-      errors.advisorChoice.push_back(0);
+      // Calculate the probability of picking the first advisor by comparing both
+      double a[2] = {
+        params.advisorTrust[(int)trials.choice0[t]], 
+        params.advisorTrust[(int)trials.choice1[t]]
+      };
+		  // Sigmoid (softmax) picking function weighted by pickVolatility
+		  double pPick0 = exp(a[0] * params.pickVolatility) / 
+		    (exp(a[0] * params.pickVolatility) + exp(a[1] * params.pickVolatility));
+      // Mark the prediction vs the result
+      int result = trials.advisorIndex[t] == trials.choice0[t]? 1 : 0;
+      errors.advisorChoice.push_back(result - pPick0);
 		}
 		else {
 			errors.advisorChoice.push_back(NA_REAL);
@@ -261,7 +282,7 @@ double model1(double initialConf, bool advisorAgrees, Parameters params, int adv
 	if (advisorAgrees <= 0)
 		return trust;
 
-	return trust + params.trustVolatility;
+	return trust + params.trustUpdateRate;
 }
 
 
@@ -275,7 +296,7 @@ double model2(double initialConf, bool advisorAgrees, Parameters params, int adv
 	if (advisorAgrees <= 0)
 		return trust;
 
-	return trust + (params.trustVolatility* initialConf);
+	return trust + (params.trustUpdateRate* initialConf);
 }
 
 
@@ -302,7 +323,7 @@ ModelResult findParams(ModelFun model, Trials trials, Parameters params,
 	    Rcout << "Conf weight: " << params.confWeight << std::endl;
 	    Rcout << "Pick volatility: " << params.pickVolatility << std::endl;
 	    Rcout << "Trust decay: " << params.trustDecay << std::endl;
-	    Rcout << "Trust volatility: " << params.trustVolatility << std::endl;
+	    Rcout << "Trust volatility: " << params.trustUpdateRate << std::endl;
 	    for (int i = 0; i < g_nAdvisors; i++) {
 	      Rcout << "Advisor Trust[" << i << "]: " << params.advisorTrust[i] << std::endl;
 	    }
@@ -395,7 +416,7 @@ List gradientDescent(
 	trialData.advisorAgrees = as<LogicalVector>(trials[4]);
 	trialData.confidenceShift = as<NumericVector>(trials[5]);
 
-	ModelFun modelFuns[3] = { model1, model0, model2 };
+	ModelFun modelFuns[3] = { model0, model1, model2 };
 	ModelResult modelResults[3];
 
 	for (int i = 0; i < nStartingLocations; i++) {
@@ -410,9 +431,9 @@ List gradientDescent(
 			// Randomize starting parameters
 			Parameters params;
 			params.confWeight = rRand();
-			params.pickVolatility = rRand();
-			params.trustVolatility= rRand(FALSE);
-			params.trustDecay = rRand(FALSE);
+			params.pickVolatility = rRand(false);
+			params.trustUpdateRate= rRand(false);
+			params.trustDecay = rRand(false);
 			for (int a = 0; a < g_nAdvisors; a++)
 				params.advisorTrust[a] = rRand();
 
@@ -434,17 +455,21 @@ List gradientDescent(
 	DataFrame models = DataFrame::create(
 		Named("model") = NumericVector::create(1, 2, 3),
 		Named("initialConfidenceWeight") =
-		NumericVector::create(modelResults[0].params.confWeight,
-			modelResults[1].params.confWeight,
-			modelResults[2].params.confWeight),
-		Named("trustVolatility") =
-		NumericVector::create(modelResults[0].params.trustVolatility,
-			modelResults[1].params.trustVolatility,
-			modelResults[2].params.trustVolatility),
+  		NumericVector::create(modelResults[0].params.confWeight,
+                          modelResults[1].params.confWeight,
+                          modelResults[2].params.confWeight),
+		Named("pickVolatility") =
+		  NumericVector::create(modelResults[0].params.confWeight,
+                          modelResults[1].params.confWeight,
+                          modelResults[2].params.confWeight),
+		Named("trustUpdateRate") =
+  		NumericVector::create(modelResults[0].params.trustUpdateRate,
+                          modelResults[1].params.trustUpdateRate,
+                          modelResults[2].params.trustUpdateRate),
 		Named("trustDecay") =
-		NumericVector::create(modelResults[0].params.trustDecay,
-			modelResults[1].params.trustDecay,
-			modelResults[2].params.trustDecay)
+  		NumericVector::create(modelResults[0].params.trustDecay,
+                          modelResults[1].params.trustDecay,
+                          modelResults[2].params.trustDecay)
 	);
 
 	for (int a = 0; a < g_nAdvisors; a++) {
@@ -454,20 +479,35 @@ List gradientDescent(
 			modelResults[1].params.advisorTrust[a],
 			modelResults[2].params.advisorTrust[a]);
 	}
+	
+	trials.push_back(modelResults[0].errors.advisorTrust0, "advisorTrust0_model1");
+	trials.push_back(modelResults[1].errors.advisorTrust0, "advisorTrust0_model2");
+	trials.push_back(modelResults[2].errors.advisorTrust0, "advisorTrust0_model3");
+	
+	trials.push_back(modelResults[0].errors.advisorTrust1, "advisorTrust1_model1");
+	trials.push_back(modelResults[1].errors.advisorTrust1, "advisorTrust1_model2");
+	trials.push_back(modelResults[2].errors.advisorTrust1, "advisorTrust1_model3");
+	
+	trials.push_back(modelResults[0].errors.advisorTrust2, "advisorTrust2_model1");
+	trials.push_back(modelResults[1].errors.advisorTrust2, "advisorTrust2_model2");
+	trials.push_back(modelResults[2].errors.advisorTrust2, "advisorTrust2_model3");
+	
+	trials.push_back(modelResults[0].errors.advisorTrust3, "advisorTrust3_model1");
+	trials.push_back(modelResults[1].errors.advisorTrust3, "advisorTrust3_model2");
+	trials.push_back(modelResults[2].errors.advisorTrust3, "advisorTrust3_model3");
+	
+	trials.push_back(modelResults[0].errors.advisorTrust4, "advisorTrust4_model1");
+	trials.push_back(modelResults[1].errors.advisorTrust4, "advisorTrust4_model2");
+	trials.push_back(modelResults[2].errors.advisorTrust4, "advisorTrust4_model3");
+	
+	trials["err_weight_model1"] = modelResults[0].errors.adviceWeight;
+	trials["err_weight_model2"] = modelResults[1].errors.adviceWeight;
+	trials["err_weight_model3"] = modelResults[2].errors.adviceWeight;
 
-	DataFrame adviceWeightErrors = DataFrame::create(
-		Named("Model1") = modelResults[0].errors.adviceWeight,
-		Named("Model2") = modelResults[1].errors.adviceWeight,
-		Named("Model3") = modelResults[2].errors.adviceWeight
-	);
+	trials["err_choice_model1"] = modelResults[0].errors.advisorChoice;
+	trials["err_choice_model2"] = modelResults[1].errors.advisorChoice;
+	trials["err_choice_model3"] = modelResults[2].errors.advisorChoice;
 
-	DataFrame advisorChoiceErrors = DataFrame::create(
-		Named("Model1") = modelResults[0].errors.advisorChoice,
-		Named("Model2") = modelResults[1].errors.advisorChoice,
-		Named("Model3") = modelResults[2].errors.advisorChoice
-	);
-
-	NumericVector all(trialData.initialConf.size(), 1.0);
 	DataFrame mse = DataFrame::create(
 		Named("Model1") = getMSE(modelResults[0].errors.adviceWeight),
 		Named("Model2") = getMSE(modelResults[1].errors.adviceWeight),
@@ -476,8 +516,7 @@ List gradientDescent(
 
 	return List::create(
 		_["parameters"] = models,
-		_["adviceWeightErrors"] = adviceWeightErrors,
-		_["advisorChoiceErrors"] = advisorChoiceErrors,
+		_["trials"] = trials,
 		_["MSE"] = mse
 	);
 }
@@ -488,5 +527,14 @@ List gradientDescent(
 //
 
 /*** R
-
+invisible(gradientDescent(
+  data.frame(
+    initialConfidence = rep(0, sample(10:30, 1)),
+    advisorIndex = 0,
+    choice0 = NA,
+    choice1 = NA,
+    advisorAgrees = 1,
+    advisorInfluenceRaw = .5
+  )
+))
 */

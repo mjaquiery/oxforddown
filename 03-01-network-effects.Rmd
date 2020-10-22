@@ -19,6 +19,7 @@ library(adviseR)
 library(igraph)
 library(BayesFactor)
 library(magrittr)
+library(parallel)
 
 library(gifski)
 ```
@@ -829,6 +830,9 @@ The picking and confidence errors are averaged to give the prediction error on t
 All parameters ($\tau$, $\lambda$, $\beta$, and the $\text{SoftMax}$ temperature parameter) will be fit to minimise prediction error over the available trials.
 
 ```{r}
+# Let's have everyone run their data through a model where they are cumulatively 
+# updating their trust in an advisor and that is driving their p(pick) and also
+# their woa. 
 
 # Load up some dots task data. Like all of it. Do need to check the ones where 
 select_experiment('dotstask')
@@ -839,9 +843,7 @@ trials <- trials %>%
 d <- trials %>% 
   nest(data = -uid) %>%
   mutate(okay = map_lgl(data, ~ any(.$hasChoice, na.rm = T))) %>%
-  filter(okay) %>% 
-  slice_sample(n = 1) %>%
-  unnest(cols = data)
+  filter(okay)
 
 # Format how the C++ code wants the data:
 # * @param trials a data frame of trials with 5 columns (names may vary):
@@ -852,36 +854,63 @@ d <- trials %>%
 # * advisorAgrees - whether the chosen advisor agrees (NA if no advice provided)
 # * confidenceShift - amount confidence shifted from initial to final judgement (standardized within participant)
 d <- d %>%
-  select(
-    uid,
-    initialConfidence, 
-    advisorId, 
-    choice0,
-    choice1,
-    advisorAgrees, 
-    advisorInfluenceRaw
-  ) %>%
-  nest(d = -uid) %>%
   mutate(
-    d = map(d, ~mutate(
-      ., 
-      initialConfidence = scale(initialConfidence),
-      advisorIndex = as.numeric(factor(advisorId)) - 1, # C likes 0-indexing
-      across(
-        .cols = matches('choice[01]'), 
-        ~ as.numeric(factor(., levels = levels(factor(advisorId)))) -1
-      ),
-      advisorInfluenceRaw = scale(advisorInfluenceRaw)
-    ))
-  ) %>%
-  unnest(cols = d) %>%
-  select(-uid, -advisorId)
+    data = map(data, ~select(
+      .,
+      initialConfidence, 
+      advisorId, 
+      choice0,
+      choice1,
+      advisorAgrees, 
+      advisorInfluenceRaw
+    ) %>%
+      mutate(
+        initialConfidence = scale(initialConfidence),
+        advisorIndex = as.numeric(factor(advisorId)) - 1, # C likes 0-indexing
+        across(
+          .cols = matches('choice[01]'), 
+          ~ as.numeric(factor(., levels = levels(factor(advisorId)))) -1
+        ),
+        advisorInfluenceRaw = scale(advisorInfluenceRaw)
+      ) %>% 
+      select(
+        initialConfidence,
+        advisorIndex,
+        choice0, 
+        choice1, 
+        advisorAgrees, 
+        advisorInfluenceRaw
+      )),
+    mdls = map(data, ~gradientDescent(., nStartingLocations = 15L))
+  )
 
-# Let's have everyone run their data through a model where they are cumulatively 
-# updating their trust in an advisor and that is driving their p(pick) and also
-# their woa. 
-Rcpp::sourceCpp('scripts_and_filters/cpp/model-fit.cpp')
+# For speed we now divvy up the data into roughly equal chunks based on the 
+# number of cores available and run the model fitting in parallel on each.
+doGradDesc <- function(x) {
+  library(dplyr)
+  Rcpp::sourceCpp('scripts_and_filters/cpp/model-fit.cpp')
+  x %>% mutate(mdls = purrr::map(
+    data, 
+    ~gradientDescent(., nStartingLocations = 15L))
+  )
+}
 
+dList <- list()
+nCores <- detectCores() - 4
+nPerCore <- ceiling(nrow(d) / nCores)
+for (i in 1:nCores) {
+  rows <- (1 + (i - 1) * nPerCore):(if (i == nCores) nrow(d) else (i) * nPerCore)
+  dList[[i]] <- d[rows, ] 
+}
 
+cl <- makeCluster(nCores)
+clusterExport(cl, "doGradDesc")
+dList <- parLapply(cl, dList, doGradDesc)
+stopCluster(cl)
+
+# rebuild d from dList
+d <- NULL
+for (x in dList)
+  d <- rbind(d, x)
 
 ```
