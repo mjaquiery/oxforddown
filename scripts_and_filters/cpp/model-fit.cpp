@@ -2,7 +2,7 @@
 using namespace Rcpp;
 
 int g_verbose = 4;
-int g_nAdvisors = 5;
+const int g_nAdvisors = 6;
 
 /**
 * @brief Take a set of trials, run gradient descent on them for a family of models,
@@ -53,7 +53,7 @@ struct Parameters {
 	double trustUpdateRate;
 	double pickVolatility;
 	double trustDecay;
-	double advisorTrust[5];
+	double advisorTrust[g_nAdvisors];
 };
 
 /**
@@ -79,6 +79,7 @@ struct ModelError {
   NumericVector advisorTrust2;
   NumericVector advisorTrust3;
   NumericVector advisorTrust4;
+  NumericVector advisorTrust5;
 	NumericVector advisorChoice;
 	NumericVector adviceWeight;
 };
@@ -202,6 +203,7 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 	  errors.advisorTrust2.push_back(params.advisorTrust[2]);
 	  errors.advisorTrust3.push_back(params.advisorTrust[3]);
 	  errors.advisorTrust4.push_back(params.advisorTrust[4]);
+	  errors.advisorTrust5.push_back(params.advisorTrust[5]);
 	  
 	  if (g_verbose == 4)
   	  Rcout << t << " ";
@@ -375,7 +377,7 @@ ModelResult findParams(ModelFun model, Trials trials, Parameters params,
 
 			// Follow the direction of the gradient for this parameter
 			// should probably scale this across all parameters to go faster down larger gradients
-			gradients[i] = (mse - partialError) / learnRate;
+			gradients[i] = mse - partialError;
 		}
 		// Normalise gradients
 		double gradSum = sum(gradients);
@@ -499,6 +501,10 @@ List gradientDescent(
 	trials.push_back(modelResults[0].errors.advisorTrust4, "advisorTrust4_model1");
 	trials.push_back(modelResults[1].errors.advisorTrust4, "advisorTrust4_model2");
 	trials.push_back(modelResults[2].errors.advisorTrust4, "advisorTrust4_model3");
+	
+	trials.push_back(modelResults[0].errors.advisorTrust5, "advisorTrust5_model1");
+	trials.push_back(modelResults[1].errors.advisorTrust5, "advisorTrust5_model2");
+	trials.push_back(modelResults[2].errors.advisorTrust5, "advisorTrust5_model3");
 	
 	trials["err_weight_model1"] = modelResults[0].errors.adviceWeight;
 	trials["err_weight_model2"] = modelResults[1].errors.adviceWeight;

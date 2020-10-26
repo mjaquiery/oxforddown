@@ -435,6 +435,8 @@ tmp <- slice_sample(d, n = 1) %>%
       select(-model))
   )
 
+tmp$parameters %>% unique()
+
 tmp <- tmp %>% 
   unnest(cols = data) %>%
   pivot_longer(
@@ -444,12 +446,18 @@ tmp <- tmp %>%
     values_to = 'Trust'
   ) %>%
   filter(Advisor != 0)
-tmp %>%
-  ggplot(aes(x = trial_id, y = Trust)) +
-  geom_rug(colour = 'grey', length = unit(.06, 'npc'), sides = 't', data = filter(tmp, !is.na(choice0))) +
-  geom_rug(sides = 't', data = filter(tmp, advisorAgrees)) +
-  geom_line() +
-  geom_point(aes(colour = advisorAgrees)) +
-  facet_wrap(~paste0('M', model, 'A', Advisor), scales = 'free_y')
 
+for (a in unique(tmp$Advisor)) {
+  x <- tmp %>% filter(advisorIndex == a, Advisor == a)
+  gg <- x %>% ggplot(aes(x = trial_id, y = Trust))
+  if (!all(is.na(x$choice0))) 
+    gg <- gg + geom_rect(aes(xmin = min(trial_id), xmax = max(trial_id), 
+                             ymin = -Inf, ymax = Inf),
+                         data = filter(x, !is.na(choice0)), fill = 'grey85')
+  gg <- gg + geom_line() +
+    geom_point(aes(colour = advisorAgrees)) +
+    facet_grid(paste0('M', model)~., scales = 'free_y') +
+    labs(title = paste0('Advisor ', a))
+  print(gg)
+}
 ```
