@@ -678,6 +678,9 @@ Different approaches to estimating participants' confidence were trialled, inclu
 
 ### Lab study {#ac-cca-lab}
 
+\mccorrect{!TODO[This bugs out in Docker with setwd(), so this needs to be a more robust implementation.]}
+
+<!--
 \OpenScience{prereg} https://aspredicted.org/ze3tn.pdf
 
 \OpenScience{materials} https://github.com/mjaquiery/nofeedback_trust
@@ -1736,3 +1739,4 @@ ggplot(tmp, aes(x = influence, y = influence.Q, color = advisor)) +
 ### Discussion {#ac-cca-d}
 
 The data are pretty equivocal here: there's no particularly solid reason for thinking that participants select Bias Sharing advisors more frequently than Anti Bias advisors.
+-->
