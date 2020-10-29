@@ -678,9 +678,6 @@ Different approaches to estimating participants' confidence were trialled, inclu
 
 ### Lab study {#ac-cca-lab}
 
-\mccorrect{!TODO[This bugs out in Docker with setwd(), so this needs to be a more robust implementation.]}
-
-<!--
 \OpenScience{prereg} https://aspredicted.org/ze3tn.pdf
 
 \OpenScience{materials} https://github.com/mjaquiery/nofeedback_trust
@@ -704,18 +701,17 @@ We place participants in a similar paradigm in which they are given a choice bet
 
 #### Method {#ac-cca-lab-m}
 
-\mccorrect{!TODO[remove local dependencies in this script. Maybe add data to esmData or make a new package.]}
-
 ```{r load exp1 data, include = F}
 
-# Run the analysis script for experiment 1 from the symlinked repository.
-exDirs <- "G:/Documents/University/Programming/nofeedback_trust_matt/AdvisorChoice/analysis/"
-wd <- setwd(exDirs)
-source("AdvisorChoice.R")
-setwd(wd)
+rm(list = ls()); source('scripts_and_filters/general_setup.R')
 
-library(kableExtra)
-library(tibble)
+# These scripts are kinda old and crappy, but they should do the correct analyses
+
+# Load utility functions
+source('scripts_and_filters/lab/utilityFunctions.R')
+source("scripts_and_filters/lab/miscFunctions.R")
+# Run script
+source("scripts_and_filters/lab/AdvisorChoice.R")
 
 ```
 
@@ -1739,4 +1735,3 @@ ggplot(tmp, aes(x = influence, y = influence.Q, color = advisor)) +
 ### Discussion {#ac-cca-d}
 
 The data are pretty equivocal here: there's no particularly solid reason for thinking that participants select Bias Sharing advisors more frequently than Anti Bias advisors.
--->
