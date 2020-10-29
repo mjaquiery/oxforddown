@@ -189,24 +189,29 @@ On the other hand, even in those cases the ground truth facts usually point to a
 How about making biases more pronounced to begin with? 
 
 ```{r}
-
-starting_weight <- .1
-parameters <- data.frame(
-  n_agents = 40,
-  n_decisions = 5000,
-  conf = c(T, T, F, F),
-  bias_mean = 3,
-  bias_sd = 1,
-  sensitivity_sd = 1,
-  trust_volatility_mean = .05,
-  trust_volatility_sd = .01,
-  bias_volatility_mean = 0,
-  bias_volatility_sd = c(0, .05, 0, .05),
-  starting_graph = .05,
-  randomSeed = 20201014
-)
-
-models <- runSimulations(parameters, cores = nrow(parameters))
+cacheFile <- '_cache/strong-biases.rda'
+if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
+  load(cacheFile)
+} else {
+  starting_weight <- .1
+  parameters <- data.frame(
+    n_agents = 40,
+    n_decisions = 5000,
+    conf = c(T, T, F, F),
+    bias_mean = 3,
+    bias_sd = 1,
+    sensitivity_sd = 1,
+    trust_volatility_mean = .05,
+    trust_volatility_sd = .01,
+    bias_volatility_mean = 0,
+    bias_volatility_sd = c(0, .05, 0, .05),
+    starting_graph = .05,
+    randomSeed = 20201014
+  )
+  
+  models <- runSimulations(parameters, cores = nrow(parameters))
+  save(models, cacheFile)
+}
 
 for (m in models) {
   networkGraph(
@@ -665,25 +670,30 @@ To explore whether this mechanism is responsible for the results we look at the 
 ### Does weighted sampling suppress bias erosion?
 
 ```{r}
-
-starting_weight <- .1
-parameters <- data.frame(
-  n_agents = 40,
-  n_decisions = 5000,
-  conf = rep(c(T, F), 3),
-  bias_mean = 3,
-  bias_sd = 1,
-  sensitivity_sd = 1,
-  trust_volatility_mean = .05,
-  trust_volatility_sd = .01,
-  bias_volatility_mean = 0,
-  bias_volatility_sd = .05,
-  starting_graph = .05,
-  randomSeed = rep(c(20201014, 202010, 1014), each = 2),
-  weighted_sampling = 1
-)
-
-models <- runSimulations(parameters, cores = nrow(parameters))
+cacheFile <- '_cache/weighted-sampling.rda'
+if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
+  load(cacheFile)
+} else {
+  starting_weight <- .1
+  parameters <- data.frame(
+    n_agents = 40,
+    n_decisions = 5000,
+    conf = rep(c(T, F), 3),
+    bias_mean = 3,
+    bias_sd = 1,
+    sensitivity_sd = 1,
+    trust_volatility_mean = .05,
+    trust_volatility_sd = .01,
+    bias_volatility_mean = 0,
+    bias_volatility_sd = .05,
+    starting_graph = .05,
+    randomSeed = rep(c(20201014, 202010, 1014), each = 2),
+    weighted_sampling = 1
+  )
+  
+  models <- runSimulations(parameters, cores = nrow(parameters))
+  save(models, cacheFile)
+}
 
 for (m in models) {
   networkGraph(
