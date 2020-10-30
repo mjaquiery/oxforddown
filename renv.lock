@@ -345,8 +345,8 @@
       "RemoteRepo": "esmData",
       "RemoteUsername": "oxacclab",
       "RemoteRef": "master",
-      "RemoteSha": "136e8ab8d3e431832186610c52fb5280212f7bad",
-      "Hash": "8e647b0ca1ba0751debdaa5fb77ad2b1"
+      "RemoteSha": "544d2a374c47b206a704cc490549c886a1a31dcd",
+      "Hash": "db5c064f7330f2f2fe9bc3e16c003879"
     },
     "evaluate": {
       "Package": "evaluate",
@@ -954,6 +954,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "6f76f71042411426ec8df6c54f34e6dd"
+    },
+    "scoring": {
+      "Package": "scoring",
+      "Version": "0.6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "b275da55925977a0c83f8364ab65b69a"
     },
     "see": {
       "Package": "see",
