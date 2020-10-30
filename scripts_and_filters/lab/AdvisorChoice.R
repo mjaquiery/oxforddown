@@ -24,6 +24,7 @@ library(lsr)
 library(BayesFactor)
 library(scoring)
 library(ez)
+library(Hmisc)
 
 ## i) Get Data ####################################################################################
 print('Loading data')
