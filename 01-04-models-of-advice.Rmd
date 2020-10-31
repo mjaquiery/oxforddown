@@ -246,7 +246,7 @@ forestPlot(mh)
 
 <!-- This suggests we trust advisors less when we have more agreement experience with them. Can we explore these further? Do we trust this analysis - can we visualise what it's doing? -->
 
-```{r}
+```{r plot models}
 
 dfh %>% filter(nthWithAdvisor > -.9) %>%
   ggplot(aes(x = agreeRate, y = zFinalConfidence, colour = disagree)) +
@@ -269,7 +269,7 @@ Overall, the largest effects in the model come from some quite complex 3- and 4-
 This may be because the biggest changes take place under specific conditions, or it may be an effect of the law of small numbers (because specific overlaps in conditions take place much more rarely than main effects, allowing outliers to produce large coefficient estimates).
 Some comfort can be taken in noting that, while the standard errors of the complex interactions with large coefficients are larger than those with smaller coefficients, they are not dramatically larger, and thus the larger coefficients are very likely to be genuinely large.
 
-```{r}
+```{r models anova}
 m <- lmer(zFinalConfidence ~ zInitialConfidence * disagree * feedback + (1 | pid), data = dfh)
 anova(m, mh)
 ```
@@ -311,7 +311,7 @@ The final confidence judgement is scaled such that it lies between 0 (completely
 The picking and confidence errors are averaged to give the prediction error on that trial. 
 All parameters ($\tau$, $\lambda$, $\beta$, and the $\rho$ temperature parameter) will be fit to minimise prediction error over the available trials.
 
-```{r}
+```{r model fit calculations}
 
 # Load up some dots task data. Like all of it. Do need to check the ones where 
 select_experiment('dotstask')
@@ -430,7 +430,7 @@ if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
 
 The model with the most parameters should have the lowest MSE because it should be able to (over?)fit the data better.
 
-```{r}
+```{r model fit mse}
 
 MSE <- d %>% 
   unnest(cols = MSE) %>%
@@ -453,7 +453,7 @@ MSE %>%
 
 We would like to know the C++ models are doing sensible things, so let's pick a participant and track their advisor preferences and how they relate to their advisor choices in the best-fitting version of the model.
 
-```{r}
+```{r model fit individual inspection}
 
 gradientDescent(trials = d[d$uid == MSE$uid[2], ]$data[[1]], nStartingLocations = 150L)$MSE
 

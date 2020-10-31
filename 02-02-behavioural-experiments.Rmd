@@ -42,7 +42,7 @@ Results indicated that participants' advice-taking depended upon both the plausi
 The procedure for these experiments follows the dates estimation task, described [previously](\mccorrect{!TODO[link properly]}).
 Additionally, in this version, participants had to provide an assessment of the honesty of each advisory estimate they received before they could integrate it into their final decision.
 
-```{r, fig.align='center', fig.caption="Advice honesty rating.  Participants rated advice on a three-point scale according to whether they thought the advice was deceptive or honest.", out.width="80%", echo=F}
+```{r be-performance, fig.align='center', fig.caption="Advice honesty rating.  Participants rated advice on a three-point scale according to whether they thought the advice was deceptive or honest.", out.width="80%", echo=F}
 knitr::include_graphics("figures/advice-honesty-rating.png")
 ```
 
@@ -150,7 +150,7 @@ The final participant list consists of `r length(unique(AdvisedTrial$pid))` part
 #### Task performance
 
 Participants performed as expected, decreasing the error between the midpoint of their answer and the true answer from the initial estimate to the final decision, which suggests that they incorporated the advice, which was indicative of the correct answer.
-```{r, fig.align='center', fig.caption="Mean answer error for initial estimates and final decisions.  Faint lines show means for individual participants collapsed across trials, while boxplots, violins, and the heavy dashed line show aggregate participant means.", out.width="80%", echo=F}
+```{r be-task-performance, fig.align='center', fig.caption="Mean answer error for initial estimates and final decisions.  Faint lines show means for individual participants collapsed across trials, while boxplots, violins, and the heavy dashed line show aggregate participant means.", out.width="80%", echo=F}
 
 tmp <- decisions %>%
   select(pid, decision, responseError) %>%
@@ -233,7 +233,7 @@ Participants were also more influenced by 'honest' advice from the advisor who w
 
 The details of the data are best presented in a combined figure.
 
-```{r, fig.align='center', fig.caption="Influence of advice by advisor according to participants\' perception of advice honesty. Faint lines show means for individual participants (missing segments indicate the participant rated no advice from that advisor with the designated category). Violins, box plots, and heavy dashed lines aggregate means for all participants.", out.width="80%", echo=F}
+```{r be-results-plot, fig.align='center', fig.caption="Influence of advice by advisor according to participants\' perception of advice honesty. Faint lines show means for individual participants (missing segments indicate the participant rated no advice from that advisor with the designated category). Violins, box plots, and heavy dashed lines aggregate means for all participants.", out.width="80%", echo=F}
 
 # AdvisedTrial %>%
 #   group_by(pid, advisor0idDescription, advisor0questionnaireHonestyLabel) %>%

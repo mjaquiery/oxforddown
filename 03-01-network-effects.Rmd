@@ -32,7 +32,7 @@ library(gifski)
 
 ### Can we reproduce the major polarisation/echo chamber effects?
 
-```{r}
+```{r network-models}
 
 starting_weight <- .1
 parameters <- data.frame(
@@ -188,7 +188,7 @@ On the other hand, even in those cases the ground truth facts usually point to a
 
 How about making biases more pronounced to begin with? 
 
-```{r include=F}
+```{r network-models-increased-bias include=F}
 cacheFile <- '_cache/strong-biases.rda'
 if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
   load(cacheFile)
@@ -369,7 +369,7 @@ Eventually, this erodes the difference in trust between members of different gro
 
 ### Models where one group is closer to the truth
 
-```{r}
+```{r network-models-one-group-accurate}
 
 starting_weight <- .1
 truth_fun <- function(model, d) .75
@@ -520,7 +520,7 @@ This is probably because agents quickly arrive at similar biases across the whol
 
 ### Do we still see all these effects if we add weighted advice selection to the model?
 
-```{r}
+```{r network-models-weighted-selection}
 
 starting_weight <- .1
 parameters <- data.frame(
@@ -669,7 +669,7 @@ To explore whether this mechanism is responsible for the results we look at the 
 
 ### Does weighted sampling suppress bias erosion?
 
-```{r include=F}
+```{r network-models-weighted-sampling-long include=F}
 cacheFile <- '_cache/weighted-sampling.rda'
 if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
   load(cacheFile)
