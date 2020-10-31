@@ -312,6 +312,13 @@ The picking and confidence errors are averaged to give the prediction error on t
 All parameters ($\tau$, $\lambda$, $\beta$, and the $\rho$ temperature parameter) will be fit to minimise prediction error over the available trials.
 
 ```{r}
+
+# Load up some dots task data. Like all of it. Do need to check the ones where 
+select_experiment('dotstask')
+trials <- trials %>% 
+  mutate(uid = factor(paste0(studyId, studyVersion, ' p', pid)))
+
+
 cacheFile <- '_cache/model-fit.rda'
 if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
   load(cacheFile)
@@ -320,16 +327,11 @@ if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
   # updating their trust in an advisor and that is driving their p(pick) and also
   # their woa. 
   
-  # Load up some dots task data. Like all of it. Do need to check the ones where 
-  select_experiment('dotstask')
-  trials <- trials %>% 
-    mutate(uid = factor(paste0(studyId, studyVersion, ' p', pid)))
-  
   # Take a subset for testing stuff
   d <- trials %>% 
     nest(data = -uid) %>%
     mutate(okay = map_lgl(data, ~ any(.$hasChoice, na.rm = T))) %>%
-    filter(okay)
+    filter(okay) %>% slice_sample(n = 16)
   
   #' Return x scaled using \link{scale}, or 0 if all values in x are identical
   scale_or_zero <- function(x, ...) {
@@ -426,18 +428,36 @@ if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
 
 ```
 
+The model with the most parameters should have the lowest MSE because it should be able to (over?)fit the data better.
+
+```{r}
+
+MSE <- d %>% 
+  unnest(cols = MSE) %>%
+  pivot_longer(
+    cols = starts_with('Model'), 
+    names_to = 'model', 
+    names_pattern = 'Model(.)', 
+    values_to = 'MSE'
+  ) %>% 
+  arrange(desc(MSE))
+
+MSE %>% 
+  ggplot(aes(x = model, y = MSE)) +
+  geom_line(aes(group = uid), alpha = .05) +
+  stat_summary(geom = 'point', aes(group = 1), size = 3, fun = mean) +
+  stat_summary(geom = 'errorbar', aes(group = 1), fun.data = mean_cl_normal, width = 0, colour = 'red') +
+  scale_y_continuous(limits = c(0, 5))
+
+```
+
 We would like to know the C++ models are doing sensible things, so let's pick a participant and track their advisor preferences and how they relate to their advisor choices in the best-fitting version of the model.
 
 ```{r}
 
-tmp <- slice_sample(d, n = 1) %>%
-  unnest(MSE) %>%
-  pivot_longer(
-    matches('Model[0-9]+'), 
-    names_to = 'model', 
-    names_pattern = "Model([0-9]+)",
-    values_to = 'MSE'
-  ) %>%
+gradientDescent(trials = d[d$uid == MSE$uid[2], ]$data[[1]], nStartingLocations = 150L)$MSE
+
+tmp <- MSE[MSE$uid == MSE$uid[1], ] %>%
   mutate(
     model = as.numeric(model),
     parameters = map2(parameters, model, ~as_tibble(.x) %>% 
@@ -452,9 +472,10 @@ tmp <- slice_sample(d, n = 1) %>%
       filter(model == .y) %>%
       rowid_to_column(var = "trial_id") %>%
       select(-model))
-  )
+  ) %>% 
+  unnest(cols = parameters)
 
-tmp$parameters %>% unique()
+tmp
 
 tmp <- tmp %>% 
   unnest(cols = data) %>%
