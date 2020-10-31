@@ -188,7 +188,7 @@ On the other hand, even in those cases the ground truth facts usually point to a
 
 How about making biases more pronounced to begin with? 
 
-```{r}
+```{r include=F}
 cacheFile <- '_cache/strong-biases.rda'
 if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
   load(cacheFile)
@@ -669,7 +669,7 @@ To explore whether this mechanism is responsible for the results we look at the 
 
 ### Does weighted sampling suppress bias erosion?
 
-```{r}
+```{r include=F}
 cacheFile <- '_cache/weighted-sampling.rda'
 if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
   load(cacheFile)
@@ -826,101 +826,3 @@ This decline is driven by the reduced difference in bias, rather than an increas
 The bias of the groups does not decline in model 1, and in model 2 it spirals out of control for both groups - perhaps it would return towards the truth given time as it appears to in model 3.
 In models 0, 4, and 5, the median bias for the groups becomes quite similar, and changes in lockstep thereafter, staying fairly close to the true value (although still at notably unlikely values given the bias is expressed in z-scores).
 
-## Models with agents based on our experiments
-
-Each participant's data is run through a model which has the following structure:
-* $P(pick_i) = \text{SoftMax}(\frac{V_i}{Vi+Vj})$ where $V$ is the trust placed in an advisor and $_i$ and $_j$ are competing advisors.
-* $V_i^t = V_i^{t-1} + f(I^t,A^t) - \tau$ where $I^t$ and $A^t$ are the initial estimate and advice on trial $^t$ and $\tau$ is a decay parameter indicating how much trust decays at each time step.  
-* $f(I, A, F) = \lambda(agree(I,A)\beta C)$ where $\lambda$ is the trust volatility, $\beta$ is the weight given to confidence, and $C$ is the confidence in the initial decision.  
-* $\text{agree}(I, A) = -1 + 2(sign(I)=sign(A))$  
-* $F^t = I^t + V_i^t A^t$ where $F^t$ is the final decision on trial $^t$.  
-
-The final confidence judgement is scaled such that it lies between 0 (completely reversed decision) and 1 (completely sure), making its error roughly compatible with the error for picking. 
-The picking and confidence errors are averaged to give the prediction error on that trial. 
-All parameters ($\tau$, $\lambda$, $\beta$, and the $\text{SoftMax}$ temperature parameter) will be fit to minimise prediction error over the available trials.
-
-```{r}
-# Let's have everyone run their data through a model where they are cumulatively 
-# updating their trust in an advisor and that is driving their p(pick) and also
-# their woa. 
-
-# Load up some dots task data. Like all of it. Do need to check the ones where 
-select_experiment('dotstask')
-trials <- trials %>% 
-  mutate(uid = factor(paste0(studyId, studyVersion, ' p', pid)))
-
-# Take a subset for testing stuff
-d <- trials %>% 
-  nest(data = -uid) %>%
-  mutate(okay = map_lgl(data, ~ any(.$hasChoice, na.rm = T))) %>%
-  filter(okay)
-
-# Format how the C++ code wants the data:
-# * @param trials a data frame of trials with 5 columns (names may vary):
-# * initialConfidence - initial confidence rating (standardized within participant)
-# * advisorIndex - index of the advisor chosen (0 or 1; NA if no choice made)
-# * choice0 - index of the first advisor offered in the choice (NA if no choice offered)
-# * choice1 - index of the second advisor offered in the choice (NA if no choice offered)
-# * advisorAgrees - whether the chosen advisor agrees (NA if no advice provided)
-# * confidenceShift - amount confidence shifted from initial to final judgement (standardized within participant)
-d <- d %>%
-  mutate(
-    data = map(data, ~select(
-      .,
-      initialConfidence, 
-      advisorId, 
-      choice0,
-      choice1,
-      advisorAgrees, 
-      advisorInfluenceRaw
-    ) %>%
-      mutate(
-        initialConfidence = scale(initialConfidence),
-        advisorIndex = as.numeric(factor(advisorId)) - 1, # C likes 0-indexing
-        across(
-          .cols = matches('choice[01]'), 
-          ~ as.numeric(factor(., levels = levels(factor(advisorId)))) -1
-        ),
-        advisorInfluenceRaw = scale(advisorInfluenceRaw)
-      ) %>% 
-      select(
-        initialConfidence,
-        advisorIndex,
-        choice0, 
-        choice1, 
-        advisorAgrees, 
-        advisorInfluenceRaw
-      )),
-    mdls = map(data, ~gradientDescent(., nStartingLocations = 15L))
-  )
-
-# For speed we now divvy up the data into roughly equal chunks based on the 
-# number of cores available and run the model fitting in parallel on each.
-doGradDesc <- function(x) {
-  library(dplyr)
-  Rcpp::sourceCpp('scripts_and_filters/cpp/model-fit.cpp')
-  x %>% mutate(mdls = purrr::map(
-    data, 
-    ~gradientDescent(., nStartingLocations = 15L))
-  )
-}
-
-dList <- list()
-nCores <- detectCores() - 4
-nPerCore <- ceiling(nrow(d) / nCores)
-for (i in 1:nCores) {
-  rows <- (1 + (i - 1) * nPerCore):(if (i == nCores) nrow(d) else (i) * nPerCore)
-  dList[[i]] <- d[rows, ] 
-}
-
-cl <- makeCluster(nCores)
-clusterExport(cl, "doGradDesc")
-dList <- parLapply(cl, dList, doGradDesc)
-stopCluster(cl)
-
-# rebuild d from dList
-d <- NULL
-for (x in dList)
-  d <- rbind(d, x)
-
-```
