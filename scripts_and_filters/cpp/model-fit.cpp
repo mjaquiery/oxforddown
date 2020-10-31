@@ -27,11 +27,13 @@ const int g_nAdvisors = 6;
 *
 * @param learnRate the learning rate for the models (size of the gradient descent steps)
 *
+* @param parameters if specified, these parameters will be used (for all models) rather than actually using gradient descent. This is supplied as a simple length-10 vector with the values for the parameters in the order: [confWeight, trustUpdateRate, pickVolatility, trustDecay, startingTrustAdvisor0, ... startingTrustAdvisor5]
+*
 * @param verbosity set this increasingly high for increased logging output
 *
 * @return List(parameters, trials, MSE) where trials includes the advisor choice and advice weight errors on each trial
 */
-List gradientDescent(DataFrame trials, LogicalVector testSetMask, int nStartingLocations, double learnRate, int verbosity);
+List gradientDescent(DataFrame trials, LogicalVector testSetMask, int nStartingLocations, double learnRate, NumericVector parameters, int verbosity);
 
 /**
  * Structure for storing information from the R dataframe
@@ -244,7 +246,7 @@ ModelError doModel(ModelFun model, Trials trials, Parameters params) {
 
 		// Update trust for advisor giving advice
 		int a = trials.advisorIndex[t];
-		if (!NumericVector::is_na(trials.advisorAgrees[t])) {
+		if (!LogicalVector::is_na(trials.advisorAgrees[t])) {
 			shift *= trials.advisorAgrees[t];
 			shift *= params.advisorTrust[a];
 			double curTrust = params.advisorTrust[a];
@@ -421,6 +423,7 @@ List gradientDescent(
     LogicalVector testSetMask = LogicalVector::create(0),
     int nStartingLocations = 5,
     double learnRate = 0.05,
+		NumericVector parameters = NumericVector::create(0),
     int verbosity = 0
 ) {
 
@@ -434,42 +437,51 @@ List gradientDescent(
 	trialData.advisorAgrees = as<LogicalVector>(trials[4]);
 	trialData.confidenceShift = as<NumericVector>(trials[5]);
 
-	ModelFun modelFuns[3] = { model0, model1, model2 };
-	ModelResult modelResults[3];
+	const int modelCount = 3;
+	ModelFun modelFuns[modelCount] = { model0, model1, model2 };
+	ModelResult modelResults[modelCount];
 
-	for (int i = 0; i < nStartingLocations; i++) {
-		// Loop through the models and look for the parameters which give the lowest MSE after
-		// undergoing gradient descent
+	if (parameters.size() == 4 + g_nAdvisors) {
+		// Use the parameters supplied by the user
+		Parameters params = gatherParams(parameters);
 		int len = sizeof(modelFuns) / sizeof(modelFuns[0]);
 		for (int m = 0; m < len; m++) {
-		  if (g_verbose >= 1) {
-		    Rcout << "FITTING PARAMS FOR MODEL " << m << " (run " << i << ")" << std::endl;
-		  }
-
-			// Randomize starting parameters
-			Parameters params;
-			params.confWeight = rRand();
-			params.pickVolatility = rRand(false);
-			params.trustUpdateRate= rRand(false);
-			params.trustDecay = rRand(false);
-			for (int a = 0; a < g_nAdvisors; a++)
-				params.advisorTrust[a] = rRand();
-
-			double bestMSE = INFINITY;
-
-			// // Run the model
-			ModelResult tmp = findParams(modelFuns[m], trialData, params, learnRate, testSetMask);
-
-			modelResults[m] = tmp;
-
-			// Save if this is the best model
-			double myMSE = getMSE(tmp.errors.adviceWeight, testSetMask);
-			if (bestMSE > myMSE) {
+			modelResults[m] = { doModel(modelFuns[m], trialData, params), params };
+		}
+	} else {
+		for (int i = 0; i < nStartingLocations; i++) {
+			// Loop through the models and look for the parameters which give the lowest MSE after
+			// undergoing gradient descent
+			for (int m = 0; m < modelCount; m++) {
 			  if (g_verbose >= 1) {
-			    Rcout << "UPDATING MODEL " << m << " BEST MSE FROM " << bestMSE << " to " << myMSE << std::endl;
+			    Rcout << "FITTING PARAMS FOR MODEL " << m << " (run " << i << ")" << std::endl;
 			  }
+
+				// Randomize starting parameters
+				Parameters params;
+				params.confWeight = rRand();
+				params.pickVolatility = rRand(false);
+				params.trustUpdateRate= rRand(false);
+				params.trustDecay = rRand(false);
+				for (int a = 0; a < g_nAdvisors; a++)
+					params.advisorTrust[a] = rRand();
+
+				double bestMSE = INFINITY;
+
+				// // Run the model
+				ModelResult tmp = findParams(modelFuns[m], trialData, params, learnRate, testSetMask);
+
 				modelResults[m] = tmp;
-				bestMSE = myMSE;
+
+				// Save if this is the best model
+				double myMSE = getMSE(tmp.errors.adviceWeight, testSetMask);
+				if (bestMSE > myMSE) {
+				  if (g_verbose >= 1) {
+				    Rcout << "UPDATING MODEL " << m << " BEST MSE FROM " << bestMSE << " to " << myMSE << std::endl;
+				  }
+					modelResults[m] = tmp;
+					bestMSE = myMSE;
+				}
 			}
 		}
 	}
@@ -502,29 +514,29 @@ List gradientDescent(
 			modelResults[2].params.advisorTrust[a]);
 	}
 
-	trials.push_back(modelResults[0].errors.advisorTrust0, "advisorTrust0_model1");
-	trials.push_back(modelResults[1].errors.advisorTrust0, "advisorTrust0_model2");
-	trials.push_back(modelResults[2].errors.advisorTrust0, "advisorTrust0_model3");
+	trials["advisorTrust0_model1"] = modelResults[0].errors.advisorTrust0;
+	trials["advisorTrust0_model2"] = modelResults[1].errors.advisorTrust0;
+	trials["advisorTrust0_model3"] = modelResults[2].errors.advisorTrust0;
 
-	trials.push_back(modelResults[0].errors.advisorTrust1, "advisorTrust1_model1");
-	trials.push_back(modelResults[1].errors.advisorTrust1, "advisorTrust1_model2");
-	trials.push_back(modelResults[2].errors.advisorTrust1, "advisorTrust1_model3");
+	trials["advisorTrust1_model1"] = modelResults[0].errors.advisorTrust1;
+	trials["advisorTrust1_model2"] = modelResults[1].errors.advisorTrust1;
+	trials["advisorTrust1_model3"] = modelResults[2].errors.advisorTrust1;
 
-	trials.push_back(modelResults[0].errors.advisorTrust2, "advisorTrust2_model1");
-	trials.push_back(modelResults[1].errors.advisorTrust2, "advisorTrust2_model2");
-	trials.push_back(modelResults[2].errors.advisorTrust2, "advisorTrust2_model3");
+	trials["advisorTrust2_model1"] = modelResults[0].errors.advisorTrust2;
+	trials["advisorTrust2_model2"] = modelResults[1].errors.advisorTrust2;
+	trials["advisorTrust2_model3"] = modelResults[2].errors.advisorTrust2;
 
-	trials.push_back(modelResults[0].errors.advisorTrust3, "advisorTrust3_model1");
-	trials.push_back(modelResults[1].errors.advisorTrust3, "advisorTrust3_model2");
-	trials.push_back(modelResults[2].errors.advisorTrust3, "advisorTrust3_model3");
+	trials["advisorTrust3_model1"] = modelResults[0].errors.advisorTrust3;
+	trials["advisorTrust3_model2"] = modelResults[1].errors.advisorTrust3;
+	trials["advisorTrust3_model3"] = modelResults[2].errors.advisorTrust3;
 
-	trials.push_back(modelResults[0].errors.advisorTrust4, "advisorTrust4_model1");
-	trials.push_back(modelResults[1].errors.advisorTrust4, "advisorTrust4_model2");
-	trials.push_back(modelResults[2].errors.advisorTrust4, "advisorTrust4_model3");
+	trials["advisorTrust4_model1"] = modelResults[0].errors.advisorTrust4;
+	trials["advisorTrust4_model2"] = modelResults[1].errors.advisorTrust4;
+	trials["advisorTrust4_model3"] = modelResults[2].errors.advisorTrust4;
 
-	trials.push_back(modelResults[0].errors.advisorTrust5, "advisorTrust5_model1");
-	trials.push_back(modelResults[1].errors.advisorTrust5, "advisorTrust5_model2");
-	trials.push_back(modelResults[2].errors.advisorTrust5, "advisorTrust5_model3");
+	trials["advisorTrust5_model1"] = modelResults[0].errors.advisorTrust5;
+	trials["advisorTrust5_model2"] = modelResults[1].errors.advisorTrust5;
+	trials["advisorTrust5_model3"] = modelResults[2].errors.advisorTrust5;
 
 	trials["err_weight_model1"] = modelResults[0].errors.adviceWeight;
 	trials["err_weight_model2"] = modelResults[1].errors.adviceWeight;
@@ -543,9 +555,11 @@ List gradientDescent(
 	return List::create(
 		_["parameters"] = models,
 		_["trials"] = trials,
-		_["MSE"] = mse
+		_["MSE"] = mse,
+		_["A3M3"] = modelResults[2].errors.advisorTrust3
 	);
 }
+
 
 // You can include R code blocks in C++ files processed with sourceCpp
 // (useful for testing and development). The R code will be automatically
