@@ -103,7 +103,7 @@ Data for all versions are accessible \mccorrect{!TODO[archive data]}.
 Should be easy...]}  
 \mccorrect{!TODO[consistent advisor naming, including in figures]}
 
-```{r load remote data, include = F}
+```{r load remote data, eval = F}
 library(prettyMD)
 library(tidyverse)
 
@@ -150,7 +150,7 @@ The final participant list consists of `r length(unique(AdvisedTrial$pid))` part
 #### Task performance
 
 Participants performed as expected, decreasing the error between the midpoint of their answer and the true answer from the initial estimate to the final decision, which suggests that they incorporated the advice, which was indicative of the correct answer.
-```{r be-task-performance, fig.align='center', fig.caption="Mean answer error for initial estimates and final decisions.  Faint lines show means for individual participants collapsed across trials, while boxplots, violins, and the heavy dashed line show aggregate participant means.", out.width="80%", echo=F}
+```{r be-task-performance, fig.align='center', fig.caption="Mean answer error for initial estimates and final decisions.  Faint lines show means for individual participants collapsed across trials, while boxplots, violins, and the heavy dashed line show aggregate participant means.", out.width="80%", echo=F, eval = F}
 
 tmp <- decisions %>%
   select(pid, decision, responseError) %>%
@@ -185,7 +185,7 @@ The hypotheses tested were that
 
 ##### Effect of advice
 
-```{r h2 woa by advice test, results='asis'}
+```{r h2 woa by advice test, results='asis', eval = F}
 
 tmp <- AdvisedTrial %>%
   dplyr::filter(advisor0questionnaireHonestyLabel %in% 
@@ -209,7 +209,7 @@ r <- "\\mccorrect{!TODO[fix ttest]}"
 As expected, participants were substantially more influenced by advice they rated as 'honest' compared to advice they rated as 'deceptive' (`r r`).
 ##### Effect of advisor
 
-```{r h1, results='asis'}
+```{r h1, results='asis', eval = F}
 
 tmp <- AdvisedTrial %>%
   dplyr::filter(advisor0questionnaireHonestyLabel == 'Honest') %>%
