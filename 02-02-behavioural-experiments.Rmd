@@ -206,7 +206,7 @@ r <- "\\mccorrect{!TODO[fix ttest]}"
 
 ```
 
-As expected, participants were substantially more influenced by advice they rated as 'honest' compared to advice they rated as 'deceptive' (`r r`).
+As expected, participants were substantially more influenced by advice they rated as 'honest' compared to advice they rated as 'deceptive' (`r "r"`).
 ##### Effect of advisor
 
 ```{r h1, results='asis', eval = F}
@@ -225,7 +225,7 @@ r <- "\\mccorrect{!TODO[fix ttest]}"
 
 ```
 
-Participants were also more influenced by 'honest' advice from the advisor who was described as 'never misleading' (`r r`).
+Participants were also more influenced by 'honest' advice from the advisor who was described as 'never misleading' (`r "r"`).
 
 \mccorrect{!TODO[plot of woa by advice rating and advisor]}
 
