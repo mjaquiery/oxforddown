@@ -13,7 +13,7 @@ rm(list = ls())
 
 options(ESM.recalculate = F) # Whether to recalculate the very computationally expensive chunks
 if (!dir.exists('_cache')) 
-  dir.create('cache')
+  dir.create('_cache')
 
 # Libraries ---------------------------------------------------------------
 # Load libraries which are widely shared by the chapter files

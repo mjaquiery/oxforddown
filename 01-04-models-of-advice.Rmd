@@ -454,7 +454,7 @@ MSE %>%
 We would like to know the C++ models are doing sensible things, so let's pick a participant and track their advisor preferences and how they relate to their advisor choices in the best-fitting version of the model.
 
 ```{r model fit individual inspection}
-
+Rcpp::sourceCpp('scripts_and_filters/cpp/model-fit.cpp')
 gradientDescent(trials = d[d$uid == MSE$uid[2], ]$data[[1]], nStartingLocations = 150L)$MSE
 
 tmp <- MSE[MSE$uid == MSE$uid[1], ] %>%
