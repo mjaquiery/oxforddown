@@ -127,7 +127,7 @@ exclude <- list(
   ) 
 
 skipLoadData <- F
-httpPath <- "https://raw.githubusercontent.com/oxacclab/ExploringSocialMetacognition/master/analysis/ACv2/"
+httpPath <- "http://raw.githubusercontent.com/oxacclab/ExploringSocialMetacognition/master/analysis/ACv2/"
 
 source(paste0(httpPath, "src/02_Exclusions.R"))
 
