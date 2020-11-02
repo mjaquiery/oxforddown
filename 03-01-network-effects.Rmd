@@ -188,7 +188,7 @@ On the other hand, even in those cases the ground truth facts usually point to a
 
 How about making biases more pronounced to begin with? 
 
-```{r network-models-increased-bias include=F}
+```{r network-models-increased-bias, include=F}
 cacheFile <- '_cache/strong-biases.rda'
 if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
   load(cacheFile)
@@ -669,7 +669,7 @@ To explore whether this mechanism is responsible for the results we look at the 
 
 ### Does weighted sampling suppress bias erosion?
 
-```{r network-models-weighted-sampling-long include=F}
+```{r network-models-weighted-sampling-long, include=F}
 cacheFile <- '_cache/weighted-sampling.rda'
 if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
   load(cacheFile)
