@@ -56,8 +56,6 @@ output:
         facebook: false
         twitter: yes
         all: false
-  bookdown::word_document2:
-    toc: true   
 link-citations: true
 documentclass: book
 

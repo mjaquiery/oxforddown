@@ -442,6 +442,8 @@ MSE <- d %>%
   ) %>% 
   arrange(desc(MSE))
 
+MSE
+
 MSE %>% 
   ggplot(aes(x = model, y = MSE)) +
   geom_line(aes(group = uid), alpha = .05) +
