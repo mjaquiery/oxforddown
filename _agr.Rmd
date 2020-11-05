@@ -1,5 +1,7 @@
 
-## Agreement \mccorrect{!TODO[check Niccolo covered this]} {#ac-agr}
+## Agreement {#ac-agr}
+
+\mccorrect{!TODO[check Niccolo covered this]} 
 
 Pescetelli and Yeung \mccorrect{!TODO[cite new paper]} demonstrated that advisors who agree \mccorrect{!TODO[somewhere we need to talk about what we mean by agreement, how Niccolo defined it, how we define it (varies between binary/continuous tasks), etc.]} more frequently are more influential (regardless of the presence of feedback) in a lab-based perceptual decision-making task.
 

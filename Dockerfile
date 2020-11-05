@@ -25,9 +25,9 @@ RUN git pull && \
   git checkout --track origin/thesis
 
 # Update packages from renv.lock file
-RUN R -e "renv::restore()"
+RUN R -e "renv::restore(); tinytex::tlmgr_install('cbfonts-fd')"
 
 # Knit PDF
-RUN rm -f _main.* && \
-	Rscript -e 'bookdown::render_book("index.Rmd", output_format = c("bookdown::pdf_book", "bookdown::html_book"), output_dir = "/usr/share/nginx/html/")' && \
-	rm -f *.mtc* *.maf *.aux *.bcf *.lof *.lot *.out *.toc front_matter/abbreviations.aux
+# RUN rm -f _main.* && \
+# 	Rscript -e 'bookdown::render_book("index.Rmd", output_format = c("bookdown::pdf_book", "bookdown::html_book"), output_dir = "/usr/share/nginx/html/")' && \
+# 	rm -f *.mtc* *.maf *.aux *.bcf *.lof *.lot *.out *.toc front_matter/abbreviations.aux
