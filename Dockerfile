@@ -22,7 +22,7 @@ RUN rm -rf /usr/share/nginx/html/*
 RUN git clone https://github.com/mjaquiery/oxforddown.git
 WORKDIR oxforddown
 RUN git pull && \
-  git checkout --track origin/thesis
+  git checkout --track origin/dockertest
 
 # Update packages from renv.lock file
 RUN R -e "renv::restore(); tinytex::tlmgr_install('cbfonts-fd')"
