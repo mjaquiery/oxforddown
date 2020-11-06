@@ -1,4 +1,8 @@
 # Produce a PDF of the thesis in a container
+# NOTE: this builds a smaller version of the thesis for continuous integration
+# testing. 
+# 
+# To build the full version, remove the call to set the R option 'ESM.skip'.
 
 # Use image with base R included
 FROM rstudio/r-base:4.0-focal
@@ -28,6 +32,5 @@ RUN git pull && \
 RUN R -e "renv::restore(); tinytex::tlmgr_install('cbfonts-fd')"
 
 # Knit PDF
-# RUN rm -f _main.* && \
-# 	Rscript -e 'bookdown::render_book("index.Rmd", output_format = c("bookdown::pdf_book", "bookdown::html_book"), output_dir = "/usr/share/nginx/html/")' && \
-# 	rm -f *.mtc* *.maf *.aux *.bcf *.lof *.lot *.out *.toc front_matter/abbreviations.aux
+RUN rm -f _main.* && \
+	Rscript -e 'options(ESM.skip = T); bookdown::render_book("index.Rmd", output_format = c("bookdown::pdf_book", "bookdown::html_book"), output_dir = "/usr/share/nginx/html/")'

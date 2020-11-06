@@ -11,7 +11,9 @@
 
 rm(list = ls())
 
-options(ESM.recalculate = F) # Whether to recalculate the very computationally expensive chunks
+options(
+  ESM.recalculate = F # Whether to recalculate the very computationally expensive chunks
+)
 if (!dir.exists('_cache')) 
   dir.create('_cache')
 
