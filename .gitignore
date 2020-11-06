@@ -13,7 +13,6 @@ text/*.aux
 *.mlt*
 _main.*
 .httr-oauth
-references.bib
 repos/EvoEgoBias/
 repos/ExploringSocialMetacognition/
 repos/nofeedback_trust/

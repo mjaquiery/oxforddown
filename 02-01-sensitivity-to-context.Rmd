@@ -38,10 +38,10 @@ In each of these three scenarios, it is hypothesised that some level of egocentr
 ## General method
 
 Agent-based computational models of an evolutionary process were programmed in R [@rcoreteamLanguageEnvironmentStatistical2018] and run variously on a home computer and the Oxford Advanced Research Computing cluster [@richardsUniversityOxfordAdvanced2015].
-The code is available at https://github.com/oxacclab/EvoEgoBias, and the specific data presented below are archived at \mccorrect{!TODO.
+The code is available at https://github.com/oxacclab/EvoEgoBias, and the specific data presented below are archived at \mccorrect{!TODO[find somewhere...]}
 
 The models reported here use 1000 generations of 1000 agents which each make 30 decisions/generation on which they receive the advice of another agent.
-Decisions are either point estimation (Scenarios [1]}(#models-scenario-1) and [2](#models-scenario-2)) or categorical decision with confidence (Scenario [3](#models-scenario-3)).
+Decisions are either point estimation (Scenarios [1](#models-scenario-1) and [2](#models-scenario-2)) or categorical decision with confidence (Scenario [3](#models-scenario-3)).
 Each agent combines their own initial estimate with the advice of another agent, with the relative weights of the initial estimate and advice set by the agent’s egocentric bias parameter, to produce a final decision.
 Final decisions are evaluated by comparison with the objective answer, and an agent’s fitness is the sum of its performance over the 30 decisions of its lifetime.
 
