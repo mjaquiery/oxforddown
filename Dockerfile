@@ -19,18 +19,20 @@ RUN apt-get update && apt-get install -y \
   cargo \
   nginx
 
-# Clear nginx html file
-RUN rm -rf /usr/share/nginx/html/*
-
 # # Clone thesis from github
 RUN git clone https://github.com/mjaquiery/oxforddown.git
 WORKDIR oxforddown
 RUN git pull && \
   git checkout --track origin/dockertest
 
+# nginx setup
+RUN cp scripts_and_filters/docker-setup/localhost.conf \
+  /etc/nginx/sites-enabled/localhost.conf && \
+  service nginx restart
+
 # Update packages from renv.lock file
 RUN R -e "renv::restore(); tinytex::tlmgr_install('cbfonts-fd')"
 
 # Knit PDF
-RUN rm -f _main.* && \
-	Rscript -e 'options(ESM.skip = T); bookdown::render_book("index.Rmd", output_format = c("bookdown::pdf_book", "bookdown::html_book"), output_dir = "/usr/share/nginx/html/")'
+# RUN rm -f _main.* && \
+# 	Rscript -e 'options(ESM.skip = T); bookdown::render_book("index.Rmd", output_format = c("bookdown::pdf_book", "bookdown::html_book"), output_dir = "/usr/share/nginx/html/")'

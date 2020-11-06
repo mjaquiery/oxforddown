@@ -62,6 +62,13 @@ documentclass: book
 ---
 
 ```{r, echo = F, include = F}
+# When knitting, do the whole shebang
+options(
+  ESM.recalculate = T # Whether to recalculate the very computationally expensive chunks
+)
+if (!dir.exists('_cache')) 
+  dir.create('_cache')
+
 source('scripts_and_filters/general_setup.R')
 ```
 

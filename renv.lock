@@ -137,8 +137,8 @@
       "RemoteRepo": "adviseR",
       "RemoteUsername": "oxacclab",
       "RemoteRef": "master",
-      "RemoteSha": "6d8fd26303aa5c5d544ef0336c9563ba464a53e2",
-      "Hash": "7293e68d13dc219955fce33a403753fe"
+      "RemoteSha": "6c416c5e81b5d00c59187daa949311ee3e040fa4",
+      "Hash": "190643d81564d0a0c959eb619425143b"
     },
     "askpass": {
       "Package": "askpass",
