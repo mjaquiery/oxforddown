@@ -35,4 +35,5 @@ RUN R -e "renv::restore(); tinytex::tlmgr_install('cbfonts-fd')"
 
 # Knit PDF
 # RUN rm -f _main.* && \
+#   rm -r docs
 # 	Rscript -e 'options(ESM.skip = T); bookdown::render_book("index.Rmd", output_format = c("bookdown::pdf_book", "bookdown::html_book"), output_dir = "/usr/share/nginx/html/")'
