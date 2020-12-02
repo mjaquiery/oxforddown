@@ -22,807 +22,284 @@ library(magrittr)
 library(parallel)
 
 library(gifski)
+
+# animation
+saveAnimation <- function(model, saveAs) {
+  p <- tempfile(pattern = 'anim_')
+  dir.create(p)
+  gs <- list(
+    which(V(model$model$graphs[[1]])$bias <= .5),
+    which(V(model$model$graphs[[1]])$bias > .5)
+  )
+  coords <- NULL
+  for (i in 1:length(m$model$graphs)) {
+    g <- model$model$graphs[[i]]
+    png(filename = paste0(p, '/', sprintf('%04i', i), '.png'))
+    plotGraph(model, i, activeColours = F, layout = function(x) 
+      layout_with_fr(x, coords = coords, start.temp = 0.1), mark.groups = gs)
+    dev.off()
+    coords <- layout_with_fr(g, coords = coords, start.temp = 0.1)
+  }
+  gifski(
+    list.files(p, full.names = T), 
+    gif_file = saveAs,
+    width = 480, 
+    height = 480, 
+    delay = .1,
+    loop = F,
+    progress = F
+  )
+  unlink(p)
+}
 ```
 
 <!-- We may have some modelling to present along these lines. -->
 
 ## Models with agents drawn from a distribution
 
-
-
 ### Can we reproduce the major polarisation/echo chamber effects?
+
+First, we present the models with a variety of parameters.
+This shows basic model behaviour range before we consider weighted selection.
 
 ```{r network-models}
 
-starting_weight <- .1
-parameters <- data.frame(
-  n_agents = 20,
-  n_decisions = 500,
-  conf = c(T, T, F, F),
-  bias_mean = 1,
-  bias_sd = 1,
-  sensitivity_sd = 1,
-  trust_volatility_mean = .05,
-  trust_volatility_sd = .01,
+parameters <- tidyr::crossing(
+  tidyr::crossing(
+    tibble(
+      trust_volatility_mean = c(.05, .2),
+      trust_volatility_sd = c(.01, .05)
+    ),
+    confidence_weighted = c(T, F),
+    bias_volatility_sd = c(0, .05)
+  ),
+  tibble(
+    n_decision = c(1000, 1500),
+    decision_flags = map(
+      n_decision, 
+      ~ if (. > 1000) {c(rep(1, 1000), rep(3, 500))} else {3}
+    )
+  ),
   bias_volatility_mean = 0,
-  bias_volatility_sd = c(0, .05, 0, .05),
-  starting_graph = starting_weight,
-  randomSeed = 20201014
+  n_agents = 100,
+  random_seed = 20201014,
+  starting_graph = .1
 )
 
-models <- runSimulations(parameters, cores = nrow(parameters))
+# Drop unnecessary models
+parameters <- parameters %>% 
+  filter(!(bias_volatility_sd == 0 & n_decision > 1000))
 
-for (m in models) {
+output <- parameters %>%
+  mutate(groupRatio = NA_real_, weightRatio = NA_real_)
+
+models <- runSimulations(parameters, cores = min(nrow(parameters), 12))
+
+for (i in 1:length(models)) {
+  m <- models[[i]]
   networkGraph(
     m, 
     mark.groups = list(
-      which(V(m$model$graphs[[1]])$bias <= 0),
-      which(V(m$model$graphs[[1]])$bias > 0)
-    ), 
-    layout = layout_nicely
+      which(V(m$model$graphs[[1]])$bias <= .5),
+      which(V(m$model$graphs[[1]])$bias > .5)
+    )
   ) 
   
-  biasGraph(m) %>% print()
+  for (x in inspectModel(m))
+    print(x)
   
-  weights <- m$model$graphs[[m$parameters$n_decisions]] %>% 
-    edge_attr() %>%
-    as_tibble() %>%
-    mutate(
-      `Group name` = factor(if_else(headBias > 0, 'Right', 'Left')), 
-      group = factor(paste0(`Group name`, '\n')),
-      sameGroup = factor(if_else(
-        sign(headBias) == sign(tailBias), 
-        'Same group', 
-        'Different groups'
-      )),
-      id = factor(head_of(
-        m$model$graphs[[m$parameters$n_decisions]], 
-        E(m$model$graphs[[m$parameters$n_decisions]])
-      ))
-    ) %>%
-    group_by(id, group, sameGroup, `Group name`) %>%
-    summarise(weight = mean(weight), .groups = 'drop')
+  if (F)
+    saveAnimation(m, paste0('figures/network-anim_', i, '.gif'))
   
-  ez::ezANOVA(
-    data = weights, 
-    dv = weight, 
-    wid = id, 
-    within = sameGroup, 
-    between = group,
-    type = 2
-  ) %>% print()
-  
-  bf <- weights %>% 
-    select(id, `Group name`, weight) %>%
-    pivot_wider(
-      names_from = `Group name`, 
-      values_from = weight,
-      values_fn = list
-    ) %$%
-    ttestBF(Left[[1]], Right[[1]]) %>%
-    .@bayesFactor %>%
-    .$bf %>%
-    exp() %>%
-    bf2str()
-  
-  bf <- weights %>% 
-    nest(d = -c(group, `Group name`)) %>%
-    mutate(
-      bf = map(d, ~ select(., sameGroup, weight) %>%
-                 pivot_wider(
-                   names_from = sameGroup, 
-                   values_from = weight,
-                   values_fn = list
-                 ) %$%
-                 ttestBF(`Same group`[[1]], `Different groups`[[1]]))
-    ) 
-  
-  bf$BF <- sapply(1:nrow(bf), function(i) bf2str(exp(bf$bf[[i]]@bayesFactor$bf)))
-  
-  dw <- .1
-  trust <- weights %>%
-    ggplot(aes(x = sameGroup, y = weight, 
-               colour = `Group name`, fill = `Group name`)) +
-    geom_hline(yintercept = starting_weight, 
-               linetype = 'dashed') +
-    geom_line(aes(group = id), alpha = .25) +
-    geom_split_violin(aes(x = nudge(sameGroup, dw),
-                          group = sameGroup), width = .9,
-                      colour = NA) +
-    geom_boxplot(outlier.shape = NA, size = 1, width = dw/2,
-                 aes(x = nudge(sameGroup, dw), 
-                     group = sameGroup),
-                 colour = 'black') +
-    geom_segment(x = 1, xend = 2, y = 1, yend = 1, colour = 'black') +
-    geom_label(y = 1, x = 1.5, colour = 'black', fill = 'white',
-               aes(label = paste0('BF = ', BF)), 
-               data = bf) +
-    scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-    coord_cartesian(clip = F) +
-    facet_grid(~group) +
-    labs(x = 'Group membership with advisor', y = 'Weight given to advice') +
-    simulation
-  
-  print(trust)
   # caption = "Simulated trust for average agents.  Simulated agents' trust in other agents at the end of the simulation. Individual lines show the average trust for an agent in those of the same or different group. Violins and boxplots show the distributions of these averages. The groups are arbitrarily named and separate agents by bias strength (whether the bias is positive or negative). Both groups contain some agents with pronounced biases and some with negligible biases.  The dashed line indicates the starting trust level between all agents in the simulation."
+  
+  # Explore quantification of a graph that splits
+  g <- m$model$graphs[[length(m$model$graphs)]]
+  g1 <- m$model$graphs[[1]]
+  edge_attr(g, 'head_group') <- head_of(g1, E(g1))$bias > .5
+  edge_attr(g, 'tail_group') <- tail_of(g1, E(g1))$bias > .5
+  
+  a <- edge_attr(g) %>% 
+    as_tibble() %>% 
+    mutate(sameGroup = head_group == tail_group)
+  
+  # Group ratio gives a good indication along the lines of visual inspection of 
+  # the igraph plots
+  output$groupRatio[i] <- 
+    mean(a$weight[a$sameGroup]) / mean(a$weight[!a$sameGroup])
+  output$weightRatio[i] <- 
+    mean(a$weight[a$weight > median(a$weight)]) /
+    mean(a$weight[a$weight < median(a$weight)])
 }
 
-# Plot bias evolution for each model
-biases <- NULL
-for (m in models[c(2, 4)]) {
-  x <- select(m$model$agents, id, decision, bias)
-  biases <- x %>%
-    mutate(
-      model = length(unique(biases$model)),
-      group = rep(
-        if_else(x$bias[x$decision == 1] > 0, 'Right', 'Left'),
-        m$parameters$n_decisions
-      )
-    ) %>%
-    rbind(biases)
-}
-
-biases %>% 
-  mutate(model = factor(model)) %>%
-  ggplot(aes(x = decision, y = bias, colour = group)) +
-  geom_hline(yintercept = 0, linetype = 'dashed') +
-  geom_line(aes(group = paste0(id)), alpha = .25) +
-  stat_summary(geom = 'line', aes(group = group), size = 1, fun = median) +
-  facet_wrap(~model, labeller = label_both)
-# Interesting that the bias updating actually reduces polarisation here!
-# Not that it necessarily gets agents closer to the truth...
+output %>% select(ends_with('ratio'), everything())
 
 ```
 
-Above we see that updating biases actually _decreases_ polarisation.
-This is probably because advice from the other camp tends to draw biases together, while there is relatively little inflation of biases from agreeing extreme opinions (which tend rather to simply stay at the extremes).
-If biases were accompanied by a confidence instead... but maybe this is what the weights are supposed to achieve. 
-Polarisation might come out of e.g. trying to appeal to a base, but doesn't seem to come out of genuine attempts to form (albeit biased) estimates of true things in the world.
+For summary purposes we now divide up the models into those which exhibit echo chamber formation and those which do not. 
+To do this, we set a threshold on the group weight ratio after the final decision. 
+This ratio is calculated as the mean of the weights of agents with the same initial bias direction divided by the mean of the weights of agents with different initial bias direction.
+In short, it represents the trust ratio for in- as compared to out-group members.
+Values for this ratio in the region of 1 indicate relatively balanced in- and out-group weight, while values around 2 or greater indicate substantially greater trust in in-group as opposed to out-group members.
+We set the threshold (somewhat arbitrarily) to 1.5.
 
-These models assume that evidence (truth of the world) is a shared feature bringing people together. 
-Some things in the modern world seem more like the same evidence is taken as bolstering the case for alternative (competing) accounts - e.g. BLM shows liberals that black people are oppressed and conservatives that they are violent.
-Maybe worth modelling this? 
-On the other hand, even in those cases the ground truth facts usually point to a (variously located) middle-ground truth which is less extreme than either interpretation?
+```{r}
 
-### Can we make bias updating increase polarisation
+output %>% 
+  transmute(
+    groupRatio,
+    echoChamber = groupRatio > 1.5,
+    confidenceWeighted = confidence_weighted,
+    `trustVolatility Mean (SD)` = paste0(
+      trust_volatility_mean, ' (', trust_volatility_sd, ')'
+    ),
+    biasUpdates = bias_volatility_sd != 0,
+    flatStart = n_decision == 1000
+  ) %>% 
+  arrange(groupRatio)
+```
 
-How about making biases more pronounced to begin with? 
+Summarising the results in this way means that we can observe some notable features of the models.
+First, echo chambers do not form where the agents update their biases and start with a flat network wherein all agents have equal trust in one another.
+This is due to the agents losing their biases at least as quickly as they build their trust networks.
 
-```{r network-models-increased-bias, eval=!(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))}
-cacheFile <- '_cache/strong-biases.rda'
-if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
-  load(cacheFile)
-} else {
-  starting_weight <- .1
-  parameters <- data.frame(
-    n_agents = 40,
-    n_decisions = 5000,
-    conf = c(T, T, F, F),
-    bias_mean = 3,
-    bias_sd = 1,
-    sensitivity_sd = 1,
-    trust_volatility_mean = .05,
-    trust_volatility_sd = .01,
-    bias_volatility_mean = 0,
-    bias_volatility_sd = c(0, .05, 0, .05),
-    starting_graph = .05,
-    randomSeed = 20201014
-  )
-  
-  models <- runSimulations(parameters, cores = nrow(parameters))
-  save(models, file = cacheFile)
-}
+Second, Where either biases do not update, or the biases do update but against the background of heterogeneous trust (as developed over some time with bias updates frozen), we see echo chambers form regardless of the other parameter values. 
 
-for (m in models) {
-  networkGraph(
-    m, 
-    mark.groups = list(
-      which(V(m$model$graphs[[1]])$bias <= 0),
-      which(V(m$model$graphs[[1]])$bias > 0)
-    ), 
-    layout = layout_nicely
-  ) 
-  
-  biasGraph(m) %>% print()
-  
-  weights <- m$model$graphs[[m$parameters$n_decisions]] %>% 
-    edge_attr() %>%
-    as_tibble() %>%
-    mutate(
-      `Group name` = factor(if_else(headBias > 0, 'Right', 'Left')), 
-      group = factor(paste0(`Group name`, '\n')),
-      sameGroup = factor(if_else(
-        sign(headBias) == sign(tailBias), 
-        'Same group', 
-        'Different groups'
-      )),
-      id = factor(head_of(
-        m$model$graphs[[m$parameters$n_decisions]], 
-        E(m$model$graphs[[m$parameters$n_decisions]])
-      ))
-    ) %>%
-    group_by(id, group, sameGroup, `Group name`) %>%
-    summarise(weight = mean(weight), .groups = 'drop')
-  
-  ez::ezANOVA(
-    data = weights, 
-    dv = weight, 
-    wid = id, 
-    within = sameGroup, 
-    between = group,
-    type = 2
-  ) %>% print()
-  
-  bf <- weights %>% 
-    select(id, `Group name`, weight) %>%
-    pivot_wider(
-      names_from = `Group name`, 
-      values_from = weight,
-      values_fn = list
-    ) %$%
-    ttestBF(Left[[1]], Right[[1]]) %>%
-    .@bayesFactor %>%
-    .$bf %>%
-    exp() %>%
-    bf2str()
-  
-  bf <- weights %>% 
-    nest(d = -c(group, `Group name`)) %>%
-    mutate(
-      bf = map(d, ~ select(., sameGroup, weight) %>%
-                 pivot_wider(
-                   names_from = sameGroup, 
-                   values_from = weight,
-                   values_fn = list
-                 ) %$%
-                 ttestBF(`Same group`[[1]], `Different groups`[[1]]))
-    ) 
-  
-  bf$BF <- sapply(1:nrow(bf), function(i) bf2str(exp(bf$bf[[i]]@bayesFactor$bf)))
-  
-  dw <- .1
-  trust <- weights %>%
-    ggplot(aes(x = sameGroup, y = weight, 
-               colour = `Group name`, fill = `Group name`)) +
-    geom_hline(yintercept = starting_weight, 
-               linetype = 'dashed') +
-    geom_line(aes(group = id), alpha = .25) +
-    geom_split_violin(aes(x = nudge(sameGroup, dw),
-                          group = sameGroup), width = .9,
-                      colour = NA) +
-    geom_boxplot(outlier.shape = NA, size = 1, width = dw/2,
-                 aes(x = nudge(sameGroup, dw), 
-                     group = sameGroup),
-                 colour = 'black') +
-    geom_segment(x = 1, xend = 2, y = 1, yend = 1, colour = 'black') +
-    geom_label(y = 1, x = 1.5, colour = 'black', fill = 'white',
-               aes(label = paste0('BF = ', BF)), 
-               data = bf) +
-    scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-    coord_cartesian(clip = F) +
-    facet_grid(~group) +
-    labs(x = 'Group membership with advisor', y = 'Weight given to advice') +
-    simulation
-  
-  print(trust)
-  # caption = "Simulated trust for average agents.  Simulated agents' trust in other agents at the end of the simulation. Individual lines show the average trust for an agent in those of the same or different group. Violins and boxplots show the distributions of these averages. The groups are arbitrarily named and separate agents by bias strength (whether the bias is positive or negative). Both groups contain some agents with pronounced biases and some with negligible biases.  The dashed line indicates the starting trust level between all agents in the simulation."
-}
+Because of this bifurcation on echo chamber formation along readily detectable lines, we collapse the other parameters (confidence weighting and trust volatility) to single values for exploring the consequences of weighted selection below. 
+These models are computationally expensive to run, and thus reducing the number of models run allows for more efficient (though less comprehensive) investigation.
 
-# Plot bias evolution for each model
-biases <- NULL
-for (m in models[c(2, 4)]) {
-  modelNum <- length(unique(biases$model))
-  x <- select(m$model$agents, id, decision, bias)
-  biases <- x %>%
-    mutate(
-      model = modelNum,
-      group = rep(
-        if_else(x$bias[x$decision == 1] > 0, 'Right', 'Left'),
-        m$parameters$n_decisions
+### The effect of weighted sampling on echo chamber formation
+
+Weighted sampling is the representation in the model of source selection behaviour.
+This source selection behaviour is the primary outcome of interest in the behavioural experiments, and thus it is important to understand how this property may theoretically affect echo chamber formation within in the models.
+
+We focus on exploring whether weighted sampling introduces a lower threshold for asymmetric tie weights to produce echo chambers. 
+We examine this over several repetitions of models, for a wider range of values for weighted_sampling and decision burn-in.
+For simplicity (and tractability) we reduce each collection of model instances to a simple set of summary statistics describing the group weight ratio.
+
+```{r}
+set.seed(20201126)
+
+summaryFun <- function(model) 
+  groupRatio(model$model$graphs[[length(model$model$graphs)]])
+
+cacheFile <- '_cache/model-summary.rda'
+if (file.exists(cacheFile)) load(cacheFile) else runs <- NULL
+
+start_time <- Sys.time()
+
+leads <- c(0, 250, 500, 750)
+parameters <- tidyr::crossing(
+  tibble(
+    n_decision = map_int(leads, ~ as.integer(. + 1000)),
+    decision_flags = map(leads, ~ c(rep(1, .), rep(3, 1000)))
+  ),
+  weighted_sampling = c(NA_real_, .3, .6, 1, 1.3, 1.6, 2),
+  bias_volatility_sd = .05,
+  bias_volatility_mean = 0,
+  n_agents = 100,
+  starting_graph = .1
+) 
+
+# We now have a lot of different models
+max_cores <- detectCores() - 6
+n_reps <- 4 # 4 full-computer runs for each model
+
+seeds <- runif(max_cores * n_reps, 1e6, 1e9)
+
+
+for (i in 1:nrow(parameters)) {
+  for (r in 1:n_reps) {
+    indices <- ((r - 1) * max_cores + 1):(r * max_cores)
+    rows <- slice_sample(parameters[i, ], n = max_cores, replace = T) %>%
+      mutate(random_seed = seeds[indices])
+    # Don't go again if we already did this and have the result saved
+    if (!is.null(runs) && 
+        nrow(filter(
+          runs, 
+          n_decision %in% rows$n_decision & 
+          weighted_sampling %in% rows$weighted_sampling & 
+          random_seed %in% rows$random_seed)) > 0
+    )
+      next()
+    runs <- rbind(
+      runs,
+      rows %>% mutate(
+        run = indices,
+        groupRatio = runSimulations(rows, max_cores, summaryFun)
       )
-    ) %>%
-    rbind(biases)
-  
-  # animation
-  if (F) {
-    p <- paste0(tempdir(), '/anim_', modelNum)
-    dir.create(p)
-    gs <- list(
-      which(V(m$model$graphs[[1]])$bias <= 0),
-      which(V(m$model$graphs[[1]])$bias > 0)
     )
-    coords <- NULL
-    for (i in 1:length(m$model$graphs)) {
-      g <- m$model$graphs[[i]]
-      png(filename = paste0(p, '/', sprintf('%04i', i), '.png'))
-      plotGraph(m, i, activeColours = F, layout = function(x) layout_with_fr(x, coords = coords, start.temp = 0.1), mark.groups = gs)
-      dev.off()
-      coords <- layout_with_fr(g, coords = coords, start.temp = 0.1)
-    }
-    gifski(
-      list.files(p, full.names = T), 
-      gif_file = paste0('figures/network-anim_', modelNum, '.gif'),
-      width = 480, 
-      height = 480, 
-      delay = 0,
-      loop = T,
-      progress = F
-    )
-    unlink(p)
+    save(runs, file = cacheFile)
   }
 }
 
-biases %>% 
-  mutate(model = factor(model)) %>%
-  ggplot(aes(x = decision, y = bias, colour = group)) +
-  geom_hline(yintercept = 0, linetype = 'dashed') +
-  geom_line(aes(group = paste0(id)), alpha = .25) +
-  stat_summary(geom = 'line', aes(group = group), size = 1, fun = median) +
-  facet_wrap(~model, labeller = label_both)
+end_time <- Sys.time()
+print(paste0(
+  'Completed ', n_reps * max_cores * nrow(parameters), ' models (',
+  n_reps, ' reps using ', max_cores, ' cores of ', nrow(parameters), 
+  ' sets of parameters)'
+))
+end_time - start_time
 
-```
 
-In this long-view version we see initial polariasation as agents with differing biases become aware of other agents' biases and coalesce into groups. 
-While this is going on, the slower process of bias updating is also occurring, and the groups are slowly but surely coming to believe similar (more accurate) things about the world. 
-After a while, the similarity in beliefs leads to a repairing of the network connections between groups, which depolarises the network structure.
-Eventually, this erodes the difference in trust between members of different groups (indeed the groups are nigh-indistinguishable).
-
-### Models where one group is closer to the truth
-
-```{r network-models-one-group-accurate}
-
-starting_weight <- .1
-truth_fun <- function(model, d) .75
-parameters <- data.frame(
-  n_agents = 20,
-  n_decisions = 500,
-  conf = c(T, T, F, F),
-  bias_mean = 1,
-  bias_sd = 1,
-  sensitivity_sd = 1,
-  trust_volatility_mean = c(.1, .1, .05, .05),
-  trust_volatility_sd = c(.05, .05, .01, .01),
-  bias_volatility_mean = 0,
-  bias_volatility_sd = c(0, .05, 0, .05),
-  starting_graph = starting_weight,
-  randomSeed = 20201014
-)
-parameters$truth_fun <- c(truth_fun, truth_fun, truth_fun, truth_fun)
-
-models <- runSimulations(parameters, cores = nrow(parameters))
-
-for (m in models) {
-  networkGraph(
-    m, 
-    mark.groups = list(
-      which(V(m$model$graphs[[1]])$bias <= 0),
-      which(V(m$model$graphs[[1]])$bias > 0)
-    ), 
-    layout = layout_nicely
-  ) 
-  
-  biasGraph(m) %>% print()
-  
-  weights <- m$model$graphs[[m$parameters$n_decisions]] %>% 
-    edge_attr() %>%
-    as_tibble() %>%
-    mutate(
-      `Group name` = factor(if_else(headBias > 0, 'Right', 'Left')), 
-      group = factor(paste0(`Group name`, '\n')),
-      sameGroup = factor(if_else(
-        sign(headBias) == sign(tailBias), 
-        'Same group', 
-        'Different groups'
-      )),
-      id = factor(head_of(
-        m$model$graphs[[m$parameters$n_decisions]], 
-        E(m$model$graphs[[m$parameters$n_decisions]])
-      ))
-    ) %>%
-    group_by(id, group, sameGroup, `Group name`) %>%
-    summarise(weight = mean(weight), .groups = 'drop')
-  
-  ez::ezANOVA(
-    data = weights, 
-    dv = weight, 
-    wid = id, 
-    within = sameGroup, 
-    between = group,
-    type = 2
-  ) %>% print()
-  
-  bf <- weights %>% 
-    select(id, `Group name`, weight) %>%
-    pivot_wider(
-      names_from = `Group name`, 
-      values_from = weight,
-      values_fn = list
-    ) %$%
-    ttestBF(Left[[1]], Right[[1]]) %>%
-    .@bayesFactor %>%
-    .$bf %>%
-    exp() %>%
-    bf2str()
-  
-  bf <- weights %>% 
-    nest(d = -c(group, `Group name`)) %>%
-    mutate(
-      bf = map(d, ~ select(., sameGroup, weight) %>%
-                 pivot_wider(
-                   names_from = sameGroup, 
-                   values_from = weight,
-                   values_fn = list
-                 ) %$%
-                 ttestBF(`Same group`[[1]], `Different groups`[[1]]))
-    ) 
-  
-  bf$BF <- sapply(1:nrow(bf), function(i) bf2str(exp(bf$bf[[i]]@bayesFactor$bf)))
-  
-  dw <- .1
-  trust <- weights %>%
-    ggplot(aes(x = sameGroup, y = weight, 
-               colour = `Group name`, fill = `Group name`)) +
-    geom_hline(yintercept = starting_weight, 
-               linetype = 'dashed') +
-    geom_line(aes(group = id), alpha = .25) +
-    geom_split_violin(aes(x = nudge(sameGroup, dw),
-                          group = sameGroup), width = .9,
-                      colour = NA) +
-    geom_boxplot(outlier.shape = NA, size = 1, width = dw/2,
-                 aes(x = nudge(sameGroup, dw), 
-                     group = sameGroup),
-                 colour = 'black') +
-    geom_segment(x = 1, xend = 2, y = 1, yend = 1, colour = 'black') +
-    geom_label(y = 1, x = 1.5, colour = 'black', fill = 'white',
-               aes(label = paste0('BF = ', BF)), 
-               data = bf) +
-    scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-    coord_cartesian(clip = F) +
-    facet_grid(~group) +
-    labs(x = 'Group membership with advisor', y = 'Weight given to advice') +
-    simulation
-  
-  print(trust)
-  # caption = "Simulated trust for average agents.  Simulated agents' trust in other agents at the end of the simulation. Individual lines show the average trust for an agent in those of the same or different group. Violins and boxplots show the distributions of these averages. The groups are arbitrarily named and separate agents by bias strength (whether the bias is positive or negative). Both groups contain some agents with pronounced biases and some with negligible biases.  The dashed line indicates the starting trust level between all agents in the simulation."
-}
-
-# Plot bias evolution for each model
-biases <- NULL
-for (m in models[c(2, 4)]) {
-  x <- select(m$model$agents, id, decision, bias)
-  biases <- x %>%
-    mutate(
-      model = length(unique(biases$model)),
-      group = rep(
-        if_else(x$bias[x$decision == 1] > 0, 'Right', 'Left'),
-        m$parameters$n_decisions
-      )
-    ) %>%
-    rbind(biases)
-}
-
-biases %>% 
-  mutate(model = factor(model)) %>%
-  ggplot(aes(x = decision, y = bias, colour = group)) +
-  geom_hline(yintercept = 0, linetype = 'dashed') +
-  geom_line(aes(group = paste0(id)), alpha = .25) +
-  stat_summary(geom = 'line', aes(group = group), size = 1, fun = median) +
-  facet_wrap(~model, labeller = label_both)
-# Interesting that the bias updating actually reduces polarisation here!
-# Not that it necessarily gets agents closer to the truth...
-
-```
-
-Where agents keep the same biases they started with, the group who are closest to the true answer show greater trust in their own group compared to the other group. 
-Those agents in the group which gets things wrong seem to show a much attenuated effect, vanishing almost entirely in the confidence-weighted case.
-Where agents' biases change according to their experience of final decisions, trust is high and not well differentiated between groups.
-This is probably because agents quickly arrive at similar biases across the whole population thanks to the double-counting of the true value between the initial decision and the advice.
-
-### Do we still see all these effects if we add weighted advice selection to the model?
-
-```{r network-models-weighted-selection}
-
-starting_weight <- .1
-parameters <- data.frame(
-  n_agents = 20,
-  n_decisions = 500,
-  conf = c(T, T, F, F),
-  bias_mean = 1,
-  bias_sd = 1,
-  sensitivity_sd = 1,
-  trust_volatility_mean = .05,
-  trust_volatility_sd = .01,
-  bias_volatility_mean = 0,
-  bias_volatility_sd = c(0, .05, 0, .05),
-  starting_graph = starting_weight,
-  randomSeed = 20201014,
-  weighted_sampling = 1
-)
-
-models <- runSimulations(parameters, cores = nrow(parameters))
-
-for (m in models) {
-  networkGraph(
-    m, 
-    mark.groups = list(
-      which(V(m$model$graphs[[1]])$bias <= 0),
-      which(V(m$model$graphs[[1]])$bias > 0)
-    ), 
-    layout = layout_nicely
-  ) 
-  
-  biasGraph(m) %>% print()
-  
-  weights <- m$model$graphs[[m$parameters$n_decisions]] %>% 
-    edge_attr() %>%
-    as_tibble() %>%
-    mutate(
-      `Group name` = factor(if_else(headBias > 0, 'Right', 'Left')), 
-      group = factor(paste0(`Group name`, '\n')),
-      sameGroup = factor(if_else(
-        sign(headBias) == sign(tailBias), 
-        'Same group', 
-        'Different groups'
-      )),
-      id = factor(head_of(
-        m$model$graphs[[m$parameters$n_decisions]], 
-        E(m$model$graphs[[m$parameters$n_decisions]])
-      ))
-    ) %>%
-    group_by(id, group, sameGroup, `Group name`) %>%
-    summarise(weight = mean(weight), .groups = 'drop')
-  
-  ez::ezANOVA(
-    data = weights, 
-    dv = weight, 
-    wid = id, 
-    within = sameGroup, 
-    between = group,
-    type = 2
-  ) %>% print()
-  
-  bf <- weights %>% 
-    select(id, `Group name`, weight) %>%
-    pivot_wider(
-      names_from = `Group name`, 
-      values_from = weight,
-      values_fn = list
-    ) %$%
-    ttestBF(Left[[1]], Right[[1]]) %>%
-    .@bayesFactor %>%
-    .$bf %>%
-    exp() %>%
-    bf2str()
-  
-  bf <- weights %>% 
-    nest(d = -c(group, `Group name`)) %>%
-    mutate(
-      bf = map(d, ~ select(., sameGroup, weight) %>%
-                 pivot_wider(
-                   names_from = sameGroup, 
-                   values_from = weight,
-                   values_fn = list
-                 ) %$%
-                 ttestBF(`Same group`[[1]], `Different groups`[[1]]))
-    ) 
-  
-  bf$BF <- sapply(1:nrow(bf), function(i) bf2str(exp(bf$bf[[i]]@bayesFactor$bf)))
-  
-  dw <- .1
-  trust <- weights %>%
-    ggplot(aes(x = sameGroup, y = weight, 
-               colour = `Group name`, fill = `Group name`)) +
-    geom_hline(yintercept = starting_weight, 
-               linetype = 'dashed') +
-    geom_line(aes(group = id), alpha = .25) +
-    geom_split_violin(aes(x = nudge(sameGroup, dw),
-                          group = sameGroup), width = .9,
-                      colour = NA) +
-    geom_boxplot(outlier.shape = NA, size = 1, width = dw/2,
-                 aes(x = nudge(sameGroup, dw), 
-                     group = sameGroup),
-                 colour = 'black') +
-    geom_segment(x = 1, xend = 2, y = 1, yend = 1, colour = 'black') +
-    geom_label(y = 1, x = 1.5, colour = 'black', fill = 'white',
-               aes(label = paste0('BF = ', BF)), 
-               data = bf) +
-    scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-    coord_cartesian(clip = F) +
-    facet_grid(~group) +
-    labs(x = 'Group membership with advisor', y = 'Weight given to advice') +
-    simulation
-  
-  print(trust)
-  # caption = "Simulated trust for average agents.  Simulated agents' trust in other agents at the end of the simulation. Individual lines show the average trust for an agent in those of the same or different group. Violins and boxplots show the distributions of these averages. The groups are arbitrarily named and separate agents by bias strength (whether the bias is positive or negative). Both groups contain some agents with pronounced biases and some with negligible biases.  The dashed line indicates the starting trust level between all agents in the simulation."
-}
-
-# Plot bias evolution for each model
-biases <- NULL
-for (m in models[c(2, 4)]) {
-  x <- select(m$model$agents, id, decision, bias)
-  biases <- x %>%
-    mutate(
-      model = length(unique(biases$model)),
-      group = rep(
-        if_else(x$bias[x$decision == 1] > 0, 'Right', 'Left'),
-        m$parameters$n_decisions
-      )
-    ) %>%
-    rbind(biases)
-}
-
-biases %>% 
-  mutate(model = factor(model)) %>%
-  ggplot(aes(x = decision, y = bias, colour = group)) +
-  geom_hline(yintercept = 0, linetype = 'dashed') +
-  geom_line(aes(group = paste0(id)), alpha = .25) +
-  stat_summary(geom = 'line', aes(group = group), size = 1, fun = median) +
-  facet_wrap(~model, labeller = label_both)
-# Interesting that the bias updating actually reduces polarisation here!
-# Not that it necessarily gets agents closer to the truth...
-
-```
-
-These simulations show that adding a correlation between the sampling strategy and the advice-taking strategy (i.e. allowing trust to be a third variable affecting both) makes the polarisation effects much more pronounced.
-The primary mechanism for this appears to be discouraging agents from seeking advice from those who disagree, thus making the simulations where biases can change following experience far less likely to converge on the true answer. 
-To explore whether this mechanism is responsible for the results we look at the setup with a wider gulf between groups, but with a weighted sampling strategy in place.
-
-### Does weighted sampling suppress bias erosion?
-
-```{r network-models-weighted-sampling-long, eval=!(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))}
-cacheFile <- '_cache/weighted-sampling.rda'
-if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
-  load(cacheFile)
-} else {
-  starting_weight <- .1
-  parameters <- data.frame(
-    n_agents = 40,
-    n_decisions = 5000,
-    conf = rep(c(T, F), 3),
-    bias_mean = 3,
-    bias_sd = 1,
-    sensitivity_sd = 1,
-    trust_volatility_mean = .05,
-    trust_volatility_sd = .01,
-    bias_volatility_mean = 0,
-    bias_volatility_sd = .05,
-    starting_graph = .05,
-    randomSeed = rep(c(20201014, 202010, 1014), each = 2),
-    weighted_sampling = 1
+runs %>% 
+  nest(d = c(groupRatio, run, random_seed)) %>%
+  mutate(
+    meanGroupRatio = map_dbl(d, ~mean(.$groupRatio)),
+    meanEchoCamber = map_dbl(d, ~mean(.$groupRatio > 1.5)),
+    leadIn = n_decision - 1000
+  ) %>%
+  select(
+    starts_with('mean'), 
+    leadIn, 
+    everything(), 
+    -d, 
+    -n_decision, 
+    -decision_flags
   )
-  
-  models <- runSimulations(parameters, cores = nrow(parameters))
-  save(models, file = cacheFile)
-}
 
-for (m in models) {
-  networkGraph(
-    m, 
-    mark.groups = list(
-      which(V(m$model$graphs[[1]])$bias <= 0),
-      which(V(m$model$graphs[[1]])$bias > 0)
-    ), 
-    layout = layout_nicely
-  ) 
-  
-  biasGraph(m) %>% print()
-  
-  weights <- m$model$graphs[[m$parameters$n_decisions]] %>% 
-    edge_attr() %>%
-    as_tibble() %>%
-    mutate(
-      `Group name` = factor(if_else(headBias > 0, 'Right', 'Left')), 
-      group = factor(paste0(`Group name`, '\n')),
-      sameGroup = factor(if_else(
-        sign(headBias) == sign(tailBias), 
-        'Same group', 
-        'Different groups'
-      )),
-      id = factor(head_of(
-        m$model$graphs[[m$parameters$n_decisions]], 
-        E(m$model$graphs[[m$parameters$n_decisions]])
-      ))
-    ) %>%
-    group_by(id, group, sameGroup, `Group name`) %>%
-    summarise(weight = mean(weight), .groups = 'drop')
-  
-  ez::ezANOVA(
-    data = weights, 
-    dv = weight, 
-    wid = id, 
-    within = sameGroup, 
-    between = group,
-    type = 2
-  ) %>% print()
-  
-  bf <- weights %>% 
-    select(id, `Group name`, weight) %>%
-    pivot_wider(
-      names_from = `Group name`, 
-      values_from = weight,
-      values_fn = list
-    ) %$%
-    ttestBF(Left[[1]], Right[[1]]) %>%
-    .@bayesFactor %>%
-    .$bf %>%
-    exp() %>%
-    bf2str()
-  
-  bf <- weights %>% 
-    nest(d = -c(group, `Group name`)) %>%
-    mutate(
-      bf = map(d, ~ select(., sameGroup, weight) %>%
-                 pivot_wider(
-                   names_from = sameGroup, 
-                   values_from = weight,
-                   values_fn = list
-                 ) %$%
-                 ttestBF(`Same group`[[1]], `Different groups`[[1]]))
-    ) 
-  
-  bf$BF <- sapply(1:nrow(bf), function(i) bf2str(exp(bf$bf[[i]]@bayesFactor$bf)))
-  
-  dw <- .1
-  trust <- weights %>%
-    ggplot(aes(x = sameGroup, y = weight, 
-               colour = `Group name`, fill = `Group name`)) +
-    geom_hline(yintercept = starting_weight, 
-               linetype = 'dashed') +
-    geom_line(aes(group = id), alpha = .25) +
-    geom_split_violin(aes(x = nudge(sameGroup, dw),
-                          group = sameGroup), width = .9,
-                      colour = NA) +
-    geom_boxplot(outlier.shape = NA, size = 1, width = dw/2,
-                 aes(x = nudge(sameGroup, dw), 
-                     group = sameGroup),
-                 colour = 'black') +
-    geom_segment(x = 1, xend = 2, y = 1, yend = 1, colour = 'black') +
-    geom_label(y = 1, x = 1.5, colour = 'black', fill = 'white',
-               aes(label = paste0('BF = ', BF)), 
-               data = bf) +
-    scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-    coord_cartesian(clip = F) +
-    facet_grid(~group) +
-    labs(x = 'Group membership with advisor', y = 'Weight given to advice') +
-    simulation
-  
-  print(trust)
-  # caption = "Simulated trust for average agents.  Simulated agents' trust in other agents at the end of the simulation. Individual lines show the average trust for an agent in those of the same or different group. Violins and boxplots show the distributions of these averages. The groups are arbitrarily named and separate agents by bias strength (whether the bias is positive or negative). Both groups contain some agents with pronounced biases and some with negligible biases.  The dashed line indicates the starting trust level between all agents in the simulation."
-}
-
-# Plot bias evolution for each model
-biases <- NULL
-for (m in models) {
-  modelNum <- length(unique(biases$model))
-  x <- select(m$model$agents, id, decision, bias)
-  biases <- x %>%
-    mutate(
-      model = modelNum,
-      group = rep(
-        if_else(x$bias[x$decision == 1] > 0, 'Right', 'Left'),
-        m$parameters$n_decisions
-      )
-    ) %>%
-    rbind(biases)
-}
-
-biases %>% 
-  mutate(model = factor(model)) %>%
-  ggplot(aes(x = decision, y = bias, colour = group)) +
-  geom_hline(yintercept = 0, linetype = 'dashed') +
-  # geom_line(aes(group = paste0(id)), alpha = .15) +
-  stat_summary(geom = 'line', aes(group = group), size = 1, fun = median) +
-  # scale_y_continuous(limits = c(-50, 50)) +
-  facet_wrap(~model, labeller = label_both)
+runs %>%
+  mutate(
+    leadIn = factor(n_decision - 1000),
+    weighted_sampling = if_else(is.na(weighted_sampling), 0, weighted_sampling),
+    weighted_sampling = factor(weighted_sampling)
+  ) %>%
+  ggplot(aes(x = leadIn, y = groupRatio, fill = weighted_sampling)) +
+  geom_hline(yintercept = 1.5, linetype = 'dashed') +
+  annotate(geom = 'label', label = 'Threshold', x = "0", y = 1.5) +
+  geom_boxplot(outlier.alpha = .25) +
+  scale_y_continuous(limits = c(0, NA)) +
+  scale_fill_brewer(palette = 'Blues')
 
 ```
 
-Somewhat surprisingly, the bias-protecting effects of the weighted sampling strategy are not clearly evident. 
-Differences in random seed make a large difference to whether or not the groups converge on the true values.
+Weighted sampling interacts with the lead-in time.
+Lead-in time is a proxy for the starting asymmetry of the connections in the network.
+The figure shows that, as networks start off with more homophilic structures, weighted selection increases the effect of homophily. 
+Note that sufficiently homophilic networks will continue to exhibit echo chamber structures regardless of the level of weighted sampling, and that even very strong weighted sampling does not produce echo chambers in networks which start off perfectly symmetrical. 
 
-All simulations show an enduring advice weight advantage for members of the same group, but the correlations between bias strength and advice weight decline in all but one of the simulations. 
-This decline is driven by the reduced difference in bias, rather than an increased weight for those who have different biases.
+The key finding of interest from the models thus far is that source selection may exacerbate echo chamber formation. 
+This finding is in line with similar findings from others who have produced these models \mccorrect{!TODO[citations galore]}.
+We are now in a position to see whether these models continue to exhibit these features when we parametrise them based on the data we observed in our participants' behavioural data.
 
-The bias of the groups does not decline in model 1, and in model 2 it spirals out of control for both groups - perhaps it would return towards the truth given time as it appears to in model 3.
-In models 0, 4, and 5, the median bias for the groups becomes quite similar, and changes in lockstep thereafter, staying fairly close to the true value (although still at notably unlikely values given the bias is expressed in z-scores).
+## Participant data
+
+Exploration of the model space shows that the models are sensitive to effects of source selection behaviour as parametrised by weighted sampling. 
+This parameter in the model can be derived from the advisor choice behaviour in the behavioural experiments.
+Other model parameters can also be fit using the participants' behavioural data. 
+
+There are two ways in which parameters can be derived for the models from behavioural data. 
+Both approaches start by taking the model used in simulation and finding the parameters for that model which best describe each participant's behaviour.
+This is done using a standard parameter estimation approach based on a gradient descent algorithm.
+
+Once parameter estimates have been obtained for all the participants, those parameters must be reconnected with the simulation side of the model. 
+The first approach to doing this is to simply instantiate agents with exactly the properties of our participants.
+By sampling a variety of models made up of different selections of participants, we can characterise some of the network behaviour that particular mixtures of individual strategies produce, at the expense of being tied explicitly to the performances of specific participants.
+
+The second approach is to construct distributions in parameter space from the individual participants' specific parameter estimates. 
+This approach allows for the generation of an unlimited number of unique participants, and can allow for correlations between parameter estimates as well as describing the estimates' distributions. 
+The drawback to this approach is that the agents produced will be more homogeneous in their overall strategies.
+For example, if a minority strategy exists within the population, this strategy should be evident in the first approach but would not be so in the second - instead we would simply have the parameter estimate distributions reflective of the dominant strategy slightly modified through averaging towards the minority strategy, which may in turn produce agents whose behaviour is not reflective of any plausible real individuals.
+
+### Model fitting
 
