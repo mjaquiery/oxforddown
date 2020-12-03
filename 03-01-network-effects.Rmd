@@ -178,98 +178,102 @@ We examine this over several repetitions of models, for a wider range of values 
 For simplicity (and tractability) we reduce each collection of model instances to a simple set of summary statistics describing the group weight ratio.
 
 ```{r}
-set.seed(20201126)
-
-summaryFun <- function(model) 
-  groupRatio(model$model$graphs[[length(model$model$graphs)]])
-
-cacheFile <- '_cache/model-summary.rda'
-if (file.exists(cacheFile)) load(cacheFile) else runs <- NULL
-
-start_time <- Sys.time()
-
-leads <- c(0, 250, 500, 750)
-parameters <- tidyr::crossing(
-  tibble(
-    n_decision = map_int(leads, ~ as.integer(. + 1000)),
-    decision_flags = map(leads, ~ c(rep(1, .), rep(3, 1000)))
-  ),
-  weighted_sampling = c(NA_real_, .3, .6, 1, 1.3, 1.6, 2),
-  bias_volatility_sd = .05,
-  bias_volatility_mean = 0,
-  n_agents = 100,
-  starting_graph = .1
-) 
-
-# We now have a lot of different models
-max_cores <- detectCores() - 6
-n_reps <- 4 # 4 full-computer runs for each model
-
-seeds <- runif(max_cores * n_reps, 1e6, 1e9)
-
-
-for (i in 1:nrow(parameters)) {
-  for (r in 1:n_reps) {
-    indices <- ((r - 1) * max_cores + 1):(r * max_cores)
-    rows <- slice_sample(parameters[i, ], n = max_cores, replace = T) %>%
-      mutate(random_seed = seeds[indices])
-    # Don't go again if we already did this and have the result saved
-    if (!is.null(runs) && 
-        nrow(filter(
-          runs, 
-          n_decision %in% rows$n_decision & 
-          weighted_sampling %in% rows$weighted_sampling & 
-          random_seed %in% rows$random_seed)) > 0
-    )
-      next()
-    runs <- rbind(
-      runs,
-      rows %>% mutate(
-        run = indices,
-        groupRatio = runSimulations(rows, max_cores, summaryFun)
+if (!(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))) {
+  set.seed(20201126)
+  
+  summaryFun <- function(model) 
+    groupRatio(model$model$graphs[[length(model$model$graphs)]])
+  
+  cacheFile <- '_cache/model-summary.rda'
+  if (file.exists(cacheFile)) load(cacheFile) else runs <- NULL
+  
+  start_time <- Sys.time()
+  
+  leads <- c(0, 250, 500, 750)
+  parameters <- tidyr::crossing(
+    tibble(
+      n_decision = map_int(leads, ~ as.integer(. + 1000)),
+      decision_flags = map(leads, ~ c(rep(1, .), rep(3, 1000)))
+    ),
+    weighted_sampling_mean = c(0, .3, .6, 1, 1.3, 1.6, 2),
+    weighted_sampling_sd = 0,
+    bias_volatility_sd = .05,
+    bias_volatility_mean = 0,
+    n_agents = 100,
+    starting_graph = .1
+  ) 
+  
+  # We now have a lot of different models
+  max_cores <- detectCores() - 6
+  n_reps <- 4 # 4 full-computer runs for each model
+  
+  seeds <- runif(max_cores * n_reps, 1e6, 1e9)
+  
+  
+  for (i in 1:nrow(parameters)) {
+    for (r in 1:n_reps) {
+      indices <- ((r - 1) * max_cores + 1):(r * max_cores)
+      rows <- slice_sample(parameters[i, ], n = max_cores, replace = T) %>%
+        mutate(random_seed = seeds[indices])
+      # Don't go again if we already did this and have the result saved
+      if (!is.null(runs) && 
+          nrow(filter(
+            runs, 
+            n_decision %in% rows$n_decision & 
+            weighted_sampling_mean %in% rows$weighted_sampling_mean &
+            random_seed %in% rows$random_seed)) > 0
       )
-    )
-    save(runs, file = cacheFile)
+        next()
+      runs <- rbind(
+        runs,
+        rows %>% mutate(
+          run = indices,
+          groupRatio = runSimulations(rows, max_cores, summaryFun)
+        )
+      )
+      save(runs, file = cacheFile)
+    }
   }
+  
+  end_time <- Sys.time()
+  print(paste0(
+    'Completed ', n_reps * max_cores * nrow(parameters), ' models (',
+    n_reps, ' reps using ', max_cores, ' cores of ', nrow(parameters), 
+    ' sets of parameters)'
+  ))
+  end_time - start_time
+  
+  
+  runs %>% 
+    nest(d = c(groupRatio, run, random_seed)) %>%
+    mutate(
+      meanGroupRatio = map_dbl(d, ~mean(.$groupRatio)),
+      meanEchoCamber = map_dbl(d, ~mean(.$groupRatio > 1.5)),
+      leadIn = n_decision - 1000
+    ) %>%
+    select(
+      starts_with('mean'), 
+      leadIn, 
+      everything(), 
+      -d, 
+      -n_decision, 
+      -decision_flags
+    )
+  
+  runs %>%
+    mutate(
+      leadIn = factor(n_decision - 1000),
+      weighted_sampling_mean = if_else(is.na(weighted_sampling_mean), 0, weighted_sampling_mean),
+      weighted_sampling_mean = factor(weighted_sampling_mean)
+    ) %>%
+    ggplot(aes(x = leadIn, y = groupRatio, fill = weighted_sampling_mean)) +
+    geom_hline(yintercept = 1.5, linetype = 'dashed') +
+    annotate(geom = 'label', label = 'Threshold', x = "0", y = 1.5) +
+    geom_boxplot(outlier.alpha = .25) +
+    scale_y_continuous(limits = c(0, NA)) +
+    scale_fill_brewer(palette = 'Blues')
+  
 }
-
-end_time <- Sys.time()
-print(paste0(
-  'Completed ', n_reps * max_cores * nrow(parameters), ' models (',
-  n_reps, ' reps using ', max_cores, ' cores of ', nrow(parameters), 
-  ' sets of parameters)'
-))
-end_time - start_time
-
-
-runs %>% 
-  nest(d = c(groupRatio, run, random_seed)) %>%
-  mutate(
-    meanGroupRatio = map_dbl(d, ~mean(.$groupRatio)),
-    meanEchoCamber = map_dbl(d, ~mean(.$groupRatio > 1.5)),
-    leadIn = n_decision - 1000
-  ) %>%
-  select(
-    starts_with('mean'), 
-    leadIn, 
-    everything(), 
-    -d, 
-    -n_decision, 
-    -decision_flags
-  )
-
-runs %>%
-  mutate(
-    leadIn = factor(n_decision - 1000),
-    weighted_sampling = if_else(is.na(weighted_sampling), 0, weighted_sampling),
-    weighted_sampling = factor(weighted_sampling)
-  ) %>%
-  ggplot(aes(x = leadIn, y = groupRatio, fill = weighted_sampling)) +
-  geom_hline(yintercept = 1.5, linetype = 'dashed') +
-  annotate(geom = 'label', label = 'Threshold', x = "0", y = 1.5) +
-  geom_boxplot(outlier.alpha = .25) +
-  scale_y_continuous(limits = c(0, NA)) +
-  scale_fill_brewer(palette = 'Blues')
 
 ```
 

@@ -27,13 +27,14 @@ RUN git pull && \
 
 # nginx setup
 RUN cp scripts_and_filters/docker-setup/localhost.conf \
-  /etc/nginx/sites-enabled/localhost.conf && \
-  service nginx restart
+  /etc/nginx/sites-enabled/localhost.conf
 
 # Update packages from renv.lock file
 RUN R -e "renv::restore(); tinytex::tlmgr_install('cbfonts-fd')"
 
 # Knit PDF
-# RUN rm -f _main.* && \
-#   rm -r docs
-# 	Rscript -e 'options(ESM.skip = T); bookdown::render_book("index.Rmd", output_format = c("bookdown::pdf_book", "bookdown::html_book"), output_dir = "/usr/share/nginx/html/")'
+RUN rm -f _main.* && \
+  rm -r docs && \
+	Rscript -e 'options(ESM.skip = T); bookdown::render_book("index.Rmd")'
+
+RUN service nginx restart
