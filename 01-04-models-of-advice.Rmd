@@ -378,15 +378,15 @@ if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
           advisorAgrees, 
           confidenceShift.z
         ))
-    )
+    ) 
   
   #' Perform gradient descent on a list of participants' data
-  doGradDesc <- function(x) {
+  doGradDesc <- function(x, nStartingLocations = 150L) {
     library(dplyr)
     Rcpp::sourceCpp('scripts_and_filters/cpp/model-fit.cpp')
     x %>% mutate(data = purrr::map(
       data, 
-      ~gradientDescent(., nStartingLocations = 150L))
+      ~gradientDescent(., nStartingLocations = nStartingLocations))
     )
   }
   
@@ -406,13 +406,18 @@ if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
   
   cl <- makeCluster(nCores)
   clusterExport(cl, "doGradDesc")
-  dList <- parLapply(cl, dList, doGradDesc)
+  dListBad <- parLapply(cl, dList, doGradDesc, nStartingLocations = 15L)
+  dList <- parLapply(cl, dList, doGradDesc, nStartingLocations = 150L)
   stopCluster(cl)
   
   # rebuild d from dList
   d <- NULL
-  for (x in dList)
-    d <- rbind(d, x)
+  for (i in 1:length(dList))
+    d <- rbind(
+      d, 
+      tidyr::crossing(nLoc = 300, dList[[i]]),
+      tidyr::crossing(nLoc = 1, dListBad[[i]])
+    )
   
   # Neaten up the data
   d <- d %>%
@@ -421,6 +426,16 @@ if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
       parameters = map(data, ~ as_tibble(.[['parameters']])),
       data = map(data, ~ as_tibble(.[['trials']]))
     )
+  
+  # Check that the longer model fitting process gives better results
+  d %>% 
+    select(nLoc, uid, MSE) %>% 
+    unnest(cols = MSE) %>% 
+    pivot_longer(starts_with('Model'), names_to = "model", values_to = "minMSE") %>% 
+    pivot_wider(names_from = "nLoc", values_from = "minMSE") %>% 
+    mutate(asExpected = .[[3]] < .[[4]]) %>%
+    group_by(model, .groups = 'drop') %>%
+    summarise(across(matches('[0-9]+', perl = T), median), mean(asExpected))
   
   # Write to the cache 
   save(d, file = cacheFile)
@@ -502,4 +517,775 @@ for (a in unique(tmp$Advisor)) {
     labs(title = paste0('Advisor ', a))
   print(gg)
 }
+```
+
+## Grid search
+
+We don't trust the C++ version of the gradient descent algorithm because it doesn't seem to be giving lower MSE for higher numbers of starting positions in parameter space. 
+We also aren't sure whether it's going to spit out parameters we can actually use with the adviseR package. 
+So we'll use the package directly and fit some behavioural data to it.
+But first we want to see what some of the landscapes look like for grid search to work out what our best search strategy is likely to be.
+
+```{r grid search}
+source('scripts_and_filters/general_setup.R')
+library(parallel)
+library(adviseR)
+
+nCores <- detectCores() - 4
+  
+#' Drop outliers above the 95th percentile, then standardize
+robustScale <- function(x, trimAtSD) {
+  # Massive hack, but we need to stop very large/infinite values breaking stuff
+  x[x > quantile(x, probs = seq(0, 1, .05), na.rm = T)[20]] <- NA_real_
+  x_scale <- scale(x)
+  scale(ifelse(abs(x_scale) < trimAtSD, x, NA_real_))
+}
+
+#' Return the amount that confidence shifted in the directly of the advice,
+#' divided by the maximum amount confidence could have shifted in that direction.
+#' @param initialConfidence participant's initial confidence rating 
+#' @param advisorAgrees whether the advisor agrees with the participant 
+#' @param advisorInfluenceRaw amount participant's answer shifts in the direction of the advice
+#' @param scale_max maximum possible value for \code{initialConfidence}
+#' @param truncate_values whether to constrain values in the interval [-1, 1]
+#' @details Where initial confidence was already maximal and the advisor agrees,
+#'   the value is NaN (0/0) if no change occurs or -Inf if any change occurs.
+#'   If \code{truncate_values} is TRUE, these values will be clamped to NaN or -1.
+findInfluenceProportion <- function(
+  initialConfidence, advisorAgrees, advisorInfluenceRaw, 
+  scale_max = 50, truncate_values = T
+) {
+  max_shift <- if_else(
+    advisorAgrees, 
+    scale_max - initialConfidence,
+    scale_max + initialConfidence
+  )
+  influence_proportion <- advisorInfluenceRaw / max_shift
+  if (truncate_values)
+    influence_proportion[influence_proportion < -1] <- -1
+  influence_proportion
+}
+
+#' Return the variation in picking behaviour. Maximal variation (=1) occurs when
+#' picking is equal for each advisor in a pair, minimal variation (=0) occurs 
+#' when picking is all for one advisor.
+#' Averaged across advisor pairs.
+findAdvisorVariation <- function(choice0, choice1, advisorIndex) {
+  df <- tibble(choice0, choice1, advisorIndex) %>%
+    mutate(
+      pair = case_when(
+        choice0 < choice1 ~ paste0(choice0, ', ', choice1),
+        choice0 >= choice1 ~ paste0(choice1, ', ', choice0)
+      )
+    ) %>% 
+    nest(d = -pair) %>%
+    mutate(
+      d = map(d, ~mutate(
+        ., 
+        choiceA = if_else(choice0 == .$choice0[1], choice0, choice1),
+        choiceB = if_else(choice1 == .$choice1[1], choice1, choice0)
+      )),
+      polarisation = map_dbl(d, ~mean(.$choiceA == .$advisorIndex), na.rm = T),
+      polarisation = 1 - abs(polarisation - .5) * 2
+    )
+  mean(df$polarisation, na.rm = T)
+}
+
+#' Return x scaled using \link{scale}, or 0 if all values in x are identical
+scale_or_zero <- function(x, ...) {
+  y <- scale(x, ...)
+  if (attr(y, 'scaled:scale') == 0)
+    rep(0, length(x))
+  else
+    y
+}
+
+#' Return the row for each uid which has the lowest combined error
+#' @param d dataframe of gridSearch results
+get_best <- function(d) {
+  library(dplyr); library(tidyr); library(purrr)
+  d %>% 
+    nest(d = -uid) %>%
+    mutate(
+      d = purrr::map(
+        d, 
+        ~unnest(., cols = y) %>%
+          mutate(
+            measure = if_else(1:length(y) %% 2 == 1, 'choice', 'influence')
+          ) %>% 
+          pivot_wider(names_from = measure, values_from = y) %>%
+          mutate(
+            across(
+              c(choice, influence), 
+              robustScale, 
+              trimAtSD = 3, 
+              .names = '{.col}_rz'
+            ),
+            combined = influence_rz + choice_rz
+          ) %>% 
+          filter(combined == min(combined, na.rm = T))
+      )
+    ) %>%
+    unnest(cols = d)
+}
+
+#' Perform grid search on a list of participants' data
+#' Filter out values for advisor choice error that will be NaN because of the 
+#' mathematics of raising negative (trust) values to fractional powers
+gridSearch <- function(x, grid = tidyr::crossing(a = seq(-1, 2, .01), b = seq(-.5, .5, .01))) {
+  library(dplyr); library(tidyr)
+  crossing(x, grid) %>%
+    filter(!is.nan(b ^ a)) %>%
+    mutate(weightedSelection = a, trustUpdateRate = b) %>%
+    nest(params = c(a, b)) %>%
+    mutate(y = purrr::map2(data, params, adviseR::simulateFromData))
+}
+
+#' Find where the input dataframe row appears in a list with scrambled trials
+getScramblePosition <- function(df, nReps = 1000) {
+  library(tidyverse)
+  out <- list()
+  if ("data.frame" %in% class(df)) {
+    out$uid <- df$uid[1]
+    d <- df$data[[1]] 
+    best <- select(df[1, ], choice, influence) %>% mutate(source = 'real')
+  } else {
+    out$uid <- df$uid
+    d <- df$data
+    best <- tibble(choice = df$choice, influence = df$influence, source = 'real')
+  }
+  params <- data.frame(
+    ws = df$weightedSelection[1], 
+    tru = df$trustUpdateRate[1]
+  )
+  scrambledErr <- sapply(
+    1:nReps, 
+    function(x) adviseR::simulateFromData(slice_sample(d, prop = 1), params)
+  )
+  scrambledErr <- t(scrambledErr) %>% as_tibble()
+  names(scrambledErr) <- c('choice', 'influence')
+  tmp <- scrambledErr %>%
+    mutate(source = 'scrambled')
+  tmp <- rbind(best, tmp) %>%
+    mutate(across(c(choice, influence), robustScale, 3, .names = "{col}_rz"))
+  if (all(is.na(tmp$choice_rz))) {
+    out$vars = 'influence'
+    tmp <- mutate(tmp, combined_error_rz = influence_rz)
+  } else {
+    out$vars = 'influence, choice'
+    tmp <- mutate(tmp, combined_error_rz = influence_rz + choice_rz)
+  }
+  tmp <- tmp %>%
+      arrange(combined_error_rz) %>%
+      rowid_to_column('nth')
+  out$position <- tmp %>% filter(source == 'real') %>% pull(nth)
+  out$samples <- filter(tmp, !is.na(combined_error_rz)) %>% nrow()
+  out$influence_err_min <- min(tmp$influence, na.rm = T)
+  out$influence_err_max <- max(tmp$influence, na.rm = T)
+  out$choice_err_min <- min(tmp$choice, na.rm = T)
+  out$choice_err_max <- max(tmp$choice, na.rm = T)
+  as_tibble(out)
+}
+
+#' Return a list of participants failing basic exclusion checks
+#' @param df data frame of trials
+#' @param nMaxOutliers maximum outlying trials a participant can have
+#' @param zThresh SDs away from the mean for defining outliers
+#' @param accuracyRange range within which mean accuracy must fall
+#' @param minTrialsPerCategory minimum trials per confidence category
+getExcludedParticipants <- function(
+  df,
+  nMaxOutliers = 2,
+  zThresh = 3, 
+  accuracyRange = c(.6, .85),
+  minTrialsPerCategory = 12
+) {
+  tmp <- df %>% 
+    nest(d = -pid) %>%
+    mutate(d = map_dbl(d, ~ mean(.$initialCorrect)))
+  
+  exclusions <- tibble(pid = unique(df$pid)) %>%
+    mutate(
+      `Accuracy too low` = pid %in% filter(tmp, d < accuracyRange[1])$pid,
+      `Accuracy too high` = pid %in% filter(tmp, d > accuracyRange[2])$pid
+    )
+  
+  tmp <- df %>% 
+    filter(!practice) %>%
+    nest(d = c(-pid, -confidenceCategory)) %>%
+    mutate(n = map_int(d, nrow)) %>%
+    select(-d) %>%
+    pivot_wider(names_from = confidenceCategory, 
+                names_prefix = "cc", 
+                values_from = n) %>%
+    mutate(
+      anyNA = is.na(cc0) | is.na(cc1) | is.na(cc2),
+      lowest = pmin(cc0, cc1, cc2, na.rm = T)
+    )
+  
+  exclusions <- exclusions %>% 
+    mutate(
+      `Missing confidence categories` = pid %in% filter(tmp, anyNA)$pid,
+      `Skewed confidence categories` = pid %in% filter(tmp, lowest < minTrialsPerCategory)$pid
+    )
+  
+  exclusions %>% 
+    mutate(n_exclusions = reduce(select(., -pid), `+`)) %>%
+    filter(n_exclusions > 0) %>%
+    pull(pid)
+}
+
+select_experiment('dotstask')
+trials <- trials %>% 
+  mutate(uid = factor(paste0(studyId, studyVersion, ' p', pid)))
+
+
+cacheFile <- '_cache/grid-search_best.rda'
+if (!(has_name(.Options, 'ESM.recalculate') &&
+    getOption('ESM.recalculate')) &&
+    file.exists(cacheFile)) {
+  load(cacheFile)
+} else {
+  # Take a subset for testing stuff
+  d <- trials %>% 
+    nest(data = -uid) %>%
+    mutate(okay = map_lgl(data, ~ any(.$hasChoice, na.rm = T))) %>%
+    filter(okay) #%>% slice_sample(n = 12)
+  
+  
+  # * initialConfidence.z - initial confidence rating (standardized within participant)
+  # * advisorIndex - index of the advisor chosen (1 or 2; NA if no choice made)
+  # * choice0 - index of the first advisor offered in the choice (NA if no choice offered)
+  # * choice1 - index of the second advisor offered in the choice (NA if no choice offered)
+  # * advisorAgrees - whether the chosen advisor agrees (NA if no advice provided)
+  # * confidenceShift.z - influence proportion (standardized within participant)
+  d <- d %>%
+    mutate(
+      data = map(data, ~select(
+        .,
+        trialId = id,
+        initialConfidence, 
+        advisorId, 
+        choice0,
+        choice1,
+        advisorAgrees, 
+        advisorInfluenceRaw
+      ) %>%
+        mutate(
+          initialConfidence.z = scale_or_zero(initialConfidence),
+          advisorIndex = as.numeric(factor(advisorId)),
+          across(
+            .cols = matches('choice[01]'), 
+            ~ as.numeric(factor(., levels = levels(factor(advisorId))))
+          ),
+          influenceProportion = findInfluenceProportion(
+            initialConfidence, advisorAgrees, advisorInfluenceRaw
+          ),
+          confidenceShift.z = scale_or_zero(influenceProportion),
+          n_influence = sum(!is.na(initialConfidence)),
+          n_choice = sum(!is.na(choice0) & !is.na(choice1)),
+          mean_conf = mean(initialConfidence, na.rm = T),
+          sd_conf = sd(initialConfidence, na.rm = T),
+          mean_agree = mean(advisorAgrees, na.rm = T),
+          advisor_variation = findAdvisorVariation(choice0, choice1, advisorIndex)
+        ) %>% 
+        select(
+          trialId,
+          initialConfidence.z,
+          advisorIndex,
+          choice0, 
+          choice1, 
+          advisorAgrees, 
+          confidenceShift.z,
+          n_influence,
+          n_choice,
+          mean_conf,
+          sd_conf,
+          mean_agree,
+          advisor_variation
+        ))
+    ) 
+  
+  # For speed we now divvy up the data into roughly equal chunks based on the 
+  # number of cores available and run the model fitting in parallel on each.
+  dList <- list()
+  nPerCore <- floor(nrow(d) / nCores)
+  for (i in 1:nCores) {
+    rows <- (1 + (i - 1) * nPerCore):(i * nPerCore)
+    dList[[i]] <- d[rows, ] 
+  }
+  # Assign remainder
+  if (nrow(d) %% nCores > 0) {
+    for (i in 1:(nrow(d) %% nCores)) {
+      dList[[i]] <- rbind(dList[[i]], d[nrow(d) - (i - 1), ])
+    }
+  }
+  
+  cl <- makeCluster(nCores)
+  clusterExport(cl, c("gridSearch", "get_best", "robustScale"))
+  dList <- parLapply(cl, dList, function(x) get_best(gridSearch(x)))
+  stopCluster(cl)
+  
+  # rebuild d from dList
+  d <- NULL
+  for (i in 1:length(dList))
+    d <- rbind(d, dList[[i]])
+  
+  save(d, file = cacheFile)  
+}
+
+cacheFile <- '_cache/grid-search_positions.rda'
+if (!(has_name(.Options, 'ESM.recalculate') &&
+    getOption('ESM.recalculate')) &&
+    file.exists(cacheFile)) {
+  load(cacheFile)
+} else {
+  cl <- makeCluster(nCores)
+  clusterExport(cl, c("getScramblePosition", "robustScale"))
+  positions <- parApply(cl, d, 1, getScramblePosition)
+  stopCluster(cl)
+  
+  positions <- bind_rows(positions)
+  
+  # Mark whether positions participants are excluded with reasonable criteria
+  excluded <- trials %>% 
+    nest(d = c(-studyId, -studyVersion)) %>% 
+    mutate(d = map(d, getExcludedParticipants)) %>%
+    unnest(cols = d) %>%
+    mutate(uid = paste0(studyId, studyVersion, ' p', d))
+  
+  positions <- positions %>% 
+    mutate(
+      flat = influence_err_max == influence_err_min | choice_err_min == choice_err_max,
+      excluded = uid %in% excluded$uid
+    )
+  
+  save(positions, file = cacheFile)
+}
+
+tmp <- positions %>% 
+  filter(!flat) %>%
+  mutate(
+    position_proportion = position / (samples + 1),
+    study = str_match(uid, "(.+) p[0-9]+$")[,2]
+  )
+
+ggplot(tmp, aes(position_proportion)) +
+  geom_histogram(position = "identity", alpha = .5, bins = 10) +
+  facet_wrap(flat~vars, labeller = label_both) +
+  facet_wrap(~study) +
+  scale_y_continuous(limits = c(0, 15)) # match to null distribution
+
+# Does the difference in the influence/choice error range correlate with position?
+tmp <- tmp %>% 
+  mutate(
+    influence_err_diff = influence_err_max - influence_err_min,
+    choice_err_diff = choice_err_max - choice_err_min
+  ) %>%
+  pivot_longer(
+    ends_with("_diff"), 
+    names_to = "dimension", 
+    names_pattern = "(.+)_err_diff",
+    values_to = "error_difference"
+  )
+
+ggplot(tmp, aes(x = position_proportion, y = error_difference, colour = excluded)) +
+  geom_smooth(method = 'lm') +
+  geom_point(alpha = .25) +
+  facet_wrap(~dimension)
+
+lm(position_proportion ~ error_difference * excluded, data = tmp) %>% summary()
+  
+
+## Some examples for individual participants
+ids <- positions %>% 
+  filter(position >= samples) %>%
+  pull(uid) %>%
+  unique() %>% sample(12)
+sample_data <- trials %>% 
+    nest(data = -uid) %>%
+    filter(uid %in% ids) %>%
+    mutate(okay = map_lgl(data, ~ any(.$hasChoice, na.rm = T))) %>%
+    filter(okay) %>%
+    mutate(
+      data = map(data, ~select(
+        .,
+        trialId = id,
+        initialConfidence, 
+        advisorId, 
+        choice0,
+        choice1,
+        advisorAgrees, 
+        advisorInfluenceRaw
+      ) %>%
+        mutate(
+          initialConfidence.z = scale_or_zero(initialConfidence),
+          advisorIndex = as.numeric(factor(advisorId)),
+          across(
+            .cols = matches('choice[01]'), 
+            ~ as.numeric(factor(., levels = levels(factor(advisorId))))
+          ),
+          influenceProportion = findInfluenceProportion(
+            initialConfidence, advisorAgrees, advisorInfluenceRaw
+          ),
+          confidenceShift.z = scale_or_zero(influenceProportion),
+          n_influence = sum(!is.na(initialConfidence)),
+          n_choice = sum(!is.na(choice0) & !is.na(choice1)),
+          mean_conf = mean(initialConfidence, na.rm = T),
+          sd_conf = sd(initialConfidence, na.rm = T),
+          mean_agree = mean(advisorAgrees, na.rm = T),
+          advisor_variation = findAdvisorVariation(choice0, choice1, advisorIndex)
+        ) %>% 
+        select(
+          trialId,
+          initialConfidence.z,
+          advisorIndex,
+          choice0, 
+          choice1, 
+          advisorAgrees, 
+          confidenceShift.z,
+          n_influence,
+          n_choice,
+          mean_conf,
+          sd_conf,
+          mean_agree,
+          advisor_variation
+        ))
+    )
+dList <- list()
+nPerCore <- floor(nrow(sample_data) / nCores)
+for (i in 1:nCores) {
+  rows <- (1 + (i - 1) * nPerCore):(i * nPerCore)
+  dList[[i]] <- sample_data[rows, ] 
+}
+# Assign remainder
+if (nrow(sample_data) %% nCores > 0) {
+  for (i in 1:(nrow(sample_data) %% nCores)) {
+    dList[[i]] <- rbind(dList[[i]], sample_data[nrow(sample_data) - (i - 1), ])
+  }
+}
+cl <- makeCluster(nCores)
+clusterExport(cl, c("gridSearch"))
+dList <- parLapply(cl, dList, gridSearch)
+stopCluster(cl)
+model_data <- bind_rows(dList)
+
+for (id in sample(ids, 12)) {
+  my_d <- model_data %>% filter(uid == id)
+  trial_data <- sample_data %>%
+    filter(uid == id) %>%
+    select(data) %>% 
+    rowid_to_column() %>% 
+    filter(rowid == 1) %>% 
+    select(data) %>% 
+    unnest(cols = data)
+  gridExample <- my_d %>% 
+    mutate(
+      n_influence = map_int(data, ~unique(.$n_influence)),
+      n_choice = map_int(data, ~unique(.$n_choice)),
+      mean_conf = map_dbl(data, ~unique(.$mean_conf)),
+      sd_conf = map_dbl(data, ~unique(.$sd_conf)),
+      mean_agree = map_dbl(data, ~unique(.$mean_agree)),
+      advisor_variation = map_dbl(data, ~unique(.$advisor_variation))
+    ) %>%
+    select(-data, -okay, -params) %>% 
+    unnest(cols = y) %>%
+    mutate(measure = if_else(1:length(y) %% 2 == 1, 'choice', 'influence')) %>%
+    pivot_wider(names_from = measure, values_from = y) %>%
+    mutate(
+      across(
+        c(choice, influence), 
+        robustScale, 
+        trimAtSD = 3, 
+        .names = '{.col}_rz'
+      ),
+      combined = influence_rz + choice_rz
+    )
+  bestTrustUpdateValue <- gridExample %>%
+    filter(influence_rz == min(influence_rz, na.rm = T)) %>%
+    pull(trustUpdateRate) %>% 
+    unique() %>% .[[1]]
+  best <- gridExample %>% 
+    filter(combined == min(combined, na.rm = T))
+  
+  # Error on each trial
+  sample_df <- slice_sample(gridExample, prop = .25) %>%
+    mutate(source = 'other') %>%
+    bind_rows(best %>% mutate(source = 'best')) %>%
+    mutate(
+      detail = map2(
+        weightedSelection,
+        trustUpdateRate,
+        ~simulateFromData(trial_data, data.frame(a = .x, b = .y), T)
+      )
+    ) %>%
+      select(uid, weightedSelection, trustUpdateRate, detail, source) %>%
+      unnest(cols = detail) %>%
+      pivot_longer(
+        c(advisor_choice_error, advice_taking_error),
+        names_to = "dimension", 
+        values_to = "error"
+      )
+  print(
+    sample_df %>%
+      ggplot(aes(x = trialId, y = abs(error))) +
+      geom_line(alpha = .1) +
+      geom_line(colour = 'red', data = sample_df %>% filter(source == 'best')) +
+      facet_wrap(.~dimension, scales = 'free_y') +
+      labs(
+        title = "Error by trial number for random sample of parameters",
+        subtitle = "Best fitting model shown in red"
+      )
+  )
+  
+  # Error
+  print(
+    ggplot(gridExample, aes(x = weightedSelection, y = trustUpdateRate)) +
+      geom_contour_filled(aes(z = choice_rz)) +
+      geom_contour(aes(z = influence_rz)) + 
+      geom_hline(yintercept = bestTrustUpdateValue, linetype = 'dashed') +
+      geom_point(colour = 'red', shape = 8, size = 3, data = best) +
+      labs(
+        title = 'Mean-squared-error for influence (lines) and choice (shading)',
+        caption = paste0(
+          '* TRU = ', best$trustUpdateRate,
+          '; WS = ', best$weightedSelection,
+          '; ErrSum = ', round(best$combined, 4)
+        )
+      )
+  )
+  print(
+    gridExample %>% 
+      ggplot(aes(x = choice_rz, y = influence_rz)) +
+      geom_point(alpha = .1) +
+      geom_point(colour = 'red', shape = 1, size = 2, data = best[1,]) +
+      coord_fixed() +
+      labs(
+        title = 'Mean-squared-error correlation',
+        caption = 'Red circle surrounds best combined score'
+      )
+  )
+  # Is the error lower for the best values than for those parameters used on scrambled trial order?
+  cl <- makeCluster(detectCores() - 6)
+  nReps <- 1000
+  df <- d$data[d$uid == id][[1]]
+  params <- data.frame(
+    ws = best$weightedSelection[1], 
+    tru = best$trustUpdateRate[1]
+  )
+  clusterExport(cl, c('df', 'params'))
+  scrambledErr <- parSapply(
+    cl, 
+    1:nReps, 
+    function(x) adviseR::simulateFromData(dplyr::slice_sample(df, prop = 1), params)
+  )
+  stopCluster(cl)
+  scrambledErr <- t(scrambledErr) %>% as_tibble()
+  names(scrambledErr) <- c('choice', 'influence')
+  tmp <- scrambledErr %>%
+    mutate(source = 'scrambled') %>%
+    rbind(select(best[1, ], choice, influence) %>% mutate(source = 'real')) %>%
+    mutate(across(c(choice, influence), robustScale, 3, .names = "{col}_rz"))
+  if (all(is.na(tmp$choice_rz))) {
+    tmp <- mutate(tmp, combined_error_rz = influence_rz)
+  } else {
+    tmp <- mutate(tmp, combined_error_rz = influence_rz + choice_rz)
+  }
+  tmp <- tmp %>%
+      arrange(combined_error_rz) %>%
+      rowid_to_column('nth')
+  print(
+    tmp %>%
+      ggplot(aes(x = nth, y = combined_error_rz)) +
+      geom_vline(xintercept = tmp$nth[tmp$source == 'real']) +
+      geom_col(colour = NA) +
+      geom_col(fill = 'red', data = filter(tmp, source == 'real')) +
+      annotate(
+        geom = 'label', 
+        label = paste0(
+          tmp$nth[tmp$source == 'real'], '\n/\n', 
+          nrow(filter(tmp, is.finite(combined_error_rz))
+          )
+        ),
+        x = tmp$nth[tmp$source == 'real'], y = Inf, vjust = 1
+      ) +
+      labs(
+        caption = paste0(
+          best$uid,
+          "\nN trials = ", best$n_influence[1], 
+          "; N choice trials = ", best$n_choice[1],
+          "\nMean conf = ", round(best$mean_conf[1], 3), 
+          " +/- SD ", round(best$sd_conf[1], 3),
+          "\nMean agreement = ", round(best$mean_agree[1], 3),
+          "; Advisor variation = ", round(best$advisor_variation[1], 3)
+        )
+      )
+  )
+}
+```
+### Shuffled trials vs shuffled trials
+
+To illustrate that we're not just overfitting the data with our grid search and that we do in fact have a real temporal structure to fit, we repeat the best-parameters-vs-shuffled-data approach but fit the best parameters to shuffled data to begin with. 
+
+We expect to see a null distribution of positions of the original data vs shuffled trials because the true temporal signal in the real data will be absent both in the seed data and the other shuffled runs.
+
+```{r}
+cacheFile <- '_cache/grid-search_shuffled.rda'
+if (!(has_name(.Options, 'ESM.recalculate') &&
+    getOption('ESM.recalculate')) &&
+    file.exists(cacheFile)) {
+  load(cacheFile)
+} else {
+  # Take a subset for testing stuff
+  d <- trials %>% 
+    nest(data = -uid) %>%
+    mutate(
+      okay = map_lgl(data, ~ any(.$hasChoice, na.rm = T)),
+      data = map(data, ~ slice_sample(., prop = 1)) # shuffle trials once
+    ) %>%
+    filter(okay)
+  
+  
+  # * initialConfidence.z - initial confidence rating (standardized within participant)
+  # * advisorIndex - index of the advisor chosen (1 or 2; NA if no choice made)
+  # * choice0 - index of the first advisor offered in the choice (NA if no choice offered)
+  # * choice1 - index of the second advisor offered in the choice (NA if no choice offered)
+  # * advisorAgrees - whether the chosen advisor agrees (NA if no advice provided)
+  # * confidenceShift.z - influence proportion (standardized within participant)
+  d <- d %>%
+    mutate(
+      data = map(data, ~select(
+        .,
+        trialId = id,
+        initialConfidence, 
+        advisorId, 
+        choice0,
+        choice1,
+        advisorAgrees, 
+        advisorInfluenceRaw
+      ) %>%
+        mutate(
+          initialConfidence.z = scale_or_zero(initialConfidence),
+          advisorIndex = as.numeric(factor(advisorId)),
+          across(
+            .cols = matches('choice[01]'), 
+            ~ as.numeric(factor(., levels = levels(factor(advisorId))))
+          ),
+          influenceProportion = findInfluenceProportion(
+            initialConfidence, advisorAgrees, advisorInfluenceRaw
+          ),
+          confidenceShift.z = scale_or_zero(influenceProportion),
+          n_influence = sum(!is.na(initialConfidence)),
+          n_choice = sum(!is.na(choice0) & !is.na(choice1)),
+          mean_conf = mean(initialConfidence, na.rm = T),
+          sd_conf = sd(initialConfidence, na.rm = T),
+          mean_agree = mean(advisorAgrees, na.rm = T),
+          advisor_variation = findAdvisorVariation(choice0, choice1, advisorIndex)
+        ) %>% 
+        select(
+          trialId,
+          initialConfidence.z,
+          advisorIndex,
+          choice0, 
+          choice1, 
+          advisorAgrees, 
+          confidenceShift.z,
+          n_influence,
+          n_choice,
+          mean_conf,
+          sd_conf,
+          mean_agree,
+          advisor_variation
+        ))
+    ) 
+  
+  # For speed we now divvy up the data into roughly equal chunks based on the 
+  # number of cores available and run the model fitting in parallel on each.
+  dList <- list()
+  nPerCore <- floor(nrow(d) / nCores)
+  for (i in 1:nCores) {
+    rows <- (1 + (i - 1) * nPerCore):(i * nPerCore)
+    dList[[i]] <- d[rows, ] 
+  }
+  # Assign remainder
+  if (nrow(d) %% nCores > 0) {
+    for (i in 1:(nrow(d) %% nCores)) {
+      dList[[i]] <- rbind(dList[[i]], d[nrow(d) - (i - 1), ])
+    }
+  }
+  
+  cl <- makeCluster(nCores)
+  clusterExport(cl, c("gridSearch", "get_best", "robustScale"))
+  dList <- parLapply(cl, dList, function(x) get_best(gridSearch(x)))
+  stopCluster(cl)
+  
+  # rebuild d from dList
+  d <- NULL
+  for (i in 1:length(dList))
+    d <- rbind(d, dList[[i]])
+  
+  save(d, file = cacheFile)  
+}
+
+cacheFile <- '_cache/grid-search_shuffled-positions.rda'
+if (!(has_name(.Options, 'ESM.recalculate') &&
+    getOption('ESM.recalculate')) &&
+    file.exists(cacheFile)) {
+  load(cacheFile)
+} else {
+  cl <- makeCluster(nCores)
+  clusterExport(cl, c("getScramblePosition", "robustScale"))
+  pos <- parApply(cl, d, 1, getScramblePosition)
+  stopCluster(cl)
+  
+  pos <- bind_rows(pos)
+  
+  # Mark whether positions participants are excluded with reasonable criteria
+  excluded <- trials %>% 
+    nest(d = c(-studyId, -studyVersion)) %>% 
+    mutate(d = map(d, getExcludedParticipants)) %>%
+    unnest(cols = d) %>%
+    mutate(uid = paste0(studyId, studyVersion, ' p', d))
+  
+  pos <- pos %>% 
+    mutate(
+      flat = influence_err_max == influence_err_min | choice_err_min == choice_err_max,
+      excluded = uid %in% excluded$uid
+    )
+  
+  save(pos, file = cacheFile)
+}
+
+tmp_shuffled <- pos %>% 
+  filter(!flat) %>%
+  mutate(
+    position_proportion = position / (samples + 1),
+    study = str_match(uid, "(.+) p[0-9]+$")[,2]
+  )
+
+ggplot(tmp_shuffled, aes(position_proportion)) +
+  geom_histogram(position = "identity", alpha = .5, bins = 10) +
+  facet_wrap(flat~vars, labeller = label_both) +
+  facet_wrap(~study)
+
+# Does the difference in the influence/choice error range correlate with position?
+tmp_shuffled <- tmp_shuffled %>% 
+  mutate(
+    influence_err_diff = influence_err_max - influence_err_min,
+    choice_err_diff = choice_err_max - choice_err_min
+  ) %>%
+  pivot_longer(
+    ends_with("_diff"), 
+    names_to = "dimension", 
+    names_pattern = "(.+)_err_diff",
+    values_to = "error_difference"
+  )
+
+ggplot(tmp_shuffled, aes(x = position_proportion, y = error_difference, colour = excluded)) +
+  geom_smooth(method = 'lm') +
+  geom_point(alpha = .25) +
+  facet_wrap(~dimension)
+
+lm(position_proportion ~ error_difference * excluded, data = tmp) %>% summary()
+  
 ```
