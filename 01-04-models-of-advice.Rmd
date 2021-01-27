@@ -320,7 +320,9 @@ trials <- trials %>%
 
 
 cacheFile <- '_cache/model-fit.rda'
-if (!getOption('ESM.recalculate') & file.exists(cacheFile)) {
+if (!(has_name(.Options, 'ESM.recalculate') &&
+    getOption('ESM.recalculate')) &&
+    file.exists(cacheFile)) {
   load(cacheFile)
 } else {
   # Let's have everyone run their data through a model where they are cumulatively 
@@ -821,6 +823,12 @@ if (!(has_name(.Options, 'ESM.recalculate') &&
     }
   }
   
+  ### !TODO Why does this step duplicate 298 times the value for 
+  ### AgreementAgreement p68 ? (dList[[9]][40, ])
+  ### Running it through get_best(gridSearch(x)) individually works
+  ### and it's not duplicated in the dList to begin with.
+  ### Using a simpler function e.g. function(x) {unique(x[,'uid'])}
+  ### does not reproduce the problem.
   cl <- makeCluster(nCores)
   clusterExport(cl, c("gridSearch", "get_best", "robustScale"))
   dList <- parLapply(cl, dList, function(x) get_best(gridSearch(x)))
@@ -863,21 +871,21 @@ if (!(has_name(.Options, 'ESM.recalculate') &&
   save(positions, file = cacheFile)
 }
 
-tmp <- positions %>% 
+positions_summary <- positions %>% 
   filter(!flat) %>%
   mutate(
     position_proportion = position / (samples + 1),
     study = str_match(uid, "(.+) p[0-9]+$")[,2]
   )
 
-ggplot(tmp, aes(position_proportion)) +
+ggplot(positions_summary, aes(position_proportion)) +
   geom_histogram(position = "identity", alpha = .5, bins = 10) +
   facet_wrap(flat~vars, labeller = label_both) +
   facet_wrap(~study) +
   scale_y_continuous(limits = c(0, 15)) # match to null distribution
 
 # Does the difference in the influence/choice error range correlate with position?
-tmp <- tmp %>% 
+tmp <- positions_summary %>% 
   mutate(
     influence_err_diff = influence_err_max - influence_err_min,
     choice_err_diff = choice_err_max - choice_err_min
@@ -1256,20 +1264,20 @@ if (!(has_name(.Options, 'ESM.recalculate') &&
   save(pos, file = cacheFile)
 }
 
-tmp_shuffled <- pos %>% 
+positions_summary_shuffled <- pos %>% 
   filter(!flat) %>%
   mutate(
     position_proportion = position / (samples + 1),
     study = str_match(uid, "(.+) p[0-9]+$")[,2]
   )
 
-ggplot(tmp_shuffled, aes(position_proportion)) +
+ggplot(positions_summary_shuffled, aes(position_proportion)) +
   geom_histogram(position = "identity", alpha = .5, bins = 10) +
   facet_wrap(flat~vars, labeller = label_both) +
   facet_wrap(~study)
 
 # Does the difference in the influence/choice error range correlate with position?
-tmp_shuffled <- tmp_shuffled %>% 
+tmp_shuffled <- positions_summary_shuffled %>% 
   mutate(
     influence_err_diff = influence_err_max - influence_err_min,
     choice_err_diff = choice_err_max - choice_err_min
@@ -1286,6 +1294,24 @@ ggplot(tmp_shuffled, aes(x = position_proportion, y = error_difference, colour =
   geom_point(alpha = .25) +
   facet_wrap(~dimension)
 
-lm(position_proportion ~ error_difference * excluded, data = tmp) %>% summary()
+lm(position_proportion ~ error_difference * excluded, data = tmp_shuffled) %>% summary()
   
+```
+
+### How does the real vs shuffled position stack up?
+
+```{r}
+
+mix <- positions_summary %>% 
+  transmute(uid, position_proportion, type = 'real') %>%
+  bind_rows(
+    positions_summary_shuffled %>%
+      transmute(uid, position_proportion, type = 'shuffled')
+  )
+
+ggplot(mix, aes(x = type, y = position_proportion, group = uid)) +
+  geom_line(alpha = .2) +
+  stat_summary(geom = 'line', aes(group = 1), linetype = 'dashed', fun = mean) +
+  scale_y_continuous(limits = c(0, 1))
+
 ```
