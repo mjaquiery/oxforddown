@@ -528,7 +528,7 @@ We also aren't sure whether it's going to spit out parameters we can actually us
 So we'll use the package directly and fit some behavioural data to it.
 But first we want to see what some of the landscapes look like for grid search to work out what our best search strategy is likely to be.
 
-```{r grid search}
+```{r grid search setup}
 source('scripts_and_filters/general_setup.R')
 library(parallel)
 library(adviseR)
@@ -543,7 +543,7 @@ robustScale <- function(x, trimAtSD) {
   scale(ifelse(abs(x_scale) < trimAtSD, x, NA_real_))
 }
 
-#' Return the amount that confidence shifted in the directly of the advice,
+#' Return the amount that confidence shifted in the direction of the advice,
 #' divided by the maximum amount confidence could have shifted in that direction.
 #' @param initialConfidence participant's initial confidence rating 
 #' @param advisorAgrees whether the advisor agrees with the participant 
@@ -736,7 +736,9 @@ getExcludedParticipants <- function(
     filter(n_exclusions > 0) %>%
     pull(pid)
 }
+```
 
+```{r grid search}
 select_experiment('dotstask')
 trials <- trials %>% 
   mutate(uid = factor(paste0(studyId, studyVersion, ' p', pid)))
@@ -829,6 +831,7 @@ if (!(has_name(.Options, 'ESM.recalculate') &&
   ### and it's not duplicated in the dList to begin with.
   ### Using a simpler function e.g. function(x) {unique(x[,'uid'])}
   ### does not reproduce the problem.
+  ### - Think this is because it can't find a unique value for choice
   cl <- makeCluster(nCores)
   clusterExport(cl, c("gridSearch", "get_best", "robustScale"))
   dList <- parLapply(cl, dList, function(x) get_best(gridSearch(x)))
@@ -1315,3 +1318,534 @@ ggplot(mix, aes(x = type, y = position_proportion, group = uid)) +
   scale_y_continuous(limits = c(0, 1))
 
 ```
+
+### Trying to figure out what's up with these really bad models by comparing good vs bad people
+
+```{r}
+
+if (!("trials" %in% ls())) {
+  select_experiment('dotstask')
+  trials <- trials %>% 
+    mutate(uid = factor(paste0(studyId, studyVersion, ' p', pid)))
+}
+if (!("positions_summary" %in% ls())) {
+  load('_cache/grid-search_positions.rda')  
+  positions_summary <- positions %>% 
+    filter(!flat) %>%
+    mutate(
+      position_proportion = position / (samples + 1),
+      study = str_match(uid, "(.+) p[0-9]+$")[,2]
+    )
+}
+
+
+uids <- positions_summary %>% 
+  group_by(uid) %>% 
+  summarise(sample_position = case_when(
+    position == 1 ~ "good",
+    position >= samples ~ "bad",
+    T ~ "okay"
+  ), .groups = "drop")
+
+everyone <- trials %>% 
+  nest(data = -uid) %>%
+  mutate(
+    okay = map_lgl(data, ~ any(.$hasChoice, na.rm = T))
+  ) %>%
+  filter(okay) %>%
+  left_join(
+    uids, by = "uid"
+  )
+
+everyone <- everyone %>%
+  mutate(
+    data = map(data, ~select(
+      .,
+      trialId = id,
+      initialConfidence, 
+      advisorId, 
+      choice0,
+      choice1,
+      advisorAgrees, 
+      advisorInfluenceRaw
+    ) %>%
+      mutate(
+        initialConfidence.z = scale_or_zero(initialConfidence),
+        advisorIndex = as.numeric(factor(advisorId)),
+        across(
+          .cols = matches('choice[01]'), 
+          ~ as.numeric(factor(., levels = levels(factor(advisorId))))
+        ),
+        influenceProportion = findInfluenceProportion(
+          initialConfidence, advisorAgrees, advisorInfluenceRaw
+        ),
+        confidenceShift.z = scale_or_zero(influenceProportion),
+        n_influence = sum(!is.na(initialConfidence)),
+        n_choice = sum(!is.na(choice0) & !is.na(choice1)),
+        mean_conf = mean(initialConfidence, na.rm = T),
+        sd_conf = sd(initialConfidence, na.rm = T),
+        mean_agree = mean(advisorAgrees, na.rm = T),
+        advisor_variation = findAdvisorVariation(choice0, choice1, advisorIndex)
+      ))
+  ) 
+
+everyone <- everyone %>% 
+  mutate(
+    colour = case_when(
+      sample_position == "good" ~ "darkgreen",
+      sample_position == "okay" ~ "lightblue",
+      sample_position == "bad" ~ "red"
+    )
+  ) %>% 
+  mutate(
+    gg = pmap(
+      .,
+      function(data, sample_position, uid, colour, ...) {
+        ggplot(data, aes(initialConfidence)) + 
+        geom_histogram(binwidth = 1, fill = colour) + 
+        labs(title = glue("Group = { sample_position }; UID { uid }"))
+      }
+    )
+  ) 
+
+everyone %>% slice_sample(n = 100) %>% .$gg %>% print()
+
+```
+
+
+### Simulate participants
+
+The models so far look to be a pretty terrible fit to the participants' data. 
+This could be because the models are incoherent or because the participants' data do not clearly instantiate the models. 
+We will simulate some participant data on the basis of the models we are fitting: simulants will start with a random preference between advisors, update their preference based on agreement, and be influenced in their answers based on the advisors' advice.
+If we see that we can apply our model fitting procedure to these data and consistently fit the specific simulated data better than shuffled simulated data, we can conclude that the model fitting process works in principle, and that therefore the models are simply not a good fit to participants' behaviour.
+
+To keep everything else as similar as possible, we will use participant data to generate: the initial confidence, the mean and standard deviation of the confidence shifts, and the advisor agreement rates (but not advisor chosen).
+
+```{r simulate participants prep}
+
+#' Generate a simulant's seed info from a participant's data
+#' @param p participant data to generate simulation from
+#' @param updateRate value of the updateRate parameter or c(min, max) for runif
+participant_to_simulant <- function(p, updateRate = c(0, .2)) {
+  # Static simulant properties
+  if (length(updateRate) > 1)
+    updateRate <- runif(1, min = updateRate[1], max = updateRate[2])
+  
+  initial_advisor_trust_sd <- .25
+  shift_sd <- attr(p$confidenceShift.z, 'scaled:scale')
+  shift_noise_sd <- shift_sd / 3
+  # vector of agreement rates where index = advisor index
+  agreement <- p %>% 
+    group_by(advisorIndex) %>% 
+    summarise(agreement = mean(advisorAgrees), .groups = 'drop') %>%
+    pull(agreement)
+  initial_advisor_trust <- rnorm(
+    length(agreement), mean = .5, sd = initial_advisor_trust_sd
+  )
+  initial_advisor_trust <- pmin(1, pmax(0, initial_advisor_trust))
+  # simulant data frame with clean data
+  simulant <- p %>% 
+    select(
+      trialId, 
+      initialConfidence.z, 
+      advisorIndex, 
+      choice0, 
+      choice1, 
+      advisorAgrees,
+      confidenceShift.z
+    ) %>%
+    mutate(
+      advisorIndex = if_else(is.na(choice0), advisorIndex, NA_real_), 
+      advisorAgrees = if_else(is.na(choice0), advisorAgrees, NA), 
+      confidenceShift.z = NA_real_
+    )
+  # Calculate the trust update round by round
+  # This is going to be painfully slow
+  for (r in simulant$trialId) {
+    if (is.na(simulant$choice0[r]) && is.na(simulant$advisorIndex[r]))
+      next()
+    so_far <- simulant[1:r, ]
+    trust <- adviseR:::trustUpdate(
+      matrix(
+        rep(initial_advisor_trust, nrow(so_far)), 
+        nrow = nrow(so_far), 
+        ncol = length(initial_advisor_trust),
+        byrow = T
+      ),
+      so_far$advisorIndex,
+      so_far$advisorAgrees,
+      updateRate
+    )
+    if (!is.na(simulant$choice0[r])) {
+      # choose an advisor probabilistically based on trust
+      p_choose_0 <- trust[nrow(trust), simulant$choice0[r]] /
+        sum(trust[nrow(trust), c(simulant$choice0[r], simulant$choice1[r])])
+      simulant$advisorIndex[r] = ifelse(
+        runif(1) < p_choose_0, 
+        simulant$choice0[r],
+        simulant$choice1[r]
+      )
+      # Advisor agrees probabilistically based on empirical agreement rate
+      simulant$advisorAgrees[r] = runif(1) < agreement[simulant$advisorIndex[r]]
+    }
+    # Update confidenceShift
+    if (is.null(shift_sd))
+      simulant$confidenceShift.z[r] = 0
+    else
+      simulant$confidenceShift.z[r] = rnorm(
+        1, 
+        # Mean is based on trust in the advisor with a bit of noise
+        mean = trust[nrow(trust), simulant$advisorIndex[r]] - .5 + rnorm(1, sd = shift_noise_sd),
+        sd = shift_sd
+      )
+  }
+  
+  simulant
+}
+
+
+```
+
+
+#### Model fitting to simulants
+
+```{r fit model to simulants}
+cacheFile <- '_cache/grid-search_best_simulants.rda'
+if (!(has_name(.Options, 'ESM.recalculate') &&
+    getOption('ESM.recalculate')) &&
+    file.exists(cacheFile)) {
+  load(cacheFile)
+} else {
+  
+  d.sim <- d %>%
+    select(uid, data, okay) %>%
+    mutate(data = map(data, participant_to_simulant))
+  
+  # Take a subset for testing stuff
+  # d.sim <- d.sim %>% slice_sample(n = 16)
+  
+  # For speed we now divvy up the data into roughly equal chunks based on the 
+  # number of cores available and run the model fitting in parallel on each.
+  dList <- list()
+  nPerCore <- floor(nrow(d.sim) / nCores)
+  for (i in 1:nCores) {
+    rows <- (1 + (i - 1) * nPerCore):(i * nPerCore)
+    dList[[i]] <- d.sim[rows, ] 
+  }
+  # Assign remainder
+  if (nrow(d.sim) %% nCores > 0) {
+    for (i in 1:(nrow(d.sim) %% nCores)) {
+      dList[[i]] <- rbind(dList[[i]], d.sim[nrow(d.sim) - (i - 1), ])
+    }
+  }
+  
+  cl <- makeCluster(nCores)
+  clusterExport(cl, c("gridSearch", "get_best", "robustScale"))
+  dList <- parLapply(cl, dList, function(x) get_best(gridSearch(x)))
+  stopCluster(cl)
+  
+  # rebuild d.sim from dList
+  d.sim <- NULL
+  for (i in 1:length(dList))
+    d.sim <- rbind(d.sim, dList[[i]])
+  
+  save(d.sim, file = cacheFile)  
+}
+
+cacheFile <- '_cache/grid-search_positions_simulants.rda'
+if (!(has_name(.Options, 'ESM.recalculate') &&
+    getOption('ESM.recalculate')) &&
+    file.exists(cacheFile)) {
+  load(cacheFile)
+} else {
+  cl <- makeCluster(nCores)
+  clusterExport(cl, c("getScramblePosition", "robustScale"))
+  positions.sim <- parApply(cl, d.sim, 1, getScramblePosition)
+  stopCluster(cl)
+  
+  positions.sim <- bind_rows(positions.sim)
+  
+  # Mark whether positions participants are excluded with reasonable criteria
+  if (is.null(excluded))
+    excluded <- trials %>% 
+      nest(d = c(-studyId, -studyVersion)) %>% 
+      mutate(d = map(d.sim, getExcludedParticipants)) %>%
+      unnest(cols = d.sim) %>%
+      mutate(uid = paste0(studyId, studyVersion, ' p', d.sim))
+  
+  positions.sim <- positions.sim %>% 
+    mutate(
+      flat = influence_err_max == influence_err_min | choice_err_min == choice_err_max,
+      excluded = uid %in% excluded$uid
+    )
+  
+  save(positions.sim, file = cacheFile)
+}
+
+positions_summary.sim <- positions.sim %>% 
+  filter(!flat) %>%
+  mutate(
+    position_proportion = position / (samples + 1),
+    study = str_match(uid, "(.+) p[0-9]+$")[,2]
+  )
+
+ggplot(positions_summary.sim, aes(position_proportion)) +
+  geom_histogram(position = "identity", alpha = .5, bins = 10) +
+  facet_wrap(flat~vars, labeller = label_both) +
+  facet_wrap(~study) +
+  scale_y_continuous(limits = c(0, 15)) # match to null distribution
+
+# Does the difference in the influence/choice error range correlate with position?
+tmp <- positions_summary.sim %>% 
+  mutate(
+    influence_err_diff = influence_err_max - influence_err_min,
+    choice_err_diff = choice_err_max - choice_err_min
+  ) %>%
+  pivot_longer(
+    ends_with("_diff"), 
+    names_to = "dimension", 
+    names_pattern = "(.+)_err_diff",
+    values_to = "error_difference"
+  )
+
+ggplot(tmp, aes(x = position_proportion, y = error_difference, colour = excluded)) +
+  geom_smooth(method = 'lm') +
+  geom_point(alpha = .25) +
+  facet_wrap(~dimension)
+
+lm(position_proportion ~ error_difference * excluded, data = tmp) %>% summary()
+
+```
+
+#### No noise
+
+
+```{r simulate participants prep}
+
+#' Generate a simulant's seed info from a participant's data
+#' @param p participant data to generate simulation from
+#' @param updateRate value of the updateRate parameter or c(min, max) for runif
+participant_to_simulant_no_noise <- function(p, updateRate = .1) {
+  # Static simulant properties
+  if (length(updateRate) > 1)
+    updateRate <- runif(1, min = updateRate[1], max = updateRate[2])
+  
+  initial_advisor_trust_sd <- .25
+  shift_sd <- attr(p$confidenceShift.z, 'scaled:scale')
+  shift_noise_sd <- 0
+  # vector of agreement rates where index = advisor index
+  agreement <- p %>% 
+    group_by(advisorIndex) %>% 
+    summarise(agreement = mean(advisorAgrees), .groups = 'drop') %>%
+    pull(agreement)
+  initial_advisor_trust <- rnorm(
+    length(agreement), mean = .5, sd = initial_advisor_trust_sd
+  )
+  initial_advisor_trust <- pmin(1, pmax(0, initial_advisor_trust))
+  # simulant data frame with clean data
+  simulant <- p %>% 
+    select(
+      trialId, 
+      initialConfidence.z, 
+      advisorIndex, 
+      choice0, 
+      choice1, 
+      advisorAgrees,
+      confidenceShift.z
+    ) %>%
+    mutate(
+      advisorIndex = if_else(is.na(choice0), advisorIndex, NA_real_), 
+      advisorAgrees = if_else(is.na(choice0), advisorAgrees, NA), 
+      confidenceShift.z = NA_real_
+    )
+  # Calculate the trust update round by round
+  # This is going to be painfully slow
+  for (r in simulant$trialId) {
+    if (is.na(simulant$choice0[r]) && is.na(simulant$advisorIndex[r]))
+      next()
+    so_far <- simulant[1:r, ]
+    trust <- adviseR:::trustUpdate(
+      matrix(
+        rep(initial_advisor_trust, nrow(so_far)), 
+        nrow = nrow(so_far), 
+        ncol = length(initial_advisor_trust),
+        byrow = T
+      ),
+      so_far$advisorIndex,
+      so_far$advisorAgrees,
+      updateRate
+    )
+    if (!is.na(simulant$choice0[r])) {
+      # choose an advisor probabilistically based on trust
+      p_choose_0 <- trust[nrow(trust), simulant$choice0[r]] /
+        sum(trust[nrow(trust), c(simulant$choice0[r], simulant$choice1[r])])
+      simulant$advisorIndex[r] = ifelse(
+        runif(1) < p_choose_0, 
+        simulant$choice0[r],
+        simulant$choice1[r]
+      )
+      # Advisor agrees probabilistically based on empirical agreement rate
+      simulant$advisorAgrees[r] = runif(1) < agreement[simulant$advisorIndex[r]]
+    }
+    # Update confidenceShift
+    if (is.null(shift_sd))
+      simulant$confidenceShift.z[r] = 0
+    else
+      simulant$confidenceShift.z[r] = rnorm(
+        1, 
+        # Mean is based on trust in the advisor with a bit of noise
+        mean = trust[nrow(trust), simulant$advisorIndex[r]] - .5 + rnorm(1, sd = shift_noise_sd),
+        sd = shift_sd
+      )
+  }
+  
+  simulant
+}
+
+
+```
+
+
+#### Model fitting to simulants
+
+```{r fit model to simulants}
+cacheFile <- '_cache/grid-search_best_simulants_no-noise.rda'
+if (!(has_name(.Options, 'ESM.recalculate') &&
+    getOption('ESM.recalculate')) &&
+    file.exists(cacheFile)) {
+  load(cacheFile)
+} else {
+  d.sim.nonoise <- d %>%
+    select(uid, data, okay) %>%
+    mutate(data = map(data, participant_to_simulant_no_noise))
+  d.sim.bak <- d.sim.nonoise
+  # Take a subset for testing stuff
+  # d.sim <- d.sim %>% slice_sample(n = 16)
+  
+  # For speed we now divvy up the data into roughly equal chunks based on the 
+  # number of cores available and run the model fitting in parallel on each.
+  dList <- list()
+  nPerCore <- floor(nrow(d.sim.nonoise) / nCores)
+  for (i in 1:nCores) {
+    rows <- (1 + (i - 1) * nPerCore):(i * nPerCore)
+    dList[[i]] <- d.sim.nonoise[rows, ] 
+  }
+  # Assign remainder
+  if (nrow(d.sim.nonoise) %% nCores > 0) {
+    for (i in 1:(nrow(d.sim.nonoise) %% nCores)) {
+      dList[[i]] <- rbind(dList[[i]], d.sim.nonoise[nrow(d.sim.nonoise) - (i - 1), ])
+    }
+  }
+  
+  cl <- makeCluster(nCores)
+  clusterExport(cl, c("gridSearch", "get_best", "robustScale"))
+  dList <- parLapply(cl, dList, function(x) get_best(gridSearch(x)))
+  stopCluster(cl)
+  
+  # rebuild d.sim from dList
+  d.sim.nonoise <- NULL
+  for (i in 1:length(dList))
+    d.sim.nonoise <- rbind(d.sim.nonoise, dList[[i]])
+  
+  save(d.sim.nonoise, file = cacheFile)  
+}
+
+cacheFile <- '_cache/grid-search_positions_simulants_no-noise.rda'
+if (!(has_name(.Options, 'ESM.recalculate') &&
+    getOption('ESM.recalculate')) &&
+    file.exists(cacheFile)) {
+  load(cacheFile)
+} else {
+  cl <- makeCluster(nCores)
+  clusterExport(cl, c("getScramblePosition", "robustScale"))
+  positions.sim.nonoise <- parApply(cl, d.sim.nonoise, 1, getScramblePosition)
+  stopCluster(cl)
+  
+  positions.sim.nonoise <- bind_rows(positions.sim.nonoise)
+  
+  # Mark whether positions participants are excluded with reasonable criteria
+  if (is.null(excluded))
+    excluded <- trials %>% 
+      nest(d = c(-studyId, -studyVersion)) %>% 
+      mutate(d = map(d.sim.nonoise, getExcludedParticipants)) %>%
+      unnest(cols = d.sim.nonoise) %>%
+      mutate(uid = paste0(studyId, studyVersion, ' p', d.sim.nonoise))
+  
+  positions.sim.nonoise <- positions.sim.nonoise %>% 
+    mutate(
+      flat = influence_err_max == influence_err_min | choice_err_min == choice_err_max,
+      excluded = uid %in% excluded$uid
+    )
+  
+  save(positions.sim.nonoise, file = cacheFile)
+}
+
+positions_summary.sim.nonoise <- positions.sim.nonoise %>% 
+  filter(!flat) %>%
+  mutate(
+    position_proportion = position / (samples + 1),
+    study = str_match(uid, "(.+) p[0-9]+$")[,2]
+  )
+
+ggplot(positions_summary.sim.nonoise, aes(position_proportion)) +
+  geom_histogram(position = "identity", alpha = .5, bins = 10) +
+  facet_wrap(flat~vars, labeller = label_both) +
+  facet_wrap(~study) +
+  scale_y_continuous(limits = c(0, 15)) # match to null distribution
+
+# Does the difference in the influence/choice error range correlate with position?
+tmp <- positions_summary.sim.nonoise %>% 
+  mutate(
+    influence_err_diff = influence_err_max - influence_err_min,
+    choice_err_diff = choice_err_max - choice_err_min
+  ) %>%
+  pivot_longer(
+    ends_with("_diff"), 
+    names_to = "dimension", 
+    names_pattern = "(.+)_err_diff",
+    values_to = "error_difference"
+  )
+
+ggplot(tmp, aes(x = position_proportion, y = error_difference, colour = excluded)) +
+  geom_smooth(method = 'lm') +
+  geom_point(alpha = .25) +
+  facet_wrap(~dimension)
+
+lm(position_proportion ~ error_difference * excluded, data = tmp) %>% summary()
+
+```
+
+### Questions:
+#### Why are the numbers different in the simulations?
+The different numbers are due to excluding different numbers of participants due to 'flat' graphs - i.e. graphs where there is no differentiation in error across the shuffled datasets (e.g. because all confidence and picks are the same, so the order doesn't matter).
+#### How do the positions for each participant stack up across real/scrambled/simulated/noise-free-simulated data?
+
+```{r positions comparisons}
+
+position_comparison <- rbind(
+  positions_summary_shuffled %>% mutate(type = 'shuffled'),
+  positions_summary %>% mutate(type = 'real'),
+  positions_summary.sim %>% mutate(type = 'simulated'),
+  positions_summary.sim.nonoise %>% mutate(type = 'sim_no-noise')
+) %>%
+  mutate(type = factor(type, levels = c(
+    'real', 'shuffled', 'simulated', 'sim_no-noise'
+  )))
+
+ggplot(
+  position_comparison, 
+  aes(x = type, y = position_proportion, colour = excluded)
+) +
+  geom_line(aes(group = uid), alpha = .1) +
+  stat_summary(
+    geom = 'line', 
+    aes(group = 1), 
+    linetype = 'dashed',
+    fun = mean
+  ) +
+  facet_wrap(~study)
+  
+
+```
+

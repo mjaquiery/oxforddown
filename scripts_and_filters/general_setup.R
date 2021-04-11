@@ -15,6 +15,7 @@ rm(list = ls())
 # Load libraries which are widely shared by the chapter files
 
 library(tidyverse)  # Pipes, tidyselectors, string manipulation, data wrangling, etc.
+library(glue)
 library(kableExtra) # Pretty formatting of output tables
 library(esmData)    # My own data package holding the data for the project (`remotes::install_github('oxacclab/esmData')`)
 library(prettyMD)   # My own formatting library for neatly formatting stats output (`remotes::install_github('mjaquiery/prettyMD)`)
