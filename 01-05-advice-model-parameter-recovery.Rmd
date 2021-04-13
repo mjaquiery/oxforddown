@@ -409,7 +409,7 @@ t1 <- Sys.time()
 gs <- sim %>%
   mutate(uid = 'sim') %>%
   nest(data = -uid) %>%
-  gridSearch(grid = tidyr::crossing(a = seq(-1, 5, .005), b = seq(-.5, 1.5, .01)))
+  gridSearch(grid = tidyr::crossing(a = seq(-1, 5, .01), b = seq(-.5, 1.5, .01)))
 Sys.time() - t1
 
 visualiseGrid(
@@ -557,8 +557,8 @@ simulants <- parameters %>%
   unnest(cols = params)
 
 simulants
-shuffled_simulants <- simulants %>% 
-  mutate(data = map(data, slice_sample, prop = 1))
+shuffled_simulants <- simulants %>%
+  mutate(data = map(data, ~ mutate(., advisorAgrees = sample(.$advisorAgrees))))
 ```
 
 ```{r visualise simulants data}
@@ -596,36 +596,43 @@ t1 <- Sys.time()
 
 
 for (s in 1:nrow(simulants)) {
-  sim <- simulants[s,  ] %>%
-    crossing(tibble(run = 1:100))
-  
-  gd <- sim %>%
-    mutate(gd = map(data, ~ gradientDescent(.) %>% gradientDescentSummary())) %>%
-    unnest(cols = gd)
-  
-  best <- gd %>% filter(tu_error + ws_error == min(tu_error + ws_error))
-  real <- adviseR::simulateFromData(
-    sim$data[[1]],
-    tibble(w = sim$weightedSelection[1], tu = sim$trustUpdateRate[1])
-  )
-  results <- bind_rows(
-    results,
-    best %>% mutate(type = 'best'), 
-    tibble(
-      uid = sim$uid[1],
-      ws_end = sim$weightedSelection[1],
-      tu_end = sim$trustUpdateRate[1],
-      ws_error = real[1],
-      tu_error = real[2],
-      type = 'real'
+  for (type in c('simulants', 'shuffled_simulants')) {
+    sim <- get(type)[s,  ] %>%
+      crossing(tibble(run = 1:100))
+    
+    gd <- sim %>%
+      mutate(gd = map(data, ~ gradientDescent(.) %>% gradientDescentSummary())) %>%
+      unnest(cols = gd)
+    
+    best <- gd %>% filter(tu_error + ws_error == min(tu_error + ws_error))
+    real <- adviseR::simulateFromData(
+      sim$data[[1]],
+      tibble(w = sim$weightedSelection[1], tu = sim$trustUpdateRate[1])
     )
-  )
+    results <- bind_rows(
+      results,
+      best %>% mutate(coefs = 'best', source = type), 
+      tibble(
+        uid = sim$uid[1],
+        ws_end = sim$weightedSelection[1],
+        tu_end = sim$trustUpdateRate[1],
+        ws_error = real[1],
+        tu_error = real[2],
+        coefs = 'real', 
+        source = type
+      )
+    )
+    
+    print(ggplot(gd, aes(x = tu_end, y = ws_end, fill = tu_error + ws_error)) +
+            geom_point(size = 4, alpha = .25) +
+            geom_point(size = 4, colour = 'red', data = best) +
+            annotate(geom = 'point', shape = 8, size = 4, colour = 'black', x = best$trustUpdateRate[1], y = best$weightedSelection[1]) +
+            labs(
+              caption = glue('Target: tu = {round(best$trustUpdateRate[1], 4)}, ws = {round(best$weightedSelection[1], 4)}'),
+              title = type
+            ))
+  }
   
-  print(ggplot(gd, aes(x = tu_end, y = ws_end, fill = tu_error + ws_error)) +
-          geom_point(size = 4, alpha = .25) +
-          geom_point(size = 4, colour = 'red', data = best) +
-          annotate(geom = 'point', shape = 8, size = 4, colour = 'black', x = best$trustUpdateRate[1], y = best$weightedSelection[1]) +
-          labs(caption = glue('Target: tu = {round(best$trustUpdateRate[1], 4)}, ws = {round(best$weightedSelection[1], 4)}')))
 }
 
 print(Sys.time() - t1)
@@ -635,9 +642,9 @@ print(Sys.time() - t1)
 ```{r parameter recovery demo evaluation}
 
 tmp <- results %>% 
-  select(uid, ws_end, tu_end, type) %>%
+  select(uid, ws_end, tu_end, coefs, source) %>%
   pivot_longer(matches('_end'), names_to = 'parameter', values_to = 'coefficient') %>%
-  pivot_wider(names_from = type, values_from = coefficient)
+  pivot_wider(names_from = coefs, values_from = coefficient)
 
 for (p in unique(tmp$parameter)) {
   print(
@@ -649,9 +656,119 @@ for (p in unique(tmp$parameter)) {
       geom_point() +
       geom_smooth(method = 'lm', formula = 'y ~ x') +
       coord_fixed() +
-      facet_wrap(~parameter)
+      facet_wrap(~source)
   )
 }
 
 ```
 
+## Parameter recovery with 10 trials
+
+```{r short parameter recovery setup}
+
+simulants.short <- simulants %>% 
+  mutate(data = map(data, ~ .[1:30, ]))
+shuffled_simulants.short <- simulants.short %>%
+  mutate(data = map(data, ~ mutate(., advisorAgrees = sample(.$advisorAgrees))))
+```
+
+```{r short visualise simulants data}
+
+for (i in 1:nrow(simulants.short)) {
+  print(visualiseRun(simulants.short$data[[i]]) + labs(title = 'sim'))
+  print(visualiseRun(shuffled_simulants.short$data[[i]]) + labs(title = 'sim_shuffled'))
+}
+
+```
+
+```{r short visualise simulant grid example}
+t1 <- Sys.time()
+
+for (i in 1:nrow(simulants.short)) {
+  print(visualiseGrid(
+    gridSearch(simulants.short[i, ]), 
+    target_value = simulants.short[i, c('trustUpdateRate', 'weightedSelection')]
+  ) + labs(title = 'sim'))
+  print(visualiseGrid(
+    gridSearch(shuffled_simulants.short[i, ]), 
+    target_value = simulants.short[i, c('trustUpdateRate', 'weightedSelection')]
+  ) + labs(title = 'sim_suffle'))
+}
+  
+
+Sys.time() - t1
+```
+
+```{r short parameter recovery demo}
+
+results.short <- NULL
+
+t1 <- Sys.time()
+
+
+for (s in 1:nrow(simulants.short)) {
+  for (type in c('simulants.short', 'shuffled_simulants.short')) {
+    sim <- get(type)[s,  ] %>%
+      crossing(tibble(run = 1:100))
+    
+    gd <- sim %>%
+      mutate(gd = map(data, ~ gradientDescent(.) %>% gradientDescentSummary())) %>%
+      unnest(cols = gd)
+    
+    best <- gd %>% filter(tu_error + ws_error == min(tu_error + ws_error))
+    real <- adviseR::simulateFromData(
+      sim$data[[1]],
+      tibble(w = sim$weightedSelection[1], tu = sim$trustUpdateRate[1])
+    )
+    results.short <- bind_rows(
+      results.short,
+      best %>% mutate(coefs = 'best', source = type), 
+      tibble(
+        uid = sim$uid[1],
+        ws_end = sim$weightedSelection[1],
+        tu_end = sim$trustUpdateRate[1],
+        ws_error = real[1],
+        tu_error = real[2],
+        coefs = 'real', 
+        source = type
+      )
+    )
+    
+    print(ggplot(gd, aes(x = tu_end, y = ws_end, fill = tu_error + ws_error)) +
+            geom_point(size = 4, alpha = .25) +
+            geom_point(size = 4, colour = 'red', data = best) +
+            annotate(geom = 'point', shape = 8, size = 4, colour = 'black', x = best$trustUpdateRate[1], y = best$weightedSelection[1]) +
+            labs(
+              caption = glue('Target: tu = {round(best$trustUpdateRate[1], 4)}, ws = {round(best$weightedSelection[1], 4)}'),
+              title = type
+            ))
+  }
+  
+}
+
+print(Sys.time() - t1)
+
+```
+
+```{r short parameter recovery demo evaluation}
+
+tmp <- results.short %>% 
+  select(uid, ws_end, tu_end, coefs, source) %>%
+  pivot_longer(matches('_end'), names_to = 'parameter', values_to = 'coefficient') %>%
+  pivot_wider(names_from = coefs, values_from = coefficient)
+
+for (p in unique(tmp$parameter)) {
+  print(
+    ggplot(
+      filter(tmp, parameter == p), 
+      aes(x = real, y = best)
+    ) +
+      geom_abline(slope = 1, intercept = 0) +
+      geom_point() +
+      geom_smooth(method = 'lm', formula = 'y ~ x') +
+      coord_fixed() +
+      facet_wrap(~source)
+  )
+}
+
+```
