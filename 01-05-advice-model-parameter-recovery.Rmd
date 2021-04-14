@@ -19,6 +19,7 @@ params:
 
 ```{r setup 01-05, echo = F, include = F}
 source('scripts_and_filters/general_setup.R')
+library(parallel)
 
 set.seed(20210406)
 ```
@@ -30,21 +31,32 @@ set.seed(20210406)
 #' @param nTrials number of trials to simulate
 #' @param agreeRate advisor agreement rate (for both advisors)
 #' @param startingTrust length 2 vector of starting trust for the two advisors
+#' @param scale_width width of the scale to simulate (symmetrical around 0)
+#'
+#' @details Influence is calculated using a Bayesian approach. Our model 
+#'   specifies how final confidence is related to initial confidence:
+#'   $$c_2 = (c_1 * t) / (c_1 * t + (1-c_1)(1-t))$$
+#'   Where c1 is the initial confidence, c2 final confidence, and t the 
+#'   probability that the advisor agrees given that the judge is correct.   
+#'   We also apply a slight compression to t by capping it at .05 and .95 so 
+#'   we can avoid awkward issues with dividing by 0 etc.
 simulate_participant <- function(
   parameters = tibble::tibble(weightedSelection = 1, trustUpdateRate = .25), 
   nTrials = 60, 
   agreeRate = .7,
-  startingTrust = c(.3, .3)
+  startingTrust = c(.65, .65), 
+  scale_width = 55
 ) {
   out <- parameters %>% 
     crossing(tibble(
       trialId = 1:nTrials,
-      initialConfidence = 0,
+      # confidence is represented as a proportion of max confidence
+      initialConfidence = runif(nTrials, min = 1, max = 55),  
+      finalConfidence = NA_real_,
       advisorIndex = NA_integer_,
       choice0 = 1,
       choice1 = 2,
       advisorAgrees = runif(nTrials) <= agreeRate,
-      confidenceShift.z = NA_real_,
       advisorTrust1 = startingTrust[1],
       advisorTrust2 = startingTrust[2]
     ))
@@ -53,7 +65,6 @@ simulate_participant <- function(
   trust <- matrix(startingTrust, nrow = nrow(out), ncol = 2, byrow = T)
   
   for (t in out$trialId) {
-    n <- ifelse(t == 1, 1, t - 1)
     # Pick probability
     p_pick_advisor1 = adviseR:::advisor_pick_probability(
       rep(1, nrow(out)), rep(2, nrow(out)), trust, out$weightedSelection[t]
@@ -69,16 +80,26 @@ simulate_participant <- function(
     )
     out$advisorTrust1[t] <- trust[t, 1]
     out$advisorTrust2[t] <- trust[t, 2]
-    
-    # Confidence shift
-    advisorTrust <- ifelse(
-      out$advisorIndex[t] == 1, 
-      out$advisorTrust1[n + 1], 
-      out$advisorTrust2[n + 1]
-    )
-    
-    out$confidenceShift.z[t] = (out$advisorAgrees[t] - .5) * advisorTrust
   }
+  
+  # Confidence shift calculated last to take advantage of vectorisation
+  advisorTrust <- if_else(
+    out$advisorIndex == 1, 
+    out$advisorTrust1, 
+    out$advisorTrust2
+  )
+  # advisorTrust[1] <- startingTrust[out$advisorIndex[1]]
+  
+  # $$c_2 = (c_1 * t) / (c_1 * t - (1-c_1)(1-t))$$
+  c1 <- abs(out$initialConfidence / scale_width / 2) + .5
+  # trust is compressed to avoid div0 errors
+  t <- pmax(.05, pmin(.95, advisorTrust))
+  # handle dis/agreement
+  t <- if_else(out$advisorAgrees, t, 1 - t)
+  # Bayes update rule
+  c2.hat <- (c1 * t) / (c1 * t + (1 - c1) * (1 - t))
+  # Rescale
+  out$finalConfidence <- c2.hat * scale_width * 2 - scale_width
   
   out
 }
@@ -86,7 +107,7 @@ simulate_participant <- function(
 #' Perform grid search on a list of participants' data
 #' Filter out values for advisor choice error that will be NaN because of the 
 #' mathematics of raising negative (trust) values to fractional powers
-gridSearch <- function(x, grid = tidyr::crossing(a = seq(-5, 5, .05), b = seq(-1, 1, .05))) {
+gridSearch <- function(x, grid = tidyr::crossing(a = seq(-5, 10, .1), b = seq(-1, 1.5, .05))) {
   library(dplyr); library(tidyr); library(parallel)
   nCores <- detectCores() - 6
   input <- crossing(x, grid) %>%
@@ -219,6 +240,35 @@ gradientDescent <- function(
   out
 }
 
+#' Parellelised implementation of gradientDescent over nRuns runs
+#' @param x dataframe to perform descent on 
+#' @param nRuns number of initial start positions to try
+#' @dotparams gradientDescent
+doGradientDescent <- function(x, nRuns = 100, ...) {
+  nCores <- detectCores() - 6
+  if (!has_name(x, 'uid'))
+    x <- mutate(x, uid = 'sim')
+  gd <- x %>%
+    nest(data = -uid) %>%
+    crossing(tibble(run = 1:nRuns)) %>%
+    mutate(core = rep(1:nCores, ceiling(nRuns / nCores))[1:nRuns]) %>%
+    group_by(core) %>%
+    group_split() 
+  
+  cl <- makeCluster(nCores)
+  clusterExport(cl, c('gradientDescent', 'gradientDescentSummary'))
+  on.exit(stopCluster(cl), add = T)
+  f <- function(d, ...) {
+    library(tidyr); library(dplyr); library(purrr)
+    d %>%
+      mutate(gd = map(data, function(z) gradientDescent(z, ...) %>% gradientDescentSummary())) %>%
+      unnest(cols = gd)
+  }
+  
+  gd <- parLapply(cl = cl, X = gd, fun = f, ...)
+  bind_rows(gd)
+}
+
 gradientDescentPath <- function(gd) {
   ggplot(gd, aes(x = trustUpdate, y = weightedSelection)) +
     geom_path() +
@@ -238,7 +288,7 @@ gradientDescentSummary <- function(gd) {
 }
 
 #' Visualise an experimental run
-visualiseRun <- function(x) {
+visualiseRun <- function(x, scale_width = 55) {
   d <- x  %>%
     # replace trial id with trial so scrables work
     rowid_to_column('trial') %>%
@@ -248,10 +298,13 @@ visualiseRun <- function(x) {
       values_to = 'trust',
       names_pattern = '([0-9]+)$'
     ) %>%
-    mutate(selected = advisorIndex == advisor)
+    mutate(
+      selected = advisorIndex == advisor,
+      confidenceUpdate = (finalConfidence - initialConfidence) / scale_width / 2
+    )
   ggplot(d, aes(x = trial, y = trust, linetype = advisor)) +
     geom_col(
-      aes(y = confidenceShift.z, fill = advisorAgrees), 
+      aes(y = confidenceUpdate, fill = advisorAgrees), 
       alpha = .5, 
       data = d %>% filter(selected)
     ) +
@@ -267,7 +320,7 @@ visualiseRun <- function(x) {
     scale_fill_manual(values = c('red', 'black')) +
     labs(
       subtitle = ifelse(has_name(d, 'weightedSelection'), glue('ws={d$weightedSelection[1]}, tu={d$trustUpdateRate}'), ''),
-      caption = 'Advisor trust by trial. When an advisor is chosen, the arrow marks dis/agreement.\nWe should expect to see the higher line being selected more often in most cases.\nColumns show influence of advice on a given trial.'
+      caption = 'Advisor trust by trial. When an advisor is chosen, the arrow marks dis/agreement.\nWe should expect to see the higher line being selected more often in most cases.\nColumns show influence of advice on a given trial as a proportion of the confidence scale.'
     ) +
     theme(legend.direction = "vertical")
 }
@@ -285,10 +338,12 @@ scaledError <- function(err1, err2) {
 #' Visualise a grid search
 #' @param gs gridSearch result tbl
 #' @param target_value tbl of trustUpdateRate and weightedSelection target values
-visualiseGrid <- function(gs, target_value = NULL) {
+#' @param scaleFun function to use to scale the two error values, takes the form
+#'   function(weightedSelectionErrors, trustUpdateErrors) {combinedErrors}
+visualiseGrid <- function(gs, target_value = NULL, scaleFun = scaledError) {
   gs <- gs %>%
     rename(ws_err = weightedSelection_error, tu_err = trustUpdateRate_error) %>%
-    mutate(error = scaledError(ws_err, tu_err))
+    mutate(error = scaleFun(ws_err, tu_err))
   min_x <- gs %>% filter(tu_err == min(tu_err))
   min_y <- gs %>% filter(ws_err == min(ws_err))
   out <- gs %>%
@@ -365,9 +420,11 @@ When the step size meets a minimum, or it stalls, it stops.
 A single run of the gradient descent can be visualised as a path over a 2d surface defined by the parameters we are trying to recover.
 
 ```{r demo gradient descent path}
+t1 <- Sys.time()
 gd <- gradientDescent(sim, start_coords = c(1, .1), max_steps = 100)
 gradientDescentPath(gd) + 
   annotate(geom = 'point', shape = 8, size = 6, colour = 'red', x = demo$tu, y = demo$ws)
+Sys.time() - t1
 ```
 
 The gradient descent algorithm gets stuck in local minima quite easily, so we initialise it in a range of starting positions to increase the chances that one of the local minima it finds is the global minimum.
@@ -375,12 +432,10 @@ The gradient descent algorithm gets stuck in local minima quite easily, so we in
 When we plot the end positions of all these descents we get a plot that looks like this:
 
 ```{r demo gradient descent summary}
-gd <- sim %>%
-  mutate(uid = 'sim') %>%
-  nest(data = -uid) %>%
-  crossing(tibble(run = 1:100)) %>%
-  mutate(gd = map(data, ~ gradientDescent(.) %>% gradientDescentSummary())) %>%
-  unnest(cols = gd)
+library(parallel)
+t1 <- Sys.time()
+
+gd <- doGradientDescent(sim)
 
 ggplot(gd, aes(x = tu_end, y = ws_end, colour = cut(tu_error + ws_error, 7))) +
   geom_point(size = 4, alpha = .25) +
@@ -390,6 +445,7 @@ ggplot(gd, aes(x = tu_end, y = ws_end, colour = cut(tu_error + ws_error, 7))) +
   ) +
   annotate(geom = 'point', shape = 8, size = 6, colour = 'red', 
            x = demo$tu, y = demo$ws)
+Sys.time() - t1
 ```
 
 The points show endpoints of individual runs, coloured according to the combined error.
@@ -409,7 +465,7 @@ t1 <- Sys.time()
 gs <- sim %>%
   mutate(uid = 'sim') %>%
   nest(data = -uid) %>%
-  gridSearch(grid = tidyr::crossing(a = seq(-1, 5, .01), b = seq(-.5, 1.5, .01)))
+  gridSearch(grid = tidyr::crossing(a = seq(-1, 10, .25), b = seq(-.5, 1.5, .05)))
 Sys.time() - t1
 
 visualiseGrid(
@@ -437,18 +493,14 @@ sim <- simulate_participant(
 Below are the same figures for the same coefficients, but with `demo$n` trials.
 
 ```{r long demo plots}
+t1 <- Sys.time()
 visualiseRun(sim)
 
 gd <- gradientDescent(sim, start_coords = c(1, .1), max_steps = 100)
 gradientDescentPath(gd) + 
   annotate(geom = 'point', shape = 8, size = 6, colour = 'red', x = demo$tu, y = demo$ws)
 
-gd <- sim %>%
-  mutate(uid = 'sim') %>%
-  nest(data = -uid) %>%
-  crossing(tibble(run = 1:100)) %>%
-  mutate(gd = map(data, ~ gradientDescent(.) %>% gradientDescentSummary())) %>%
-  unnest(cols = gd)
+gd <- doGradientDescent(sim)
 
 ggplot(gd, aes(x = tu_end, y = ws_end, colour = cut(tu_error + ws_error, 7))) +
   geom_point(size = 4, alpha = .25) +
@@ -459,18 +511,17 @@ ggplot(gd, aes(x = tu_end, y = ws_end, colour = cut(tu_error + ws_error, 7))) +
   annotate(geom = 'point', shape = 8, size = 6, colour = 'red', 
            x = demo$tu, y = demo$ws)
 
-t1 <- Sys.time()
 gs <- sim %>%
   mutate(uid = 'sim') %>%
   nest(data = -uid) %>%
-  gridSearch(grid = tidyr::crossing(a = seq(-1, 5, .005), b = seq(-.5, 1.5, .01)))
-Sys.time() - t1
+  gridSearch(grid = tidyr::crossing(a = seq(-1, 10, .5), b = seq(-.5, 1.5, .01)))
 
 visualiseGrid(
   gs, 
   target_value = tibble(trustUpdateRate = demo$tu, weightedSelection = demo$ws)
 )
 
+Sys.time() - t1
 ```
 
 #### Outstanding puzzles
@@ -489,21 +540,16 @@ t1 <- Sys.time()
 sim <- tibble(
   uid = 'sim', 
   trialId = 1:10,
-  initialConfidence = 0,
+  initialConfidence = 1,
   advisorIndex = c(1, 1, 1, 1, 1, 2, 2, 1, 1, 1),
   choice0 = 1,
   choice1 = 2,
   advisorAgrees = T,
-  confidenceShift.z = c(.1, .15, .2, .25, .3, .1, .15, .35, .4, .45)
-) %>% 
-  nest(data = -uid) %>%
-  crossing(tibble(run = 1:100))
+  finalConfidence = c(10, 15, 20, 25, 30, 10, 15, 35, 40, 45)
+) 
 
-gd <- sim %>%
-  mutate(gd = map(data, ~ gradientDescent(.) %>% gradientDescentSummary())) %>%
-  unnest(cols = gd)
+gd <- doGradientDescent(sim)
 
-print(Sys.time() - t1)
 
 best <- gd %>% filter(tu_error + ws_error == min(tu_error + ws_error))
 best
@@ -512,21 +558,26 @@ ggplot(gd, aes(x = tu_end, y = ws_end, fill = tu_error + ws_error)) +
   geom_point(size = 4, alpha = .25) +
   geom_point(size = 4, colour = 'red', data = best)
 
+print(Sys.time() - t1)
 ```
 
 ```{r simple model grid search}
 t1 <- Sys.time()
 
-gs <- gridSearch(sim[1, ])
-
-Sys.time() - t1
+gs <- sim %>%
+  mutate(uid = 'sim') %>%
+  nest(data = -uid) %>%
+  gridSearch()
 
 visualiseGrid(gs)
+
+Sys.time() - t1
 ```
 
 ## Parameter recovery
 
 We generate data from the model itself, then see if we can recover the parameters we used to generate that data.
+For this we use a realistic number of trials, around 30.
 
 ```{r parameter recovery setup}
 
@@ -553,7 +604,7 @@ parameters <- tribble(
 
 simulants <- parameters %>%
   nest(params = -uid) %>%
-  mutate(data = map(params, simulate_participant)) %>%
+  mutate(data = map(params, simulate_participant, nTrials = 30)) %>%
   unnest(cols = params)
 
 simulants
@@ -598,15 +649,14 @@ t1 <- Sys.time()
 for (s in 1:nrow(simulants)) {
   for (type in c('simulants', 'shuffled_simulants')) {
     sim <- get(type)[s,  ] %>%
-      crossing(tibble(run = 1:100))
+      select(uid, data) %>%
+      unnest(cols = data)
     
-    gd <- sim %>%
-      mutate(gd = map(data, ~ gradientDescent(.) %>% gradientDescentSummary())) %>%
-      unnest(cols = gd)
+    gd <- doGradientDescent(sim)
     
     best <- gd %>% filter(tu_error + ws_error == min(tu_error + ws_error))
     real <- adviseR::simulateFromData(
-      sim$data[[1]],
+      sim,
       tibble(w = sim$weightedSelection[1], tu = sim$trustUpdateRate[1])
     )
     results <- bind_rows(
@@ -626,9 +676,9 @@ for (s in 1:nrow(simulants)) {
     print(ggplot(gd, aes(x = tu_end, y = ws_end, fill = tu_error + ws_error)) +
             geom_point(size = 4, alpha = .25) +
             geom_point(size = 4, colour = 'red', data = best) +
-            annotate(geom = 'point', shape = 8, size = 4, colour = 'black', x = best$trustUpdateRate[1], y = best$weightedSelection[1]) +
+            annotate(geom = 'point', shape = 8, size = 6, colour = 'red', x = results$tu_end[2], y = results$ws_end[2]) +
             labs(
-              caption = glue('Target: tu = {round(best$trustUpdateRate[1], 4)}, ws = {round(best$weightedSelection[1], 4)}'),
+              caption = glue('Target: tu = {round(results$tu_end[2], 4)}, ws = {round(results$ws_end[2], 4)}'),
               title = type
             ))
   }
@@ -647,6 +697,11 @@ tmp <- results %>%
   pivot_wider(names_from = coefs, values_from = coefficient)
 
 for (p in unique(tmp$parameter)) {
+  lim <- tmp %>% 
+    filter(parameter == p) %>% 
+    select(real, best) %>% 
+    pivot_longer(everything()) %>%
+    summarise(low = min(value), high = max(value))
   print(
     ggplot(
       filter(tmp, parameter == p), 
@@ -655,120 +710,10 @@ for (p in unique(tmp$parameter)) {
       geom_abline(slope = 1, intercept = 0) +
       geom_point() +
       geom_smooth(method = 'lm', formula = 'y ~ x') +
-      coord_fixed() +
+      coord_fixed(xlim = c(lim$low, lim$high), ylim = c(lim$low, lim$high)) +
       facet_wrap(~source)
   )
 }
 
 ```
 
-## Parameter recovery with 10 trials
-
-```{r short parameter recovery setup}
-
-simulants.short <- simulants %>% 
-  mutate(data = map(data, ~ .[1:30, ]))
-shuffled_simulants.short <- simulants.short %>%
-  mutate(data = map(data, ~ mutate(., advisorAgrees = sample(.$advisorAgrees))))
-```
-
-```{r short visualise simulants data}
-
-for (i in 1:nrow(simulants.short)) {
-  print(visualiseRun(simulants.short$data[[i]]) + labs(title = 'sim'))
-  print(visualiseRun(shuffled_simulants.short$data[[i]]) + labs(title = 'sim_shuffled'))
-}
-
-```
-
-```{r short visualise simulant grid example}
-t1 <- Sys.time()
-
-for (i in 1:nrow(simulants.short)) {
-  print(visualiseGrid(
-    gridSearch(simulants.short[i, ]), 
-    target_value = simulants.short[i, c('trustUpdateRate', 'weightedSelection')]
-  ) + labs(title = 'sim'))
-  print(visualiseGrid(
-    gridSearch(shuffled_simulants.short[i, ]), 
-    target_value = simulants.short[i, c('trustUpdateRate', 'weightedSelection')]
-  ) + labs(title = 'sim_suffle'))
-}
-  
-
-Sys.time() - t1
-```
-
-```{r short parameter recovery demo}
-
-results.short <- NULL
-
-t1 <- Sys.time()
-
-
-for (s in 1:nrow(simulants.short)) {
-  for (type in c('simulants.short', 'shuffled_simulants.short')) {
-    sim <- get(type)[s,  ] %>%
-      crossing(tibble(run = 1:100))
-    
-    gd <- sim %>%
-      mutate(gd = map(data, ~ gradientDescent(.) %>% gradientDescentSummary())) %>%
-      unnest(cols = gd)
-    
-    best <- gd %>% filter(tu_error + ws_error == min(tu_error + ws_error))
-    real <- adviseR::simulateFromData(
-      sim$data[[1]],
-      tibble(w = sim$weightedSelection[1], tu = sim$trustUpdateRate[1])
-    )
-    results.short <- bind_rows(
-      results.short,
-      best %>% mutate(coefs = 'best', source = type), 
-      tibble(
-        uid = sim$uid[1],
-        ws_end = sim$weightedSelection[1],
-        tu_end = sim$trustUpdateRate[1],
-        ws_error = real[1],
-        tu_error = real[2],
-        coefs = 'real', 
-        source = type
-      )
-    )
-    
-    print(ggplot(gd, aes(x = tu_end, y = ws_end, fill = tu_error + ws_error)) +
-            geom_point(size = 4, alpha = .25) +
-            geom_point(size = 4, colour = 'red', data = best) +
-            annotate(geom = 'point', shape = 8, size = 4, colour = 'black', x = best$trustUpdateRate[1], y = best$weightedSelection[1]) +
-            labs(
-              caption = glue('Target: tu = {round(best$trustUpdateRate[1], 4)}, ws = {round(best$weightedSelection[1], 4)}'),
-              title = type
-            ))
-  }
-  
-}
-
-print(Sys.time() - t1)
-
-```
-
-```{r short parameter recovery demo evaluation}
-
-tmp <- results.short %>% 
-  select(uid, ws_end, tu_end, coefs, source) %>%
-  pivot_longer(matches('_end'), names_to = 'parameter', values_to = 'coefficient') %>%
-  pivot_wider(names_from = coefs, values_from = coefficient)
-
-for (p in unique(tmp$parameter)) {
-  print(
-    ggplot(
-      filter(tmp, parameter == p), 
-      aes(x = real, y = best)
-    ) +
-      geom_abline(slope = 1, intercept = 0) +
-      geom_point() +
-      geom_smooth(method = 'lm', formula = 'y ~ x') +
-      coord_fixed() +
-      facet_wrap(~source)
-  )
-}
-
-```
