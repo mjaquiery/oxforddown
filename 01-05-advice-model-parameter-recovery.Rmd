@@ -154,7 +154,7 @@ gradientDescent <- function(
   starting_limits = tibble::tibble(min = c(-5, -1), max = c(5, 1)), 
   max_steps = 200,
   step_size = 2,
-  min_step_size = .001,
+  min_step_size = .005,
   stall_count = max_steps
   ) {
   out <- NULL
@@ -432,7 +432,6 @@ The gradient descent algorithm gets stuck in local minima quite easily, so we in
 When we plot the end positions of all these descents we get a plot that looks like this:
 
 ```{r demo gradient descent summary}
-library(parallel)
 t1 <- Sys.time()
 
 gd <- doGradientDescent(sim)
@@ -717,3 +716,110 @@ for (p in unique(tmp$parameter)) {
 
 ```
 
+## Parameter recovery systematic investigation
+
+We set up a grid to investigate parameter recovery systematically.
+
+```{r simulant grid}
+
+sims <- bind_cols(
+  tibble(uid = 1:35),
+  crossing(
+    weightedSelection = seq(-6, 18, 4),
+    trustUpdateRate = seq(0.1, 1, .2)
+  )
+) %>%
+  nest(params = -uid) %>%
+  mutate(data = map(params, simulate_participant, nTrials = 30)) %>%
+  unnest(cols = params)
+
+sims
+shuffled_sims <- sims %>%
+  mutate(data = map(data, ~ mutate(., advisorAgrees = sample(.$advisorAgrees))))
+  
+```
+
+```{r visualise simulant grid}
+t1 <- Sys.time()
+
+for (i in 1:nrow(sims)) {
+  print(visualiseGrid(
+    gridSearch(sims[i, ], grid = crossing(a = seq(-10, 30, .5),
+                                          b = seq(-.1, 1.5, .1))), 
+    target_value = sims[i, c('trustUpdateRate', 'weightedSelection')]
+  ) + labs(title = 'sim'))
+  print(visualiseGrid(
+    gridSearch(shuffled_sims[i, ], grid = crossing(a = seq(-10, 30, .5),
+                                          b = seq(-.1, 1.5, .1))),
+    target_value = sims[i, c('trustUpdateRate', 'weightedSelection')]
+  ) + labs(title = 'sim_suffle'))
+}
+  
+
+Sys.time() - t1
+```
+
+```{r parameter recovery demo}
+
+results <- NULL
+
+t1 <- Sys.time()
+
+
+for (s in 1:nrow(sims)) {
+  for (type in c('sims', 'shuffled_sims')) {
+    sim <- get(type)[s,  ] %>%
+      select(uid, data) %>%
+      unnest(cols = data)
+    
+    gd <- doGradientDescent(sim)
+    
+    best <- gd %>% filter(tu_error + ws_error == min(tu_error + ws_error))
+    real <- adviseR::simulateFromData(
+      sim,
+      tibble(w = sim$weightedSelection[1], tu = sim$trustUpdateRate[1])
+    )
+    results <- bind_rows(
+      results,
+      best %>% mutate(coefs = 'best', source = type), 
+      tibble(
+        uid = sim$uid[1],
+        ws_end = sim$weightedSelection[1],
+        tu_end = sim$trustUpdateRate[1],
+        ws_error = real[1],
+        tu_error = real[2],
+        coefs = 'real', 
+        source = type
+      )
+    )
+  }
+  
+}
+
+tmp <- results %>% 
+  select(uid, ws_end, tu_end, coefs, source) %>%
+  pivot_longer(matches('_end'), names_to = 'parameter', values_to = 'coefficient') %>%
+  pivot_wider(names_from = coefs, values_from = coefficient)
+
+for (p in unique(tmp$parameter)) {
+  lim <- tmp %>% 
+    filter(parameter == p) %>% 
+    select(real, best) %>% 
+    pivot_longer(everything()) %>%
+    summarise(low = min(value, -100), high = max(value))
+  print(
+    ggplot(
+      filter(tmp, parameter == p), 
+      aes(x = real, y = best)
+    ) +
+      geom_abline(slope = 1, intercept = 0) +
+      geom_point() +
+      geom_smooth(method = 'lm', formula = 'y ~ x') +
+      coord_fixed(xlim = c(lim$low, lim$high), ylim = c(lim$low, lim$high)) +
+      facet_wrap(~source)
+  )
+}
+
+print(Sys.time() - t1)
+
+```
