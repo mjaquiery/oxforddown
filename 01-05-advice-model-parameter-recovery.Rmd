@@ -32,6 +32,8 @@ set.seed(20210406)
 #' @param agreeRate advisor agreement rate (for both advisors)
 #' @param startingTrust length 2 vector of starting trust for the two advisors
 #' @param scale_width width of the scale to simulate (symmetrical around 0)
+#' @param noise standard deviation of noise added to initial and final confidence.
+#'   On the same scale as scale_width. 
 #'
 #' @details Influence is calculated using a Bayesian approach. Our model 
 #'   specifies how final confidence is related to initial confidence:
@@ -45,8 +47,16 @@ simulate_participant <- function(
   nTrials = 60, 
   agreeRate = .7,
   startingTrust = c(.65, .65), 
-  scale_width = 55
+  scale_width = 55,
+  noise = 0
 ) {
+  #' Cap x +/- rnorm(sd = n) values to [-w, w] and nudge 0 values to 1
+  smear <- function(x, n, w) {
+    x <- pmin(w, pmax(-w, rnorm(length(x), x, n)))
+    x[x == 0] <- 1
+    round(x)
+  }
+  
   out <- parameters %>% 
     crossing(tibble(
       trialId = 1:nTrials,
@@ -60,6 +70,7 @@ simulate_participant <- function(
       advisorTrust1 = startingTrust[1],
       advisorTrust2 = startingTrust[2]
     ))
+  out$initialConfidence <- smear(out$initialConfidence, noise, scale_width)
   
   # Set up initial trust matrix
   trust <- matrix(startingTrust, nrow = nrow(out), ncol = 2, byrow = T)
@@ -100,6 +111,7 @@ simulate_participant <- function(
   c2.hat <- (c1 * t) / (c1 * t + (1 - c1) * (1 - t))
   # Rescale
   out$finalConfidence <- c2.hat * scale_width * 2 - scale_width
+  out$finalConfidence <- smear(out$finalConfidence, noise, scale_width)
   
   out
 }
@@ -376,7 +388,7 @@ If the fitting process works effectively we should see that the parameters the m
 ## Simple test case
 
 ```{r demo case}
-demo <- list(tu = .5, ws = 3, n = 15)
+demo <- list(tu = .25, ws = 3, n = 15, noise = 0)
 sim <- simulate_participant(
   tibble(trustUpdateRate = demo$tu, weightedSelection = demo$ws), 
   nTrials = demo$n
