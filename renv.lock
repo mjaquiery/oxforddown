@@ -130,15 +130,15 @@
     },
     "adviseR": {
       "Package": "adviseR",
-      "Version": "0.0.0.940",
+      "Version": "0.0.0.960",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "adviseR",
       "RemoteUsername": "oxacclab",
       "RemoteRef": "master",
-      "RemoteSha": "411350836be20bfd206fa97b717e6e0007fb2ca9",
-      "Hash": "44effae7792e66c899bd74289f89ff96"
+      "RemoteSha": "382c214fff3535bc53724ba5498b63adf2a0c342",
+      "Hash": "1d1e5282b912eb644e3bbe6ec8f6fe69"
     },
     "askpass": {
       "Package": "askpass",

@@ -32,6 +32,7 @@ set.seed(20210406)
 #' @param agreeRate advisor agreement rate (for both advisors)
 #' @param startingTrust length 2 vector of starting trust for the two advisors
 #' @param scale_width width of the scale to simulate (symmetrical around 0)
+#' @param expand_confidence whether to scale the confidence values such that the highest recorded confidence value is 100% and the lowest is completely unsure
 #' @param noise standard deviation of noise added to initial and final confidence.
 #'   On the same scale as scale_width. 
 #'
@@ -48,14 +49,47 @@ simulate_participant <- function(
   agreeRate = .7,
   startingTrust = c(.65, .65), 
   scale_width = 55,
+  expand_confidence = F,
   noise = 0
 ) {
   #' Cap x +/- rnorm(sd = n) values to [-w, w] and nudge 0 values to 1
-  smear <- function(x, n, w) {
+  .smear <- function(x, n, w) {
     x <- pmin(w, pmax(-w, rnorm(length(x), x, n)))
+    x <- round(x)
     x[x == 0] <- 1
-    round(x)
+    x
   }
+  #' Conversion functions between scale values, probabilities, and z-expanded probabilities. These don't do much here but we'll perhaps use them in model fitting.
+  .scale_to_p <- function(x, lim) abs(x / lim / 2) + .5
+  .p_to_scale <- function(x, lim) x * lim * 2 - lim
+  .p_to_pz <- function(x) {
+    x <- scale(x)
+    attr(x, 'min') <- min(x)
+    attr(x, 'max') <- max(x)
+    (x - min(x)) / (max(x) - min(x))
+  }
+  .pz_to_p <- function(x) {
+    x <- x * (attr(x, 'max') - attr(x, 'min')) + attr(x, 'min')
+    x <- x * attr(x, 'scaled:scale') + attr(x, 'scaled:center')
+    attr(x, 'min') <- NULL
+    attr(x, 'max') <- NULL
+    attr(x, 'scaled:scale') <- NULL
+    attr(x, 'scaled:center') <- NULL
+    x
+  }
+  convert_in <- 
+    if (expand_confidence) function(x) .p_to_pz(.scale_to_p(x, scale_width)) 
+    else function(x) .scale_to_p(x, scale_width)
+  convert_out <- 
+    if (expand_confidence) function(x) .p_to_scale(.pz_to_p(x), scale_width) 
+    else function(x) .p_to_scale(x, scale_width)
+  
+  # tests for conversion functions - need a better place for these
+  .test_vector <- rnorm(1000, 25, 3)
+  testthat::expect_equal(
+    round(.test_vector, 9), 
+    round(convert_out(convert_in(.test_vector)), 9)
+  )
   
   out <- parameters %>% 
     crossing(tibble(
@@ -70,7 +104,7 @@ simulate_participant <- function(
       advisorTrust1 = startingTrust[1],
       advisorTrust2 = startingTrust[2]
     ))
-  out$initialConfidence <- smear(out$initialConfidence, noise, scale_width)
+  out$initialConfidence <- .smear(out$initialConfidence, noise, scale_width)
   
   # Set up initial trust matrix
   trust <- matrix(startingTrust, nrow = nrow(out), ncol = 2, byrow = T)
@@ -102,7 +136,7 @@ simulate_participant <- function(
   # advisorTrust[1] <- startingTrust[out$advisorIndex[1]]
   
   # $$c_2 = (c_1 * t) / (c_1 * t - (1-c_1)(1-t))$$
-  c1 <- abs(out$initialConfidence / scale_width / 2) + .5
+  c1 <- convert_in(out$initialConfidence)
   # trust is compressed to avoid div0 errors
   t <- pmax(.05, pmin(.95, advisorTrust))
   # handle dis/agreement
@@ -110,8 +144,8 @@ simulate_participant <- function(
   # Bayes update rule
   c2.hat <- (c1 * t) / (c1 * t + (1 - c1) * (1 - t))
   # Rescale
-  out$finalConfidence <- c2.hat * scale_width * 2 - scale_width
-  out$finalConfidence <- smear(out$finalConfidence, noise, scale_width)
+  out$finalConfidence <- convert_out(c2.hat)
+  out$finalConfidence <- .smear(out$finalConfidence, noise, scale_width)
   
   out
 }
@@ -163,7 +197,7 @@ gridSearch <- function(x, grid = tidyr::crossing(a = seq(-5, 10, .1), b = seq(-1
 gradientDescent <- function(
   x, 
   start_coords = NULL, 
-  starting_limits = tibble::tibble(min = c(-5, -1), max = c(5, 1)), 
+  starting_limits = tibble::tibble(min = c(-5, -.5), max = c(30, .5)), 
   max_steps = 200,
   step_size = 2,
   min_step_size = .005,
@@ -255,13 +289,19 @@ gradientDescent <- function(
 #' Parellelised implementation of gradientDescent over nRuns runs
 #' @param x dataframe to perform descent on 
 #' @param nRuns number of initial start positions to try
+#' @param nCores number of cores to use
 #' @dotparams gradientDescent
-doGradientDescent <- function(x, nRuns = 100, ...) {
-  nCores <- detectCores() - 6
+doGradientDescent <- function(
+  x, 
+  nRuns = 100,
+  nCores = parallel::detectCores() / 2, 
+  ...
+) {
   if (!has_name(x, 'uid'))
     x <- mutate(x, uid = 'sim')
+  if (!has_name(x, 'data'))
+    x <- nest(x, data = -uid)
   gd <- x %>%
-    nest(data = -uid) %>%
     crossing(tibble(run = 1:nRuns)) %>%
     mutate(core = rep(1:nCores, ceiling(nRuns / nCores))[1:nRuns]) %>%
     group_by(core) %>%
@@ -302,7 +342,7 @@ gradientDescentSummary <- function(gd) {
 #' Visualise an experimental run
 visualiseRun <- function(x, scale_width = 55) {
   d <- x  %>%
-    # replace trial id with trial so scrables work
+    # replace trial id with trial so scrambles work
     rowid_to_column('trial') %>%
     pivot_longer(
       starts_with('advisorTrust'), 
@@ -712,7 +752,7 @@ for (p in unique(tmp$parameter)) {
     filter(parameter == p) %>% 
     select(real, best) %>% 
     pivot_longer(everything()) %>%
-    summarise(low = min(value), high = max(value))
+    summarise(low = max(min(value), -100), high = max(value))
   print(
     ggplot(
       filter(tmp, parameter == p), 
@@ -818,7 +858,7 @@ for (p in unique(tmp$parameter)) {
     filter(parameter == p) %>% 
     select(real, best) %>% 
     pivot_longer(everything()) %>%
-    summarise(low = min(value, -100), high = max(value))
+    summarise(low = max(min(value), -100), high = max(value))
   print(
     ggplot(
       filter(tmp, parameter == p), 
@@ -835,3 +875,184 @@ for (p in unique(tmp$parameter)) {
 print(Sys.time() - t1)
 
 ```
+
+## Noisy simulations
+
+We systematically vary noise to explore how it affect parameter recovery.
+
+```{r simulant noise}
+
+sims <- tibble(
+  uid = 1:10,
+  weightedSelection = 5,
+  trustUpdateRate = .3,
+  noise = c(0, 1, 2, 3, 5, 10, 15, 25, 40, 55)
+) %>%
+  nest(params = c(-uid, -noise)) %>%
+  mutate(data = map(params, simulate_participant, nTrials = 30, noise = noise)) %>%
+  unnest(cols = params)
+
+sims
+shuffled_sims <- sims %>%
+  mutate(data = map(data, ~ mutate(., advisorAgrees = sample(.$advisorAgrees))))
+  
+```
+
+```{r visualise simulant noise grid}
+t1 <- Sys.time()
+
+for (i in 1:nrow(sims)) {
+  print(visualiseGrid(
+    gridSearch(sims[i, ], grid = crossing(a = seq(-10, 30, .5),
+                                          b = seq(-.1, 1.5, .1))), 
+    target_value = sims[i, c('trustUpdateRate', 'weightedSelection')]
+  ) + labs(title = glue('sim(noise = {sims$noise[i]})')))
+  print(visualiseGrid(
+    gridSearch(shuffled_sims[i, ], grid = crossing(a = seq(-10, 30, .5),
+                                          b = seq(-.1, 1.5, .1))),
+    target_value = sims[i, c('trustUpdateRate', 'weightedSelection')]
+  ) + labs(title = glue('sim_suffle(noise = {shuffled_sims$noise[i]})')))
+}
+  
+
+Sys.time() - t1
+```
+
+```{r noise parameter recovery demo}
+
+results <- NULL
+
+t1 <- Sys.time()
+
+
+for (s in 1:nrow(sims)) {
+  for (type in c('sims', 'shuffled_sims')) {
+    sim <- get(type)[s,  ] %>%
+      select(uid, data) %>%
+      unnest(cols = data)
+    
+    gd <- doGradientDescent(sim)
+    
+    best <- gd %>% filter(tu_error + ws_error == min(tu_error + ws_error))
+    real <- adviseR::simulateFromData(
+      sim,
+      tibble(w = sim$weightedSelection[1], tu = sim$trustUpdateRate[1])
+    )
+    results <- bind_rows(
+      results,
+      best %>% mutate(coefs = 'best', source = type, noise = get(type)$noise[s]), 
+      tibble(
+        uid = sim$uid[1],
+        ws_end = sim$weightedSelection[1],
+        tu_end = sim$trustUpdateRate[1],
+        ws_error = real[1],
+        tu_error = real[2],
+        coefs = 'real', 
+        source = type, 
+        noise = get(type)$noise[s]
+      )
+    )
+  }
+}
+
+tmp <- results %>% 
+  select(uid, ws_end, tu_end, coefs, source, noise) %>%
+  pivot_longer(matches('_end'), names_to = 'parameter', values_to = 'coefficient') %>%
+  pivot_wider(names_from = coefs, values_from = coefficient)
+
+for (p in unique(tmp$parameter)) {
+  lim <- tmp %>% 
+    filter(parameter == p) %>% 
+    select(real, best) %>% 
+    pivot_longer(everything()) %>%
+    summarise(low = max(min(value), -100), high = max(value))
+  print(
+    ggplot(
+      filter(tmp, parameter == p), 
+      aes(x = real, y = best)
+    ) +
+      geom_abline(slope = 1, intercept = 0) +
+      geom_label(aes(label = noise)) +
+      geom_smooth(method = 'lm', formula = 'y ~ x') +
+      coord_fixed(xlim = c(lim$low, lim$high), ylim = c(lim$low, lim$high)) +
+      facet_wrap(~source)
+  )
+}
+
+print(Sys.time() - t1)
+
+```
+
+
+## Fixed trustUpdateRate
+
+The weighted selection is our primary variable of interest. 
+It is possible (reading from the model fitting results to participant data) that we are estimating a population parameter rather than discovering individual differences. 
+To minimise the variability in weighted selection which is accounted for by measurement error rather than genuine inter-individual variation, we can fix the estimate of trust update rate (upon which weighted selection depends). 
+
+In the simulations below, we explore the accuracy of weighted selection parameter recovery when trust update rate is fixed across all simulants. 
+
+```{r fixed TUR}
+sims <- bind_cols(
+  tibble(uid = 1:35),
+  crossing(
+    weightedSelection = seq(-6, 18, 4),
+    trustUpdateRate = seq(0.1, .5, .1)
+  )
+) %>%
+  nest(params = -uid) %>%
+  mutate(data = map(params, simulate_participant, nTrials = 30)) %>%
+  unnest(cols = params)
+
+sims
+fixed_TUR <- .2
+shuffled_sims <- sims %>%
+  mutate(data = map(data, ~ mutate(., advisorAgrees = sample(.$advisorAgrees))))
+
+best <- NULL
+
+for (i in 1:nrow(sims)) {
+  x <- gridSearch(sims[i,], grid = crossing(a = seq(-15, 30, .5), b = fixed_TUR))
+  x.min <- filter(x, weightedSelection_error == min(weightedSelection_error))
+  best <- bind_rows(
+    best, 
+    tibble(
+      uid = x.min$uid,
+      best = x.min$weightedSelection,
+      real = x.min$data[[1]]$weightedSelection[1]
+    )
+  )
+  
+  print(
+    ggplot(x, aes(x = weightedSelection, y = weightedSelection_error)) +
+      geom_point(
+        aes(
+          x = x$data[[1]]$weightedSelection[1], 
+          y = mean(weightedSelection_error)
+        ),
+        colour = 'red', 
+        shape = 8, 
+        size = 6
+      ) +
+      geom_point() + 
+      geom_vline(aes(xintercept = weightedSelection), data = x.min) +
+      geom_label(
+        aes(
+          x = weightedSelection, 
+          y = mean(x$weightedSelection_error), 
+          label = weightedSelection
+        ),
+        data = x.min
+      )
+  )
+}
+
+ggplot(best, aes(x = real, y = best)) +
+  geom_abline(slope = 1, intercept = 0, linetype = 'dashed') +
+  geom_smooth(method = 'lm', formula = y ~ x) +
+  geom_point() +
+  coord_fixed()
+
+
+```
+

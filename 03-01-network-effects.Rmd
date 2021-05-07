@@ -63,77 +63,126 @@ First, we present the models with a variety of parameters.
 This shows basic model behaviour range before we consider weighted selection.
 
 ```{r network-models}
-
+t1 <- Sys.time()
+n_reps <- 20
+withr::with_seed(
+  20210507,
+  seeds <- c(20210507, floor(runif(n_reps - 1) * 1e8))
+)
 parameters <- tidyr::crossing(
   tidyr::crossing(
     tibble(
       trust_volatility_mean = c(.05, .2),
       trust_volatility_sd = c(.01, .05)
     ),
+    bias_sd = c(1, .25),
     confidence_weighted = c(T, F),
     bias_volatility_sd = c(0, .05)
   ),
   tibble(
-    n_decision = c(1000, 1500),
+    n_decision = c(200, 300),
     decision_flags = map(
       n_decision, 
-      ~ if (. > 1000) {c(rep(1, 1000), rep(3, 500))} else {3}
+      ~ if (. > 200) {c(rep(1, 200), rep(3, 100))} else {3}
     )
   ),
   bias_volatility_mean = 0,
   n_agents = 100,
-  random_seed = 20201014,
-  starting_graph = .1
+  random_seed = seeds,
+  starting_graph = .6
 )
 
 # Drop unnecessary models
 parameters <- parameters %>% 
-  filter(!(bias_volatility_sd == 0 & n_decision > 1000))
+  filter(!(bias_volatility_sd == 0 & n_decision > 200))
 
 output <- parameters %>%
   mutate(groupRatio = NA_real_, weightRatio = NA_real_)
 
-models <- runSimulations(parameters, cores = min(nrow(parameters), 12))
-
-for (i in 1:length(models)) {
-  m <- models[[i]]
-  networkGraph(
-    m, 
-    mark.groups = list(
-      which(V(m$model$graphs[[1]])$bias <= .5),
-      which(V(m$model$graphs[[1]])$bias > .5)
-    )
-  ) 
+summary_fun <- function(m) {
   
-  for (x in inspectModel(m))
-    print(x)
+  m$parameters$group_ratio_original <-
+    adviseR::groupRatio(m$model$graphs[[length(m$model$graphs)]])
+  m$parameters$group_ratio_empirical <-
+    adviseR::groupRatio(m$model$graphs[[length(m$model$graphs)]], F)
   
-  if (F)
-    saveAnimation(m, paste0('figures/network-anim_', i, '.gif'))
+  # Save the summary stuff for the first example of each model
+  if (m$parameters$random_seed != 20210507) {
+    m$model <- NULL
+  }
   
-  # caption = "Simulated trust for average agents.  Simulated agents' trust in other agents at the end of the simulation. Individual lines show the average trust for an agent in those of the same or different group. Violins and boxplots show the distributions of these averages. The groups are arbitrarily named and separate agents by bias strength (whether the bias is positive or negative). Both groups contain some agents with pronounced biases and some with negligible biases.  The dashed line indicates the starting trust level between all agents in the simulation."
-  
-  # Explore quantification of a graph that splits
-  g <- m$model$graphs[[length(m$model$graphs)]]
-  g1 <- m$model$graphs[[1]]
-  edge_attr(g, 'head_group') <- head_of(g1, E(g1))$bias > .5
-  edge_attr(g, 'tail_group') <- tail_of(g1, E(g1))$bias > .5
-  
-  a <- edge_attr(g) %>% 
-    as_tibble() %>% 
-    mutate(sameGroup = head_group == tail_group)
-  
-  # Group ratio gives a good indication along the lines of visual inspection of 
-  # the igraph plots
-  output$groupRatio[i] <- 
-    mean(a$weight[a$sameGroup]) / mean(a$weight[!a$sameGroup])
-  output$weightRatio[i] <- 
-    mean(a$weight[a$weight > median(a$weight)]) /
-    mean(a$weight[a$weight < median(a$weight)])
+  m
 }
 
-output %>% select(ends_with('ratio'), everything())
+models <- runSimulations(
+  parameters, 
+  cores = min(nrow(parameters), 12),
+  summaryFun = summary_fun
+)
 
+output <- models %>%
+  lapply(function(m) {
+    if (!is.null(m$model)) {
+      adviseR::networkGraph(
+        m, 
+        mark.groups = list(
+          which(V(m$model$graphs[[1]])$bias <= .5),
+          which(V(m$model$graphs[[1]])$bias > .5)
+        )
+      ) 
+      
+      for (x in adviseR::inspectModel(m))
+        print(x)
+    }
+    
+    m$parameters$truth_fun <- NULL
+    m$parameters$decision_flags <- NULL
+    as_tibble(m$parameters)
+  }) %>%
+  bind_rows()
+
+# 
+# for (i in 1:length(models)) {
+#   m <- models[[i]]
+#   
+#   if (F) {
+#     networkGraph(
+#       m, 
+#       mark.groups = list(
+#         which(V(m$model$graphs[[1]])$bias <= .5),
+#         which(V(m$model$graphs[[1]])$bias > .5)
+#       )
+#     ) 
+#     
+#     for (x in inspectModel(m))
+#       print(x)
+#     
+#     saveAnimation(m, paste0('figures/network-anim_', i, '.gif'))
+#   }
+#   
+#   # caption = "Simulated trust for average agents.  Simulated agents' trust in other agents at the end of the simulation. Individual lines show the average trust for an agent in those of the same or different group. Violins and boxplots show the distributions of these averages. The groups are arbitrarily named and separate agents by bias strength (whether the bias is positive or negative). Both groups contain some agents with pronounced biases and some with negligible biases.  The dashed line indicates the starting trust level between all agents in the simulation."
+#   
+#   # Explore quantification of a graph that splits
+#   g <- m$model$graphs[[length(m$model$graphs)]]
+#   g1 <- m$model$graphs[[1]]
+#   edge_attr(g, 'head_group') <- head_of(g1, E(g1))$bias > .5
+#   edge_attr(g, 'tail_group') <- tail_of(g1, E(g1))$bias > .5
+#   
+#   a <- edge_attr(g) %>% 
+#     as_tibble() %>% 
+#     mutate(sameGroup = head_group == tail_group)
+#   
+#   # Group ratio gives a good indication along the lines of visual inspection of 
+#   # the igraph plots
+#   output$groupRatio[i] <- 
+#     mean(a$weight[a$sameGroup]) / mean(a$weight[!a$sameGroup])
+#   output$weightRatio[i] <- 
+#     mean(a$weight[a$weight > median(a$weight)]) /
+#     mean(a$weight[a$weight < median(a$weight)])
+# }
+
+output %>% select(ends_with('ratio'), everything())
+Sys.time() - t1
 ```
 
 For summary purposes we now divide up the models into those which exhibit echo chamber formation and those which do not. 
@@ -145,18 +194,37 @@ We set the threshold (somewhat arbitrarily) to 1.5.
 
 ```{r}
 
-output %>% 
-  transmute(
-    groupRatio,
-    echoChamber = groupRatio > 1.5,
-    confidenceWeighted = confidence_weighted,
-    `trustVolatility Mean (SD)` = paste0(
-      trust_volatility_mean, ' (', trust_volatility_sd, ')'
-    ),
+runs <- output %>% 
+  filter(confidence_weighted == F) %>%
+  mutate(
     biasUpdates = bias_volatility_sd != 0,
-    flatStart = n_decision == 1000
+    flatStart = n_decisions == 200,
+    echoChamber_original = group_ratio_original > 1.05
+  ) %>%
+  select(
+    -random_seed, -starting_graph, -bias_volatility_mean,
+    -bias_volatility_sd, -n_decisions, -n_agents, 
+    -starting_graph_type
+  ) 
+
+run_summary <- runs %>%
+  group_by(
+    trust_volatility_mean, trust_volatility_sd,
+    confidence_weighted, biasUpdates, flatStart, bias_sd
+  ) %>%
+  summarise(
+    across(.fns = list(mean = mean, sd = sd), .names = '{.col}_{.fn}'),
+    .groups = 'drop'
   ) %>% 
-  arrange(groupRatio)
+  arrange(group_ratio_original_mean) %>%
+  select(
+    starts_with('echo'), 
+    starts_with('group'), 
+    everything(), 
+    -matches('^echo.+_sd$', perl = T)
+  )
+
+run_summary
 ```
 
 Summarising the results in this way means that we can observe some notable features of the models.
@@ -179,6 +247,7 @@ For simplicity (and tractability) we reduce each collection of model instances t
 
 ```{r}
 if (!(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))) {
+  t1 <- Sys.time()
   set.seed(20201126)
   
   summaryFun <- function(model) 
@@ -195,7 +264,7 @@ if (!(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))) {
       n_decision = map_int(leads, ~ as.integer(. + 1000)),
       decision_flags = map(leads, ~ c(rep(1, .), rep(3, 1000)))
     ),
-    weighted_sampling_mean = c(0, .3, .6, 1, 1.3, 1.6, 2),
+    weighted_sampling_mean = c(0, 3, 6, 12, 24, 48),
     weighted_sampling_sd = 0,
     bias_volatility_sd = .05,
     bias_volatility_mean = 0,
@@ -263,7 +332,11 @@ if (!(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))) {
   runs %>%
     mutate(
       leadIn = factor(n_decision - 1000),
-      weighted_sampling_mean = if_else(is.na(weighted_sampling_mean), 0, weighted_sampling_mean),
+      weighted_sampling_mean = if_else(
+        is.na(weighted_sampling_mean), 
+        0, 
+        weighted_sampling_mean
+      ),
       weighted_sampling_mean = factor(weighted_sampling_mean)
     ) %>%
     ggplot(aes(x = leadIn, y = groupRatio, fill = weighted_sampling_mean)) +
@@ -273,6 +346,7 @@ if (!(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))) {
     scale_y_continuous(limits = c(0, NA)) +
     scale_fill_brewer(palette = 'Blues')
   
+  Sys.time() - t1
 }
 
 ```
