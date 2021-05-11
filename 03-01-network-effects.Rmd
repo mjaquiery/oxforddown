@@ -77,7 +77,8 @@ parameters <- tidyr::crossing(
     ),
     bias_sd = c(1, .25),
     confidence_weighted = c(T, F),
-    bias_volatility_sd = c(0, .05)
+    bias_volatility_sd = c(0, .05), 
+    weighted_sampling_mean = c(0, 50)
   ),
   tibble(
     n_decision = c(200, 300),
@@ -100,14 +101,20 @@ output <- parameters %>%
   mutate(groupRatio = NA_real_, weightRatio = NA_real_)
 
 summary_fun <- function(m) {
-  
+  # Calculate group ratios
   m$parameters$group_ratio_original <-
     adviseR::groupRatio(m$model$graphs[[length(m$model$graphs)]])
   m$parameters$group_ratio_empirical <-
     adviseR::groupRatio(m$model$graphs[[length(m$model$graphs)]], F)
   
+  # Calculate proportion of extremes
+  x <- m$model$agents$bias[m$model$agents$decision == max(m$model$agents$decision)]
+  m$parameters$n_lt_20 <- mean(x < .2)
+  m$parameters$n_gt_80 <- mean(x > .8)
+  m$parameters$n_mid <- mean(x >= .2 & x <= .8)
+  
   # Save the summary stuff for the first example of each model
-  if (m$parameters$random_seed != 20210507) {
+  if (m$parameters$random_seed != 20210507 || m$parameters$confidence_weighted) {
     m$model <- NULL
   }
   
@@ -116,7 +123,7 @@ summary_fun <- function(m) {
 
 models <- runSimulations(
   parameters, 
-  cores = min(nrow(parameters), 12),
+  cores = min(nrow(parameters), 8),
   summaryFun = summary_fun
 )
 
@@ -141,46 +148,6 @@ output <- models %>%
   }) %>%
   bind_rows()
 
-# 
-# for (i in 1:length(models)) {
-#   m <- models[[i]]
-#   
-#   if (F) {
-#     networkGraph(
-#       m, 
-#       mark.groups = list(
-#         which(V(m$model$graphs[[1]])$bias <= .5),
-#         which(V(m$model$graphs[[1]])$bias > .5)
-#       )
-#     ) 
-#     
-#     for (x in inspectModel(m))
-#       print(x)
-#     
-#     saveAnimation(m, paste0('figures/network-anim_', i, '.gif'))
-#   }
-#   
-#   # caption = "Simulated trust for average agents.  Simulated agents' trust in other agents at the end of the simulation. Individual lines show the average trust for an agent in those of the same or different group. Violins and boxplots show the distributions of these averages. The groups are arbitrarily named and separate agents by bias strength (whether the bias is positive or negative). Both groups contain some agents with pronounced biases and some with negligible biases.  The dashed line indicates the starting trust level between all agents in the simulation."
-#   
-#   # Explore quantification of a graph that splits
-#   g <- m$model$graphs[[length(m$model$graphs)]]
-#   g1 <- m$model$graphs[[1]]
-#   edge_attr(g, 'head_group') <- head_of(g1, E(g1))$bias > .5
-#   edge_attr(g, 'tail_group') <- tail_of(g1, E(g1))$bias > .5
-#   
-#   a <- edge_attr(g) %>% 
-#     as_tibble() %>% 
-#     mutate(sameGroup = head_group == tail_group)
-#   
-#   # Group ratio gives a good indication along the lines of visual inspection of 
-#   # the igraph plots
-#   output$groupRatio[i] <- 
-#     mean(a$weight[a$sameGroup]) / mean(a$weight[!a$sameGroup])
-#   output$weightRatio[i] <- 
-#     mean(a$weight[a$weight > median(a$weight)]) /
-#     mean(a$weight[a$weight < median(a$weight)])
-# }
-
 output %>% select(ends_with('ratio'), everything())
 Sys.time() - t1
 ```
@@ -195,51 +162,129 @@ We set the threshold (somewhat arbitrarily) to 1.5.
 ```{r}
 
 runs <- output %>% 
-  filter(confidence_weighted == F) %>%
+  # filter(confidence_weighted == F) %>%
   mutate(
     biasUpdates = bias_volatility_sd != 0,
     flatStart = n_decisions == 200,
-    echoChamber_original = group_ratio_original > 1.05
+    ec_orig = group_ratio_original > 1.05,
+    ec_emp = group_ratio_empirical > 1.05
   ) %>%
   select(
     -random_seed, -starting_graph, -bias_volatility_mean,
     -bias_volatility_sd, -n_decisions, -n_agents, 
-    -starting_graph_type
+    -starting_graph_type, -trust_volatility_sd,
+    gr_orig = group_ratio_original,
+    gr_emp = group_ratio_empirical,
+    ws_mean = weighted_sampling_mean
   ) 
 
 run_summary <- runs %>%
   group_by(
-    trust_volatility_mean, trust_volatility_sd,
-    confidence_weighted, biasUpdates, flatStart, bias_sd
+    trust_volatility_mean, confidence_weighted, biasUpdates, flatStart, bias_sd,
+    ws_mean
   ) %>%
   summarise(
-    across(.fns = list(mean = mean, sd = sd), .names = '{.col}_{.fn}'),
+    across(.fns = list(m = mean, sd = sd), .names = '{.col}_{.fn}'),
     .groups = 'drop'
   ) %>% 
-  arrange(group_ratio_original_mean) %>%
+  mutate(across(matches('_(m|sd)$', perl = T), .fns = ~ round(., 4))) %>%
+  arrange(gr_emp_m) %>%
   select(
-    starts_with('echo'), 
-    starts_with('group'), 
+    starts_with('ec_'), 
+    matches('^gr_.+_m$', perl = T), 
+    matches('^n_.+_m$', perl = T),
+    ws_mean,
+    tv_mean = trust_volatility_mean,
+    conf_weighted = confidence_weighted,
+    biasUpdates,
+    flatStart,
+    bias_sd, 
+    matches('^gr_.+_sd$', perl = T),
+    matches('^n_.+_sd$', perl = T),
     everything(), 
-    -matches('^echo.+_sd$', perl = T)
+    -matches('^ec_.+_sd$', perl = T)
   )
 
 run_summary
+
+for (v in names(select(run_summary, ws_mean:bias_sd))) {
+  print(
+    run_summary %>% 
+      select(starts_with('gr_e'), ws_mean:bias_sd) %>%
+      mutate(across(ws_mean:bias_sd, factor)) %>%
+      ggplot(aes(y = gr_emp_m, x = !!sym(v))) + 
+      geom_hline(yintercept = 1.05, linetype = 'dashed') +
+      geom_violin(alpha = .1, fill = 'black', colour = NA) +
+      geom_boxplot(outlier.colour = NA, fill = NA, width = .2) +
+      geom_point(alpha = .1, position = position_jitter(.1)) + 
+      stat_summary(
+        geom = 'label', 
+        fun.data = function(x) data.frame(
+          y = .975, label = glue('mean = {round(mean(x), 2)}')
+        )
+      )
+  )
+}
+
 ```
 
 Summarising the results in this way means that we can observe some notable features of the models.
-First, echo chambers do not form where the agents update their biases and start with a flat network wherein all agents have equal trust in one another.
-This is due to the agents losing their biases at least as quickly as they build their trust networks.
-
-Second, Where either biases do not update, or the biases do update but against the background of heterogeneous trust (as developed over some time with bias updates frozen), we see echo chambers form regardless of the other parameter values. 
-
-Because of this bifurcation on echo chamber formation along readily detectable lines, we collapse the other parameters (confidence weighting and trust volatility) to single values for exploring the consequences of weighted selection below. 
-These models are computationally expensive to run, and thus reducing the number of models run allows for more efficient (though less comprehensive) investigation.
+Echo chambers form more readily where  
+* the agents update their trust more readily  
+* the agents update their biases  
+* the agents start with a flat network wherein all agents have equal trust in one another  
+  * this is due to the agents losing their biases at least as quickly as they build their trust networks  
+* decisions are updated proportional to the judge's confidence  
+* the agents' biases are more different to start with  
 
 ### The effect of weighted sampling on echo chamber formation
 
 Weighted sampling is the representation in the model of source selection behaviour.
 This source selection behaviour is the primary outcome of interest in the behavioural experiments, and thus it is important to understand how this property may theoretically affect echo chamber formation within in the models.
+
+```{r weighted sampling simple}
+ws <- run_summary %>% 
+  select(starts_with('gr_e'), ws_mean:bias_sd) %>%
+  mutate(
+    across(ws_mean:bias_sd, factor),
+    model_id = glue('{tv_mean}.{conf_weighted}.{biasUpdates}.{flatStart}.{bias_sd}'),
+    model_id = factor(model_id)
+  )
+
+ws %>%
+  ggplot(aes(y = gr_emp_m, x = ws_mean)) + 
+  geom_hline(yintercept = 1.05, linetype = 'dashed') +
+  geom_violin(alpha = .1, fill = 'black', colour = NA) +
+  geom_boxplot(outlier.colour = NA, fill = NA, width = .2) +
+  geom_line(alpha = .2, aes(group = model_id)) + 
+  stat_summary(
+    geom = 'label', 
+    fun.data = function(x) data.frame(
+      y = .975, label = glue('mean = {round(mean(x), 2)}')
+    )
+  )
+
+ws %>% 
+  select(model_id, ws_mean, gr_emp_m) %>%
+  pivot_wider(names_from = ws_mean, values_from = gr_emp_m) %>%
+  transmute(model_id, diff = `50` - `0`) %>%
+  arrange(diff)
+```
+
+It's odd that weighted selection should universally decrease the echo chambery-ness of all the models. 
+We can investigate this under conditions where it ought to increase: when the network is already set up such that shared bias correlates with trust.
+
+```{r weighted selection increase}
+
+# Select an appropriate model to examine
+
+# Set up a starting_trust function to make trust proportional to shared bias
+
+# Check same initial state for each model
+
+# Explore differences in weighted selection 
+
+```
 
 We focus on exploring whether weighted sampling introduces a lower threshold for asymmetric tie weights to produce echo chambers. 
 We examine this over several repetitions of models, for a wider range of values for weighted_sampling and decision burn-in.
