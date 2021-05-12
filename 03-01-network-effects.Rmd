@@ -282,42 +282,117 @@ parameters[100, ]
 trust_fun <- function(agents) {
   bias <- matrix(agents$bias, nrow = nrow(agents), ncol = nrow(agents))
   bias <- abs(bias - t(bias)) # bias similarity
-  1 - abs(bias / 2)
+  apply(bias, 1, function(x) {
+    1 - (x / max(x) * .5)
+  })
 }
 # Run models across weighted sampling and starting trust
 m_base <- runSimulation(
-  n_agents = 100, n_decisions = 500, trust_volatility_mean = .05,
+  n_agents = 100, n_decisions = 1000, trust_volatility_mean = .05,
   trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
   bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = .6,
   weighted_sampling_mean = 0
 )
 m_tf <- runSimulation(
-  n_agents = 100, n_decisions = 500, trust_volatility_mean = .05,
+  n_agents = 100, n_decisions = 1000, trust_volatility_mean = .05,
   trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
   bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = trust_fun,
   weighted_sampling_mean = 0
 )
-m_base_ws <- runSimulation(
-  n_agents = 100, n_decisions = 500, trust_volatility_mean = .05,
+m_base_ws_50 <- runSimulation(
+  n_agents = 100, n_decisions = 1000, trust_volatility_mean = .05,
   trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
   bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = .6,
   weighted_sampling_mean = 50
 )
-m_tf_ws <- runSimulation(
-  n_agents = 100, n_decisions = 500, trust_volatility_mean = .05,
+m_tf_ws_50 <- runSimulation(
+  n_agents = 100, n_decisions = 1000, trust_volatility_mean = .05,
   trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
   bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = trust_fun,
   weighted_sampling_mean = 50
+)
+m_base_ws_10 <- runSimulation(
+  n_agents = 100, n_decisions = 1000, trust_volatility_mean = .05,
+  trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
+  bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = .6,
+  weighted_sampling_mean = 10
+)
+m_tf_ws_10 <- runSimulation(
+  n_agents = 100, n_decisions = 1000, trust_volatility_mean = .05,
+  trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
+  bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = trust_fun,
+  weighted_sampling_mean = 10
 )
 # Explore differences in weighted selection 
 bind_rows(
   mutate(adviseR:::.biasCorrelation(m_base), model = 'm_base'),
   mutate(adviseR:::.biasCorrelation(m_tf), model = 'm_tf'),
-  mutate(adviseR:::.biasCorrelation(m_base_ws), model = 'm_base_ws'),
-  mutate(adviseR:::.biasCorrelation(m_tf_ws), model = 'm_tf_ws')
+  mutate(adviseR:::.biasCorrelation(m_base_ws_10), model = 'm_base_ws_10'),
+  mutate(adviseR:::.biasCorrelation(m_tf_ws_10), model = 'm_tf_ws_10'),
+  mutate(adviseR:::.biasCorrelation(m_base_ws_50), model = 'm_base_ws_50'),
+  mutate(adviseR:::.biasCorrelation(m_tf_ws_50), model = 'm_tf_ws_50')
 ) %>%
   ggplot(aes(x = decision, y = r, colour = model)) +
   geom_errorbar(aes(ymin = ciL, ymax = ciH), alpha = .5)
+```
+
+Okay, odd behaviour. 
+Apparently the higher the weighted selection the _lower_ the correlation between shared bias and advice weight. 
+This seems wrong. 
+Even when advice weight starts as perfectly correlated with shared bias, the correlation unravels _faster_ when weighted selection is higher. 
+
+We can explore this directly by taking the connectivity graphs and feeding them into the selectAdvisorSimple function.
+
+```{r weighted selection investigation}
+generations <- c(1, 100, 500, 1000)
+g <- lapply(generations, function(i) {
+  m_tf$model$graphs[[i]][attr = 'weight'] %>%
+  matrix(sqrt(length(.)), sqrt(length(.)))
+})
+
+picks <- tidyr::crossing(
+  i = 1:1e4, 
+  weightedSelection = c(0, 10, 50, 500), 
+  generation = 1:length(g)
+) %>% mutate(
+  picks = map2(weightedSelection, generation, function(ws, gen) {
+    tibble(
+      agent = c(1, 50, 100),
+      pick = adviseR:::selectAdvisorSimple(g[[gen]], ws)[agent]
+    )
+  })
+) %>% 
+  unnest(cols = picks) %>%
+  mutate(generation = generations[generation])
+
+picks
+
+picks %>% 
+  mutate(across(-pick, factor)) %>%
+  ggplot(aes(pick, colour = weightedSelection)) +
+  geom_density(position = 'identity') +
+  facet_wrap(generation~agent, labeller = label_both)
+  
+
+```
+
+So from the above it looks like the weighted selection function is making agents more likely to select agents they trust more.
+
+We can next check that the mean weight of advisor is higher than the mean advisor weight (i.e. the advisor actually selected on each trial is probably more trusted than the average advisor).
+
+```{r weighted selection average weight}
+tibble(
+  generation = generations,
+  average_weight = map_dbl(generations, ~ mean(
+    g[[which(generations == .)]][upper.tri(g[[which(generations == .)]])]
+  )),
+  average_advisor_weight = m_tf_ws_50$model$agents %>%
+    filter(decision %in% generations) %>%
+    group_by(decision) %>%
+    summarise(x = mean(weight), .groups = 'drop') %>%
+    pull(x),
+  sensible = average_advisor_weight > average_weight
+)
 ```
 
 We focus on exploring whether weighted sampling introduces a lower threshold for asymmetric tie weights to produce echo chambers. 
