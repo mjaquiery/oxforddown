@@ -277,13 +277,47 @@ We can investigate this under conditions where it ought to increase: when the ne
 ```{r weighted selection increase}
 
 # Select an appropriate model to examine
-
+parameters[100, ]
 # Set up a starting_trust function to make trust proportional to shared bias
-
-# Check same initial state for each model
-
+trust_fun <- function(agents) {
+  bias <- matrix(agents$bias, nrow = nrow(agents), ncol = nrow(agents))
+  bias <- abs(bias - t(bias)) # bias similarity
+  1 - abs(bias / 2)
+}
+# Run models across weighted sampling and starting trust
+m_base <- runSimulation(
+  n_agents = 100, n_decisions = 500, trust_volatility_mean = .05,
+  trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
+  bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = .6,
+  weighted_sampling_mean = 0
+)
+m_tf <- runSimulation(
+  n_agents = 100, n_decisions = 500, trust_volatility_mean = .05,
+  trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
+  bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = trust_fun,
+  weighted_sampling_mean = 0
+)
+m_base_ws <- runSimulation(
+  n_agents = 100, n_decisions = 500, trust_volatility_mean = .05,
+  trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
+  bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = .6,
+  weighted_sampling_mean = 50
+)
+m_tf_ws <- runSimulation(
+  n_agents = 100, n_decisions = 500, trust_volatility_mean = .05,
+  trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
+  bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = trust_fun,
+  weighted_sampling_mean = 50
+)
 # Explore differences in weighted selection 
-
+bind_rows(
+  mutate(adviseR:::.biasCorrelation(m_base), model = 'm_base'),
+  mutate(adviseR:::.biasCorrelation(m_tf), model = 'm_tf'),
+  mutate(adviseR:::.biasCorrelation(m_base_ws), model = 'm_base_ws'),
+  mutate(adviseR:::.biasCorrelation(m_tf_ws), model = 'm_tf_ws')
+) %>%
+  ggplot(aes(x = decision, y = r, colour = model)) +
+  geom_errorbar(aes(ymin = ciL, ymax = ciH), alpha = .5)
 ```
 
 We focus on exploring whether weighted sampling introduces a lower threshold for asymmetric tie weights to produce echo chambers. 
