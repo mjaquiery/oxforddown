@@ -64,58 +64,97 @@ This shows basic model behaviour range before we consider weighted selection.
 
 ```{r network-models}
 t1 <- Sys.time()
-n_reps <- 20
+n_reps <- 10
 withr::with_seed(
   20210507,
   seeds <- c(20210507, floor(runif(n_reps - 1) * 1e8))
 )
 parameters <- tidyr::crossing(
-  tidyr::crossing(
-    tibble(
-      trust_volatility_mean = c(.05, .2),
-      trust_volatility_sd = c(.01, .05)
-    ),
-    bias_sd = c(1, .25),
-    confidence_weighted = c(T, F),
-    bias_volatility_sd = c(0, .05), 
-    weighted_sampling_mean = c(0, 50)
-  ),
+  bias_volatility_mean = .01,
+  bias_volatility_sd = .005,
+  n_agents = 100,
+  truth_sd = .5,
+  sensitivity_mean = 3,
+  sensitivity_sd = .5,
+  random_seed = seeds,
+  # starting_graph = c(function(x) {
+  #   matrix(runif(nrow(x) ^ 2, .5), nrow(x), nrow(x))
+  # }),
+  starting_graph = .6,
+  confidence_weighted = F,
   tibble(
-    n_decision = c(200, 300),
+    n_decision = c(500, 700),
     decision_flags = map(
       n_decision, 
-      ~ if (. > 200) {c(rep(1, 200), rep(3, 100))} else {3}
+      ~ if (. > 500) {c(rep(1, 500), rep(3, 200))} else {rep(3, .)}
     )
   ),
-  bias_volatility_mean = 0,
-  n_agents = 100,
-  random_seed = seeds,
-  starting_graph = .6
+  tidyr::crossing(
+    tibble(
+      trust_volatility_mean = c(.05),#, .2),
+      trust_volatility_sd = c(.01)#, .05)
+    ),
+    bias_sd = c(.1, .75),
+    # confidence_weighted = c(T, F),
+    # bias_volatility_sd = c(0, .05), 
+    # feedback_proportion = c(0, .1),
+    weighted_sampling_mean = c(0, 10, 30)
+  )
 )
 
 # Drop unnecessary models
-parameters <- parameters %>% 
-  filter(!(bias_volatility_sd == 0 & n_decision > 200))
-
-output <- parameters %>%
-  mutate(groupRatio = NA_real_, weightRatio = NA_real_)
+# parameters <- parameters %>% 
+#   filter(!(bias_volatility_sd == 0 & n_decision > 200))
 
 summary_fun <- function(m) {
+  .cc <- function(x, ...) adviseR::.cluster_count(x, k = 1:2, ...)
   # Calculate group ratios
   m$parameters$group_ratio_original <-
     adviseR::groupRatio(m$model$graphs[[length(m$model$graphs)]])
   m$parameters$group_ratio_empirical <-
     adviseR::groupRatio(m$model$graphs[[length(m$model$graphs)]], F)
   
+  lastGen <- 
+    m$model$agents[m$model$agents$decision == max(m$model$agents$decision), ]
+  
+  # Record mean final bias to determine which way the population is going
+  m$parameters$mean_final_bias <- mean(
+    m$model$agents$bias[m$model$agents$decision == max(m$model$agents$decision)]
+  )
+  
   # Calculate proportion of extremes
-  x <- m$model$agents$bias[m$model$agents$decision == max(m$model$agents$decision)]
+  x <- lastGen$bias
   m$parameters$n_lt_20 <- mean(x < .2)
   m$parameters$n_gt_80 <- mean(x > .8)
   m$parameters$n_mid <- mean(x >= .2 & x <= .8)
   
+  # Calculate the bias magnitude
+  m$parameters$meanBiasMagnitude <- mean(abs(lastGen$bias - .5)) 
+  
+  # Calculate the compression stats
+  m$parameters$cluster_count <- .cc(
+    m$model$graphs[[length(m$model$graphs)]]
+  )
   # Save the summary stuff for the first example of each model
   if (m$parameters$random_seed != 20210507 || m$parameters$confidence_weighted) {
     m$model <- NULL
+  } else {
+    library(tidyverse)
+    m$model$agents <- m$model$agents %>%
+      nest(d = -decision) %>%
+      mutate(
+        cluster_count = map_int(
+          decision,
+          function(i) {
+            g <- m$model$graphs[[i]]
+            if (all(is.na(g)))
+              NA_integer_
+            else
+              .cc(g)
+          }
+        )
+      ) %>%
+      unnest(cols = d)
   }
   
   m
@@ -123,13 +162,13 @@ summary_fun <- function(m) {
 
 models <- runSimulations(
   parameters, 
-  cores = min(nrow(parameters), 8),
+  cores = min(nrow(parameters), 3),
   summaryFun = summary_fun
 )
 
-output <- models %>%
-  lapply(function(m) {
-    if (!is.null(m$model)) {
+for (m in models) {
+  if (!is.null(m$model)) {
+    try({
       adviseR::networkGraph(
         m, 
         mark.groups = list(
@@ -137,92 +176,68 @@ output <- models %>%
           which(V(m$model$graphs[[1]])$bias > .5)
         )
       ) 
-      
+    })
+    
+    try({
       for (x in adviseR::inspectModel(m))
         print(x)
-    }
+    })
     
+    # Bias magnitude
+    print(
+      m$model$agents %>% 
+        mutate(biasDeviance = abs(bias - .5)) %>%
+        ggplot(aes(x = decision, y = biasDeviance)) +
+        stat_summary(geom = 'ribbon', fun.data = mean_cl_normal) +
+        scale_y_continuous(limits = c(0, .5))
+    )
+  }
+}
+
+output <- models %>%
+  lapply(function(m) {
     m$parameters$truth_fun <- NULL
     m$parameters$decision_flags <- NULL
+    m$parameters$starting_graph <- NULL
     as_tibble(m$parameters)
   }) %>%
-  bind_rows()
+  bind_rows() %>%
+  mutate(burnInPeriod = n_decisions - min(n_decisions))
 
 output %>% select(ends_with('ratio'), everything())
 Sys.time() - t1
 ```
 
-For summary purposes we now divide up the models into those which exhibit echo chamber formation and those which do not. 
-To do this, we set a threshold on the group weight ratio after the final decision. 
-This ratio is calculated as the mean of the weights of agents with the same initial bias direction divided by the mean of the weights of agents with different initial bias direction.
-In short, it represents the trust ratio for in- as compared to out-group members.
-Values for this ratio in the region of 1 indicate relatively balanced in- and out-group weight, while values around 2 or greater indicate substantially greater trust in in-group as opposed to out-group members.
-We set the threshold (somewhat arbitrarily) to 1.5.
 
-```{r}
 
-runs <- output %>% 
-  # filter(confidence_weighted == F) %>%
-  mutate(
-    biasUpdates = bias_volatility_sd != 0,
-    flatStart = n_decisions == 200,
-    ec_orig = group_ratio_original > 1.05,
-    ec_emp = group_ratio_empirical > 1.05
-  ) %>%
-  select(
-    -random_seed, -starting_graph, -bias_volatility_mean,
-    -bias_volatility_sd, -n_decisions, -n_agents, 
-    -starting_graph_type, -trust_volatility_sd,
-    gr_orig = group_ratio_original,
-    gr_emp = group_ratio_empirical,
-    ws_mean = weighted_sampling_mean
-  ) 
-
-run_summary <- runs %>%
-  group_by(
-    trust_volatility_mean, confidence_weighted, biasUpdates, flatStart, bias_sd,
-    ws_mean
-  ) %>%
-  summarise(
-    across(.fns = list(m = mean, sd = sd), .names = '{.col}_{.fn}'),
-    .groups = 'drop'
-  ) %>% 
-  mutate(across(matches('_(m|sd)$', perl = T), .fns = ~ round(., 4))) %>%
-  arrange(gr_emp_m) %>%
-  select(
-    starts_with('ec_'), 
-    matches('^gr_.+_m$', perl = T), 
-    matches('^n_.+_m$', perl = T),
-    ws_mean,
-    tv_mean = trust_volatility_mean,
-    conf_weighted = confidence_weighted,
-    biasUpdates,
-    flatStart,
-    bias_sd, 
-    matches('^gr_.+_sd$', perl = T),
-    matches('^n_.+_sd$', perl = T),
-    everything(), 
-    -matches('^ec_.+_sd$', perl = T)
-  )
-
-run_summary
-
-for (v in names(select(run_summary, ws_mean:bias_sd))) {
+```{r} 
+# As above but individual runs
+for (v in names(select(output, burnInPeriod, bias_sd:starting_graph_type, truth_sd, confidence_weighted))) {
+  if (length(unique(pull(output, v))) < 2)
+    next()
   print(
-    run_summary %>% 
-      select(starts_with('gr_e'), ws_mean:bias_sd) %>%
-      mutate(across(ws_mean:bias_sd, factor)) %>%
-      ggplot(aes(y = gr_emp_m, x = !!sym(v))) + 
-      geom_hline(yintercept = 1.05, linetype = 'dashed') +
+    output %>% 
+      mutate(grp = glue(
+        '{',
+        paste0(names(select(output, burnInPeriod, bias_sd:random_seed, truth_sd:confidence_weighted, -!!sym(v))), collapse = "}|{"),
+        '}'
+      )) %>%
+      rowid_to_column() %>%
+      select(rowid, meanBiasMagnitude, cluster_count, group_ratio_empirical, burnInPeriod, bias_sd:random_seed, truth_sd:confidence_weighted, grp) %>%
+      pivot_longer(c(meanBiasMagnitude, cluster_count, group_ratio_empirical), names_to = 'outcome') %>%
+      mutate(across(-value, factor)) %>%
+      ggplot(aes(y = value, x = !!sym(v))) + 
+      # stat_summary(
+      #   geom = 'label', 
+      #   fun.data = function(x) data.frame(
+      #     y = -Inf, label = glue('mean = {round(mean(x), 2)}'), vjust = 0
+      #   )
+      # ) + 
       geom_violin(alpha = .1, fill = 'black', colour = NA) +
-      geom_boxplot(outlier.colour = NA, fill = NA, width = .2) +
-      geom_point(alpha = .1, position = position_jitter(.1)) + 
-      stat_summary(
-        geom = 'label', 
-        fun.data = function(x) data.frame(
-          y = .975, label = glue('mean = {round(mean(x), 2)}')
-        )
-      )
+      geom_line(aes(group = grp), alpha = .25, position = position_jitter(.1, .01)) +
+      # geom_boxplot(outlier.colour = NA, fill = NA, width = .5) +
+      # geom_label(aes(label = rowid)) +
+      facet_wrap(~outcome, scales = 'free_y')
   )
 }
 
@@ -299,17 +314,17 @@ m_tf <- runSimulation(
   bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = trust_fun,
   weighted_sampling_mean = 0
 )
-m_base_ws_50 <- runSimulation(
+m_base_ws_5 <- runSimulation(
   n_agents = 100, n_decisions = 1000, trust_volatility_mean = .05,
   trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
   bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = .6,
-  weighted_sampling_mean = 50
+  weighted_sampling_mean = 5
 )
-m_tf_ws_50 <- runSimulation(
+m_tf_ws_5 <- runSimulation(
   n_agents = 100, n_decisions = 1000, trust_volatility_mean = .05,
   trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
   bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = trust_fun,
-  weighted_sampling_mean = 50
+  weighted_sampling_mean = 5
 )
 m_base_ws_10 <- runSimulation(
   n_agents = 100, n_decisions = 1000, trust_volatility_mean = .05,
@@ -329,8 +344,8 @@ bind_rows(
   mutate(adviseR:::.biasCorrelation(m_tf), model = 'm_tf'),
   mutate(adviseR:::.biasCorrelation(m_base_ws_10), model = 'm_base_ws_10'),
   mutate(adviseR:::.biasCorrelation(m_tf_ws_10), model = 'm_tf_ws_10'),
-  mutate(adviseR:::.biasCorrelation(m_base_ws_50), model = 'm_base_ws_50'),
-  mutate(adviseR:::.biasCorrelation(m_tf_ws_50), model = 'm_tf_ws_50')
+  mutate(adviseR:::.biasCorrelation(m_base_ws_5), model = 'm_base_ws_5'),
+  mutate(adviseR:::.biasCorrelation(m_tf_ws_5), model = 'm_tf_ws_5')
 ) %>%
   ggplot(aes(x = decision, y = r, colour = model)) +
   geom_errorbar(aes(ymin = ciL, ymax = ciH), alpha = .5)
@@ -352,7 +367,7 @@ g <- lapply(generations, function(i) {
 
 picks <- tidyr::crossing(
   i = 1:1e4, 
-  weightedSelection = c(0, 10, 50, 500), 
+  weightedSelection = c(0, 1, 5, 15, 25, 50), 
   generation = 1:length(g)
 ) %>% mutate(
   picks = map2(weightedSelection, generation, function(ws, gen) {
@@ -366,6 +381,11 @@ picks <- tidyr::crossing(
   mutate(generation = generations[generation])
 
 picks
+
+picks %>% filter(agent == 1, generation == 1) %>%
+  ggplot(aes(pick, fill = factor(weightedSelection))) +
+  geom_histogram(position = 'identity', binwidth = 1) +
+  facet_wrap(~weightedSelection, labeller = label_both, scales = 'free_y')
 
 picks %>% 
   mutate(across(-pick, factor)) %>%
@@ -381,19 +401,113 @@ So from the above it looks like the weighted selection function is making agents
 We can next check that the mean weight of advisor is higher than the mean advisor weight (i.e. the advisor actually selected on each trial is probably more trusted than the average advisor).
 
 ```{r weighted selection average weight}
-tibble(
+avg_vs_actual <- tibble(
   generation = generations,
   average_weight = map_dbl(generations, ~ mean(
     g[[which(generations == .)]][upper.tri(g[[which(generations == .)]])]
   )),
-  average_advisor_weight = m_tf_ws_50$model$agents %>%
+  average_advisor_weight_0 = m_tf$model$agents %>%
     filter(decision %in% generations) %>%
     group_by(decision) %>%
     summarise(x = mean(weight), .groups = 'drop') %>%
     pull(x),
-  sensible = average_advisor_weight > average_weight
-)
+  average_advisor_weight_5 = m_tf_ws_5$model$agents %>%
+    filter(decision %in% generations) %>%
+    group_by(decision) %>%
+    summarise(x = mean(weight), .groups = 'drop') %>%
+    pull(x),
+  average_advisor_weight_10 = m_tf_ws_10$model$agents %>%
+    filter(decision %in% generations) %>%
+    group_by(decision) %>%
+    summarise(x = mean(weight), .groups = 'drop') %>%
+    pull(x)
+) %>%
+  pivot_longer(
+    starts_with('average_advisor_weight_'), 
+    names_to = 'weightedSelection', 
+    names_pattern = '([0-9]+)$', 
+    values_to = 'average_advisor_weight'
+  )
+
+avg_vs_actual
+
+avg_vs_actual %>%
+  mutate(across(-ends_with('_weight'), factor)) %>%
+  ggplot(aes(x = weightedSelection, y = average_advisor_weight)) +
+  geom_point() + 
+  geom_hline(aes(yintercept = average_weight)) +
+  geom_label(
+    x = 1.5,
+    aes(y = average_weight, label = glue('avg={round(average_weight, 2)}'))
+  ) +
+  scale_y_continuous(limits = c(.5, 1)) +
+  facet_wrap(~generation, labeller = label_both)
 ```
+
+So it looks like the weighted selection really is behaving properly in the models: when weighted selection is not active the average weight of the selected advisors is approximately equal to the average weight of all advisors; and as weighted selection is increasingly strong the average weight of selected advisors rises.
+
+This, in combination with the previous graphs, suggests that weighted selection really is doing its job.
+The next candidate for examination is trust updating: are agents decreasing their trust in one another on average following interaction (thus producing an effect whereby the more likely interaction is to occur, the more likely trust is to degrade)?
+
+```{r trust update investigation}
+g_to_mat <- function(g) {
+  x <- g[attr = 'weight']
+  n <- sqrt(length(x))
+  matrix(x, n, n)
+}
+
+get_trust_update <- function(g1, g2) {
+  apply(g2 - g1, 1, sum)
+}
+
+generations <- c(1, 99, 499, 999)
+
+for (m in c("m_tf", "m_tf_ws_10", "m_base_ws_10")) {
+  mdl <- get(m)
+  tu <- mdl$model$agents %>% 
+    filter(decision %in% generations) %>%
+    mutate(generation = decision) %>%
+    nest(d = -decision) %>%
+    mutate(
+      d = map(d, ~ mutate(
+        .,
+        trust_update = get_trust_update(
+          g_to_mat(mdl$model$graphs[[.$generation[1]]]),
+          g_to_mat(mdl$model$graphs[[.$generation[1] + 1]])
+        )
+      ))
+    ) %>%
+    unnest(cols = d)
+  
+  print(
+    tu %>% 
+      mutate(advisorAgrees = adviseR:::adviceAgrees(initial, advice)) %>%
+      ggplot(aes(x = weight, y = trust_update, colour = advisorAgrees)) +
+      geom_hline(yintercept = 0) +
+      geom_vline(xintercept = .5) +
+      geom_smooth(method = 'lm', formula = y ~ x) +
+      geom_point(alpha = .5) +
+      coord_fixed() +
+      scale_y_continuous(limits = c(-.25, .25)) +
+      scale_x_continuous(limits = c(0, 1)) +
+      facet_wrap(~generation, labeller = label_both) +
+      labs(title = m)
+  )
+}
+```
+
+As shown in these figures, trust updates are dependent upon the current weight (because they use a weighted average drift). 
+This means that, the more trusted an advisor, the more damaging disagreement becomes and the less beneficial agreement becomes. 
+This makes sense, but may be driving the phenomenon of weighted selection producing less pronounced bias-weight correlations.
+More highly weighted advisors are more likely to be called on for advice, and given the disproportionate penalties for disagreement, more likely on average to decrease trust weights.
+Over time, this may produce the pattern of more highly trusted advisors being less trusted.
+The correlation seen in the non-weighted case might be an artefact of the more trustworthy advisors being consulted less often, and hence having less opportunity to lose their trust.
+
+Note that disagreement is still very common even with highly rated advisors.
+
+
+
+
 
 We focus on exploring whether weighted sampling introduces a lower threshold for asymmetric tie weights to produce echo chambers. 
 We examine this over several repetitions of models, for a wider range of values for weighted_sampling and decision burn-in.
