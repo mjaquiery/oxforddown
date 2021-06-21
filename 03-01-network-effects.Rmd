@@ -20,6 +20,7 @@ library(igraph)
 library(BayesFactor)
 library(magrittr)
 library(parallel)
+library(PearsonDS)
 
 library(gifski)
 
@@ -91,14 +92,17 @@ parameters <- tidyr::crossing(
   ),
   tidyr::crossing(
     tibble(
-      trust_volatility_mean = c(.05),#, .2),
-      trust_volatility_sd = c(.01)#, .05)
+      trust_volatility_mean = .0112, # estimated from our empirical data
+      trust_volatility_sd = 0
     ),
     bias_sd = c(.1, .75),
     # confidence_weighted = c(T, F),
     # bias_volatility_sd = c(0, .05), 
     # feedback_proportion = c(0, .1),
-    weighted_sampling_mean = c(0, 10, 30)
+    tibble(
+      weighted_sampling_mean = c(0, 3.0, 10.1),
+      weighted_sampling_sd = c(0, 18.1, 151)
+    )
   )
 )
 
@@ -202,7 +206,7 @@ output <- models %>%
     as_tibble(m$parameters)
   }) %>%
   bind_rows() %>%
-  mutate(burnInPeriod = n_decisions - min(n_decisions))
+  mutate(burnIn = n_decisions != min(n_decisions))
 
 output %>% select(ends_with('ratio'), everything())
 Sys.time() - t1
@@ -212,19 +216,39 @@ Sys.time() - t1
 
 ```{r} 
 # As above but individual runs
-for (v in names(select(output, burnInPeriod, bias_sd:starting_graph_type, truth_sd, confidence_weighted))) {
+
+# used to access names of potentially varying parameters
+tmp <- output %>% select( 
+  burnIn, 
+  bias_sd:feedback_proportion, 
+  truth_sd, 
+  confidence_weighted, 
+  -weighted_sampling_sd, 
+  -trust_volatility_sd,
+  random_seed
+)
+
+for (v in names(select(tmp, -random_seed))) {
   if (length(unique(pull(output, v))) < 2)
     next()
   print(
     output %>% 
       mutate(grp = glue(
         '{',
-        paste0(names(select(output, burnInPeriod, bias_sd:random_seed, truth_sd:confidence_weighted, -!!sym(v))), collapse = "}|{"),
+        paste0(names(select(tmp, -!!sym(v))), collapse = "}|{"),
         '}'
       )) %>%
       rowid_to_column() %>%
-      select(rowid, meanBiasMagnitude, cluster_count, group_ratio_empirical, burnInPeriod, bias_sd:random_seed, truth_sd:confidence_weighted, grp) %>%
-      pivot_longer(c(meanBiasMagnitude, cluster_count, group_ratio_empirical), names_to = 'outcome') %>%
+      select(
+        rowid, 
+        meanBiasMagnitude, 
+        cluster_count, 
+        burnIn, 
+        bias_sd:random_seed, 
+        truth_sd:confidence_weighted, 
+        grp
+      ) %>%
+      pivot_longer(c(meanBiasMagnitude, cluster_count), names_to = 'outcome') %>%
       mutate(across(-value, factor)) %>%
       ggplot(aes(y = value, x = !!sym(v))) + 
       # stat_summary(
@@ -252,38 +276,157 @@ Echo chambers form more readily where
 * decisions are updated proportional to the judge's confidence  
 * the agents' biases are more different to start with  
 
-### The effect of weighted sampling on echo chamber formation
+### Using the empirically estimated weighted selection distribution
 
 Weighted sampling is the representation in the model of source selection behaviour.
 This source selection behaviour is the primary outcome of interest in the behavioural experiments, and thus it is important to understand how this property may theoretically affect echo chamber formation within in the models.
 
 ```{r weighted sampling simple}
-ws <- run_summary %>% 
-  select(starts_with('gr_e'), ws_mean:bias_sd) %>%
-  mutate(
-    across(ws_mean:bias_sd, factor),
-    model_id = glue('{tv_mean}.{conf_weighted}.{biasUpdates}.{flatStart}.{bias_sd}'),
-    model_id = factor(model_id)
-  )
+t1 <- Sys.time()
 
-ws %>%
-  ggplot(aes(y = gr_emp_m, x = ws_mean)) + 
-  geom_hline(yintercept = 1.05, linetype = 'dashed') +
-  geom_violin(alpha = .1, fill = 'black', colour = NA) +
-  geom_boxplot(outlier.colour = NA, fill = NA, width = .2) +
-  geom_line(alpha = .2, aes(group = model_id)) + 
-  stat_summary(
-    geom = 'label', 
-    fun.data = function(x) data.frame(
-      y = .975, label = glue('mean = {round(mean(x), 2)}')
+ws.emp <- list(
+  uncoupled = c(mean = 3.0, sd = 18.1, skewness = .0067, kurtosis = 7.75),
+  fixedTU = c(mean = 10.1, sd = 151, skewness = 1.40, kurtosis = 32.8)
+)
+ws <- lapply(ws.emp, function(x) rpearson(parameters$n_agents[1], moments = x))
+
+# Check actual moments vs target moments
+ws.emp
+lapply(ws, function(x) round(empMoments(x), 3))
+
+models.emp <- NULL
+for (i in 1:nrow(parameters)) {
+  p <- parameters[i, ]
+  agts <- adviseR:::makeAgents(
+    n_agents = p$n_agents, n_decisions = p$n_decision, 
+    bias_sd = p$bias_sd, sensitivity_mean = p$sensitivity_mean,
+    sensitivity_sd = p$sensitivity_sd, 
+    trust_volatility_mean = p$trust_volatility_mean,
+    trust_volatility_sd = p$trust_volatility_sd, 
+    bias_volatility_mean = p$bias_volatility_mean,
+    bias_volatility_sd = p$bias_volatility_sd,
+    weighted_sampling_mean = p$weighted_sampling_mean,
+    weighted_sampling_sd = p$weighted_sampling_sd,
+    starting_graph = p$starting_graph
+  )
+  if (p$weighted_sampling_mean != 0) {
+    if (p$weighted_sampling_mean == 3.0)
+      agts$agents$weighted_sampling <- rep(ws$uncoupled, p$n_decision)
+    if (p$weighted_sampling_mean == 10.1)
+      agts$agents$weighted_sampling <- rep(ws$fixedTU, p$n_decision)
+  }
+  models.emp[[i]] <- list(
+    n_agents = p$n_agents, n_decisions = p$n_decision, 
+    bias_sd = p$bias_sd, sensitivity_mean = p$sensitivity_mean,
+    sensitivity_sd = p$sensitivity_sd, 
+    trust_volatility_mean = p$trust_volatility_mean,
+    trust_volatility_sd = p$trust_volatility_sd, 
+    bias_volatility_mean = p$bias_volatility_mean,
+    bias_volatility_sd = p$bias_volatility_sd,
+    weighted_sampling_mean = p$weighted_sampling_mean,
+    weighted_sampling_sd = p$weighted_sampling_sd,
+    starting_graph = p$starting_graph,
+    decision_flags = unlist(p$decision_flags),
+    confidence_weighted = p$confidence_weighted,
+    random_seed = p$random_seed,
+    model = agts
+  )
+}
+
+models.emp <- runSimulations(
+  models.emp, 
+  cores = min(nrow(parameters), 3),
+  summaryFun = summary_fun
+)
+
+for (m in models.emp) {
+  if (!is.null(m$model)) {
+    try({
+      adviseR::networkGraph(
+        m, 
+        mark.groups = list(
+          which(V(m$model$graphs[[1]])$bias <= .5),
+          which(V(m$model$graphs[[1]])$bias > .5)
+        )
+      ) 
+    })
+    
+    try({
+      for (x in adviseR::inspectModel(m))
+        print(x)
+    })
+    
+    # Bias magnitude
+    print(
+      m$model$agents %>% 
+        mutate(biasDeviance = abs(bias - .5)) %>%
+        ggplot(aes(x = decision, y = biasDeviance)) +
+        stat_summary(geom = 'ribbon', fun.data = mean_cl_normal) +
+        scale_y_continuous(limits = c(0, .5))
     )
-  )
+  }
+}
 
-ws %>% 
-  select(model_id, ws_mean, gr_emp_m) %>%
-  pivot_wider(names_from = ws_mean, values_from = gr_emp_m) %>%
-  transmute(model_id, diff = `50` - `0`) %>%
-  arrange(diff)
+output.emp <- models.emp %>%
+  lapply(function(m) {
+    m$parameters$truth_fun <- NULL
+    m$parameters$decision_flags <- NULL
+    m$parameters$starting_graph <- NULL
+    as_tibble(m$parameters)
+  }) %>%
+  bind_rows() %>%
+  mutate(burnIn = n_decisions == min(n_decisions))
+
+output.emp %>% select(ends_with('ratio'), everything())
+Sys.time() - t1
+```
+
+```{r}
+
+op <- bind_rows(
+  mutate(output, ws_source = 'sim'),
+  mutate(output.emp, ws_source = 'emp')
+)
+
+for (v in names(select(tmp, -random_seed, -ws_source))) {
+  if (length(unique(pull(output, v))) < 2)
+    next()
+  print(
+    op %>% 
+      mutate(grp = glue(
+        '{',
+        paste0(names(select(tmp, -!!sym(v))), collapse = "}|{"),
+        '}|{ws_source}'
+      )) %>%
+      rowid_to_column() %>%
+      select(
+        rowid, 
+        ws_source,
+        meanBiasMagnitude, 
+        cluster_count, 
+        burnIn, 
+        bias_sd:random_seed, 
+        truth_sd:confidence_weighted, 
+        grp
+      ) %>%
+      pivot_longer(c(meanBiasMagnitude, cluster_count), names_to = 'outcome') %>%
+      mutate(across(-value, factor)) %>%
+      ggplot(aes(y = value, x = !!sym(v))) + 
+      # stat_summary(
+      #   geom = 'label', 
+      #   fun.data = function(x) data.frame(
+      #     y = -Inf, label = glue('mean = {round(mean(x), 2)}'), vjust = 0
+      #   )
+      # ) + 
+      geom_violin(alpha = .15, aes(fill = ws_source), colour = NA) +
+      geom_line(aes(group = grp, colour = ws_source), alpha = .25, 
+                position = position_jitter(.1, .01)) +
+      # geom_boxplot(outlier.colour = NA, fill = NA, width = .5) +
+      # geom_label(aes(label = rowid)) +
+      facet_wrap(~outcome, scales = 'free_y')
+  )
+}
+
 ```
 
 It's odd that weighted selection should universally decrease the echo chambery-ness of all the models. 

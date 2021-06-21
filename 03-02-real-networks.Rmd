@@ -13,6 +13,24 @@ documentclass: book
 # Network effects with heterogeneous agents {#chapter-hetero-networks}
 \adjustmtc 
 
+```{r}
+source('scripts_and_filters/general_setup.R')
+library(adviseR)
+library(igraph)
+library(BayesFactor)
+library(magrittr)
+library(parallel)
+
+```
+
+
+
+```{r}
+
+
+
+```
+
 <!-- 
 
 -->
