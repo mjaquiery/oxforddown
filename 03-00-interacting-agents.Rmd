@@ -16,6 +16,39 @@ documentclass: book
 # Interaction of psychological processes across minds {#chapter-interacting-agents}
 \adjustmtc 
 
+* We saw in Section II that advisor choice is varied among individuals.
+
+* We know from previous modelling work that source selection behaviour produces homophilic network dynamics (e.g. echo chambers).
+
+* We wonder what the variability observed in Section II will have on network dynamics.
+
+## Mini-review of networking models
+
+* Niccolo showed source selection is pathological (unless judgements are uncorrelated) in absence of bias updating
+  - True whether or not confidence weights updating
+  
+## Goals of this approach
+
+* Characterise models which implement basic effects
+  - Polarisation/attractors
+  - Echo chambers (burn-in period)
+  - Agents based on same model used for behavioural data
+  
+* Explore dynamics when using different values of weighted selection
+  - Mean 0 vs mean derived from parameter estimation
+  - Mean derived from parameter estimation vs Mean + SD derived from parameter estimation
+  - Mean + SD derived from parameter estimation vs samping estimated values
+  
+## Limitations
+
+* This is an initial exploration only
+  - Models are time-consuming to run (even with key components written in C++)
+  - Parameter space is huge and dynamics dependent upon parameter interactions
+* But it should serve to highlight whether and how heterogeneity could matter for dynamics
+* ...and indicate directions for further study
+
+## Old stuff
+
 <!-- Models suggest interactions between agents exascerbate problems, especially where source selection and info weighting combine. -->
 
 \mccorrect{!TODO[extend the simulation/agreement-effects-analysis stuff a bit and it will fill this chapter out well.]}

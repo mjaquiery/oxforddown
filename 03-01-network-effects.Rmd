@@ -13,59 +13,32 @@ documentclass: book
 # Network effects of interaction {#chapter-network-effects}
 \adjustmtc 
 
-```{r}
+## Method 
+
+### Model details
+
+### Parameters varied between model runs
+
+There are three parameters which are varied between runs:
+* The standard deviation of the agents' biases
+* Whether or not there is time for the random network weights to update before biases update
+* The agents' weighted selection values
+
+## Results
+
+```{r setup 03-01, echo = F, include = F}
 source('scripts_and_filters/general_setup.R')
 library(adviseR)
 library(igraph)
 library(BayesFactor)
 library(magrittr)
 library(parallel)
-library(PearsonDS)
-
-library(gifski)
-
-# animation
-saveAnimation <- function(model, saveAs) {
-  p <- tempfile(pattern = 'anim_')
-  dir.create(p)
-  gs <- list(
-    which(V(model$model$graphs[[1]])$bias <= .5),
-    which(V(model$model$graphs[[1]])$bias > .5)
-  )
-  coords <- NULL
-  for (i in 1:length(m$model$graphs)) {
-    g <- model$model$graphs[[i]]
-    png(filename = paste0(p, '/', sprintf('%04i', i), '.png'))
-    plotGraph(model, i, activeColours = F, layout = function(x) 
-      layout_with_fr(x, coords = coords, start.temp = 0.1), mark.groups = gs)
-    dev.off()
-    coords <- layout_with_fr(g, coords = coords, start.temp = 0.1)
-  }
-  gifski(
-    list.files(p, full.names = T), 
-    gif_file = saveAs,
-    width = 480, 
-    height = 480, 
-    delay = .1,
-    loop = F,
-    progress = F
-  )
-  unlink(p)
-}
 ```
 
-<!-- We may have some modelling to present along these lines. -->
+### Validity of the model
 
-## Models with agents drawn from a distribution
-
-### Can we reproduce the major polarisation/echo chamber effects?
-
-First, we present the models with a variety of parameters.
-This shows basic model behaviour range before we consider weighted selection.
-
-```{r network-models}
-t1 <- Sys.time()
-n_reps <- 10
+```{r basic models run}
+n_reps <- 5
 withr::with_seed(
   20210507,
   seeds <- c(20210507, floor(runif(n_reps - 1) * 1e8))
@@ -78,16 +51,18 @@ parameters <- tidyr::crossing(
   sensitivity_mean = 3,
   sensitivity_sd = .5,
   random_seed = seeds,
-  # starting_graph = c(function(x) {
-  #   matrix(runif(nrow(x) ^ 2, .5), nrow(x), nrow(x))
-  # }),
-  starting_graph = .6,
+  starting_graph = c(function(x) {
+    m <- matrix(runif(nrow(x) ^ 2, .5), nrow(x), nrow(x))
+    diag(m) <- 0
+    m
+  }),
+  # starting_graph = .6,
   confidence_weighted = F,
   tibble(
-    n_decision = c(500, 700),
+    n_decision = c(3000, 4000),
     decision_flags = map(
       n_decision, 
-      ~ if (. > 500) {c(rep(1, 500), rep(3, 200))} else {rep(3, .)}
+      ~ if (. > 3000) {c(rep(1, 3000), rep(3, . - 3000))} else {rep(3, .)}
     )
   ),
   tidyr::crossing(
@@ -95,20 +70,13 @@ parameters <- tidyr::crossing(
       trust_volatility_mean = .0112, # estimated from our empirical data
       trust_volatility_sd = 0
     ),
-    bias_sd = c(.1, .75),
-    # confidence_weighted = c(T, F),
-    # bias_volatility_sd = c(0, .05), 
-    # feedback_proportion = c(0, .1),
+    bias_sd = c(1, 1.5),
     tibble(
-      weighted_sampling_mean = c(0, 3.0, 10.1),
-      weighted_sampling_sd = c(0, 18.1, 151)
+      weighted_sampling_mean = c(0, 3.0, 3.0),
+      weighted_sampling_sd = c(0, 0, 18.1)
     )
   )
 )
-
-# Drop unnecessary models
-# parameters <- parameters %>% 
-#   filter(!(bias_volatility_sd == 0 & n_decision > 200))
 
 summary_fun <- function(m) {
   .cc <- function(x, ...) adviseR::.cluster_count(x, k = 1:2, ...)
@@ -140,627 +108,541 @@ summary_fun <- function(m) {
     m$model$graphs[[length(m$model$graphs)]]
   )
   # Save the summary stuff for the first example of each model
-  if (m$parameters$random_seed != 20210507 || m$parameters$confidence_weighted) {
-    m$model <- NULL
-  } else {
-    library(tidyverse)
-    m$model$agents <- m$model$agents %>%
-      nest(d = -decision) %>%
-      mutate(
-        cluster_count = map_int(
-          decision,
-          function(i) {
-            g <- m$model$graphs[[i]]
-            if (all(is.na(g)))
-              NA_integer_
-            else
-              .cc(g)
-          }
-        )
-      ) %>%
-      unnest(cols = d)
-  }
+  library(tidyverse)
+  m$model$agents <- m$model$agents %>%
+    nest(d = -decision) %>%
+    mutate(
+      cluster_count = map_int(
+        decision,
+        function(i) {
+          g <- m$model$graphs[[i]]
+          if (all(is.na(g)))
+            NA_integer_
+          else
+            .cc(g)
+        }
+      )
+    ) %>%
+    unnest(cols = d)
   
   m
 }
 
-models <- runSimulations(
-  parameters, 
-  cores = min(nrow(parameters), 3),
-  summaryFun = summary_fun
-)
-
-for (m in models) {
-  if (!is.null(m$model)) {
-    try({
-      adviseR::networkGraph(
-        m, 
-        mark.groups = list(
-          which(V(m$model$graphs[[1]])$bias <= .5),
-          which(V(m$model$graphs[[1]])$bias > .5)
-        )
-      ) 
-    })
-    
-    try({
-      for (x in adviseR::inspectModel(m))
-        print(x)
-    })
-    
-    # Bias magnitude
-    print(
-      m$model$agents %>% 
-        mutate(biasDeviance = abs(bias - .5)) %>%
-        ggplot(aes(x = decision, y = biasDeviance)) +
-        stat_summary(geom = 'ribbon', fun.data = mean_cl_normal) +
-        scale_y_continuous(limits = c(0, .5))
-    )
-  }
-}
-
-output <- models %>%
-  lapply(function(m) {
-    m$parameters$truth_fun <- NULL
-    m$parameters$decision_flags <- NULL
-    m$parameters$starting_graph <- NULL
-    as_tibble(m$parameters)
-  }) %>%
-  bind_rows() %>%
-  mutate(burnIn = n_decisions != min(n_decisions))
-
-output %>% select(ends_with('ratio'), everything())
-Sys.time() - t1
-```
-
-
-
-```{r} 
-# As above but individual runs
-
-# used to access names of potentially varying parameters
-tmp <- output %>% select( 
-  burnIn, 
-  bias_sd:feedback_proportion, 
-  truth_sd, 
-  confidence_weighted, 
-  -weighted_sampling_sd, 
-  -trust_volatility_sd,
-  random_seed
-)
-
-for (v in names(select(tmp, -random_seed))) {
-  if (length(unique(pull(output, v))) < 2)
-    next()
-  print(
-    output %>% 
-      mutate(grp = glue(
-        '{',
-        paste0(names(select(tmp, -!!sym(v))), collapse = "}|{"),
-        '}'
-      )) %>%
-      rowid_to_column() %>%
-      select(
-        rowid, 
-        meanBiasMagnitude, 
-        cluster_count, 
-        burnIn, 
-        bias_sd:random_seed, 
-        truth_sd:confidence_weighted, 
-        grp
-      ) %>%
-      pivot_longer(c(meanBiasMagnitude, cluster_count), names_to = 'outcome') %>%
-      mutate(across(-value, factor)) %>%
-      ggplot(aes(y = value, x = !!sym(v))) + 
-      # stat_summary(
-      #   geom = 'label', 
-      #   fun.data = function(x) data.frame(
-      #     y = -Inf, label = glue('mean = {round(mean(x), 2)}'), vjust = 0
-      #   )
-      # ) + 
-      geom_violin(alpha = .1, fill = 'black', colour = NA) +
-      geom_line(aes(group = grp), alpha = .25, position = position_jitter(.1, .01)) +
-      # geom_boxplot(outlier.colour = NA, fill = NA, width = .5) +
-      # geom_label(aes(label = rowid)) +
-      facet_wrap(~outcome, scales = 'free_y')
-  )
-}
-
-```
-
-Summarising the results in this way means that we can observe some notable features of the models.
-Echo chambers form more readily where  
-* the agents update their trust more readily  
-* the agents update their biases  
-* the agents start with a flat network wherein all agents have equal trust in one another  
-  * this is due to the agents losing their biases at least as quickly as they build their trust networks  
-* decisions are updated proportional to the judge's confidence  
-* the agents' biases are more different to start with  
-
-### Using the empirically estimated weighted selection distribution
-
-Weighted sampling is the representation in the model of source selection behaviour.
-This source selection behaviour is the primary outcome of interest in the behavioural experiments, and thus it is important to understand how this property may theoretically affect echo chamber formation within in the models.
-
-```{r weighted sampling simple}
-t1 <- Sys.time()
-
-ws.emp <- list(
-  uncoupled = c(mean = 3.0, sd = 18.1, skewness = .0067, kurtosis = 7.75),
-  fixedTU = c(mean = 10.1, sd = 151, skewness = 1.40, kurtosis = 32.8)
-)
-ws <- lapply(ws.emp, function(x) rpearson(parameters$n_agents[1], moments = x))
-
-# Check actual moments vs target moments
-ws.emp
-lapply(ws, function(x) round(empMoments(x), 3))
-
-models.emp <- NULL
-for (i in 1:nrow(parameters)) {
-  p <- parameters[i, ]
-  agts <- adviseR:::makeAgents(
-    n_agents = p$n_agents, n_decisions = p$n_decision, 
-    bias_sd = p$bias_sd, sensitivity_mean = p$sensitivity_mean,
-    sensitivity_sd = p$sensitivity_sd, 
-    trust_volatility_mean = p$trust_volatility_mean,
-    trust_volatility_sd = p$trust_volatility_sd, 
-    bias_volatility_mean = p$bias_volatility_mean,
-    bias_volatility_sd = p$bias_volatility_sd,
-    weighted_sampling_mean = p$weighted_sampling_mean,
-    weighted_sampling_sd = p$weighted_sampling_sd,
-    starting_graph = p$starting_graph
-  )
-  if (p$weighted_sampling_mean != 0) {
-    if (p$weighted_sampling_mean == 3.0)
-      agts$agents$weighted_sampling <- rep(ws$uncoupled, p$n_decision)
-    if (p$weighted_sampling_mean == 10.1)
-      agts$agents$weighted_sampling <- rep(ws$fixedTU, p$n_decision)
-  }
-  models.emp[[i]] <- list(
-    n_agents = p$n_agents, n_decisions = p$n_decision, 
-    bias_sd = p$bias_sd, sensitivity_mean = p$sensitivity_mean,
-    sensitivity_sd = p$sensitivity_sd, 
-    trust_volatility_mean = p$trust_volatility_mean,
-    trust_volatility_sd = p$trust_volatility_sd, 
-    bias_volatility_mean = p$bias_volatility_mean,
-    bias_volatility_sd = p$bias_volatility_sd,
-    weighted_sampling_mean = p$weighted_sampling_mean,
-    weighted_sampling_sd = p$weighted_sampling_sd,
-    starting_graph = p$starting_graph,
-    decision_flags = unlist(p$decision_flags),
-    confidence_weighted = p$confidence_weighted,
-    random_seed = p$random_seed,
-    model = agts
-  )
-}
-
-models.emp <- runSimulations(
-  models.emp, 
-  cores = min(nrow(parameters), 3),
-  summaryFun = summary_fun
-)
-
-for (m in models.emp) {
-  if (!is.null(m$model)) {
-    try({
-      adviseR::networkGraph(
-        m, 
-        mark.groups = list(
-          which(V(m$model$graphs[[1]])$bias <= .5),
-          which(V(m$model$graphs[[1]])$bias > .5)
-        )
-      ) 
-    })
-    
-    try({
-      for (x in adviseR::inspectModel(m))
-        print(x)
-    })
-    
-    # Bias magnitude
-    print(
-      m$model$agents %>% 
-        mutate(biasDeviance = abs(bias - .5)) %>%
-        ggplot(aes(x = decision, y = biasDeviance)) +
-        stat_summary(geom = 'ribbon', fun.data = mean_cl_normal) +
-        scale_y_continuous(limits = c(0, .5))
-    )
-  }
-}
-
-output.emp <- models.emp %>%
-  lapply(function(m) {
-    m$parameters$truth_fun <- NULL
-    m$parameters$decision_flags <- NULL
-    m$parameters$starting_graph <- NULL
-    as_tibble(m$parameters)
-  }) %>%
-  bind_rows() %>%
-  mutate(burnIn = n_decisions == min(n_decisions))
-
-output.emp %>% select(ends_with('ratio'), everything())
-Sys.time() - t1
-```
-
-```{r}
-
-op <- bind_rows(
-  mutate(output, ws_source = 'sim'),
-  mutate(output.emp, ws_source = 'emp')
-)
-
-for (v in names(select(tmp, -random_seed, -ws_source))) {
-  if (length(unique(pull(output, v))) < 2)
-    next()
-  print(
-    op %>% 
-      mutate(grp = glue(
-        '{',
-        paste0(names(select(tmp, -!!sym(v))), collapse = "}|{"),
-        '}|{ws_source}'
-      )) %>%
-      rowid_to_column() %>%
-      select(
-        rowid, 
-        ws_source,
-        meanBiasMagnitude, 
-        cluster_count, 
-        burnIn, 
-        bias_sd:random_seed, 
-        truth_sd:confidence_weighted, 
-        grp
-      ) %>%
-      pivot_longer(c(meanBiasMagnitude, cluster_count), names_to = 'outcome') %>%
-      mutate(across(-value, factor)) %>%
-      ggplot(aes(y = value, x = !!sym(v))) + 
-      # stat_summary(
-      #   geom = 'label', 
-      #   fun.data = function(x) data.frame(
-      #     y = -Inf, label = glue('mean = {round(mean(x), 2)}'), vjust = 0
-      #   )
-      # ) + 
-      geom_violin(alpha = .15, aes(fill = ws_source), colour = NA) +
-      geom_line(aes(group = grp, colour = ws_source), alpha = .25, 
-                position = position_jitter(.1, .01)) +
-      # geom_boxplot(outlier.colour = NA, fill = NA, width = .5) +
-      # geom_label(aes(label = rowid)) +
-      facet_wrap(~outcome, scales = 'free_y')
-  )
-}
-
-```
-
-It's odd that weighted selection should universally decrease the echo chambery-ness of all the models. 
-We can investigate this under conditions where it ought to increase: when the network is already set up such that shared bias correlates with trust.
-
-```{r weighted selection increase}
-
-# Select an appropriate model to examine
-parameters[100, ]
-# Set up a starting_trust function to make trust proportional to shared bias
-trust_fun <- function(agents) {
-  bias <- matrix(agents$bias, nrow = nrow(agents), ncol = nrow(agents))
-  bias <- abs(bias - t(bias)) # bias similarity
-  apply(bias, 1, function(x) {
-    1 - (x / max(x) * .5)
-  })
-}
-# Run models across weighted sampling and starting trust
-m_base <- runSimulation(
-  n_agents = 100, n_decisions = 1000, trust_volatility_mean = .05,
-  trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
-  bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = .6,
-  weighted_sampling_mean = 0
-)
-m_tf <- runSimulation(
-  n_agents = 100, n_decisions = 1000, trust_volatility_mean = .05,
-  trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
-  bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = trust_fun,
-  weighted_sampling_mean = 0
-)
-m_base_ws_5 <- runSimulation(
-  n_agents = 100, n_decisions = 1000, trust_volatility_mean = .05,
-  trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
-  bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = .6,
-  weighted_sampling_mean = 5
-)
-m_tf_ws_5 <- runSimulation(
-  n_agents = 100, n_decisions = 1000, trust_volatility_mean = .05,
-  trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
-  bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = trust_fun,
-  weighted_sampling_mean = 5
-)
-m_base_ws_10 <- runSimulation(
-  n_agents = 100, n_decisions = 1000, trust_volatility_mean = .05,
-  trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
-  bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = .6,
-  weighted_sampling_mean = 10
-)
-m_tf_ws_10 <- runSimulation(
-  n_agents = 100, n_decisions = 1000, trust_volatility_mean = .05,
-  trust_volatility_sd = .01, bias_sd = 1, confidence_weighted = F,
-  bias_volatility_mean = 0, random_seed = pi * 1e8, starting_graph = trust_fun,
-  weighted_sampling_mean = 10
-)
-# Explore differences in weighted selection 
-bind_rows(
-  mutate(adviseR:::.biasCorrelation(m_base), model = 'm_base'),
-  mutate(adviseR:::.biasCorrelation(m_tf), model = 'm_tf'),
-  mutate(adviseR:::.biasCorrelation(m_base_ws_10), model = 'm_base_ws_10'),
-  mutate(adviseR:::.biasCorrelation(m_tf_ws_10), model = 'm_tf_ws_10'),
-  mutate(adviseR:::.biasCorrelation(m_base_ws_5), model = 'm_base_ws_5'),
-  mutate(adviseR:::.biasCorrelation(m_tf_ws_5), model = 'm_tf_ws_5')
-) %>%
-  ggplot(aes(x = decision, y = r, colour = model)) +
-  geom_errorbar(aes(ymin = ciL, ymax = ciH), alpha = .5)
-```
-
-Okay, odd behaviour. 
-Apparently the higher the weighted selection the _lower_ the correlation between shared bias and advice weight. 
-This seems wrong. 
-Even when advice weight starts as perfectly correlated with shared bias, the correlation unravels _faster_ when weighted selection is higher. 
-
-We can explore this directly by taking the connectivity graphs and feeding them into the selectAdvisorSimple function.
-
-```{r weighted selection investigation}
-generations <- c(1, 100, 500, 1000)
-g <- lapply(generations, function(i) {
-  m_tf$model$graphs[[i]][attr = 'weight'] %>%
-  matrix(sqrt(length(.)), sqrt(length(.)))
-})
-
-picks <- tidyr::crossing(
-  i = 1:1e4, 
-  weightedSelection = c(0, 1, 5, 15, 25, 50), 
-  generation = 1:length(g)
-) %>% mutate(
-  picks = map2(weightedSelection, generation, function(ws, gen) {
-    tibble(
-      agent = c(1, 50, 100),
-      pick = adviseR:::selectAdvisorSimple(g[[gen]], ws)[agent]
-    )
-  })
-) %>% 
-  unnest(cols = picks) %>%
-  mutate(generation = generations[generation])
-
-picks
-
-picks %>% filter(agent == 1, generation == 1) %>%
-  ggplot(aes(pick, fill = factor(weightedSelection))) +
-  geom_histogram(position = 'identity', binwidth = 1) +
-  facet_wrap(~weightedSelection, labeller = label_both, scales = 'free_y')
-
-picks %>% 
-  mutate(across(-pick, factor)) %>%
-  ggplot(aes(pick, colour = weightedSelection)) +
-  geom_density(position = 'identity') +
-  facet_wrap(generation~agent, labeller = label_both)
+nCores <- 3
+for (i in 1:ceiling(nrow(parameters) / nCores)) {
+  n <- (i - 1) * nCores + 1
+  n <- c(n, min(n + nCores - 1, nrow(parameters)))
+  fName <- glue('_cache/network-models-cuF/100a3000d_{n[1]}-{n[2]}.rda')
+  if (file.exists(fName)) next()
   
-
-```
-
-So from the above it looks like the weighted selection function is making agents more likely to select agents they trust more.
-
-We can next check that the mean weight of advisor is higher than the mean advisor weight (i.e. the advisor actually selected on each trial is probably more trusted than the average advisor).
-
-```{r weighted selection average weight}
-avg_vs_actual <- tibble(
-  generation = generations,
-  average_weight = map_dbl(generations, ~ mean(
-    g[[which(generations == .)]][upper.tri(g[[which(generations == .)]])]
-  )),
-  average_advisor_weight_0 = m_tf$model$agents %>%
-    filter(decision %in% generations) %>%
-    group_by(decision) %>%
-    summarise(x = mean(weight), .groups = 'drop') %>%
-    pull(x),
-  average_advisor_weight_5 = m_tf_ws_5$model$agents %>%
-    filter(decision %in% generations) %>%
-    group_by(decision) %>%
-    summarise(x = mean(weight), .groups = 'drop') %>%
-    pull(x),
-  average_advisor_weight_10 = m_tf_ws_10$model$agents %>%
-    filter(decision %in% generations) %>%
-    group_by(decision) %>%
-    summarise(x = mean(weight), .groups = 'drop') %>%
-    pull(x)
-) %>%
-  pivot_longer(
-    starts_with('average_advisor_weight_'), 
-    names_to = 'weightedSelection', 
-    names_pattern = '([0-9]+)$', 
-    values_to = 'average_advisor_weight'
-  )
-
-avg_vs_actual
-
-avg_vs_actual %>%
-  mutate(across(-ends_with('_weight'), factor)) %>%
-  ggplot(aes(x = weightedSelection, y = average_advisor_weight)) +
-  geom_point() + 
-  geom_hline(aes(yintercept = average_weight)) +
-  geom_label(
-    x = 1.5,
-    aes(y = average_weight, label = glue('avg={round(average_weight, 2)}'))
-  ) +
-  scale_y_continuous(limits = c(.5, 1)) +
-  facet_wrap(~generation, labeller = label_both)
-```
-
-So it looks like the weighted selection really is behaving properly in the models: when weighted selection is not active the average weight of the selected advisors is approximately equal to the average weight of all advisors; and as weighted selection is increasingly strong the average weight of selected advisors rises.
-
-This, in combination with the previous graphs, suggests that weighted selection really is doing its job.
-The next candidate for examination is trust updating: are agents decreasing their trust in one another on average following interaction (thus producing an effect whereby the more likely interaction is to occur, the more likely trust is to degrade)?
-
-```{r trust update investigation}
-g_to_mat <- function(g) {
-  x <- g[attr = 'weight']
-  n <- sqrt(length(x))
-  matrix(x, n, n)
-}
-
-get_trust_update <- function(g1, g2) {
-  apply(g2 - g1, 1, sum)
-}
-
-generations <- c(1, 99, 499, 999)
-
-for (m in c("m_tf", "m_tf_ws_10", "m_base_ws_10")) {
-  mdl <- get(m)
-  tu <- mdl$model$agents %>% 
-    filter(decision %in% generations) %>%
-    mutate(generation = decision) %>%
-    nest(d = -decision) %>%
-    mutate(
-      d = map(d, ~ mutate(
-        .,
-        trust_update = get_trust_update(
-          g_to_mat(mdl$model$graphs[[.$generation[1]]]),
-          g_to_mat(mdl$model$graphs[[.$generation[1] + 1]])
-        )
-      ))
-    ) %>%
-    unnest(cols = d)
-  
-  print(
-    tu %>% 
-      mutate(advisorAgrees = adviseR:::adviceAgrees(initial, advice)) %>%
-      ggplot(aes(x = weight, y = trust_update, colour = advisorAgrees)) +
-      geom_hline(yintercept = 0) +
-      geom_vline(xintercept = .5) +
-      geom_smooth(method = 'lm', formula = y ~ x) +
-      geom_point(alpha = .5) +
-      coord_fixed() +
-      scale_y_continuous(limits = c(-.25, .25)) +
-      scale_x_continuous(limits = c(0, 1)) +
-      facet_wrap(~generation, labeller = label_both) +
-      labs(title = m)
-  )
-}
-```
-
-As shown in these figures, trust updates are dependent upon the current weight (because they use a weighted average drift). 
-This means that, the more trusted an advisor, the more damaging disagreement becomes and the less beneficial agreement becomes. 
-This makes sense, but may be driving the phenomenon of weighted selection producing less pronounced bias-weight correlations.
-More highly weighted advisors are more likely to be called on for advice, and given the disproportionate penalties for disagreement, more likely on average to decrease trust weights.
-Over time, this may produce the pattern of more highly trusted advisors being less trusted.
-The correlation seen in the non-weighted case might be an artefact of the more trustworthy advisors being consulted less often, and hence having less opportunity to lose their trust.
-
-Note that disagreement is still very common even with highly rated advisors.
-
-
-
-
-
-We focus on exploring whether weighted sampling introduces a lower threshold for asymmetric tie weights to produce echo chambers. 
-We examine this over several repetitions of models, for a wider range of values for weighted_sampling and decision burn-in.
-For simplicity (and tractability) we reduce each collection of model instances to a simple set of summary statistics describing the group weight ratio.
-
-```{r}
-if (!(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))) {
   t1 <- Sys.time()
-  set.seed(20201126)
-  
-  summaryFun <- function(model) 
-    groupRatio(model$model$graphs[[length(model$model$graphs)]])
-  
-  cacheFile <- '_cache/model-summary.rda'
-  if (file.exists(cacheFile)) load(cacheFile) else runs <- NULL
-  
-  start_time <- Sys.time()
-  
-  leads <- c(0, 250, 500, 750)
-  parameters <- tidyr::crossing(
-    tibble(
-      n_decision = map_int(leads, ~ as.integer(. + 1000)),
-      decision_flags = map(leads, ~ c(rep(1, .), rep(3, 1000)))
-    ),
-    weighted_sampling_mean = c(0, 3, 6, 12, 24, 48),
-    weighted_sampling_sd = 0,
-    bias_volatility_sd = .05,
-    bias_volatility_mean = 0,
-    n_agents = 100,
-    starting_graph = .1
-  ) 
-  
-  # We now have a lot of different models
-  max_cores <- detectCores() - 6
-  n_reps <- 4 # 4 full-computer runs for each model
-  
-  seeds <- runif(max_cores * n_reps, 1e6, 1e9)
-  
-  
-  for (i in 1:nrow(parameters)) {
-    for (r in 1:n_reps) {
-      indices <- ((r - 1) * max_cores + 1):(r * max_cores)
-      rows <- slice_sample(parameters[i, ], n = max_cores, replace = T) %>%
-        mutate(random_seed = seeds[indices])
-      # Don't go again if we already did this and have the result saved
-      if (!is.null(runs) && 
-          nrow(filter(
-            runs, 
-            n_decision %in% rows$n_decision & 
-            weighted_sampling_mean %in% rows$weighted_sampling_mean &
-            random_seed %in% rows$random_seed)) > 0
-      )
-        next()
-      runs <- rbind(
-        runs,
-        rows %>% mutate(
-          run = indices,
-          groupRatio = runSimulations(rows, max_cores, summaryFun)
+  models <- runSimulations(
+    parameters[n[1]:n[2], ], 
+    cores = nCores,
+    summaryFun = summary_fun
+  )
+  save(models, file = fName)
+  print(glue('Completed run {i} ({n[1]}-{n[2]}).'))
+  print(Sys.time() - t1)
+}
+```
+
+```{r basic models load}
+t1 <- Sys.time()
+fName <- '_cache/network-models-cuF.rda'
+if (file.exists(fName)) {
+  load(fName)
+} else {
+  # Gather data and bind into an analysable data frame
+  agents.cuF <- NULL
+  graphs.cuF <- list()
+  fList <- list.files('_cache/network-models-cuF/', pattern = '', full.names = T)
+  i <- 1
+  for (f in fList) {
+    load(f)
+    for (m in models) {
+      graphs.cuF[[i]] <- list()
+      for (d in 1:m$parameters$n_decisions) {
+        if ((d %% 100 == 1) | d == m$parameters$n_decisions) {
+          graphs.cuF[[i]][[d]] <- m$model$graphs[[d]]
+        }
+      }
+      
+      m$parameters$model_num <- i
+      i <- i + 1
+      m$parameters$starting_graph <- NULL
+      m$parameters$truth_fun <- NULL
+      m$parameters$decision_flags <- NULL
+      agents.cuF <- 
+        bind_rows(
+          agents.cuF, 
+          m$model$agents %>% 
+            filter(decision %% 100 == 1) %>%
+            rename(agt_cluster_count = cluster_count) %>%
+            left_join(as_tibble(m$parameters), by = character())
         )
-      )
-      save(runs, file = cacheFile)
     }
   }
-  
-  end_time <- Sys.time()
-  print(paste0(
-    'Completed ', n_reps * max_cores * nrow(parameters), ' models (',
-    n_reps, ' reps using ', max_cores, ' cores of ', nrow(parameters), 
-    ' sets of parameters)'
-  ))
-  end_time - start_time
-  
-  
-  runs %>% 
-    nest(d = c(groupRatio, run, random_seed)) %>%
-    mutate(
-      meanGroupRatio = map_dbl(d, ~mean(.$groupRatio)),
-      meanEchoCamber = map_dbl(d, ~mean(.$groupRatio > 1.5)),
-      leadIn = n_decision - 1000
-    ) %>%
-    select(
-      starts_with('mean'), 
-      leadIn, 
-      everything(), 
-      -d, 
-      -n_decision, 
-      -decision_flags
+  rm(m, models)
+  save(agents.cuF, graphs.cuF, file = fName)
+}
+Sys.time() - t1
+```
+
+```{r basic models graphs}
+# Plot graphs for example instances of each model
+ns <- agents.cuF %>% 
+  filter(random_seed == min(random_seed)) %>%
+  select(model_num) %>%
+  unique() %>%
+  pull(model_num)
+
+for (n in ns) {
+  adviseR::networkGraph(
+    list(model = list(graphs = graphs.cuF[[n]])),
+    mark.groups = list(
+      which(V(graphs.cuF[[n]][[1]])$bias <= .5),
+      which(V(graphs.cuF[[n]][[1]])$bias > .5)
     )
+  )
   
-  runs %>%
-    mutate(
-      leadIn = factor(n_decision - 1000),
-      weighted_sampling_mean = if_else(
-        is.na(weighted_sampling_mean), 
-        0, 
-        weighted_sampling_mean
-      ),
-      weighted_sampling_mean = factor(weighted_sampling_mean)
-    ) %>%
-    ggplot(aes(x = leadIn, y = groupRatio, fill = weighted_sampling_mean)) +
-    geom_hline(yintercept = 1.5, linetype = 'dashed') +
-    annotate(geom = 'label', label = 'Threshold', x = "0", y = 1.5) +
-    geom_boxplot(outlier.alpha = .25) +
-    scale_y_continuous(limits = c(0, NA)) +
-    scale_fill_brewer(palette = 'Blues')
+  tmp <- agents.cuF %>% filter(model_num == n)
+  print(
+    tmp %>%
+      filter(decision %in% range(decision)) %>%
+      transmute(
+        model_num, 
+        bias_sd, 
+        ws_mean = weighted_sampling_mean,
+        ws_sd = weighted_sampling_sd,
+        burnIn = n_decisions > 3000,
+        clusters = cluster_count, 
+        mean_bias = round(meanBiasMagnitude, 3), 
+        group_ratio = round(group_ratio_empirical, 3)
+      ) %>%
+      unique()
+  )
+  tmp <- list(
+    model = list(agents.cuF = tmp),
+    # hack back in the decision flags
+    parameters = list(
+      decision_flags = 
+        if (tmp$n_decisions[1] == 3000) {
+          rep(3, 3000)
+        } else {
+          c(rep(1, 3000), rep(3, 1000))
+        }
+    )
+  )
+  print(biasEvolution(tmp))
   
-  Sys.time() - t1
+  # Strip out decision_flags for dropped decisions
+  tmp$parameters$decision_flags <- 
+    tmp$parameters$decision_flags[
+      1:length(tmp$parameters$decision_flags) %in% tmp$model$agents$decision
+    ]
+  tmp$model$graphs <- graphs.cuF[[n]]
+  print(weightEvolution(tmp, decisions = function(d) c(1, 1501, 2901, 3401, 3901)))
 }
 
 ```
+
+
+The model reproduces key effects of interest. 
+Firstly, agents reinforce one another's biases, leading to the emergence of extreme biases.
+Secondly, agents develop greater trust in agents who share their bias.
+
+#### Emergence of extreme biases
+
+* Where there is a burn-in time, the population usually polarises quickly to opposite extremes when biases are allowed to vary.
+  * Without burn-in, the tendency is for the whole network to collapse on one or other extreme.
+  * (Not shown) high levels of feedback can prevent this collapse.
+
+#### Homophily
+
+* Burn-in time also leads to more dichotomous final networks (captured by group ratio where that number is defined). 
+  * This effect is most clearly seen where networks diverge after biases are allowed to vary.
+
+#### Effect of weighted selection
+
+* Weighted selection increases the likelihood agents select similarly-minded agents for their advisors (or dissimilarly-minded if the coefficient is negative).
+  * Its effects on bias dynamics can be chaotic. 
+  * Without burn-in it allows individuals, or small clusters, to resist an emerging consensus.
+  * Where burn-in allows homophily to emerge before biases update, weighted selection accelerates polarisation.
+  
+### Consistency of the model
+
+```{r basic model graphs consistency}
+# Plot graphs for all instances of weighted sampling models to show heterogeneity
+ns <- agents.cuF %>% 
+  filter(
+    bias_sd == 1.5,
+    weighted_sampling_mean == 3,
+    n_decisions == 3000
+  ) %>%
+  select(model_num) %>%
+  unique() %>%
+  pull(model_num)
+
+for (n in ns) {
+  adviseR::networkGraph(
+    list(model = list(graphs = graphs.cuF[[n]])),
+    mark.groups = list(
+      which(V(graphs.cuF[[n]][[1]])$bias <= .5),
+      which(V(graphs.cuF[[n]][[1]])$bias > .5)
+    )
+  )
+  
+  tmp <- agents.cuF %>% filter(model_num == n)
+  print(
+    tmp %>%
+      filter(decision %in% range(decision)) %>%
+      transmute(
+        model_num, 
+        bias_sd, 
+        ws_mean = weighted_sampling_mean,
+        ws_sd = weighted_sampling_sd,
+        burnIn = n_decisions > 3000,
+        clusters = cluster_count, 
+        mean_bias = round(meanBiasMagnitude, 3), 
+        group_ratio = round(group_ratio_empirical, 3)
+      ) %>%
+      unique()
+  )
+  tmp <- list(
+    model = list(agents.cuF = tmp),
+    # hack back in the decision flags
+    parameters = list(
+      decision_flags = 
+        if (tmp$n_decisions[1] == 3000) {
+          rep(3, 3000)
+        } else {
+          c(rep(1, 3000), rep(3, 1000))
+        }
+    )
+  )
+  print(biasEvolution(tmp))
+  
+  # Strip out decision_flags for dropped decisions
+  tmp$parameters$decision_flags <- 
+    tmp$parameters$decision_flags[
+      1:length(tmp$parameters$decision_flags) %in% tmp$model$agents$decision
+    ]
+  tmp$model$graphs <- graphs.cuF[[n]]
+  print(weightEvolution(tmp, decisions = function(d) c(1, 1501, 2901, 3401, 3901)))
+}
+
+```
+
+Each model was run `r length(unique(agents$random_seed))` times with different random seeds to check which features were consistent across runs. 
+The features described above were all consistent across runs.
+
+For parameter sets in which all agents' biases tend towards the same extreme, which extreme was favoured varied according to the random seed used. 
+This stochasticity is akin to placing a ball on a gabled roof: tiny variations in the initial conditions affect which way it will roll, but it will always roll down one pitch or the other.
+
+Similarly, in some of these models, adding in weighted selection switches which bias extreme is adopted.
+This effect is not consistent between runs with different random seeds, and is an outsized effect of minor differences to early states, analogous to a breath of wind nudging the ball in the previous example one way or another.
+
+### Using empirically estimated coefficients
+
+Now we have a reasonable understanding of how the models behave, we can examine the effects of drawing parameter values for trust volatility and weighted selection directly from the parameter estimation approach used in \mccorrect{!TODO[link to chapter wherever we did parameter estimates]}.
+Using parameters estimated from actual individuals has both strengths and weaknesses. 
+The strengths are that the values represent genuine best-estimates of both trust volatility and weighted selection. 
+Given that these two parameters are related to one another, with weighted selection being dependent on trust volatility, it may be important to use observations of both simultaneously to appropriately model individuals' behaviour.
+The weaknesses are that the task given to human participants differed in potentially important ways from the task modelled in the agent-based model. 
+The most potentially important difference in this respect is the choice of advisor: in the behavioural experiments the human participants were familiarised with two advisors and then given the choice between them; whereas in the model the agents are picking from a large number of potential advisors. 
+The parameter is estimated on the basis of a sigmoid function applied to the trust difference between advisors, whereas it is used in the agent-based models in a half-sigmoid applied to the difference between each advisor and the most trusted advisor. 
+
+These considerations mean that the model dynamics arising from using estimated coefficients may be informative, but only in an illustrative capacity. 
+Too much differs between the behavioural and simulated situations to draw strong conclusions.
+
+```{r empirical models run}
+load('_cache/thesis-parameter-estimation.rda')
+
+# Fetch the unique parameter combinations for the models we just ran
+parameters.cuF.emp <- agents.cuF %>%
+  select(
+    n_agents:confidence_weighted,
+    -starts_with('trust_volatility'),
+    -starts_with('weighted_sampling'),
+    -starting_graph_type
+  ) %>%
+  unique() %>%
+  rowid_to_column() %>%
+  nest(d = -rowid) %>%
+  mutate(
+    model = map(d, function(.) {
+      withr::with_seed(
+        .$.random_seed_agents,
+        do.call(adviseR:::makeAgents, select(
+          ., 
+          -bias_update_slope, -starts_with('feedback'), 
+          -contains('random_seed'), -truth_sd, -confidence_weighted
+        ))
+      )
+    })
+  ) %>%
+  # Substitute trust_volatility and weighted_sampling coefficients from estimates
+  mutate(
+    model = map2(model, d, function(.x, .y) {
+      p <- withr::with_seed(
+        .y$.random_seed_agents,
+        slice_sample(recovered_parameters, n = .y$n_agents, replace = T)
+      )
+      .x$agents <- .x$agents %>%
+        mutate(
+          trust_volatility = rep(p$tu_end, .y$n_decisions),
+          weighted_sampling = rep(p$ws_end, .y$n_decisions)
+        )
+      .x
+    })
+  ) %>% 
+  unnest(cols = d) %>%
+  mutate(
+    decision_flags = map(
+      n_decisions,
+      function(.) {
+        if (. > 3000) c(rep(1, 3000), rep(3, . - 3000)) else rep(3, .)
+      }
+    ),
+    starting_graph = parameters$starting_graph[1],
+    model = map2(model, n_agents, function(.x, .y) {
+      g <- parameters$starting_graph[[1]](tibble(x = 1:.y))
+      .x$graphs <- list(g)
+      .x
+    })
+  ) %>%
+  select(-rowid)
+
+nCores <- 3
+for (i in 1:ceiling(nrow(parameters.cuF.emp) / nCores)) {
+  n <- (i - 1) * nCores + 1
+  n <- c(n, min(n + nCores - 1, nrow(parameters.cuF.emp)))
+  fName <- glue('_cache/network-models-cuF-emp/100a3000d_{n[1]}-{n[2]}.rda')
+  if (file.exists(fName)) next()
+  
+  t1 <- Sys.time()
+  models <- runSimulations(
+    parameters.cuF.emp[n[1]:n[2], ], 
+    cores = nCores,
+    summaryFun = summary_fun
+  )
+  save(models, file = fName)
+  print(glue('Completed run {i} ({n[1]}-{n[2]}).'))
+  print(Sys.time() - t1)
+}
+```
+
+```{r empirical models load}
+t1 <- Sys.time()
+fName <- '_cache/network-models-cuF-emp.rda'
+if (file.exists(fName)) {
+  load(fName)
+} else {
+  # Gather data and bind into an analysable data frame
+  agents.cuF.emp <- NULL
+  graphs.cuF.emp <- list()
+  fList <- list.files('_cache/network-models-cuF-emp/', pattern = '', full.names = T)
+  i <- 1
+  for (f in fList) {
+    load(f)
+    for (m in models) {
+      graphs.cuF.emp[[i]] <- list()
+      for (d in 1:m$parameters$n_decisions) {
+        if ((d %% 100 == 1) | d == m$parameters$n_decisions) {
+          graphs.cuF.emp[[i]][[d]] <- m$model$graphs[[d]]
+        }
+      }
+      
+      m$parameters$model_num <- i
+      i <- i + 1
+      m$parameters$starting_graph <- NULL
+      m$parameters$truth_fun <- NULL
+      m$parameters$decision_flags <- NULL
+      agents.cuF.emp <- 
+        bind_rows(
+          agents.cuF.emp, 
+          m$model$agents %>% 
+            filter(decision %% 100 == 1) %>%
+            rename(agt_cluster_count = cluster_count) %>%
+            left_join(as_tibble(m$parameters), by = character())
+        )
+    }
+  }
+  rm(m, models)
+  save(agents.cuF.emp, graphs.cuF.emp, file = fName)
+}
+Sys.time() - t1
+```
+
+```{r empirical models graphs}
+# Plot graphs for example instances of each model
+ns <- agents.cuF.emp %>% 
+  filter(random_seed == min(random_seed)) %>%
+  select(model_num) %>%
+  unique() %>%
+  pull(model_num)
+
+for (n in ns) {
+  adviseR::networkGraph(
+    list(
+      model = list(graphs = graphs.cuF.emp[[n]]), 
+      parameters = list(
+        n_agents = agents.cuF.emp %>% 
+          filter(model_num == n) %>% 
+          pull(n_agents) %>%
+          .[1]
+      )
+    ),
+    mark.groups = list(
+      which(V(graphs.cuF.emp[[n]][[1]])$bias <= .5),
+      which(V(graphs.cuF.emp[[n]][[1]])$bias > .5)
+    )
+  )
+  
+  tmp.emp <- agents.cuF.emp %>% filter(model_num == n)
+  print(
+    tmp.emp %>%
+      filter(decision %in% range(decision)) %>%
+      transmute(
+        model_num, 
+        bias_sd, 
+        ws_mean = weighted_sampling_mean,
+        ws_sd = weighted_sampling_sd,
+        burnIn = n_decisions > 3000,
+        clusters = cluster_count, 
+        mean_bias = round(meanBiasMagnitude, 3), 
+        group_ratio = round(group_ratio_empirical, 3)
+      ) %>%
+      unique()
+  )
+  tmp.emp <- list(
+    model = list(agents = tmp.emp),
+    # hack back in the decision flags
+    parameters = list(
+      decision_flags = 
+        if (tmp.emp$n_decisions[1] == 3000) {
+          rep(3, 3000)
+        } else {
+          c(rep(1, 3000), rep(3, 1000))
+        }
+    )
+  )
+  print(biasEvolution(tmp.emp))
+  
+  # Strip out decision_flags for dropped decisions
+  tmp.emp$parameters$decision_flags <- 
+    tmp.emp$parameters$decision_flags[
+      1:length(tmp.emp$parameters$decision_flags) %in% tmp.emp$model$agents$decision
+    ]
+  tmp.emp$model$graphs <- graphs.cuF.emp[[n]]
+  print(weightEvolution(tmp.emp, decisions = function(d) c(1, 1501, 2901, 3401, 3901)))
+}
+
+```
+
+#### Descriptive observations of individual models
+
+As with the simulations with heterogeneous weighted sampling values, some agents resist the consensus extreme. 
+As compared to those simulations, though, more agents occupy a middle-ground, and can cross more easily from one extreme to another.
+Where a burn-in period is present, a large proportion of the agents occupy unstable middle-ground positions, preventing clear polarisation or consensus in the population.
+
+### Combined output with previous
+
+```{r all models summary}
+
+mdls.cuF.all <- bind_rows(
+  agents.cuF %>% 
+    group_by(model_num) %>%
+    summarise(across(n_agents:cluster_count, unique), .groups = 'drop') %>%
+    mutate(
+      burnIn = n_decisions > 3000,
+      weighted_sampling = glue(
+        '{ifelse(nchar(weighted_sampling_mean) == 1, "0", "")}{weighted_sampling_mean}',
+        ' ({weighted_sampling_sd})'
+      )
+    ) %>%
+    select(
+      model_num:starting_graph_type,
+      weighted_sampling,
+      burnIn,
+      everything(),
+      -n_decisions, 
+      -weighted_sampling_mean, 
+      -weighted_sampling_sd
+    ),
+  agents.cuF.emp %>% 
+    mutate(model_num = model_num + max(agents.cuF$model_num)) %>%
+    group_by(model_num) %>%
+    summarise(across(n_agents:cluster_count, unique), .groups = 'drop') %>%
+    mutate(
+      burnIn = n_decisions > 3000,
+      weighted_sampling = 'emp'
+    ) %>%
+    select(
+      model_num:starting_graph_type,
+      weighted_sampling,
+      burnIn,
+      everything(),
+      -n_decisions, 
+      -weighted_sampling_mean, 
+      -weighted_sampling_sd
+    )
+) %>%
+  select(-starts_with('trust_volatility'))
+
+for (v in names(select(mdls.cuF.all, n_agents:burnIn))) {
+  if (length(unique(pull(mdls.cuF.all, v))) < 2)
+    next()
+  print(
+    mdls.cuF.all %>% 
+      mutate(grp = glue(
+        '{',
+        paste0(
+          names(
+            select(
+              mdls.cuF.all, 
+              n_agents:random_seed, 
+              -!!sym(v)
+            )
+          ), 
+          collapse = "}|{"
+        ),
+        '}'
+      )) %>%
+      pivot_longer(
+        c(meanBiasMagnitude, cluster_count, starts_with('group_ratio')), 
+        names_to = 'outcome'
+      ) %>%
+      mutate(across(-value, factor)) %>%
+      ggplot(aes(y = value, x = !!sym(v), colour = weighted_sampling == 'emp')) + 
+      geom_violin(alpha = .1, fill = 'black', colour = NA) +
+      geom_line(aes(group = grp), alpha = .25, position = position_jitter(.1, .01)) +
+      facet_wrap(~outcome, scales = 'free_y')
+  )
+}
+```
+
+Having considered the patterns at the level of individual models, we can draw more useful conclusions at a higher level from considering them as a set. 
+In this analysis we attend to two properties of primary interest: 
+First, how accurate are agents over time? 
+This is represented by the mean bias magnitude. 
+In ideal circumstances, this should be very low, indicating that agents are largely unbiased. 
+Second, to what extent are agents more likely to trust advice from agents who share their bias?
+This is captured by the ratio between trust in agents with the same versus different bias. 
+This value is not always well defined - where all agents eventually acquire the same bias, the mean weight of out-group advisors is undefined.
+
+Summarising the results in this way means that we can observe some general features of the models by comparing otherwise-similar models over the different parameters.
+
+A more varied range of biases in the population has relatively little consistent effect on mean bias magnitude, but does lead to higher group ratios. 
+This indicates that models more readily split into polarised camps with echo-chambers where there are more extreme biases present in the population.
+
+Mean bias magnitude is less pronounced where there is a burn-in time, although this is likely due to there being less time after burn-in for the biases to update. 
+Burn-in time tends to decrease the homophily of the models, judging by final bias, but to increase it judging by initial bias. 
+This suggests that polarisation occurs, but that many middle-ground agents change which camp they end up in.
+
+Weighted selection has little effect where the mean is increased, but a clearer effect where variation is introduced. 
+The clustering of weights suggests that there is less homophily where agents are more selective about whom they consult for advice. 
 
 Weighted sampling interacts with the lead-in time.
 Lead-in time is a proxy for the starting asymmetry of the connections in the network.
@@ -770,6 +652,30 @@ Note that sufficiently homophilic networks will continue to exhibit echo chamber
 The key finding of interest from the models thus far is that source selection may exacerbate echo chamber formation. 
 This finding is in line with similar findings from others who have produced these models \mccorrect{!TODO[citations galore]}.
 We are now in a position to see whether these models continue to exhibit these features when we parametrise them based on the data we observed in our participants' behavioural data.
+
+##### Bias x TrustUpdate
+
+```{r}
+
+agents.cuF.emp %>% 
+  filter(
+    decision == max(decision),
+    abs(trust_volatility) < .2
+  ) %>%
+  ggplot(aes(x = trust_volatility, y = abs(bias - .5))) +
+  geom_smooth(method = 'lm', formula = y ~ x) + 
+  geom_point(alpha = .25)
+
+agents.cuF.emp %>% 
+  filter(
+    decision == max(decision),
+    abs(weighted_sampling) < 55
+  ) %>%
+  ggplot(aes(x = weighted_sampling, y = abs(bias - .5))) +
+  geom_smooth(method = 'lm', formula = y ~ x) + 
+  geom_point(alpha = .25)
+
+```
 
 ## Participant data
 

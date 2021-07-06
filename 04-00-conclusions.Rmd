@@ -28,12 +28,14 @@ I haven't wasted 3 years of my life and Nick's time.
 * I've demonstrated that the structure of information networks may be partially dependent upon psychological mechanisms of advisor evaluation. 
 
 * I've provided some evidence for a model of advisor evaluation in the absence of feedback and demonstrated how that model produces adverse network effects. 
+  * I've shown how some of these effects depend upon heterogeneity of agents' preferences/tendencies.
 
 * I've shown how the information environment can affect advice taking, and I've provided and reviewed empirical evidence that humans can alter advice-taking flexibly depending on these contextual factors. 
 
 * I've modelled how the psychological mechanisms create an information network structure, and how that information network structure might use the flexibility to context to change advisor evaluation processes. 
 
 * I've demonstrated how those changes might attenuate or exacerbate the formation of pathological network structures. 
+
 
 ## Open questions
 

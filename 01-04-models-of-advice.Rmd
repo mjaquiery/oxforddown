@@ -432,3 +432,11 @@ Negative values for weighted selection are somewhat understandable: they indicat
 Negative values of trust update rate are more concerning - they indicate that the advisor becomes more trusted (more influential and more likely to be picked given a positive weighted selection coefficient) following disagreement.
 
 
+#### Verification of model fitting validity
+
+Verification of this model fitting approach was conducted on the Advanced Research Cluster \mccorrect{!TODO[CITATION_NEEDED]} in two ways. 
+Firstly, the coefficients derived for each participant were fitted to versions of that participant's data where the advisor agreement column values had been shuffled. 
+Overwhelmingly, the fitting error on the shuffled data tended to be higher than the fit to the original data.
+Secondly, the fitting error for coefficients based on the participants' data were compared to fitting errors for coefficients fitted to shuffled data. 
+Error values for the shuffled data tended to be higher than values for the original data, suggesting that participants' behaviour shared some features with the model's expectations.
+
