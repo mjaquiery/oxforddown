@@ -10,7 +10,7 @@ output:
 documentclass: book
 ---
 
-# Network effects with heterogeneous agents {#chapter-hetero-networks}
+# Interaction discussion {#chapter-networks-discussion}
 \adjustmtc 
 
 ## Discussion

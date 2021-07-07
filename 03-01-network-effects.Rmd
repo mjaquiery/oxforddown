@@ -13,19 +13,6 @@ documentclass: book
 # Network effects of interaction {#chapter-network-effects}
 \adjustmtc 
 
-## Method 
-
-### Model details
-
-### Parameters varied between model runs
-
-There are three parameters which are varied between runs:
-* The standard deviation of the agents' biases
-* Whether or not there is time for the random network weights to update before biases update
-* The agents' weighted selection values
-
-## Results
-
 ```{r setup 03-01, echo = F, include = F}
 source('scripts_and_filters/general_setup.R')
 library(adviseR)
@@ -34,8 +21,6 @@ library(BayesFactor)
 library(magrittr)
 library(parallel)
 ```
-
-### Validity of the model
 
 ```{r basic models run}
 n_reps <- 5
@@ -189,6 +174,185 @@ if (file.exists(fName)) {
 Sys.time() - t1
 ```
 
+## Method 
+
+Agent-based modelling is used to simulate the interactive effects of repeated paired decision-making.
+The agents in the model perform a cycle of making an initial decision, selecting one of the other agents as an advisor, making a final decision, and updating their trust in their advisor and their internal beliefs about the world.
+The task the agents face is roughly similar to the task faced by human participants in the Dots Task experiments [§Perceptual decision (Dots Task)](#m-p-dots), where the participants make a decision about which of two rapidly and simultaneously presented grids contained more dots.
+
+Each model consists of a population of agents implementing the same mathematical model of decision-making, trust-updating, and advisor selection, with coefficients for parameters of that mathematical model drawn from appropriate distributions. 
+
+### Model details
+
+Each model is defined by a set of model parameters, which are assigned capital letters in the equations below. 
+These parameters are used to generate further parameters which govern agents' tendencies, and these are assigned lower-case letters and superscripted with the agent to whom they belong. 
+Selections from distributions are indicated by a subscript showing which step they belong to.
+
+This is best illustrated with an example. 
+Each agent has a sensitivity parameter, $s^a$ which governs the amount of random noise which is attached to their perception of the world.
+On any given decision, the amount of this noise $\epsilon^a_t$ is determined by drawing from a normal distribution with standard deviation defined by the agent's sensitivity ($N(0, \frac{1}{s^a})$).
+When the agent is created, the parameter defining its sensitivity distribution is itself drawn from a normal distribution with mean and standard deviation defined by the model settings ($N(S^\mu, S^\sigma)$).
+
+#### Creating agents
+
+Each agent has the following properties:
+
+```{r agent property table}
+
+tribble(
+  ~ `Property`, ~ `Description`, ~ `Updates each step`,
+  "$a$", "Agent unique identfier", "",
+  "$s^a$", "Accuracy of agent's perceptions", "",
+  "$c^a$", "Agent's subjective confidence scaling", "",
+  "$\\tau^a$", "Size of agent's trust updates", "",
+  "$\\lambda^a$", "Size of agent's bias updates", "",
+  "$w^a$", "Extent of agent's preference for trusted advisors", "",
+  "$b^a_t$", "Agent's prior expectation about the task answer", "Yes"
+) %>%
+  kable(caption = "\\label{tab:agent-properties}Agent properties")
+
+```
+
+An agent's values for each of these properties (except id) are created by drawing values from normal distributions defined by parameters in the model settings.
+
+Additionally, each agent has a 'trust' in each other agent, ranging from being convinced that the other agent is always correct to being convinced that the other agent is always wrong.
+These values are updated at each step and initialised by drawing from a uniform random distribution with limits $[0.5, 1]$.
+
+#### Model step
+
+##### Establishing the stimulus
+
+The same stimulus is presented to each agent, in the form of a value ($v_t$) drawn from a normal distribution with mean ($V^\mu$) and standard deviation ($V^\sigma$) defined in the model settings:
+
+$$v_t \sim N(V^\mu, V^\sigma)$$
+
+The agents' task is to determine whether $v_t$ is greater than or less than zero.
+
+##### Initial decision-making
+
+Agents perform a noisy perception of the stimulus, by combining the true stimulus value with random noise ($\epsilon^a_t$), to produce a percept $q^a_t$.
+
+$$q^a_t = v_t + \epsilon^a_t$$
+Where: $\epsilon^a_t \sim N(0, \frac{1}{s^a})$
+
+This sensory percept is then converted into a subjective probability that the stimulus was greater than zero ($p^a_t$) using a sigmoid function with a slope defined by the agent's subjective confidence scaling parameter.
+
+$$p^a_t = \varsigma(q^a_t, c^a)$$
+Where: $\varsigma(x, y) = \frac{1}{1 + e^{-xy}}$
+
+This subjective probability is then integrated with the agent's prior expectation about whether stimuli are generally less than or greater than 0 ($b^a_t$), using Bayes' rule, to produce an initial decision, $i^a_t$.
+
+$$i^a_t = \frac{P(v_t<0|p^a_t)}{P(v_t<0|p^a_t) \cdot P(v_t>0|p^a_t)}$$
+
+Where: $P(v_t < 0 | p^a_t) = b^a_t \cdot z(p^a_t, 1, V^\sigma)$;
+and: $P(v_t > 0 | p^a_t) = (1 - b^a_t) \cdot z(p^a_t, 0, V^\sigma)$;
+with: $z(x, \mu, \sigma)$ giving the density of $N(\mu, \sigma)$ at $x$.
+
+Note that in these initial decision equations the agents have direct access to a model property, $V^\sigma$, the standard deviation of the true values of the stimuli. 
+Ideally, in an agent-based model, the agents would not have such direct access to non-observable properties, and would instead build up specific expectations about the variability of stimuli from observation, perhaps seeded with a loosely-informative prior. 
+The agents are allowed to know the value here as a shorthand for such exploration. 
+This makes the agents' task analogous to well-practised real-world tasks such as perceptual decision-making.
+It is unlikely to seriously affect any conclusions or illustrations drawn from the models.
+
+The initial decision contains both a discrete decision (whether the stimulus value was more likely to be less than zero, $i^a_t < 0.5$, or greater than zero $i^a_t \geq 0.5$), and how much so ($|i^a_t - 0.5|$). 
+It thus represents both the agent's decision and the confidence in that decision.
+
+##### Advisor selection
+
+Having made an initial decision, each agent selects a single advisor from whom to receive advice.
+This choice is made based on the trust in each potential advisor scaled by the strength of the agent's preference for receiving more-trusted advice.
+
+The identity of an agent's advisor on a given trial is designated by $a'$, and the weight assigned to advisor $a'$ by agent $a$ at step $t$ by $\omega^{a,a'}_t$.
+Each agent's trust value is adjusted to be relative to the most (or least) trusted advisor, depending upon whether the agent prefers trusted ($w^a > 0$) or untrusted ($w^a \leq 0$) advisors.
+
+$$\omega' ^{a,a'} = 
+\begin{cases}
+w^a > 0, \omega^{a,a'}_t - \text{max}(\Omega^a_t)\\
+w^a \leq 0, \omega^{a,a'}_t - \text{min}(\Omega^a_t)
+\end{cases}$$
+
+Where $\Omega^a_t$ is the set of trust weights in all potential advisors for agent $a$ at step $t$.
+
+These relative trust values are then assigned probability weightings for selection based on a sigmoid function.
+Because of the relative scaling, each probability is in fact drawn from a half sigmoid, with the probability weight assigned to the most likely candidate is 1, and other candidates' probability weights between 1 and 0.
+
+The identity of advisor $^{a,a'}_t$ is determined by sampling at random from the advisors, weighted by the probability weights assigned.
+
+###### Differences from parameter estimation
+
+The approach used for fitting participant data from the behavioural experiments is subtly different from that used for advisor selection in the agent-based models.
+In the behavioural experiments, rather than being presented with a choice of many different advisors whose appeals all had to be considered, participants were presented with a choice of two advisors only. 
+The parameter recovery process estimated a trust update rate ($\tau^a$ in the agent-based model) which tracked the trust in each advisor, and the difference between these trust values was fed into a sigmoid governing selection.
+The slope of that best-fitting sigmoid function was taken as equivalent to $w^a$ in the agent-based models.
+This approach is reasonable given the differences in the advisor selection task facing the human participants and model agents, but should be noted as a caveat for drawing interpretations concerning the role of weighted selection values based on human participants' performance.
+
+##### Final decision-making
+
+Final decisions are made by Bayesian integration of the initial decision and advice.
+Advice takes the form of a binary recommendation, and is weighted by the trust the agent has in their advisor.
+
+First, initial decisions and advice are reoriented to the direction of the initial decision, such that initial decisions represent confidence in the initial decision and advice represents agreement with that decision.
+
+$$i'~^a_t = 
+\begin{cases}
+i < 0.5, 1 - i^a_t \\
+i \geq 0.5, i^a_t
+\end{cases}$$
+
+$$i'~^{a,a'}_t = 
+\begin{cases}
+i < 0.5, \text{round}(1 - i^{a,a'}_t) \\
+i \geq 0.5, \text{round}(i^{a,a'}_t)
+\end{cases}$$
+
+The trust weight is slightly truncated to avoid very extreme values: 
+$$ = $$
+$$\omega'~^{a,a'}_t = 
+\begin{cases}
+i'~^{a,a'}_t = 0, 1 - \text{min}(0.95, \text{max}(0.05, \omega^{a,a'}_t)) \\
+i'~^{a,a'}_t = 1, \text{min}(0.95, \text{max}(0.05, \omega^{a,a'}_t))
+\end{cases}$$
+
+The derived trust weight $\omega'~^{a,a'}_t$ now represents the probability that the advice will agree with the initial decision, given the initial decision is correct.
+
+The final decision is obtained by performing Bayesian integration.
+In Bayesian terms, we are trying to discover the probability of our final answer being correct given the agreement (or disagreement) observed from the advisor. 
+Thus we are multiplying the initial probability of being correct (our subjective confidence, $i'~^a_t$) by the probability of the advisor agreeing if we are correct ($w'~^{a,a'}_t$).
+This is divided by all of the options that could have led to the observed advice: the probability that we are correct multiplied by the probability of the advice if we are (the numerator), plus the probability that we are incorrect multiplied by the probability of the advice if we are incorrect. 
+Because correctness and the advice are both mutually exclusive binaries, the probability of being incorrect is 1 - the probability of being correct, and the probability of the advice if we are incorrect is 1 - the probability of the advice if we are correct.
+
+$$f'~^a_t = \frac{i'~a_t \cdot \omega'~^{a,a'}_t}{i'~a_t \cdot \omega'~^{a,a'}_t + (1 - i'~a_t)(1 - \omega'~^{a,a'}_t)}$$
+and the final decision is taken by reversing the transformation applied earlier:
+$$f~^a_t = 
+\begin{cases}
+i < 0.5, 1 - f'~^a_t \\
+i \geq 0.5, f'~^a_t
+\end{cases}$$
+
+###### Feedback
+
+##### Trust updating
+
+##### Bias updating
+
+### Model parameters
+
+The models have a large number of parameters. 
+Many of these are used to create the agents.
+
+#### Parameters varied between model runs
+
+There are three parameters which are varied between runs:
+* The standard deviation of the agents' biases
+* Whether or not there is time for the random network weights to update before biases update
+* The agents' weighted selection values
+
+## Results
+
+### Validity of the model
+
+
+
 ```{r basic models graphs}
 # Plot graphs for example instances of each model
 ns <- agents.cuF %>% 
@@ -246,7 +410,6 @@ for (n in ns) {
 }
 
 ```
-
 
 The model reproduces key effects of interest. 
 Firstly, agents reinforce one another's biases, leading to the emergence of extreme biases.
@@ -346,7 +509,10 @@ This effect is not consistent between runs with different random seeds, and is a
 ### Using empirically estimated coefficients
 
 Now we have a reasonable understanding of how the models behave, we can examine the effects of drawing parameter values for trust volatility and weighted selection directly from the parameter estimation approach used in \mccorrect{!TODO[link to chapter wherever we did parameter estimates]}.
-Using parameters estimated from actual individuals has both strengths and weaknesses. 
+The weighted selection values used above are taken from distributions defined by the estimated values for the population, which allows for the generation of an unlimited number of unique participants, but means that the agents produced will be more homogeneous in their overall strategies.
+For example, if a minority strategy exists within the population, we would see the parameter estimate distributions reflective of the dominant strategy slightly modified through averaging towards the minority strategy, which may in turn produce agents whose behaviour is not reflective of any plausible real individuals.
+
+Using parameters estimated from actual individuals instead of drawing from a distribution derived form those values has both strengths and weaknesses. 
 The strengths are that the values represent genuine best-estimates of both trust volatility and weighted selection. 
 Given that these two parameters are related to one another, with weighted selection being dependent on trust volatility, it may be important to use observations of both simultaneously to appropriately model individuals' behaviour.
 The weaknesses are that the task given to human participants differed in potentially important ways from the task modelled in the agent-based model. 
@@ -677,24 +843,5 @@ agents.cuF.emp %>%
 
 ```
 
-## Participant data
 
-Exploration of the model space shows that the models are sensitive to effects of source selection behaviour as parametrised by weighted sampling. 
-This parameter in the model can be derived from the advisor choice behaviour in the behavioural experiments.
-Other model parameters can also be fit using the participants' behavioural data. 
-
-There are two ways in which parameters can be derived for the models from behavioural data. 
-Both approaches start by taking the model used in simulation and finding the parameters for that model which best describe each participant's behaviour.
-This is done using a standard parameter estimation approach based on a gradient descent algorithm.
-
-Once parameter estimates have been obtained for all the participants, those parameters must be reconnected with the simulation side of the model. 
-The first approach to doing this is to simply instantiate agents with exactly the properties of our participants.
-By sampling a variety of models made up of different selections of participants, we can characterise some of the network behaviour that particular mixtures of individual strategies produce, at the expense of being tied explicitly to the performances of specific participants.
-
-The second approach is to construct distributions in parameter space from the individual participants' specific parameter estimates. 
-This approach allows for the generation of an unlimited number of unique participants, and can allow for correlations between parameter estimates as well as describing the estimates' distributions. 
-The drawback to this approach is that the agents produced will be more homogeneous in their overall strategies.
-For example, if a minority strategy exists within the population, this strategy should be evident in the first approach but would not be so in the second - instead we would simply have the parameter estimate distributions reflective of the dominant strategy slightly modified through averaging towards the minority strategy, which may in turn produce agents whose behaviour is not reflective of any plausible real individuals.
-
-### Model fitting
 
