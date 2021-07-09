@@ -316,7 +316,7 @@ For each of these trials, the model takes the average probability of picking the
 The difference between these two numbers is the advisor choice error on that trial.
 
 Both advisor choice and advice influence errors lie on a scale between 0 and 1, with 0 being a perfect match to the data and 1 being entirely wrong. 
-To account for different distributions of errors across each dimension, the overall model error is calculated by normalising each error dimension seperately and then summing them.
+To account for different distributions of errors across each dimension, the overall model error is calculated by normalising each error dimension separately and then summing them.
 
 \mccorrect{!TODO[Should we scale participant confidence values such that their lowest confidence is always treated as completely unsure and their highest reported confidence always treated as the top of the scale? It would keep model predictions on a similar scale to answers, but it would also make the maths harder and impose artificial limits other than the ones actually introduced by the scale. We probably shouldn't do this but should explain why we didn't - it would distort participants' confidence judgements.]}
 
@@ -329,7 +329,7 @@ To account for different distributions of errors across each dimension, the over
 #' code run can be inspected at
 #' https://github.com/oxacclab/arc_thesis-parameter-estimation
 
-load('_cache/thesis-parameter-estimation.rda')
+load('cache/thesis-parameter-estimation.rda')
 
 ```
 
@@ -339,6 +339,12 @@ The models key on the advisor agreement.
 This means that if we shuffle the advisor agreement the model's ability to fit the data collapses (provided the model's parameters are kept fixed).
 
 ```{r visualise shuffles}
+
+scaledError <- function(err1, err2) {
+  x <- scale(err1); y <- scale(err2)
+  x <- x - min(x); y <- y - min(y)
+  log(x + y)
+}
 
 positions <- bind_rows(
   recovered_parameters %>%
@@ -424,7 +430,7 @@ ggplot(coefs, aes(trustUpdateRate, fill = pos < 3)) +
 ```
 
 The distribution of parameters is fairly similar between those datasets with good (1-2) positions in the shuffled list and those with bad (>=3) positions.
-In both cases, the mean trust update parameter is just above 0 (overall mean = `round(mean(coefs$trustUpdateRate), 3)`), as is the weighted selection parameter (overall mean = `round(mean(coefs$weightedSelection), 2)`). 
+In both cases, the mean trust update parameter is just above 0 (overall mean = `r round(mean(coefs$trustUpdateRate), 3)`), as is the weighted selection parameter (overall mean = `r  round(mean(coefs$weightedSelection), 2)`). 
 The ranges of the parameters are sensible: trust updates are small, while weighted selection is larger.
 The normal distribution of coefficients is expected, but the number of cases where the parameters are estimated to be below 0 is not. 
 
@@ -434,7 +440,7 @@ Negative values of trust update rate are more concerning - they indicate that th
 
 #### Verification of model fitting validity
 
-Verification of this model fitting approach was conducted on the Advanced Research Cluster \mccorrect{!TODO[CITATION_NEEDED]} in two ways. 
+Verification of this model fitting approach was conducted on the Advanced Research Cluster \mccorrect{!TODO[CITATION]} in two ways. 
 Firstly, the coefficients derived for each participant were fitted to versions of that participant's data where the advisor agreement column values had been shuffled. 
 Overwhelmingly, the fitting error on the shuffled data tended to be higher than the fit to the original data.
 Secondly, the fitting error for coefficients based on the participants' data were compared to fitting errors for coefficients fitted to shuffled data. 

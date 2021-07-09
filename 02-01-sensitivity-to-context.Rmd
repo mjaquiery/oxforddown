@@ -25,7 +25,7 @@ Notes:
 
 Advice-taking is often overly-conservative as compared to the normative level of advice-taking for a given experimental design.
 I argue that participants' performances in advice-taking experiments reflect both the specifics of the experimental design and prior expectations about advice-taking situations.
-These prior expectations may be both learned, as where individuals who grow up in less stable environments show lower propensity to trust `reference?`\mccorrect{!TODO, and inherited.
+These prior expectations may be both learned, as where individuals who grow up in less stable environments show lower propensity to trust \mccorrect{!TODO[Find reference]}, and inherited.
 Most useful for the current argument would be a demonstration that conservatism can emerge within a population even where detrimental advice is rarely experienced, and that this can thus produce individuals who exhibit conservatism without ever experiencing detrimental advice.
 This demonstration is presented in the form of evolutionary modelling.
 

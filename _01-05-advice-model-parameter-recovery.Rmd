@@ -676,14 +676,19 @@ for (i in 1:nrow(simulants)) {
 t1 <- Sys.time()
 
 for (i in 1:nrow(simulants)) {
-  print(visualiseGrid(
-    gridSearch(simulants[i, ]), 
-    target_value = simulants[i, c('trustUpdateRate', 'weightedSelection')]
-  ) + labs(title = 'sim'))
-  print(visualiseGrid(
-    gridSearch(shuffled_simulants[i, ]), 
-    target_value = simulants[i, c('trustUpdateRate', 'weightedSelection')]
-  ) + labs(title = 'sim_suffle'))
+  tryCatch(
+    {
+      print(visualiseGrid(
+        gridSearch(simulants[i, ]), 
+        target_value = simulants[i, c('trustUpdateRate', 'weightedSelection')]
+      ) + labs(title = 'sim'))
+      print(visualiseGrid(
+        gridSearch(shuffled_simulants[i, ]), 
+        target_value = simulants[i, c('trustUpdateRate', 'weightedSelection')]
+      ) + labs(title = 'sim_suffle'))
+    },
+    error = \(e) warning(paste0('Error as warning:\n', e))
+  )
 }
   
 
@@ -699,41 +704,45 @@ t1 <- Sys.time()
 
 for (s in 1:nrow(simulants)) {
   for (type in c('simulants', 'shuffled_simulants')) {
-    sim <- get(type)[s,  ] %>%
-      select(uid, data) %>%
-      unnest(cols = data)
-    
-    gd <- doGradientDescent(sim)
-    
-    best <- gd %>% filter(tu_error + ws_error == min(tu_error + ws_error))
-    real <- adviseR::simulateFromData(
-      sim,
-      tibble(w = sim$weightedSelection[1], tu = sim$trustUpdateRate[1])
+    tryCatch(
+      {
+        sim <- get(type)[s,  ] %>%
+          select(uid, data) %>%
+          unnest(cols = data)
+        
+        gd <- doGradientDescent(sim)
+        
+        best <- gd %>% filter(tu_error + ws_error == min(tu_error + ws_error))
+        real <- adviseR::simulateFromData(
+          sim,
+          tibble(w = sim$weightedSelection[1], tu = sim$trustUpdateRate[1])
+        )
+        results <- bind_rows(
+          results,
+          best %>% mutate(coefs = 'best', source = type), 
+          tibble(
+            uid = sim$uid[1],
+            ws_end = sim$weightedSelection[1],
+            tu_end = sim$trustUpdateRate[1],
+            ws_error = real[1],
+            tu_error = real[2],
+            coefs = 'real', 
+            source = type
+          )
+        )
+        
+        print(ggplot(gd, aes(x = tu_end, y = ws_end, fill = tu_error + ws_error)) +
+                geom_point(size = 4, alpha = .25) +
+                geom_point(size = 4, colour = 'red', data = best) +
+                annotate(geom = 'point', shape = 8, size = 6, colour = 'red', x = results$tu_end[2], y = results$ws_end[2]) +
+                labs(
+                  caption = glue('Target: tu = {round(results$tu_end[2], 4)}, ws = {round(results$ws_end[2], 4)}'),
+                  title = type
+                ))
+      },
+      error = \(e) warning(paste0('Error as warning:\n', e))
     )
-    results <- bind_rows(
-      results,
-      best %>% mutate(coefs = 'best', source = type), 
-      tibble(
-        uid = sim$uid[1],
-        ws_end = sim$weightedSelection[1],
-        tu_end = sim$trustUpdateRate[1],
-        ws_error = real[1],
-        tu_error = real[2],
-        coefs = 'real', 
-        source = type
-      )
-    )
-    
-    print(ggplot(gd, aes(x = tu_end, y = ws_end, fill = tu_error + ws_error)) +
-            geom_point(size = 4, alpha = .25) +
-            geom_point(size = 4, colour = 'red', data = best) +
-            annotate(geom = 'point', shape = 8, size = 6, colour = 'red', x = results$tu_end[2], y = results$ws_end[2]) +
-            labs(
-              caption = glue('Target: tu = {round(results$tu_end[2], 4)}, ws = {round(results$ws_end[2], 4)}'),
-              title = type
-            ))
   }
-  
 }
 
 print(Sys.time() - t1)
@@ -796,12 +805,12 @@ t1 <- Sys.time()
 
 for (i in 1:nrow(sims)) {
   print(visualiseGrid(
-    gridSearch(sims[i, ], grid = crossing(a = seq(-10, 30, .5),
+    gridSearch(sims[i, ], grid = tidyr::crossing(a = seq(-10, 30, .5),
                                           b = seq(-.1, 1.5, .1))), 
     target_value = sims[i, c('trustUpdateRate', 'weightedSelection')]
   ) + labs(title = 'sim'))
   print(visualiseGrid(
-    gridSearch(shuffled_sims[i, ], grid = crossing(a = seq(-10, 30, .5),
+    gridSearch(shuffled_sims[i, ], grid = tidyr::crossing(a = seq(-10, 30, .5),
                                           b = seq(-.1, 1.5, .1))),
     target_value = sims[i, c('trustUpdateRate', 'weightedSelection')]
   ) + labs(title = 'sim_suffle'))
@@ -811,7 +820,7 @@ for (i in 1:nrow(sims)) {
 Sys.time() - t1
 ```
 
-```{r parameter recovery demo}
+```{r parameter recovery sim demo}
 
 results <- NULL
 
@@ -902,18 +911,22 @@ shuffled_sims <- sims %>%
 t1 <- Sys.time()
 
 for (i in 1:nrow(sims)) {
-  print(visualiseGrid(
-    gridSearch(sims[i, ], grid = crossing(a = seq(-10, 30, .5),
-                                          b = seq(-.1, 1.5, .1))), 
-    target_value = sims[i, c('trustUpdateRate', 'weightedSelection')]
-  ) + labs(title = glue('sim(noise = {sims$noise[i]})')))
-  print(visualiseGrid(
-    gridSearch(shuffled_sims[i, ], grid = crossing(a = seq(-10, 30, .5),
-                                          b = seq(-.1, 1.5, .1))),
-    target_value = sims[i, c('trustUpdateRate', 'weightedSelection')]
-  ) + labs(title = glue('sim_suffle(noise = {shuffled_sims$noise[i]})')))
+  tryCatch(
+    {
+      print(visualiseGrid(
+        gridSearch(sims[i, ], grid = tidyr::crossing(a = seq(-10, 30, .5),
+                                                     b = seq(-.1, 1.5, .1))), 
+        target_value = sims[i, c('trustUpdateRate', 'weightedSelection')]
+      ) + labs(title = glue('sim(noise = {sims$noise[i]})')))
+      print(visualiseGrid(
+        gridSearch(shuffled_sims[i, ], grid = tidyr::crossing(a = seq(-10, 30, .5),
+                                                              b = seq(-.1, 1.5, .1))),
+        target_value = sims[i, c('trustUpdateRate', 'weightedSelection')]
+      ) + labs(title = glue('sim_suffle(noise = {shuffled_sims$noise[i]})')))
+    },
+    error = \(e) warning(paste0('Error as warning:\n', e))
+  )
 }
-  
 
 Sys.time() - t1
 ```
@@ -927,30 +940,35 @@ t1 <- Sys.time()
 
 for (s in 1:nrow(sims)) {
   for (type in c('sims', 'shuffled_sims')) {
-    sim <- get(type)[s,  ] %>%
-      select(uid, data) %>%
-      unnest(cols = data)
-    
-    gd <- doGradientDescent(sim)
-    
-    best <- gd %>% filter(tu_error + ws_error == min(tu_error + ws_error))
-    real <- adviseR::simulateFromData(
-      sim,
-      tibble(w = sim$weightedSelection[1], tu = sim$trustUpdateRate[1])
-    )
-    results <- bind_rows(
-      results,
-      best %>% mutate(coefs = 'best', source = type, noise = get(type)$noise[s]), 
-      tibble(
-        uid = sim$uid[1],
-        ws_end = sim$weightedSelection[1],
-        tu_end = sim$trustUpdateRate[1],
-        ws_error = real[1],
-        tu_error = real[2],
-        coefs = 'real', 
-        source = type, 
-        noise = get(type)$noise[s]
-      )
+    tryCatch(
+      {
+        sim <- get(type)[s,  ] %>%
+          select(uid, data) %>%
+          unnest(cols = data)
+        
+        gd <- doGradientDescent(sim)
+        
+        best <- gd %>% filter(tu_error + ws_error == min(tu_error + ws_error))
+        real <- adviseR::simulateFromData(
+          sim,
+          tibble(w = sim$weightedSelection[1], tu = sim$trustUpdateRate[1])
+        )
+        results <- bind_rows(
+          results,
+          best %>% mutate(coefs = 'best', source = type, noise = get(type)$noise[s]), 
+          tibble(
+            uid = sim$uid[1],
+            ws_end = sim$weightedSelection[1],
+            tu_end = sim$trustUpdateRate[1],
+            ws_error = real[1],
+            tu_error = real[2],
+            coefs = 'real', 
+            source = type, 
+            noise = get(type)$noise[s]
+          )
+        )
+      },
+      error = \(e) warning(paste0('Error as warning:\n', e))
     )
   }
 }
@@ -995,7 +1013,7 @@ In the simulations below, we explore the accuracy of weighted selection paramete
 ```{r fixed TUR}
 sims <- bind_cols(
   tibble(uid = 1:35),
-  crossing(
+  tidyr::crossing(
     weightedSelection = seq(-6, 18, 4),
     trustUpdateRate = seq(0.1, .5, .1)
   )
@@ -1012,38 +1030,43 @@ shuffled_sims <- sims %>%
 best <- NULL
 
 for (i in 1:nrow(sims)) {
-  x <- gridSearch(sims[i,], grid = crossing(a = seq(-15, 30, .5), b = fixed_TUR))
-  x.min <- filter(x, weightedSelection_error == min(weightedSelection_error))
-  best <- bind_rows(
-    best, 
-    tibble(
-      uid = x.min$uid,
-      best = x.min$weightedSelection,
-      real = x.min$data[[1]]$weightedSelection[1]
-    )
-  )
-  
-  print(
-    ggplot(x, aes(x = weightedSelection, y = weightedSelection_error)) +
-      geom_point(
-        aes(
-          x = x$data[[1]]$weightedSelection[1], 
-          y = mean(weightedSelection_error)
-        ),
-        colour = 'red', 
-        shape = 8, 
-        size = 6
-      ) +
-      geom_point() + 
-      geom_vline(aes(xintercept = weightedSelection), data = x.min) +
-      geom_label(
-        aes(
-          x = weightedSelection, 
-          y = mean(x$weightedSelection_error), 
-          label = weightedSelection
-        ),
-        data = x.min
+  tryCatch(
+    {
+      x <- gridSearch(sims[i,], grid = tidyr::crossing(a = seq(-15, 30, .5), b = fixed_TUR))
+      x.min <- filter(x, weightedSelection_error == min(weightedSelection_error))
+      best <- bind_rows(
+        best, 
+        tibble(
+          uid = x.min$uid,
+          best = x.min$weightedSelection,
+          real = x.min$data[[1]]$weightedSelection[1]
+        )
       )
+      
+      print(
+        ggplot(x, aes(x = weightedSelection, y = weightedSelection_error)) +
+          geom_point(
+            aes(
+              x = x$data[[1]]$weightedSelection[1], 
+              y = mean(weightedSelection_error)
+            ),
+            colour = 'red', 
+            shape = 8, 
+            size = 6
+          ) +
+          geom_point() + 
+          geom_vline(aes(xintercept = weightedSelection), data = x.min) +
+          geom_label(
+            aes(
+              x = weightedSelection, 
+              y = mean(x$weightedSelection_error), 
+              label = weightedSelection
+            ),
+            data = x.min
+          )
+      )
+    },
+    error = \(e) warning(paste0('Error as warning:\n', e))
   )
 }
 

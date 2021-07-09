@@ -64,10 +64,13 @@ documentclass: book
 ```{r, echo = F, include = F}
 # When knitting, do the whole shebang
 options(
-  ESM.recalculate = T # Whether to recalculate the very computationally expensive chunks
+  ESM.recalculate = F # Whether to recalculate the very computationally expensive chunks
 )
-if (!dir.exists('_cache')) 
-  dir.create('_cache')
+if (!dir.exists('cache')) {
+  dir.create('cache')
+  dir.create('cache/network-models-cuF')
+  dir.create('cache/network-models-cuF-emp')
+}
 
 source('scripts_and_filters/general_setup.R')
 ```

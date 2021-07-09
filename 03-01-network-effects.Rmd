@@ -117,8 +117,11 @@ nCores <- 3
 for (i in 1:ceiling(nrow(parameters) / nCores)) {
   n <- (i - 1) * nCores + 1
   n <- c(n, min(n + nCores - 1, nrow(parameters)))
-  fName <- glue('_cache/network-models-cuF/100a3000d_{n[1]}-{n[2]}.rda')
-  if (file.exists(fName)) next()
+  fName <- glue('cache/network-models-cuF/100a3000d_{n[1]}-{n[2]}.rda')
+  if ((is.null(getOption('ESM.recalculate')) || getOption('ESM.recalculate') < 2) 
+      && file.exists(fName)) {
+    next()
+  }
   
   t1 <- Sys.time()
   models <- runSimulations(
@@ -134,14 +137,15 @@ for (i in 1:ceiling(nrow(parameters) / nCores)) {
 
 ```{r basic models load}
 t1 <- Sys.time()
-fName <- '_cache/network-models-cuF.rda'
-if (file.exists(fName)) {
+fName <- 'cache/network-models-cuF.rda'
+if ((is.null(getOption('ESM.recalculate')) || getOption('ESM.recalculate') < 2) 
+    && file.exists(fName)) {
   load(fName)
 } else {
   # Gather data and bind into an analysable data frame
   agents.cuF <- NULL
   graphs.cuF <- list()
-  fList <- list.files('_cache/network-models-cuF/', pattern = '', full.names = T)
+  fList <- list.files('cache/network-models-cuF/', pattern = '', full.names = T)
   i <- 1
   for (f in fList) {
     load(f)
@@ -191,7 +195,7 @@ Selections from distributions are indicated by a subscript showing which step th
 This is best illustrated with an example. 
 Each agent has a sensitivity parameter, $s^a$ which governs the amount of random noise which is attached to their perception of the world.
 On any given decision, the amount of this noise $\epsilon^a_t$ is determined by drawing from a normal distribution with standard deviation defined by the agent's sensitivity ($N(0, \frac{1}{s^a})$).
-When the agent is created, the parameter defining its sensitivity distribution is itself drawn from a normal distribution with mean and standard deviation defined by the model settings ($N(S^\mu, S^\sigma)$).
+When the agent is created, the parameter defining its sensitivity distribution ($s^a$) is itself drawn from a normal distribution with mean and standard deviation defined by the model settings ($N(S^\mu, S^\sigma)$).
 
 #### Creating agents
 
@@ -201,12 +205,12 @@ Each agent has the following properties:
 
 tribble(
   ~ `Property`, ~ `Description`, ~ `Updates each step`,
-  "$a$", "Agent unique identfier", "",
-  "$s^a$", "Accuracy of agent's perceptions", "",
-  "$c^a$", "Agent's subjective confidence scaling", "",
-  "$\\tau^a$", "Size of agent's trust updates", "",
-  "$\\lambda^a$", "Size of agent's bias updates", "",
-  "$w^a$", "Extent of agent's preference for trusted advisors", "",
+  "$a$", "Agent unique identfier", "No",
+  "$s^a$", "Accuracy of agent's perceptions", "No",
+  "$c^a$", "Agent's subjective confidence scaling", "No",
+  "$\\tau^a$", "Size of agent's trust updates", "No",
+  "$\\lambda^a$", "Size of agent's bias updates", "No",
+  "$\\text{w}^a$", "Extent of agent's preference for trusted advisors", "No",
   "$b^a_t$", "Agent's prior expectation about the task answer", "Yes"
 ) %>%
   kable(caption = "\\label{tab:agent-properties}Agent properties")
@@ -216,7 +220,7 @@ tribble(
 An agent's values for each of these properties (except id) are created by drawing values from normal distributions defined by parameters in the model settings.
 
 Additionally, each agent has a 'trust' in each other agent, ranging from being convinced that the other agent is always correct to being convinced that the other agent is always wrong.
-These values are updated at each step and initialised by drawing from a uniform random distribution with limits $[0.5, 1]$.
+These values are updated at each step and initialised by drawing from a uniform random distribution with limits [0.5, 1].
 
 #### Model step
 
@@ -244,8 +248,8 @@ This subjective probability is then integrated with the agent's prior expectatio
 
 $$i^a_t = \frac{P(v_t<0|p^a_t)}{P(v_t<0|p^a_t) \cdot P(v_t>0|p^a_t)}$$
 
-Where: $P(v_t < 0 | p^a_t) = b^a_t \cdot z(p^a_t, 1, V^\sigma)$;
-and: $P(v_t > 0 | p^a_t) = (1 - b^a_t) \cdot z(p^a_t, 0, V^\sigma)$;
+Where: $P(v_t < 0 | p^a_t) = b^a_t \cdot z(p^a_t, 1, V^\sigma)$;  
+and: $P(v_t > 0 | p^a_t) = (1 - b^a_t) \cdot z(p^a_t, 0, V^\sigma)$;  
 with: $z(x, \mu, \sigma)$ giving the density of $N(\mu, \sigma)$ at $x$.
 
 Note that in these initial decision equations the agents have direct access to a model property, $V^\sigma$, the standard deviation of the true values of the stimuli. 
@@ -263,12 +267,12 @@ Having made an initial decision, each agent selects a single advisor from whom t
 This choice is made based on the trust in each potential advisor scaled by the strength of the agent's preference for receiving more-trusted advice.
 
 The identity of an agent's advisor on a given trial is designated by $a'$, and the weight assigned to advisor $a'$ by agent $a$ at step $t$ by $\omega^{a,a'}_t$.
-Each agent's trust value is adjusted to be relative to the most (or least) trusted advisor, depending upon whether the agent prefers trusted ($w^a > 0$) or untrusted ($w^a \leq 0$) advisors.
+Each agent's trust value is adjusted to be relative to the most (or least) trusted advisor, depending upon whether the agent prefers trusted ($\text{w}^a > 0$) or untrusted ($\text{w}^a \leq 0$) advisors.
 
-$$\omega' ^{a,a'} = 
+$$\omega'~^{a,a'} = 
 \begin{cases}
-w^a > 0, \omega^{a,a'}_t - \text{max}(\Omega^a_t)\\
-w^a \leq 0, \omega^{a,a'}_t - \text{min}(\Omega^a_t)
+\text{w}^a > 0, \omega^{a,a'}_t - \text{max}(\Omega^a_t)\\
+\text{w}^a \leq 0, \omega^{a,a'}_t - \text{min}(\Omega^a_t)
 \end{cases}$$
 
 Where $\Omega^a_t$ is the set of trust weights in all potential advisors for agent $a$ at step $t$.
@@ -283,7 +287,7 @@ The identity of advisor $^{a,a'}_t$ is determined by sampling at random from the
 The approach used for fitting participant data from the behavioural experiments is subtly different from that used for advisor selection in the agent-based models.
 In the behavioural experiments, rather than being presented with a choice of many different advisors whose appeals all had to be considered, participants were presented with a choice of two advisors only. 
 The parameter recovery process estimated a trust update rate ($\tau^a$ in the agent-based model) which tracked the trust in each advisor, and the difference between these trust values was fed into a sigmoid governing selection.
-The slope of that best-fitting sigmoid function was taken as equivalent to $w^a$ in the agent-based models.
+The slope of that best-fitting sigmoid function was taken as equivalent to $\text{w}^a$ in the agent-based models.
 This approach is reasonable given the differences in the advisor selection task facing the human participants and model agents, but should be noted as a caveat for drawing interpretations concerning the role of weighted selection values based on human participants' performance.
 
 ##### Final decision-making
@@ -305,53 +309,92 @@ i < 0.5, \text{round}(1 - i^{a,a'}_t) \\
 i \geq 0.5, \text{round}(i^{a,a'}_t)
 \end{cases}$$
 
-The trust weight is slightly truncated to avoid very extreme values: 
-$$ = $$
+The trust weight is slightly truncated to avoid very extreme values, and oriented based on whether the advice agrees, giving the expectedness of the advice provided the initial answer was correct: 
 $$\omega'~^{a,a'}_t = 
 \begin{cases}
 i'~^{a,a'}_t = 0, 1 - \text{min}(0.95, \text{max}(0.05, \omega^{a,a'}_t)) \\
 i'~^{a,a'}_t = 1, \text{min}(0.95, \text{max}(0.05, \omega^{a,a'}_t))
 \end{cases}$$
 
-The derived trust weight $\omega'~^{a,a'}_t$ now represents the probability that the advice will agree with the initial decision, given the initial decision is correct.
-
 The final decision is obtained by performing Bayesian integration.
-In Bayesian terms, we are trying to discover the probability of our final answer being correct given the agreement (or disagreement) observed from the advisor. 
-Thus we are multiplying the initial probability of being correct (our subjective confidence, $i'~^a_t$) by the probability of the advisor agreeing if we are correct ($w'~^{a,a'}_t$).
-This is divided by all of the options that could have led to the observed advice: the probability that we are correct multiplied by the probability of the advice if we are (the numerator), plus the probability that we are incorrect multiplied by the probability of the advice if we are incorrect. 
-Because correctness and the advice are both mutually exclusive binaries, the probability of being incorrect is 1 - the probability of being correct, and the probability of the advice if we are incorrect is 1 - the probability of the advice if we are correct.
+In Bayesian terms, agents are trying to discover the probability of their final answer being correct given the agreement (or disagreement) observed from their advisor. 
+Thus they multiply the initial probability of being correct (subjective confidence, $i'~^a_t$) by the probability of the advisor agreeing if they are correct ($w'~^{a,a'}_t$).
+This is divided by all of the options that could have led to the observed advice: the probability that they are correct multiplied by the probability of the advice if they are (the numerator), plus the probability that they are incorrect multiplied by the probability of the advice if they are incorrect. 
+Because correctness and advice agreement probability are both mutually exclusive binaries, the probability of being incorrect is 1 - the probability of being correct, and the probability of the advice if they are incorrect is 1 - the probability of the advice if they are correct.
 
 $$f'~^a_t = \frac{i'~a_t \cdot \omega'~^{a,a'}_t}{i'~a_t \cdot \omega'~^{a,a'}_t + (1 - i'~a_t)(1 - \omega'~^{a,a'}_t)}$$
-and the final decision is taken by reversing the transformation applied earlier:
-$$f~^a_t = 
+The final decision (with confidence) is acquired by reversing the transformation applied earlier:
+$$f^a_t = 
 \begin{cases}
 i < 0.5, 1 - f'~^a_t \\
 i \geq 0.5, f'~^a_t
 \end{cases}$$
 
-###### Feedback
+##### Feedback
 
-##### Trust updating
+On a proportion of trials a proportion of the agents are randomly selected to receive feedback.
+The feedback is always accurate, and implicitly trusted by all the agents. 
+When they receive feedback, the agents use that feedback rather than their own final decisions to update their trust and bias.
 
 ##### Bias updating
 
+The agents update their bias after each final decision, taking an average of their current bias and the feedback or their final decision, weighted by the agent's bias volatility ($\lambda^a$).
+They therefore adjust their prior expectations on the basis of their experience (and advice).
+
+$$b'~^a_{t+1} = b^a \cdot (1 - \lambda^a) + f^a_t \cdot \lambda^a$$
+
+The bias is clamped to within 0.05 and 0.95 to keep agents at least a little open-minded. 
+
+$$b^a_{t+1} = \text{min}(0.95, \text{max}(0.05, b'~^a_{t+1}))$$
+
+##### Trust updating
+
+The agents update their advice by taking an average of their current trust in their advisor and the advisor's agreement, weighted by their trust volatility ($\tau^a$).
+
+$$x = w^{a,a'}_t \cdot (1 - \tau^a) + i'~^{a,a'}_t \cdot \tau^a$$
+
+A tiny cap is used for truncation to prevent agents wholly disregarding or blindly trusting others:
+$$w^{a,a'}_{t+1} = \text{min}(0.9999, \text{max}(0.0001, x))$$
+
 ### Model parameters
 
-The models have a large number of parameters. 
-Many of these are used to create the agents.
+The models have a large number of parameters.
+These can be broadly divided into parameters which govern the distributions from which the agents' parameters are drawn, and parameters which define the operation of the model.
+
+```{r model property table}
+
+tribble(
+  ~ `Property`, ~ `Description`, ~ `Type`,
+  "$\\text{n_agents}$", "Number of agents to simulate", "model",
+  "$\\text{n_steps}$", "Number of decisions to simulate", "model",
+  "$\\text{decision_flags}$", "Binary flags indicating whether trust and/or bias update at each step", "model",
+  "$\\text{feedback_probability}$", "Probability feedback is provided each step", "model",
+  "$\\text{feedback_proportion}$", "Proportion of the population receiving feedback when provided", "model",
+  "$\\text{random_seed}$", "Seed used for the pseudorandom number generator to allow repetition of runs", "model",
+  "$\\text{truth_sd}$", "Mean, standard deviation for true world values", "model",
+  "$\\text{confidence_weighted}$", "Whether agents use their own confidence to modify their trust updates", "model",
+  "$B^\\mu, B^\\sigma$", "Mean, standard deviation of distribution of agents' biases", "agents",
+  "$S^\\mu, S^\\sigma$", "Mean, standard deviation of distribution of agents' sensitivities", "agents",
+  "$T^\\mu, T^\\sigma$", "Mean, standard deviation of distribution of agents' trust volatilities", "agents",
+  "$\\Lambda ^\\mu, \\Lambda ^\\sigma$", "Mean, standard deviation of distribution of agents' bias volatilities", "agents",
+  "$C^\\mu, C^\\sigma$", "Mean, standard deviation of distribution of agents' confidence scaling", "agents",
+  "$W^\\mu, W^\\sigma$", "Mean, standard deviation of distribution of agents' trusted advisor preference", "agents"
+) %>%
+  kable(caption = "\\label{tab:model-properties}Model properties")
+
+```
+
 
 #### Parameters varied between model runs
 
 There are three parameters which are varied between runs:
-* The standard deviation of the agents' biases
-* Whether or not there is time for the random network weights to update before biases update
-* The agents' weighted selection values
+* $B^\sigma$, the standard deviation of the agents' biases
+* $\text{decision\_flags}$, whether or not there is time for the random network weights to update before agents' biases begin to update
+* $W^\mu, W^\sigma$, the agents' weighted selection values
 
 ## Results
 
 ### Validity of the model
-
-
 
 ```{r basic models graphs}
 # Plot graphs for example instances of each model
@@ -432,7 +475,7 @@ Secondly, agents develop greater trust in agents who share their bias.
   * Its effects on bias dynamics can be chaotic. 
   * Without burn-in it allows individuals, or small clusters, to resist an emerging consensus.
   * Where burn-in allows homophily to emerge before biases update, weighted selection accelerates polarisation.
-  
+
 ### Consistency of the model
 
 ```{r basic model graphs consistency}
@@ -497,7 +540,7 @@ for (n in ns) {
 
 ```
 
-Each model was run `r length(unique(agents$random_seed))` times with different random seeds to check which features were consistent across runs. 
+Each model was run `r length(unique(agents.cuF$random_seed))` times with different random seeds to check which features were consistent across runs. 
 The features described above were all consistent across runs.
 
 For parameter sets in which all agents' biases tend towards the same extreme, which extreme was favoured varied according to the random seed used. 
@@ -523,7 +566,7 @@ These considerations mean that the model dynamics arising from using estimated c
 Too much differs between the behavioural and simulated situations to draw strong conclusions.
 
 ```{r empirical models run}
-load('_cache/thesis-parameter-estimation.rda')
+load('cache/thesis-parameter-estimation.rda')
 
 # Fetch the unique parameter combinations for the models we just ran
 parameters.cuF.emp <- agents.cuF %>%
@@ -584,8 +627,11 @@ nCores <- 3
 for (i in 1:ceiling(nrow(parameters.cuF.emp) / nCores)) {
   n <- (i - 1) * nCores + 1
   n <- c(n, min(n + nCores - 1, nrow(parameters.cuF.emp)))
-  fName <- glue('_cache/network-models-cuF-emp/100a3000d_{n[1]}-{n[2]}.rda')
-  if (file.exists(fName)) next()
+  fName <- glue('cache/network-models-cuF-emp/100a3000d_{n[1]}-{n[2]}.rda')
+  if ((is.null(getOption('ESM.recalculate')) || getOption('ESM.recalculate') < 2) 
+      && file.exists(fName)) {
+    next()
+  }
   
   t1 <- Sys.time()
   models <- runSimulations(
@@ -601,14 +647,15 @@ for (i in 1:ceiling(nrow(parameters.cuF.emp) / nCores)) {
 
 ```{r empirical models load}
 t1 <- Sys.time()
-fName <- '_cache/network-models-cuF-emp.rda'
-if (file.exists(fName)) {
+fName <- 'cache/network-models-cuF-emp.rda'
+if ((is.null(getOption('ESM.recalculate')) || getOption('ESM.recalculate') < 2) 
+    && file.exists(fName)) {
   load(fName)
 } else {
   # Gather data and bind into an analysable data frame
   agents.cuF.emp <- NULL
   graphs.cuF.emp <- list()
-  fList <- list.files('_cache/network-models-cuF-emp/', pattern = '', full.names = T)
+  fList <- list.files('cache/network-models-cuF-emp/', pattern = '', full.names = T)
   i <- 1
   for (f in fList) {
     load(f)
