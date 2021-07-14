@@ -68,8 +68,8 @@ options(
 )
 if (!dir.exists('cache')) {
   dir.create('cache')
-  dir.create('cache/network-models-cuF')
-  dir.create('cache/network-models-cuF-emp')
+  dir.create('cache/network-models')
+  dir.create('cache/network-models/emp')
 }
 
 source('scripts_and_filters/general_setup.R')

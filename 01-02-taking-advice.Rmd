@@ -41,7 +41,7 @@ Niccolo's stuff about advice-taking, and then demonstrate similar results in my 
 
 \mccorrect{!TODO[Why agreeing vs accurate advisors? It's a distillation of the core insight from Niccolo's work.]}
 
-```{r include = F}
+```{r ai-ava-r-load-data, include = F}
 
 rm(list = ls()); source('scripts_and_filters/general_setup.R')
 
@@ -103,7 +103,7 @@ This study used the continuous version of the Dates Task ([§Estimation (Dates T
 
 ##### Exclusions
 
-```{r}
+```{r ai-ava-r-exclusions}
 nMaxOutliers <- 2
 zThresh <- 3
 
@@ -168,7 +168,7 @@ Participants' data could be excluded from analysis where they fail attention che
 
 A browser compatibility issue in this study meant that any participants completing the study using the Safari family of browsers had to be excluded because the advice was not presented appropriately. 
 
-```{r}
+```{r ai-ava-r-exclusion-table}
 
 exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
 n <- ncol(exclusions)
@@ -307,7 +307,7 @@ tmp <- rename(tmp,
 .AOV <- ezANOVA(tmp, dv = WOA, wid = pid, within = Advisor, between = Feedback)
 ```
 
-```{r}
+```{r ai-ava-r-anovas}
 
 kable(.BF, caption = "\\label{tab:ai-ava-dates-r-bf}Bayesian ANOVA for Dates task advice influence experiment")
 

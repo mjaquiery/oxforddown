@@ -7,6 +7,9 @@
 # Use image with base R included
 FROM rstudio/r-base:4.0-focal
 
+# Prevent "must specify --save, --no-save, or --vanilla" complaint
+ENTRYPOINT ["/bin/bash"]
+
 # Install system libraries the R packages will depend on
 # Also nginx so we can serve the thesis
 RUN apt-get update && apt-get install -y \
@@ -37,4 +40,5 @@ RUN rm -f _main.* && \
   rm -r docs && \
 	Rscript -e 'options(ESM.skip = T); bookdown::render_book("index.Rmd")'
 
-RUN service nginx restart
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

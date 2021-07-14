@@ -19,430 +19,914 @@ params:
 
 ```{r setup 01-04, echo = F, include = F}
 source('scripts_and_filters/general_setup.R')
+library(adviseR)
+library(igraph)
+library(BayesFactor)
+library(magrittr)
 library(parallel)
-
+library(patchwork)
 ```
 
-# Modelling advice-taking behaviour {#chapter-advice-models}
+# Network effects of advisor choice {#chapter-network-effects}
 \adjustmtc 
 
-<!-- 
-Modelling work on advice-taking/source selection
+## Introduction
 
-Descriptive modelling of data using multivariate regression
-- ML/decision-tree approach instead; could use some python for this
-- how good is an unweighted model that uses the biggest predictors?
+* We saw in Section II that advisor choice is varied among individuals.
 
-Advisor choice/advisor preference/advice usage as endpoints
-- advisor choice a softmax function of advisor preference
--->
+* We know from previous modelling work that source selection behaviour produces homophilic network dynamics (e.g. echo chambers).
 
-First we put all the data into the workspace.
+* We wonder what the variability observed in Section II will have on network dynamics.
 
-```{r gather all data}
+## Mini-review of networking models
 
-select_experiment('datequiz')
-AdvisedTrial <- full_join(
-  AdvisedTrial,
-  AdvisedTrialWithConf,
-  by = names(AdvisedTrial)[names(AdvisedTrial) %in% names(AdvisedTrialWithConf)]
+* Niccolo showed source selection is pathological (unless judgements are uncorrelated) in absence of bias updating
+  - True whether or not confidence weights updating
+  
+## Goals of this approach
+
+* Characterise models which implement basic effects
+  - Polarisation/attractors
+  - Echo chambers (burn-in period)
+  - Agents based on same model used for behavioural data
+  
+* Explore dynamics when using different values of weighted selection
+  - Mean 0 vs mean derived from parameter estimation
+  - Mean derived from parameter estimation vs Mean + SD derived from parameter estimation
+  - Mean + SD derived from parameter estimation vs samping estimated values
+  
+## Limitations
+
+* This is an initial exploration only
+  - Models are time-consuming to run (even with key components written in C++)
+  - Parameter space is huge and dynamics dependent upon parameter interactions
+* But it should serve to highlight whether and how heterogeneity could matter for dynamics
+* ...and indicate directions for further study
+
+## Old stuff
+
+<!-- Models suggest interactions between agents exascerbate problems, especially where source selection and info weighting combine. -->
+
+\mccorrect{!TODO[extend the simulation/agreement-effects-analysis stuff a bit and it will fill this chapter out well.]}
+
+* Even when biases don't change (Niccolo covered that), source selection on the basis of agreement is inherently pathological (unless judgements are uncorrelated).  
+  - This is true whether or not confidence weights updating. 
+
+* Why should we care if it's not changing biases (i.e. opinions?)  
+  - because it reinforces final decisions through agreement instead of attenuating them through disagreement. 
+
+* Our psychological mechanisms from Section II thus produce bad network effects when feedback is absent. 
+
+* Can we relate the networks back to the advice-giving environments from Section III?
+
+Models say this will go horribly wrong.
+
+```{r nw-r-run-basic, include = F}
+n_reps <- 5
+nD <- 2000
+nBI <- 3000
+withr::with_seed(
+  20210507,
+  seeds <- c(20210507, floor(runif(n_reps - 1) * 1e8))
+)
+parameters <- tidyr::crossing(
+  bias_volatility_mean = .01,
+  bias_volatility_sd = .005,
+  n_agents = 100,
+  truth_sd = .5,
+  bias_sd = 1,
+  sensitivity_mean = 3,
+  sensitivity_sd = .5,
+  random_seed = seeds,
+  starting_graph = c(function(x) {
+    m <- matrix(runif(nrow(x) ^ 2, .5), nrow(x), nrow(x))
+    diag(m) <- 0
+    m
+  }),
+  confidence_weighted = F,
+  tibble(
+    n_decision = c(nD, nD + nBI),
+    decision_flags = map(
+      n_decision, 
+      ~ if (. > nD) {c(rep(1, nBI), rep(3, . - nBI))} else {rep(3, .)}
+    )
+  ),
+  tidyr::crossing(
+    tibble(
+      trust_volatility_mean = .00955, # estimated from our empirical data
+      trust_volatility_sd = .0371
+    ),
+    tibble(
+      weighted_sampling_mean = c(0, 3.01, 3.01),
+      weighted_sampling_sd = c(0, 0, 18.1)
+    )
+  )
 )
 
-rm(advisors)
-
-select_experiment('dotstask')
-
-```
-
-Next we grab the data from the binary tasks. 
-This includes all the dotstask data and a small portion of the datequiz data.
-\mccorrect{!TODO[Later we can try to join them using an interoperable measure of influence.]}
-
-For what follows, we standardize initial estimate confidence and final decision confidence. 
-The initial estimate confidence is standardized using its own mean and standard deviation. 
-The final decision confidence is first oriented to the initial decision, meaning that it can take negative values where the endorsed answer switches from one side to the other.
-Increasingly negative values represent increasingly confident endorsement of the answer endorsed in the final decision.
-These final decision confidence values are then standardized using the mean and standard deviation from the initial estimate confidence. 
-This means that the final decision confidence readings are z-scores based on the distribution for initial estimate confidence.
-It also means some of the values are much higher or lower than would be expected from the initial estimate confidence distribution because the range of possible values is wider (because negative values are possible in the final decision confidence).
-
-```{r extract binary task data}
-df <- rbind(
-  AdvisedTrial %>% 
-    transmute(
-      pid,
-      number,
-      feedback = if_else(is.na(feedback), feedback, F),
-      advisor = advisor0idDescription,
-      study = 'dates',
-      confidenceIncrease = if_else(responseAnswerSide == responseAnswerSideFinal,
-                                   responseConfidenceFinal - responseConfidence,
-                                   responseConfidenceFinal + responseConfidence),
-      zConfidenceIncrease = scale(confidenceIncrease),
-      initialConfidenceFlat = responseConfidence,
-      finalConfidenceFlat = if_else(
-        responseAnswerSide == responseAnswerSideFinal,
-        responseConfidenceFinal,
-        -(responseConfidenceFinal + responseConfidence)
-      ),
-      zFinalConfidence = 
-        (finalConfidenceFlat - mean(responseConfidence, na.rm = T)) /
-        sd(responseConfidence, na.rm = T),
-      initialAnswer = responseAnswerSide,
-      # standardize initial confidence. We could use scale() but keep consistency with finalConfidence above.
-      zInitialConfidence = 
-        (responseConfidence - mean(responseConfidence, na.rm = T)) / 
-        sd(responseConfidence, na.rm = T),
-      advice = advisor0adviceSide
-    ),
-  trials %>% 
-    transmute(
-      pid,
-      number = id,
-      feedback,
-      advisor = advisor0type,
-      study = 'dots',
-      confidenceIncrease = if_else(initialAnswer == finalAnswer,
-                                   finalConfidence - initialConfidence,
-                                   finalConfidence + initialConfidence),
-      zConfidenceIncrease = scale(confidenceIncrease),
-      initialConfidenceFlat = initialConfidence,
-      finalConfidenceFlat = if_else(
-        initialAnswer == finalAnswer,
-        finalConfidence,
-        -(finalConfidence + initialConfidence)
-      ),
-      zFinalConfidence = 
-        (finalConfidenceFlat - mean(initialConfidence, na.rm = T)) /
-        sd(initialConfidence, na.rm = T),
-      initialAnswer,
-      # standardize initial confidence. We could use scale() but keep consistency with finalConfidence above.
-      zInitialConfidence = 
-        (initialConfidence - mean(initialConfidence, na.rm = T)) / 
-        sd(initialConfidence, na.rm = T),
-      advice = adviceSide
-    )
-) %>%
-  filter(across(.cols = everything(), .fns = ~ !is.na(.)))
-
-df <- df %>%
-  mutate(
-    disagree = initialAnswer != advice,
-    influence = if_else(disagree, zConfidenceIncrease, -zConfidenceIncrease),
-    noise = rnorm(n())
+summary_fun <- function(m) {
+  .cc <- function(x, ...) adviseR::.cluster_count(x, k = 1:2, ...)
+  # Calculate group ratios
+  m$parameters$group_ratio_original <-
+    adviseR::groupRatio(m$model$graphs[[length(m$model$graphs)]])
+  m$parameters$group_ratio_empirical <-
+    adviseR::groupRatio(m$model$graphs[[length(m$model$graphs)]], F)
+  
+  lastGen <- 
+    m$model$agents[m$model$agents$decision == max(m$model$agents$decision), ]
+  
+  # Record mean final bias to determine which way the population is going
+  m$parameters$mean_final_bias <- mean(
+    m$model$agents$bias[m$model$agents$decision == max(m$model$agents$decision)]
   )
-
-df %>% pivot_longer(cols = c('zInitialConfidence', 'zFinalConfidence')) %>%
-  ggplot(aes(value, fill = name)) + 
-  geom_vline(xintercept = 0, linetype = 'dashed') +
-  geom_density(alpha = .5) +
-  facet_grid(feedback~disagree, labeller = label_both)
-
-```
-The distribution of advisor influence by agreement shows that final decision confidence in the initially-chosen answer is usually lower following disagreement from the advisor.
-This makes sense, and is to be expected. 
-There are also a reasonable number of trials on which disagreeing advice leads to a modest _increase_ in confidence.
-
-Following agreement by an advisor, final decision confidence sometimes increases quite dramatically, but usually changes are modest and somewhat likely to be negative. 
-Very dramatic negative shifts in confidence are rare following agreement.
-
-<!-- Feedback effect may be participants being more cautious where evidence might appear that they are wrong -->
-
-
-First, we run a simple multivariate linear regression predicting the final decision confidence of advice from initial estimate confidence and whether there is agreement between advice and initial estimate.
-
-```{r multivariate linear regression}
-
-library(lmerTest)
-
-m <- lmer(zFinalConfidence ~ zInitialConfidence * disagree * feedback + (1|pid), data = df)
-summary(m)
-
-```
-
-```{r}
-
-#' Plot the parameters of a linear model in a neat way
-forestPlot <- function(model) {
-  tmp <- summary(model) %>%
-    .$coefficients %>%
-    as.data.frame() %>%
-    rownames_to_column('Parameter') %>%
-    mutate(sig = if_else(`Pr(>|t|)` < .05, '*', ''))
   
-  low = -ceiling(max(abs(tmp$Estimate + tmp$`Std. Error`)) * 1.1)
+  # Calculate proportion of extremes
+  x <- lastGen$bias
+  m$parameters$n_lt_20 <- mean(x < .2)
+  m$parameters$n_gt_80 <- mean(x > .8)
+  m$parameters$n_mid <- mean(x >= .2 & x <= .8)
   
-  ggplot(tmp, aes(
-    y = Parameter, 
-    x = Estimate, 
-    xmin = Estimate - `Std. Error`,
-    xmax = Estimate + `Std. Error`,
-    label = sig
-  )) +
-    geom_vline(xintercept = 0, linetype = 'dashed') +
-    geom_point() +
-    geom_errorbarh() +
-    geom_text(x = low) +
-    scale_x_continuous(limits = c(low, -low)) +
-    labs(caption = 'DV = standardized directional final decision confidence; * p < .05')
-}
-
-forestPlot(m)
-
-```
-
-Where the advisor disagrees with a participant, the participant's final decision confidence is substantially lower on average than the average for initial estimate confidence.
-There is also a small effect of initial confidence, indicating that a participant who is initially more confident is likely to retain that increased confidence in their final decision.
-The interaction between the parameters indicates that the retention of initial estimate confidence is largely cancelled out by disagreement from an advisor: there is a small net positive effect from initial confidence on final confidence even where the advisor disagrees.
-
-The presence of feedback on a trial is better regarded as a noisy proxy for feedback on previous trials than as contributing meaningfully to the final decision on any particular trial (because feedback happens _after_ the final decision has been made).
-Feedback slightly reduces the confidence of final decisions, and noticeably reduces the final confidence penalty from disagreeing advice.
-Slightly more initial confidence is retained into final decision confidence in feedback trials.
-
-Next, we can look at the effect of adding in parameters based on the historical interactions between the advisor and the participant.
-The two main effects we look at are the total amount of experience a participant has had with an advisor, and the agreement rate experienced in that time.
-
-```{r advice history predictors}
-
-dfh <- df %>%
-  nest(d = -c(pid, study)) %>%
-  mutate(d = map(d, ~ nest(., x = -advisor) %>%
-                   mutate(
-                     x = map(x, ~ arrange(., number) %>%
-                               rowid_to_column(var = 'nthWithAdvisor'))
-                   ) %>%
-                   unnest(cols = x))) %>%
-  unnest(cols = d) 
-
-dfh <- dfh %>% mutate(agreeRate = NA)
-
-for (n in 1:max(dfh$nthWithAdvisor)) {
-  dfh$agreeRate[dfh$nthWithAdvisor == n] <- dfh %>% 
-    filter(nthWithAdvisor <= n) %>%
-    nest(d = c(-pid, -advisor)) %>%
+  # Calculate the bias magnitude
+  m$parameters$meanBiasMagnitude <- mean(abs(lastGen$bias - .5)) 
+  
+  # Calculate the compression stats
+  m$parameters$cluster_count <- .cc(
+    m$model$graphs[[length(m$model$graphs)]]
+  )
+  # Save the summary stuff for the first example of each model
+  library(tidyverse)
+  m$model$agents <- m$model$agents %>%
+    nest(d = -decision) %>%
     mutate(
-      x = map_dbl(d, ~ mean(!.$disagree)),
-      nth = map_int(d, ~ max(.$nthWithAdvisor))
+      cluster_count = map_int(
+        decision,
+        function(i) {
+          g <- m$model$graphs[[i]]
+          if (all(is.na(g)))
+            NA_integer_
+          else
+            .cc(g)
+        }
+      )
     ) %>%
-    filter(nth == n) %>%
-    pull(x)
+    unnest(cols = d)
+  
+  m
 }
 
-dfh <- dfh %>%
+nCores <- 3
+for (i in 1:ceiling(nrow(parameters) / nCores)) {
+  n <- (i - 1) * nCores + 1
+  n <- c(n, min(n + nCores - 1, nrow(parameters)))
+  fName <- glue('cache/network-models/100a2000d_{n[1]}-{n[2]}.rda')
+  if ((is.null(getOption('ESM.recalculate')) || getOption('ESM.recalculate') < 2) 
+      && file.exists(fName)) {
+    next()
+  }
+  
+  t1 <- Sys.time()
+  models <- runSimulations(
+    parameters[n[1]:n[2], ], 
+    cores = nCores,
+    summaryFun = summary_fun
+  )
+  save(models, file = fName)
+  print(glue('Completed run {i} ({n[1]}-{n[2]}).'))
+  print(Sys.time() - t1)
+}
+```
+
+```{r nw-r-load-basic, include = F}
+t1 <- Sys.time()
+fName <- 'cache/network-models.rda'
+if ((is.null(getOption('ESM.recalculate')) || getOption('ESM.recalculate') < 2) 
+    && file.exists(fName)) {
+  load(fName)
+} else {
+  # Gather data and bind into an analysable data frame
+  agents <- NULL
+  graphs <- list()
+  fList <- list.files('cache/network-models/', pattern = '.rda', full.names = T)
+  i <- 1
+  for (f in fList) {
+    load(f)
+    for (m in models) {
+      graphs[[i]] <- list()
+      for (d in 1:m$parameters$n_decisions) {
+        if ((d %% 100 == 1) | d == m$parameters$n_decisions) {
+          graphs[[i]][[d]] <- m$model$graphs[[d]]
+        }
+      }
+      
+      m$parameters$model_num <- i
+      i <- i + 1
+      m$parameters$starting_graph <- NULL
+      m$parameters$truth_fun <- NULL
+      m$parameters$decision_flags <- NULL
+      agents <- 
+        bind_rows(
+          agents, 
+          m$model$agents %>% 
+            filter(decision %% 100 == 1 | decision == max(decision)) %>%
+            rename(agt_cluster_count = cluster_count) %>%
+            left_join(as_tibble(m$parameters), by = character())
+        )
+    }
+  }
+  rm(m, models)
+  save(agents, graphs, file = fName)
+}
+
+agents <- agents %>% 
   mutate(
-    nthWithAdvisor = scale(nthWithAdvisor)
+    family = glue(
+      'burnIn={n_decisions > nD}|ws={weighted_sampling}'
+    )
   )
 
+Sys.time() - t1
 ```
 
-```{r models with history}
-
-mh <- lmer(zFinalConfidence ~ zInitialConfidence * disagree * feedback * nthWithAdvisor * agreeRate + (1|pid), data = dfh)
-summary(mh)
-
-forestPlot(mh)
-
-```
-
-<!-- This suggests we trust advisors less when we have more agreement experience with them. Can we explore these further? Do we trust this analysis - can we visualise what it's doing? -->
-
-```{r plot models}
-
-dfh %>% filter(nthWithAdvisor > -.9) %>%
-  ggplot(aes(x = agreeRate, y = zFinalConfidence, colour = disagree)) +
-  geom_point(alpha = .05) + 
-  geom_smooth(method = 'lm') +
-  facet_wrap(~study)
-
-```
-
-Absent any effects, average final decision confidence is slightly higher than average initial estimate confidence in this model.
-As before, there is a pronounced effect of disagreement, with final confidence being notably lower following disagreement from the advisor, and a smaller effect whereby higher initial confidence increases final confidence.
-
-The two history parameters, total experience with advisor and experienced agreement rate, go in opposite directions. 
-The more experience a participant has had with an advisor, the higher their final confidence, while the greater the experienced agreement rate the lower the confidence. 
-These effects are small, but puzzling; both advisor experience and experience of agreement should go the same way, and we might expect small positive effects (to be later reversed by interaction with disagreement).
-The interaction between experience of agreement and disagreement is also peculiar: the reduction in confidence from disagreement is largely cancelled out in an advisor who agrees very frequently, suggesting that disagreeing advice from a advisor who usually agrees is less rather than more influential.
-The history parameters also interact with one another: the greater the experience with an advisor the greater the penalty to final confidence from increased experience of agreement.
-
-Overall, the largest effects in the model come from some quite complex 3- and 4-way interactions, suggesting a nuanced structure to the data which is not well-captured simple effects.
-This may be because the biggest changes take place under specific conditions, or it may be an effect of the law of small numbers (because specific overlaps in conditions take place much more rarely than main effects, allowing outliers to produce large coefficient estimates).
-Some comfort can be taken in noting that, while the standard errors of the complex interactions with large coefficients are larger than those with smaller coefficients, they are not dramatically larger, and thus the larger coefficients are very likely to be genuinely large.
-
-```{r models anova}
-m <- lmer(zFinalConfidence ~ zInitialConfidence * disagree * feedback + (1 | pid), data = dfh)
-anova(m, mh)
-```
-
-\mccorrect{Do we want to take a descriptive model like this and use it directly as a predictive model in the network modelling (or use machine learning/decision tree/heterogeneous models)? 
-Can we massage continuous dates task data to be compatible?
-Can we use a multilevel model with task[participant[trial]]] structure?}
-
-* Which parameters are important for making network agents display human-like psychology?  
-  * People choose in line with their experience (mostly)  
-    * Feedback is a big deal  
-    * Agreement less so?  
-  * Lots of variability within and between people  
-    * Individual differences are interesting - but what drives them/which dimensions matter?  
-  * What effects do all these have on the network structure?  
-    * Does heterogeneity lead to a stable network structure?  
-    * Do extremely opinionated individuals form 'echo chambers'?  
-      * Do they draw in others?  
-  * Other parameters such as  
-    * Choice availability  
-    * Hidden preference  
-      * How important is agree rate?  
-
-* Explore some of the parameters in these linear models  
-  * Visualise some of the raw data and the individual effects  
-
-* Individual differences might be able to be tracked with parameter-fitted decision-tree-type choice models between pick/average  
-
-## Models with agents based on our experiments
-
-Each participant's data is run through a model which has the following structure:
-* $1/(1 + e^{(-(V_i - V_j) * \rho)})$ softmax logistic compression where $V$ is the trust placed in an advisor, $_i$ and $_j$ are competing advisors and $\rho$ is the free parameter governing the consistency of picking based on differences in preference.
-* $V_i^t = (1-\lambda) \cdot V_i^{t-1} + \lambda \cdot agree(I^t, A^t)$ where $I^t$ and $A^t$ are the initial estimate and advice on trial $^t$ and $\lambda$ is the free parameter governing the model's trust update rate. $\text{agree}(I, A)$ is 1 if $I$ and $A$ indicate the same decision, 0 otherwise.
-
-The model error is calculated on each trial. 
-Final confidence judgements are calculated on current trust in the active advisor, according to a Bayesian update wherein the initial confidence is used as a marker of the subjective probability that the initial decision direction is correct. 
-The trust in the advisor is taken to signify the advisor's reliability - the probability the advisor indicates the same decision direction given that decision direction was correct.
-Thus, Bayes theorem yields $F = \frac{I T}{IT + (1-I)(1-T)}$, where $I$ and $F$ are the initial and final decision probabilities (scaled confidences), and T is the trust in the advisor.
-The difference between the predicted final confidence and the actual final confidence is the advice taking error on that trial.
-
-The advisor choice error is also calculated, for trials where a choice of advisor was offered.
-Advisor choice error is calculated over the last (up to) 5 trials where the currently chosen advisor on the current trial was one of the choices offered.
-For each of these trials, the model takes the average probability of picking the currently chosen advisor versus the other choice, and compares this figure to the average pick rate of the currently chosen advisor. 
-The difference between these two numbers is the advisor choice error on that trial.
-
-Both advisor choice and advice influence errors lie on a scale between 0 and 1, with 0 being a perfect match to the data and 1 being entirely wrong. 
-To account for different distributions of errors across each dimension, the overall model error is calculated by normalising each error dimension separately and then summing them.
-
-\mccorrect{!TODO[Should we scale participant confidence values such that their lowest confidence is always treated as completely unsure and their highest reported confidence always treated as the top of the scale? It would keep model predictions on a similar scale to answers, but it would also make the maths harder and impose artificial limits other than the ones actually introduced by the scale. We probably shouldn't do this but should explain why we didn't - it would distort participants' confidence judgements.]}
-
-```{r model fit calculations}
-
-#' This parameter estimation process takes a long time, and takes even longer to
-#' do the checking via shuffling 9 shuffles of each participants' data.
-#' To make this tractable, the process was run on the Advanced Research 
-#' Computing high performance cluster. The loaded file is the result, and the
-#' code run can be inspected at
-#' https://github.com/oxacclab/arc_thesis-parameter-estimation
-
+```{r nw-r-run-empirical, include = F}
 load('cache/thesis-parameter-estimation.rda')
 
-```
-
-### Sanity checking by shuffling agreement
-
-The models key on the advisor agreement. 
-This means that if we shuffle the advisor agreement the model's ability to fit the data collapses (provided the model's parameters are kept fixed).
-
-```{r visualise shuffles}
-
-scaledError <- function(err1, err2) {
-  x <- scale(err1); y <- scale(err2)
-  x <- x - min(x); y <- y - min(y)
-  log(x + y)
-}
-
-positions <- bind_rows(
-  recovered_parameters %>%
-    rename(weightedSelection = ws_end, trustUpdateRate = tu_end) %>%
-    mutate(shuffle_run = 0),
-  shuffles
-) %>%
-  select(-data) %>%
-  nest(data = -uid) %>%
+# Fetch the unique parameter combinations for the models we just ran
+parameters.emp <- agents %>%
+  select(
+    n_agents:confidence_weighted,
+    -starts_with('trust_volatility'),
+    -starts_with('weighted_sampling'),
+    -starting_graph_type
+  ) %>%
+  unique() %>%
+  rowid_to_column() %>%
+  nest(d = -rowid) %>%
   mutate(
-    data = map(data, ~ mutate(
-      .,
-      combined_error = scaledError(ws_error, tu_error)
-    ) %>% arrange(combined_error)),
-    pos = map_int(data, ~ rowid_to_column(., 'pos') %>% 
-                    filter(shuffle_run == 0) %>%
-                    pull(pos) %>% 
-                    .[1]
+    model = map(d, function(.) {
+      withr::with_seed(
+        .$.random_seed_agents,
+        do.call(adviseR:::makeAgents, select(
+          ., 
+          -bias_update_slope, -starts_with('feedback'), 
+          -contains('random_seed'), -truth_sd, -confidence_weighted
+        ))
+      )
+    })
+  ) %>%
+  # Substitute trust_volatility and weighted_sampling coefficients from estimates
+  mutate(
+    model = map2(model, d, function(.x, .y) {
+      p <- withr::with_seed(
+        .y$.random_seed_agents,
+        slice_sample(recovered_parameters, n = .y$n_agents, replace = T)
+      )
+      .x$agents <- .x$agents %>%
+        mutate(
+          trust_volatility = rep(p$tu_end, .y$n_decisions),
+          weighted_sampling = rep(p$ws_end, .y$n_decisions)
+        )
+      .x
+    })
+  ) %>% 
+  unnest(cols = d) %>%
+  mutate(
+    decision_flags = map(
+      n_decisions,
+      function(.) {
+        if (. > nD) c(rep(1, nBI), rep(3, . - nBI)) else rep(3, .)
+      }
     ),
-    combined_error = map_dbl(data, ~ filter(., shuffle_run == 0) %>%
-                               pull(combined_error) %>% 
-                               .[1]),
-    tu_error = map_dbl(data, ~ filter(., shuffle_run == 0) %>% 
-                         pull(tu_error) %>%
-                         .[1]),
-    ws_error = map_dbl(data, ~ filter(., shuffle_run == 0) %>% 
-                         pull(ws_error) %>%
-                         .[1]),
-    sum_error = tu_error + ws_error,
-    studyId = str_match(uid, '^(.+) p[0-9]+$')[,2]
+    starting_graph = parameters$starting_graph[1],
+    model = map2(model, n_agents, function(.x, .y) {
+      g <- parameters$starting_graph[[1]](tibble(x = 1:.y))
+      .x$graphs <- list(g)
+      .x
+    })
+  ) %>%
+  select(-rowid)
+
+nCores <- 3
+for (i in 1:ceiling(nrow(parameters.emp) / nCores)) {
+  n <- (i - 1) * nCores + 1
+  n <- c(n, min(n + nCores - 1, nrow(parameters.emp)))
+  fName <- glue('cache/network-models/emp/100a{nD}d_{n[1]}-{n[2]}.rda')
+  if ((is.null(getOption('ESM.recalculate')) || getOption('ESM.recalculate') < 2) 
+      && file.exists(fName)) {
+    next()
+  }
+  
+  t1 <- Sys.time()
+  models <- runSimulations(
+    parameters.emp[n[1]:n[2], ], 
+    cores = nCores,
+    summaryFun = summary_fun
   )
-
-ggplot(positions, aes(pos)) + 
-  geom_histogram(binwidth = 1) +
-  scale_x_continuous(breaks = 1:10, limits = c(NA, 10)) + 
-  facet_wrap(~studyId)
-
-positions %>% 
-  pivot_longer(
-    c(tu_error, ws_error, sum_error), 
-    names_pattern = '(.+)_error',
-    names_to = 'ErrorDimension',
-    values_to = 'Error'
-  ) %>%
-  ggplot(aes(x = pos, y = Error)) +
-  geom_point(alpha = .5) +
-  geom_smooth(method = 'lm', formula = y ~ x) +
-  scale_x_continuous(breaks = 1:10, limits = c(NA, 10)) +
-  facet_wrap(~ErrorDimension)
-
-cor.test(positions$pos, positions$tu_error)
-cor.test(positions$pos, positions$ws_error)
-cor.test(positions$pos, positions$sum_error)
+  save(models, file = fName)
+  print(glue('Completed run {i} ({n[1]}-{n[2]}).'))
+  print(Sys.time() - t1)
+}
 ```
 
-The summaries look reasonably sensible.
-The experiments which yielded the best results have participants whose data is better fit by the real data than by data with the advisor agreement shuffled.
-Those experiments where there were issues with how agreement was coded or recorded do not show this pattern, nor is the pattern clearly visible in experiments where we do not believe the advisors were clearly differentiated to the participants.
+```{r nw-r-load-empirical, include = F}
+t1 <- Sys.time()
+fName <- 'cache/network-models-emp.rda'
+if ((is.null(getOption('ESM.recalculate')) || getOption('ESM.recalculate') < 2) 
+    && file.exists(fName)) {
+  load(fName)
+} else {
+  # Gather data and bind into an analysable data frame
+  agents.emp <- NULL
+  graphs.emp <- list()
+  fList <- list.files('cache/network-models/emp/', pattern = '.rda', full.names = T)
+  i <- 1
+  for (f in fList) {
+    load(f)
+    for (m in models) {
+      graphs.emp[[i]] <- list()
+      for (d in 1:m$parameters$n_decisions) {
+        if ((d %% 100 == 1) | d == m$parameters$n_decisions) {
+          graphs.emp[[i]][[d]] <- m$model$graphs[[d]]
+        }
+      }
+      
+      m$parameters$model_num <- i
+      i <- i + 1
+      m$parameters$starting_graph <- NULL
+      m$parameters$truth_fun <- NULL
+      m$parameters$decision_flags <- NULL
+      agents.emp <- 
+        bind_rows(
+          agents.emp, 
+          m$model$agents %>% 
+            filter(decision %% 100 == 1 | decision == max(decision)) %>%
+            rename(agt_cluster_count = cluster_count) %>%
+            left_join(as_tibble(m$parameters), by = character())
+        )
+    }
+  }
+  rm(m, models)
+  save(agents.emp, graphs.emp, file = fName)
+}
+Sys.time() - t1
+```
 
-There is a clear pattern for participants' datasets with better scramble positions to have lower overall mean squared error, at least for the weighted selection parameter.
-
-```{r best fit distributions}
-
-coefs <- positions %>% 
-  select(uid, data, pos) %>%
+```{r nw-r-bind, include = F}
+agents.all <- bind_rows(
+  agents, 
+  agents.emp %>% mutate(model_num = model_num + max(agents$model_num))
+) %>%
   mutate(
-    data = map(data, ~ filter(., shuffle_run == 0) %>% .[1, ])
+    burnIn = n_decisions > nD,
+    trust_weights = if_else(n_decisions > nD, "Evolved", "Random"),
+    trust_weights = factor(trust_weights, levels = c("Random", "Evolved")),
+    ws_agent = weighted_sampling,
+    weighted_sampling = case_when(
+      model_num > max(agents$model_num) ~ "Empirical",
+      weighted_sampling_mean == 0 & weighted_sampling_sd == 0 ~ "Zero",
+      weighted_sampling_sd == 0 ~ "Homogenous",
+      T ~ "Heterogeneous"
+    ),
+    weighted_sampling = factor(
+      weighted_sampling, 
+      levels = c("Zero", "Homogenous", "Heterogeneous", "Empirical")
+    ),
+    family = glue('{burnIn}|{weighted_sampling}')
   ) %>%
-  unnest(cols = data) %>%
-  select(uid, pos, weightedSelection, trustUpdateRate)
+  nest(d = -c(model_num, id)) %>%
+  mutate(
+    starting_bias = map_dbl(d, ~ .$bias[.$decision == 1]),
+    d = map(d, ~ mutate(
+      ., 
+      step = decision, 
+      decision = ifelse(burnIn, step - nBI, step)
+    ))
+  ) %>%
+  unnest(cols = d)
+  
+graphs.all <- c(graphs, graphs.emp)
 
-ggplot(coefs, aes(weightedSelection, fill = pos < 3)) +
-  geom_vline(xintercept = 0, linetype = 'dashed') +
-  geom_histogram(binwidth = 1, alpha = .1, fill = 'black') +
-  geom_histogram(binwidth = 1, alpha = .5, position = 'identity') +
-  scale_x_continuous(limits = c(-50, 50))
+models.all <- agents.all %>% 
+  group_by(model_num) %>%
+  summarise(
+    across(c(weighted_sampling, n_agents:trust_weights), unique), 
+    .groups = 'drop'
+  ) %>%
+  select(
+    model_num,
+    weighted_sampling,
+    trust_weights,
+    n_agents:starting_graph_type,
+    everything(),
+    -n_decisions, 
+    -weighted_sampling_mean, 
+    -weighted_sampling_sd,
+    -starts_with('trust_volatility')
+  )
+```
 
-ggplot(coefs, aes(trustUpdateRate, fill = pos < 3)) +
-  geom_vline(xintercept = 0, linetype = 'dashed') +
-  geom_histogram(binwidth = .005, alpha = .1, fill = 'black') +
-  geom_histogram(binwidth = .005, alpha = .5, position = 'identity')
+## Method 
+
+Agent-based modelling is used to simulate the interactive effects of repeated paired decision-making.
+The agents in the model perform a cycle of making an initial decision, selecting one of the other agents as an advisor, making a final decision, and updating their trust in their advisor and their internal beliefs about the world.
+The task the agents face is roughly analogous to the task faced by human participants in the Dots Task experiments [§Perceptual decision (Dots Task)](#m-p-dots), where the participants make a decision about which of two rapidly and simultaneously presented grids contained more dots.
+
+Each model consists of a population of agents implementing the same mathematical model of decision-making, trust-updating, and advisor selection, with different coefficients for parameters of that mathematical model (\@ref(tab:nw-r-agent-properties-table)) drawn from appropriate distributions.
+
+### \OpenScience{materials} Open code
+
+The agent-based modelling is performed using a custom-written R package.
+\mccorrect{Zenodo}
+The functions which implement each of the steps below are listed in the (non-exported) simulation loop function [`simulationStep`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L261). 
+Each of these sub-functions includes unit tests to verify its behaviour.
+For readers who prefer to follow along with code rather than maths, each section below includes details of the function implementing the equations.
+These small functions are not exported by the package, so links are to source-code rather than package documentation.
+
+### Model details
+
+Each model is defined by a set of model parameters (\@ref(tab:nw-r-model-properties-table)), which are assigned capital letters in the equations below. 
+These parameters are used to generate further parameters which govern agents' tendencies, and these are assigned lower-case letters and superscripted with the agent to whom they belong. 
+Variables which change over the course of the model have a subscript indicating which step of the model they belong to.
+
+This is best illustrated with an example. 
+Each agent has a sensitivity parameter, $s^a$ which governs the amount of random noise which is attached to their perception of the world.
+On any given decision, the amount of this noise $\epsilon^a_t$ is determined by drawing from a normal distribution with standard deviation defined by the agent's sensitivity ($N(0, \frac{1}{s^a})$).
+When the agent is created, the parameter defining its sensitivity distribution ($s^a$) is itself drawn from a normal distribution with mean and standard deviation defined by the model settings ($N(S^\mu, S^\sigma)$).
+
+#### Creating agents
+
+Each agent has the following properties:
+
+```{r nw-r-agent-properties}
+
+tribble(
+  ~ `Property`, ~ `Description`, ~ `Updates each step`,
+  "$a$", "Agent unique identfier", "No",
+  "$s^a$", "Accuracy of agent's perceptions", "No",
+  "$c^a$", "Agent's subjective confidence scaling", "No",
+  "$\\tau^a$", "Size of agent's trust updates", "No",
+  "$\\lambda^a$", "Size of agent's bias updates", "No",
+  "$\\text{w}^a$", "Extent of agent's preference for trusted advisors", "No",
+  "$b^a_t$", "Agent's prior expectation about the task answer", "Yes"
+) %>%
+  kable(caption = "\\label{tab: nw-r-agent-properties-table}Agent properties")
 
 ```
 
-The distribution of parameters is fairly similar between those datasets with good (1-2) positions in the shuffled list and those with bad (>=3) positions.
-In both cases, the mean trust update parameter is just above 0 (overall mean = `r round(mean(coefs$trustUpdateRate), 3)`), as is the weighted selection parameter (overall mean = `r  round(mean(coefs$weightedSelection), 2)`). 
-The ranges of the parameters are sensible: trust updates are small, while weighted selection is larger.
-The normal distribution of coefficients is expected, but the number of cases where the parameters are estimated to be below 0 is not. 
+An agent's values for each of these properties (except id) are created by drawing values from normal distributions defined by parameters in the model settings.
 
-Negative values for weighted selection are somewhat understandable: they indicate that the participant seeks out disagreeing advice preferentially, which is a sound strategy in many of the experimental designs. 
-Negative values of trust update rate are more concerning - they indicate that the advisor becomes more trusted (more influential and more likely to be picked given a positive weighted selection coefficient) following disagreement.
+Additionally, each agent has a 'trust' in each other agent, ranging from being convinced that the other agent is always correct to being convinced that the other agent is always wrong.
+These values are updated at each step and initialised by drawing from a uniform random distribution with limits [0.5, 1].
 
+Agents are created in the [`make_agents`](https://github.com/oxacclab/adviseR/blob/master/R/make-agents.R) function.
 
-#### Verification of model fitting validity
+#### Model step
+
+##### Establishing the stimulus
+
+The same stimulus is presented to each agent, in the form of a value ($v_t$) drawn from a normal distribution with mean ($V^\mu$) and standard deviation ($V^\sigma$) defined in the model settings:
+
+$$v_t \sim N(V^\mu, V^\sigma)$$
+
+The agents' task is to determine whether $v_t$ is greater than or less than zero.
+
+The establishing of true values is achieved in the code within the [`simulationStep`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L261) function, and executes a function supplied by the user.
+The default function, used in all models described below, is drawing from the normal distribution.
+This default can be seen in the `truth_fun` parameter for the [`runSimulation`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L107) function.
+
+##### Initial decision-making
+
+Agents perform a noisy perception of the stimulus, by combining the true stimulus value with random noise ($\epsilon^a_t$), to produce a percept $q^a_t$.
+
+$$q^a_t = v_t + \epsilon^a_t$$
+Where: $\epsilon^a_t \sim N(0, \frac{1}{s^a})$
+
+This sensory percept is then converted into a subjective probability that the stimulus was greater than zero ($p^a_t$) using a sigmoid function with a slope defined by the agent's subjective confidence scaling parameter.
+
+$$p^a_t = \varsigma(q^a_t, c^a)$$
+Where: $\varsigma(x, y) = \frac{1}{1 + e^{-xy}}$
+
+The conversion of the percept ($q^a_t$) to the subjective probability ($p^a_t$) changes the representation from a theoretically-unbounded normal distribution centred around 0 to a probability in the interval [0,1] centred around 0.5. 
+The subjective probability expresses a judgement about whether or not $v_t$ is greater than or less than zero, but does not contain an estimate of $v_t$ itself.
+
+In the code, the percept is calculated using [`getPercept`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L345). 
+The inclusion of the agent's confidence scaling is done as part of the second step in the determination of the initial decision.
+
+This subjective probability is then integrated with the agent's prior expectation about whether stimuli are generally less than or greater than 0 ($b^a_t$), or 'bias', to produce an initial decision, $i^a_t$.
+This integration is performed using Bayes' rule. 
+
+$$
+i^a_t = \frac
+  {b^a_t \cdot P(p^a_t | v_t > 0)}
+  {b^a_t \cdot P(p^a_t | v_t > 0) + (1 - b^a_t) \cdot P(p^a_t | v_t \leq 0)}
+$$
+
+Where: $P(p^a_t | v_t > 0) = z(p^a_t, 1, V^\sigma)$;  
+and: $P(p^a_t | v_t \leq 0) = z(p^a_t, 0, V^\sigma)$;  
+with: $z(x, \mu, \sigma)$ giving the density of $N(\mu, \sigma)$ at $x$.
+
+The prior, $b^a_t$, is equal the prior probability that the value is greater than 0:
+$$b^a_t = P(v_t > 0)$$
+
+In the code, the calculation of initial decision from the percept (including the scaling of the percept according to the agent's confidence scaling parameter) is performed in [`getConfidence`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L359).
+
+Note that in these initial decision equations the agents have direct access to a model property, $V^\sigma$, the standard deviation of the true values of the stimuli. 
+Ideally, in an agent-based model, the agents would not have such direct access to non-observable properties, and would instead build up specific expectations about the variability of stimuli from observation, perhaps seeded with a loosely-informative prior. 
+The agents are allowed to know the value here as a shorthand for such exploration. 
+This makes the agents' task analogous to well-practised real-world tasks such as perceptual decision-making.
+It is unlikely to seriously affect any conclusions or illustrations drawn from the models.
+
+The initial decision contains both a discrete decision (whether the stimulus value was more likely to be less than zero, $i^a_t < 0.5$, or greater than zero $i^a_t \geq 0.5$), and how much so ($|i^a_t - 0.5|$). 
+It thus represents both the agent's decision and the confidence in that decision.
+
+##### Advisor selection
+
+Having made an initial decision, each agent selects a single advisor from whom to receive advice.
+This choice is made based on the trust in each potential advisor scaled by the strength of the agent's preference for receiving more-trusted advice.
+
+The identity of an agent's advisor on a given trial is designated by $a'$, and the weight assigned to advisor $a'$ by agent $a$ at step $t$ by $\omega^{a,a'}_t$.
+Each agent's trust value is adjusted to be relative to the most (or least) trusted advisor, depending upon whether the agent prefers trusted ($\text{w}^a > 0$) or untrusted ($\text{w}^a \leq 0$) advisors.
+
+$$\omega'~^{a,a'} = 
+\begin{cases}
+\text{w}^a > 0, \omega^{a,a'}_t - \text{max}(\Omega^a_t)\\
+\text{w}^a \leq 0, \omega^{a,a'}_t - \text{min}(\Omega^a_t)
+\end{cases}$$
+
+Where $\Omega^a_t$ is the set of trust weights in all potential advisors for agent $a$ at step $t$.
+
+These relative trust values are then assigned probability weightings for selection based on a sigmoid function.
+Because of the relative scaling, each probability is in fact drawn from a half sigmoid, where the probability weight assigned to the most likely candidate is 1 and other candidates' probability weights between 1 and 0.
+
+The identity of advisor $^{a,a'}_t$ is determined by sampling at random from the advisors, weighted by the probability weights assigned.
+In the R code the advisor selection procedure occurs in [`selectAdvisorSimple`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L399).
+
+###### Differences from parameter estimation
+
+The approach used for fitting participant data from the behavioural experiments is subtly different from that used for advisor selection in the agent-based models.
+In the behavioural experiments, rather than being presented with a choice of many different advisors whose appeals all had to be considered, participants were presented with a choice of two advisors only. 
+The parameter recovery process estimated a trust update rate ($\tau^a$ in the agent-based model) which tracked the trust in each advisor, and the difference between these trust values was fed into a sigmoid governing selection.
+The slope of that best-fitting sigmoid function was taken as equivalent to $\text{w}^a$ in the agent-based models.
+This approach is reasonable given the differences in the advisor selection task facing the human participants and model agents, but should be noted as a caveat for drawing interpretations concerning the role of weighted selection values based on human participants' performance.
+
+Code for the implementation of advisor choice fitting can be found in the function  [`advisor_pick_probability`](https://github.com/oxacclab/adviseR/blob/master/R/simulate_from_data.R#L116).
+
+##### Final decision-making
+
+Final decisions are made by Bayesian integration of the initial decision and advice.
+Advice takes the form of a binary recommendation, and is weighted by the trust the agent has in their advisor.
+
+First, initial decisions and advice are reoriented to the direction of the initial decision, such that initial decisions represent confidence in the initial decision and advice represents agreement with that decision.
+
+$$i'~^a_t = 
+\begin{cases}
+i < 0.5, 1 - i^a_t \\
+i \geq 0.5, i^a_t
+\end{cases}$$
+
+$$i'~^{a,a'}_t = 
+\begin{cases}
+i < 0.5, \text{round}(1 - i^{a,a'}_t) \\
+i \geq 0.5, \text{round}(i^{a,a'}_t)
+\end{cases}$$
+
+The trust weight is slightly truncated to avoid very extreme values, and oriented based on whether the advice agrees, giving the expectedness of the advice provided the initial answer was correct: 
+$$\omega'~^{a,a'}_t = 
+\begin{cases}
+i'~^{a,a'}_t = 0, 1 - \text{min}(0.95, \text{max}(0.05, \omega^{a,a'}_t)) \\
+i'~^{a,a'}_t = 1, \text{min}(0.95, \text{max}(0.05, \omega^{a,a'}_t))
+\end{cases}$$
+
+The final decision is obtained by performing Bayesian integration.
+In Bayesian terms, agents are trying to discover the probability of their final answer being correct given the agreement (or disagreement) observed from their advisor. 
+Thus they multiply the initial probability of being correct (subjective confidence, $i'~^a_t$) by the probability of the advisor agreeing if they are correct ($w'~^{a,a'}_t$).
+This is divided by all of the options that could have led to the observed advice: the probability that they are correct multiplied by the probability of the advice if they are (the numerator), plus the probability that they are incorrect multiplied by the probability of the advice if they are incorrect. 
+Because correctness and advice agreement probability are both mutually exclusive binaries, the probability of being incorrect is 1 - the probability of being correct, and the probability of the advice if they are incorrect is 1 - the probability of the advice if they are correct.
+
+$$f'~^a_t = \frac{i'~a_t \cdot \omega'~^{a,a'}_t}{i'~a_t \cdot \omega'~^{a,a'}_t + (1 - i'~a_t)(1 - \omega'~^{a,a'}_t)}$$
+The final decision (with confidence) is acquired by reversing the transformation applied earlier:
+$$f^a_t = 
+\begin{cases}
+i < 0.5, 1 - f'~^a_t \\
+i \geq 0.5, f'~^a_t
+\end{cases}$$
+
+Final decisions are calculated in the code in the [`bayes`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L442) function.
+
+##### Feedback
+
+On a proportion of trials a proportion of the agents are randomly selected to receive feedback.
+The feedback is always accurate, and implicitly trusted by all the agents. 
+When they receive feedback, the agents use that feedback rather than their own final decisions to update their trust and bias.
+The R implementation is part of the [`simulationStep`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L312) function.
+
+##### Bias updating
+
+The agents update their bias after each final decision, taking an average of their current bias and the feedback or their final decision, weighted by the agent's bias volatility ($\lambda^a$).
+They therefore adjust their prior expectations on the basis of their experience (and advice).
+
+$$b'~^a_{t+1} = b^a \cdot (1 - \lambda^a) + f^a_t \cdot \lambda^a$$
+
+The bias is clamped to within 0.05 and 0.95 to keep agents at least a little open-minded. 
+
+$$b^a_{t+1} = \text{min}(0.95, \text{max}(0.05, b'~^a_{t+1}))$$
+
+This is implemented using the [`getUpdatedBias`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L496) function.
+
+##### Trust updating
+
+The agents update their advice by taking an average of their current trust in their advisor and the advisor's agreement, weighted by their trust volatility ($\tau^a$).
+
+$$x = w^{a,a'}_t \cdot (1 - \tau^a) + i'~^{a,a'}_t \cdot \tau^a$$
+
+A tiny cap is used for truncation to prevent agents wholly disregarding or blindly trusting others:
+$$w^{a,a'}_{t+1} = \text{min}(0.9999, \text{max}(0.0001, x))$$
+
+Trust updates are accomplished using the [`newWeightsByDrift`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L563) function.
+
+### Model parameters
+
+The models have a large number of parameters.
+These can be broadly divided into parameters which govern the distributions from which the agents' parameters are drawn, and parameters which define the operation of the model.
+
+```{r  nw-r-model-properties}
+
+tribble(
+  ~ `Property`, ~ `Description`, ~ `Type`,
+  "`n_agents`", "Number of agents to simulate", "model",
+  "`n_steps`", "Number of decisions to simulate", "model",
+  "`decision_flags`", "Binary flags indicating whether trust and/or bias update at each step", "model",
+  "`feedback_probability`", "Probability feedback is provided each step", "model",
+  "`feedback_proportion`", "Proportion of the population receiving feedback when provided", "model",
+  "`random_seed`", "Seed used for the pseudorandom number generator to allow repetition of runs", "model",
+  "`truth_sd`", "Mean, standard deviation for true world values", "model",
+  "`confidence_weighted`", "Whether agents use their own confidence to modify their trust updates", "model",
+  "$B^\\mu, B^\\sigma$", "Mean, standard deviation of distribution of agents' biases", "agents",
+  "$S^\\mu, S^\\sigma$", "Mean, standard deviation of distribution of agents' sensitivities", "agents",
+  "$T^\\mu, T^\\sigma$", "Mean, standard deviation of distribution of agents' trust volatilities", "agents",
+  "$\\Lambda ^\\mu, \\Lambda ^\\sigma$", "Mean, standard deviation of distribution of agents' bias volatilities", "agents",
+  "$C^\\mu, C^\\sigma$", "Mean, standard deviation of distribution of agents' confidence scaling", "agents",
+  "$W^\\mu, W^\\sigma$", "Mean, standard deviation of distribution of agents' trusted advisor preference", "agents"
+) %>%
+  kable(caption = "\\label{tab: nw-r-model-properties-table}Model properties")
+
+```
+
+These parameters can be seen in full by inspecting the parameters for the [`runSimulation`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L1) function.
+
+#### Parameters varied between model runs
+
+There are three parameters which are varied between runs:
+* $B^\sigma$, the standard deviation of the agents' biases
+* `decision_flags`, whether or not there is time for the random network weights to update before agents' biases begin to update
+* $W^\mu, W^\sigma$, the agents' weighted selection values
+
+The exact specification of how these parameters are varied can be seen in the [source code for this document](https://github.com/mjaquiery/oxforddown/blob/dockertest/03-01-network-effects.Rmd) \mccorrect{Zenodo thesis code when it's all working}.
+
+#### Constant parameters
+
+Many parameters are held constant across runs. 
+Within reasonable tolerances, these parameters do not have substantial effects upon the model dynamics.
+An detailed exploration of the model space is beyond the scope of this work, but all parameters were varied in some way during model development.
+The main parameters which might vary but are held constant are:
+* `feedback_probability` and `feedback_proportion`, which force the agents' biases to remain closer to the optimal value of 0.5  
+* $B^\mu$, which increases polarisation and homophily by separating the mean of the agent groups  
+* $B^\sigma$, which has little effect independent of $B^\mu$, but can increase the frequency of extreme and moderate biases  
+* $S^\mu$ and $S^\sigma$, which interact with `truth_sd` and $C^\mu$, $C^\sigma$ to determine agreement rates given a constant bias, increasing or decreasing the power of weighted sampling to shape network dynamics  
+* $\Lambda ^\mu$ and $\Lambda ^\sigma$, which increase the speed of the network dynamics (so that similar trajectories occur over fewer generations)  
+* and `confidence_weighted`, which decreases the speed of the network dynamics.
+
+It is plausible that there are interactions between these and other model parameters that were not detected during model development. 
+The model code is made available to allow others who may be curious about aspects of the model beyond the scope of this thesis to investigate behaviour in these regions of the parameter space.
+Formal runs illustrating the effects described above are not provided here because they would require a huge amount of computational time to generate for the full models described in this chapter.
+
+#### Empirically estimated coefficients
+
+The models which have their weighted_sampling value marked as 'emp' are constructed by drawing parameter values for trust volatility ($\tau^a$) and weighted selection ($\text{w}^a$) directly from the parameter estimation approach used in \mccorrect{!TODO[link to chapter wherever we did parameter estimates]}.
+The weighted selection values in other models are taken from distributions defined by the estimated values for the population, which allows for the generation of an unlimited number of unique participants but means that the agents produced will be more homogeneous in their overall strategies.
+For example, if a minority strategy exists within the population, the parameter estimate distributions reflective of the dominant strategy would be slightly modified through averaging towards the minority strategy, which may in turn produce agents whose behaviour is not reflective of any plausible real individuals.
+
+Using parameters estimated from actual individuals instead of drawing from a distribution derived form those values has both strengths and weaknesses. 
+The strengths are that the values represent genuine best-estimates of both trust volatility and weighted selection. 
+Given that these two parameters are related to one another, with weighted selection being dependent on trust volatility, it may be important to use observations of both simultaneously to appropriately model individuals' behaviour.
+The weaknesses are that the task given to human participants differed in potentially important ways from the task modelled in the agent-based model. 
+The most potentially important difference in this respect is the choice of advisor: in the behavioural experiments the human participants were familiarised with two advisors and then given the choice between them; whereas in the model the agents are picking from a large number of potential advisors. 
+The parameter is estimated on the basis of a sigmoid function applied to the trust difference between advisors, whereas it is used in the agent-based models in a half-sigmoid applied to the difference between each advisor and the most trusted advisor. 
+
+These considerations mean that the model dynamics arising from using estimated coefficients may be informative, but only in an illustrative capacity. 
+Too much differs between the behavioural and simulated situations to draw strong conclusions.
+
+##### Verification
 
 Verification of this model fitting approach was conducted on the Advanced Research Cluster \mccorrect{!TODO[CITATION]} in two ways. 
 Firstly, the coefficients derived for each participant were fitted to versions of that participant's data where the advisor agreement column values had been shuffled. 
-Overwhelmingly, the fitting error on the shuffled data tended to be higher than the fit to the original data.
+Overwhelmingly, the fitting error on the shuffled data tended to be higher than the fit to the original data, indicating that the models were sensitive to advisor agreement.
 Secondly, the fitting error for coefficients based on the participants' data were compared to fitting errors for coefficients fitted to shuffled data. 
 Error values for the shuffled data tended to be higher than values for the original data, suggesting that participants' behaviour shared some features with the model's expectations.
+
+## Results
+
+### Validity of the model
+
+```{r  nw-r-bias-evolution, fig.caption="Bias evolution within each model.  Each row of graphs is a family of models, defined by shared settings (burn_in, weighted_selection), and each column is the graph for that family run with the indicated random seed.  Each graph shows the evolution of each agent's bias over time, with agents coloured according to whether their starting bias was less than or greater than 0.5.  The model family key is BI|FS (burn_in = Burn in/Flat start), weighted_sampling (mean (sd)/sampled empirical values).", fig.asp=1.5}
+# Plot bias evolution
+agents.all %>%
+  filter(decision > -100, random_seed == min(random_seed)) %>%
+  ggplot(aes(x = decision, y = bias, colour = starting_bias < .5, group = id)) +
+  geom_rect(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf, fill = 'grey95', colour = NA) +
+  geom_line(alpha = .2) +
+  scale_y_continuous(limits = 0:1, breaks = c(0, .5, 1)) +
+  facet_grid(weighted_sampling ~ trust_weights)
+
+```
+
+```{r nw-r-weight-distribution, fig.caption="Distribution of final weights for each model.  Each row of graphs is a family of models, defined by shared settings (burn_in, weighted_selection), and each column is the graph for that family run with the indicated random seed.  Each graph is a histogram of the agents' final trust weights.  The model family key is BI|FS (burn_in = Burn in/Flat start), weighted_sampling (mean (sd)/sampled empirical values).", fig.asp=1.5}
+# Plot final weights
+agents.all %>%
+  nest(d = -c(trust_weights, weighted_sampling, random_seed, model_num)) %>%
+  filter(random_seed == min(random_seed)) %>%
+  mutate(d = map_int(d, ~ max(.$step))) %>%
+  mutate(weights = map2(
+    model_num, 
+    d, 
+    function(.x, .y) {
+      w <- graphs.all[[.x]][[.y]] %>% as_adjacency_matrix(attr = 'weight')
+      tibble(id = rep(1:nrow(w)), weight = map(id, ~ as.numeric(w[., -.]))) %>%
+        unnest(cols = weight)
+    }
+  )) %>%
+  # filter(model_num == 74) %>%
+  unnest(cols = weights) %>%
+  ggplot(aes(x = weight)) +
+  geom_histogram(binwidth = .01) +
+  scale_x_continuous(breaks = c(0, .5, 1)) +
+  facet_grid(weighted_sampling ~ trust_weights)
+
+```
+
+```{r nw-r-weight-by-bias-evolution, fig.caption="Shared bias-weight correlation evolution for each model.  Each row of graphs is a family of models, defined by shared settings (burn_in, weighted_selection), and each column is the graph for that family run with the indicated random seed.  Each graph shows the mean correlation between shared weight between agents and trust weights at each decision.  The model family key is BI|FS (burn_in = Burn in/Flat start), weighted_sampling (mean (sd)/sampled empirical values).", fig.asp=1.5}
+# Plot the correlation between shared bias and weight over time
+agents.all %>%
+  nest(d = -c(trust_weights, weighted_sampling, model_num, burnIn)) %>%
+  mutate(cors = map(
+    model_num, 
+    function(.x) {
+      gs <- graphs.all[[.x]]
+      m <- list(
+        model = list(graphs = gs), 
+        parameters = list(n_decisions = length(gs))
+      )
+      adviseR:::.biasCorrelation(m)
+    }
+  )) %>%
+  unnest(cols = cors) %>%
+  mutate(decision = ifelse(burnIn, decision - nBI, decision)) %>%
+  ggplot(aes(x = decision)) +
+  geom_rect(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf, fill = 'grey95') +
+  geom_hline(yintercept = 0, linetype = 'dashed') +
+  geom_errorbar(aes(ymin = ciL, ymax = ciH), width = 0) +
+  geom_point(aes(y = r, colour = p < .05)) +
+  scale_y_continuous(limits = c(NA, 1), breaks = c(0, .5, 1)) +
+  facet_grid(weighted_sampling ~ trust_weights)
+
+```
+
+The model reproduces key effects of interest. 
+Firstly, agents reinforce one another's biases, leading to the emergence of extreme biases.
+Secondly, agents develop greater trust in agents who share their bias.
+
+#### Emergence of extreme biases
+
+* Where there is a burn-in time, the population usually polarises quickly to opposite extremes when biases are allowed to vary.
+  * Without burn-in, the tendency is for the whole network to collapse on one or other extreme.
+  * (Not shown) high levels of feedback can prevent this collapse.
+
+#### Homophily
+
+* Burn-in time also leads to more dichotomous final networks (captured by group ratio where that number is defined). 
+  * This effect is most clearly seen where networks diverge after biases are allowed to vary.
+
+#### Effect of weighted selection
+
+* Weighted selection increases the likelihood agents select similarly-minded agents for their advisors (or dissimilarly-minded if the coefficient is negative).
+  * Its effects on bias dynamics can be chaotic. 
+  * Without burn-in it allows individuals, or small clusters, to resist an emerging consensus.
+  * Where burn-in allows homophily to emerge before biases update, weighted selection accelerates polarisation.
+
+### Consistency of the models
+
+Each model was run `r length(unique(agents$random_seed))` times with different random seeds to check which features were consistent across runs. 
+The features described above were all consistent across runs, as can be seen by observing the minimal variability within rows in Figures \mccorrect{!TODO[link figures]}.
+
+For parameter sets in which all agents' biases tend towards the same extreme, which extreme was favoured varied according to the random seed used. 
+This stochasticity is akin to placing a ball on a gabled roof: tiny variations in the initial conditions affect which way it will roll, but it will always roll down one pitch or the other.
+
+Similarly, in some of these models, adding in weighted selection switches which bias extreme is adopted.
+This effect is not consistent between runs with different random seeds, and is an outsized effect of minor differences to early states, analogous to a breath of wind nudging the ball in the previous example one way or another.
+
+Output of the models with different random seeds can be visualised by tweaking the source code for this chapter, but their derived final values are included in the summary figure below.
+
+#### Descriptive observations of individual models
+
+As with the simulations with heterogeneous weighted sampling values, some agents resist the consensus extreme. 
+As compared to those simulations, though, more agents occupy a middle-ground, and can cross more easily from one extreme to another.
+Where a burn-in period is present, a large proportion of the agents occupy unstable middle-ground positions, preventing clear polarisation or consensus in the population.
+
+### Analysis of all models
+
+```{r nw-r-all-models-summary, fig.caption="Model final decision group ratio and mean final bias magnitude.  Each model is represented by a single line. Some models have no group ratio because there is only one group at the final decision (because all agents in the model have the same direction of bias), which means that the ratio of weights is undefined."}
+ggs <- list()
+
+ggs[[1]] <- models.all %>%
+  ggplot(aes(
+    x = weighted_sampling, 
+    y = group_ratio_empirical, 
+    group = paste(random_seed, trust_weights),
+    colour = trust_weights
+  )) +
+  geom_violin(alpha = .1, fill = 'black', colour = NA) +
+  geom_line(alpha = .5) +
+  scale_y_continuous(
+    limits = c(1, ceiling(max(models.all$group_ratio_empirical) / 10) * 10)
+  ) +
+  labs(y = "Group ratio") +
+  theme(
+    axis.text.x = element_blank(),
+    axis.title.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank()
+  )
+
+ggs[[2]] <- models.all %>%
+  ggplot(aes(
+    x = weighted_sampling, 
+    y = meanBiasMagnitude, 
+    group = paste(random_seed, trust_weights),
+    colour = trust_weights
+  )) +
+  geom_violin(alpha = .1, fill = 'black', colour = NA) +
+  geom_line(alpha = .5) +
+  scale_y_continuous(limits = c(0, .5)) +
+  labs(y = "Bias magnitude") +
+  theme(legend.position = 'none')
+
+ggs[[1]] / ggs[[2]]
+
+```
+
+Having observed the patterns at the level of individual models, we can draw more useful conclusions at a higher level from considering them as a set. 
+In this analysis we attend to two properties of primary interest: 
+First, how accurate are agents over time? 
+This is represented by the mean bias magnitude. 
+In ideal circumstances, this should be very low, indicating that agents are largely unbiased. 
+Second, to what extent are agents more likely to trust advice from agents who share their bias?
+This is captured by the ratio between trust in agents with the same versus different bias. 
+This value is not always well defined - where all agents eventually acquire the same bias, the mean weight of out-group advisors is undefined.
+
+Summarising the results in this way means that we can observe some general features of the models by comparing otherwise-similar models over the different parameters.
+
+Mean bias magnitude is less pronounced where the starting trust weights are random, although this is likely due to there being less time after burn-in for the biases to update. 
+Burn-in time tends to decrease the homophily of the models, judging by final bias, but to increase it judging by initial bias. 
+This suggests that polarisation occurs, but that many middle-ground agents change which camp they end up in.
+
+Weighted selection has little effect where the mean is increased, but a clearer effect where variation is introduced. 
+The clustering of weights suggests that there is less homophily where agents are more selective about whom they consult for advice. 
+
+Weighted sampling interacts with the lead-in time.
+Lead-in time is a proxy for the starting asymmetry of the connections in the network.
+The figure shows that, as networks start off with more homophilic structures, weighted selection increases the effect of homophily. 
+Note that sufficiently homophilic networks will continue to exhibit echo chamber structures regardless of the level of weighted sampling, and that even very strong weighted sampling does not produce echo chambers in networks which start off perfectly symmetrical. 
+
+The key finding of interest from the models thus far is that source selection may exacerbate echo chamber formation. 
+This finding is in line with similar findings from others who have produced these models \mccorrect{!TODO[citations galore]}.
+We are now in a position to see whether these models continue to exhibit these features when we parametrise them based on the data we observed in our participants' behavioural data.
+
+##### Bias x TrustUpdate
+
+```{r}
+
+agents.all %>% 
+  filter(
+    weighted_sampling == "Empirical",
+    decision == max(decision),
+    abs(trust_volatility) < .2
+  ) %>%
+  ggplot(aes(x = trust_volatility, y = abs(bias - .5))) +
+  geom_smooth(method = 'lm', formula = y ~ x) + 
+  geom_point(alpha = .25) +
+  scale_y_continuous(limits = c(0, .5)) 
+
+agents.all %>% 
+  filter(
+    weighted_sampling == "Empirical",
+    decision == max(decision),
+    abs(ws_agent) < 55
+  ) %>%
+  ggplot(aes(x = ws_agent, y = abs(bias - .5))) +
+  geom_smooth(method = 'lm', formula = y ~ x) + 
+  geom_point(alpha = .25) +
+  scale_y_continuous(limits = c(0, .5)) 
+
+```
+
+## Discussion
+
 
