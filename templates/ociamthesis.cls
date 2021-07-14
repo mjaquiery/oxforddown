@@ -75,13 +75,6 @@
 
 
 %
-% CRESTS
-%
-
-\def\crest{{\includegraphics{figures/beltcrest.pdf}}}
-
-
-%
 % Define text area of page and margin offsets
 %
 
@@ -93,32 +86,6 @@
 
 \usepackage{xcolor}
 \usepackage{graphicx} 
-
-\usepackage{fancyhdr}
-\setlength{\headheight}{15pt}
-\fancyhf{} % clear the header and footers
-\pagestyle{fancy}
-\renewcommand{\chaptermark}[1]{\markboth{\thechapter. #1}{\thechapter. #1}}
-\renewcommand{\sectionmark}[1]{\markright{\thesection. #1}} 
-\renewcommand{\headrulewidth}{0pt}
-\fancyhead[LO]{\emph{\leftmark}} 
-\fancyhead[RE]{\emph{\rightmark}} 
-\fancyhead[RO,LE]{\emph{\thepage}}
-
-\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\emph{\thepage}}}
-
-% JEM fix header on cleared pages for openright
-\def\cleardoublepage{\clearpage\if@twoside \ifodd\c@page\else
-   \hbox{}
-   \fancyhead[RE,LO]{}
-   \newpage
-   \if@twocolumn\hbox{}\newpage
-   \fi
-   \fancyhead[LO]{\emph{\leftmark}} 
-   \fancyhead[RE]{\emph{\rightmark}} 
-   \fi\fi}
-
-
 \usepackage{microtype}
 \usepackage{nicefrac}
 \usepackage{amsmath}
@@ -171,7 +138,7 @@
 	% To format the bibliography	
 
 
-\usepackage[colorlinks=false,pdfpagelabels]{hyperref} 
+%\usepackage[colorlinks=false,pdfpagelabels]{hyperref} 
 	% for linking between references, figures, TOC, etc in the pdf document
 
 \usepackage[nohints,tight]{minitoc} 
@@ -200,6 +167,7 @@
 
 
 %define title page layout
+\newcommand{\university}{University of Oxford}
 
 \renewcommand{\maketitle}{%
 \begin{alwayssingle}\null
@@ -231,7 +199,7 @@
 {\large \vspace*{1ex}
     {{\@college} \par}
 \vspace*{1ex}
-    {University of Oxford \par}
+    {\university \par}
 \vspace*{20mm}
     {{\submittedtext} \par}
 \vspace*{1ex}

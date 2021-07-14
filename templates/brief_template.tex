@@ -5,6 +5,17 @@
 % format for PDF output (ie equal margins, no extra blank pages):
 \documentclass[a4paper,nobind]{templates/ociamthesis}
 
+% add hyperref package with links hidden %
+\usepackage[colorlinks=false,pdfpagelabels,hidelinks]{hyperref}
+
+% add float package to allow manual control of figure positioning %
+\usepackage{float}
+
+%UL set section header spacing
+\usepackage{titlesec}
+% 
+\titlespacing\subsubsection{0pt}{24pt plus 4pt minus 2pt}{0pt plus 2pt minus 2pt}
+
 % UL 30 Nov 2018 pandoc puts lists in 'tightlist' command when no space between bullet points in Rmd file
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
@@ -57,11 +68,11 @@
 %UL 2 Dec 2018 add a bit of white space before and after code blocks
 \renewenvironment{Shaded}
 {
-  \vspace{4pt}%
+  \vspace{10pt}%
   \begin{snugshade}%
 }{%
   \end{snugshade}%
-  \vspace{4pt}%
+  \vspace{8pt}%
 }
 %UL 2 Dec 2018 reduce whitespace around verbatim environments
 \usepackage{etoolbox}
@@ -72,16 +83,27 @@
 %UL 28 Mar 2019, enable strikethrough
 \usepackage[normalem]{ulem}
 
-%MJ Apr 2020: open science images
-% https://tex.stackexchange.com/a/139150
-\DeclareRobustCommand{\OpenScience}[1]{%
-  \begingroup\normalfont
-  \includegraphics[height=\baselineskip]{figures/OS-badges/{#1}.png}%
+%UL use soul package for correction highlighting
+\usepackage{soul}
+\usepackage{xcolor}
+\newcommand{\ctext}[3][RGB]{%
+  \begingroup
+  \definecolor{hlcolor}{#1}{#2}\sethlcolor{hlcolor}%
+  \hl{#3}%
   \endgroup
 }
+\soulregister\ref7
+\soulregister\cite7
+\soulregister\autocite7
+\soulregister\textcite7
+\soulregister\pageref7
 
-%MJ Aug 2020: enable umlauts etc
-\usepackage[utf8]{inputenc}
+% user-included things with header_includes or in_header will appear here
+% kableExtra packages will appear here if you use library(kableExtra)
+$for(header-includes)$
+$header-includes$
+$endfor$
+
 
 %%%%% SELECT YOUR DRAFT OPTIONS
 % Three options going on here; use in any combination.  But remember to turn the first two off before
@@ -106,6 +128,16 @@ $endif$
 % If you're already a LaTeX pro and are used to natbib or something, modify as necessary.
 % Either way, you'll have to choose and configure an appropriate bibliography format...
 
+%MJ trying to fix CSLReferences undefined error%
+$if(csl-refs)$
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newenvironment{CSLReferences}%
+  {$if(csl-hanging-indent)$\setlength{\parindent}{0pt}%
+  \everypar{\setlength{\hangindent}{\cslhangindent}}\ignorespaces$endif$}%
+  {\par}
+$endif$
+
 % The science-type option: numerical in-text citation with references in order of appearance.
 % \usepackage[style=numeric-comp, sorting=none, backend=biber, doi=false, isbn=false]{biblatex}
 % \newcommand*{\bibtitle}{References}
@@ -127,10 +159,23 @@ $endif$
 \renewcommand*{\bibfont}{\raggedright\small}
 
 % Change this to the name of your .bib file (usually exported from a citation manager like Zotero or EndNote).
+$for(bibliography)$
 \addbibresource{$bibliography$}
+$endfor$
 
 %%%%% YOUR OWN PERSONAL MACROS
 % This is a good place to dump your own LaTeX macros as they come up.
+
+%MJ Apr 2020: open science images
+% https://tex.stackexchange.com/a/139150
+\DeclareRobustCommand{\OpenScience}[1]{%
+  \begingroup\normalfont
+  \includegraphics[height=\baselineskip]{figures/OS-badges/{#1}.png}%
+  \endgroup
+}
+
+%MJ Aug 2020: enable umlauts etc
+\usepackage[utf8]{inputenc}
 
 % To make text superscripts shortcuts
 	\renewcommand{\th}{\textsuperscript{th}} % ex: I won 4\th place
