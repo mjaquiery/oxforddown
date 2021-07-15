@@ -14,7 +14,7 @@ params:
   corrections: true
 ---
 
-# (PART) Psychology of advice {-}
+<!-- # (PART) Psychology of advice {-} -->
 \minitoc <!-- this will include a mini table of contents-->
 
 # Psychological mechanisms of advisor evaluation {#chapter-advisor-evaluation}

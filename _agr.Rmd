@@ -741,7 +741,7 @@ ggplot(tmp, aes(x = adviceTypeName, y = adviceInfluence,
 
 ```
 
-##### \OpenScience{prereg} Hypothesis test {##ac-agr-r-h}
+##### \OpenScience{prereg} Hypothesis test {#ac-agr-r-h}
 
 ```{r ac-agr-dots-r-graph, fig.caption="Dot task advisor choice for high/low agreement advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line.", fig.height=6, fig.width=5}
 

@@ -230,6 +230,9 @@ for (E in c(.GlobalEnv, .prevStudy)) {
     mutate(`Feedback condition` = feedbackCondition)
 }
 
+```
+
+```{r}
 bf <- tmp %>% 
   nest(d = -c(feedbackCondition, `Feedback condition`)) %>%
   mutate(
@@ -307,9 +310,13 @@ tmp <- rename(tmp,
 .AOV <- ezANOVA(tmp, dv = WOA, wid = pid, within = Advisor, between = Feedback)
 ```
 
-```{r ai-ava-r-anovas}
+```{r ai-ava-r-anovas-bf}
 
 kable(.BF, caption = "\\label{tab:ai-ava-dates-r-bf}Bayesian ANOVA for Dates task advice influence experiment")
+
+```
+
+```{r ai-ava-r-anovas}
 
 kableANOVA(.AOV$ANOVA, caption = "\\label{tab:ai-ava-dates-r-aov}Frequentist ANOVA for Dates task advice influence experiment")
 

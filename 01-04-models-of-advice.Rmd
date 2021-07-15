@@ -42,6 +42,7 @@ library(patchwork)
 
 * Niccolo showed source selection is pathological (unless judgements are uncorrelated) in absence of bias updating
   - True whether or not confidence weights updating
+* Large networks of rational agents form echoChambers (Bayesian updating = confirmation bias) madsenLargeNetworksRational2018a
   
 ## Goals of this approach
 
@@ -82,6 +83,27 @@ library(patchwork)
 Models say this will go horribly wrong.
 
 ```{r nw-r-run-basic, include = F}
+
+#' Note:
+#' these blocks which run models take 5-10 minutes/model to run. For 40 models,
+#' including save and load time, this works out at about 5 hours or so.
+#' Don't run the original unless you're _sure_ you want this.
+cacheRoot <- 'cache/network-models'
+must_rerun_models <- 
+  (!is.null(getOption('ESM.recalculate')) && getOption('ESM.recalculate') >= 2) ||
+  !length(list.files(paste0(cacheRoot, '/'), pattern = '.rda'))
+must_rerun_models.emp <- 
+  (!is.null(getOption('ESM.recalculate')) && getOption('ESM.recalculate') >= 2) ||
+  !length(list.files(paste0(cacheRoot, '/emp/'), pattern = '.rda'))
+can_use_cache <- 
+  (is.null(getOption('ESM.recalculate')) || !getOption('ESM.recalculate')) &&
+  file.exists(paste0(cacheRoot, '.rda')) &&
+  !must_rerun_models
+can_use_cache.emp <- 
+  (is.null(getOption('ESM.recalculate')) || !getOption('ESM.recalculate')) &&
+  file.exists(paste0(cacheRoot, '-emp.rda')) &&
+  !must_rerun_models.emp
+
 n_reps <- 5
 nD <- 2000
 nBI <- 3000
@@ -174,32 +196,34 @@ summary_fun <- function(m) {
 }
 
 nCores <- 3
-for (i in 1:ceiling(nrow(parameters) / nCores)) {
-  n <- (i - 1) * nCores + 1
-  n <- c(n, min(n + nCores - 1, nrow(parameters)))
-  fName <- glue('cache/network-models/100a2000d_{n[1]}-{n[2]}.rda')
-  if ((is.null(getOption('ESM.recalculate')) || getOption('ESM.recalculate') < 2) 
-      && file.exists(fName)) {
-    next()
+if (must_rerun_models) {
+  unlink(list.files(paste0(cacheRoot, '/'), pattern = '.rda'))
+  for (i in 1:ceiling(nrow(parameters) / nCores)) {
+    n <- (i - 1) * nCores + 1
+    n <- c(n, min(n + nCores - 1, nrow(parameters)))
+    fName <- glue('{cacheRoot}/models_{n[1]}-{n[2]}.rda')
+    if ((is.null(getOption('ESM.recalculate')) || getOption('ESM.recalculate') < 2) 
+        && file.exists(fName)) {
+      next()
+    }
+    
+    t1 <- Sys.time()
+    models <- runSimulations(
+      parameters[n[1]:n[2], ], 
+      cores = nCores,
+      summaryFun = summary_fun
+    )
+    save(models, file = fName)
+    print(glue('Completed run {i} ({n[1]}-{n[2]}).'))
+    print(Sys.time() - t1)
   }
-  
-  t1 <- Sys.time()
-  models <- runSimulations(
-    parameters[n[1]:n[2], ], 
-    cores = nCores,
-    summaryFun = summary_fun
-  )
-  save(models, file = fName)
-  print(glue('Completed run {i} ({n[1]}-{n[2]}).'))
-  print(Sys.time() - t1)
 }
 ```
 
 ```{r nw-r-load-basic, include = F}
 t1 <- Sys.time()
-fName <- 'cache/network-models.rda'
-if ((is.null(getOption('ESM.recalculate')) || getOption('ESM.recalculate') < 2) 
-    && file.exists(fName)) {
+fName <- paste0(cacheRoot, '.rda')
+if (can_use_cache) {
   load(fName)
 } else {
   # Gather data and bind into an analysable data frame
@@ -305,32 +329,35 @@ parameters.emp <- agents %>%
   select(-rowid)
 
 nCores <- 3
-for (i in 1:ceiling(nrow(parameters.emp) / nCores)) {
-  n <- (i - 1) * nCores + 1
-  n <- c(n, min(n + nCores - 1, nrow(parameters.emp)))
-  fName <- glue('cache/network-models/emp/100a{nD}d_{n[1]}-{n[2]}.rda')
-  if ((is.null(getOption('ESM.recalculate')) || getOption('ESM.recalculate') < 2) 
-      && file.exists(fName)) {
-    next()
+
+if (must_rerun_models.emp) {
+  unlink(list.files(paste0(cacheRoot, '/emp/'), pattern = '.rda'))
+  for (i in 1:ceiling(nrow(parameters.emp) / nCores)) {
+    n <- (i - 1) * nCores + 1
+    n <- c(n, min(n + nCores - 1, nrow(parameters.emp)))
+    fName <- glue('{cacheRoot}/emp/models_{n[1]}-{n[2]}.rda')
+    if ((is.null(getOption('ESM.recalculate')) || getOption('ESM.recalculate') < 2) 
+        && file.exists(fName)) {
+      next()
+    }
+    
+    t1 <- Sys.time()
+    models <- runSimulations(
+      parameters.emp[n[1]:n[2], ], 
+      cores = nCores,
+      summaryFun = summary_fun
+    )
+    save(models, file = fName)
+    print(glue('Completed run {i} ({n[1]}-{n[2]}).'))
+    print(Sys.time() - t1)
   }
-  
-  t1 <- Sys.time()
-  models <- runSimulations(
-    parameters.emp[n[1]:n[2], ], 
-    cores = nCores,
-    summaryFun = summary_fun
-  )
-  save(models, file = fName)
-  print(glue('Completed run {i} ({n[1]}-{n[2]}).'))
-  print(Sys.time() - t1)
 }
 ```
 
 ```{r nw-r-load-empirical, include = F}
 t1 <- Sys.time()
-fName <- 'cache/network-models-emp.rda'
-if ((is.null(getOption('ESM.recalculate')) || getOption('ESM.recalculate') < 2) 
-    && file.exists(fName)) {
+fName <- paste0(cacheRoot, '-emp.rda')
+if (can_use_cache.emp) {
   load(fName)
 } else {
   # Gather data and bind into an analysable data frame
@@ -475,6 +502,12 @@ An agent's values for each of these properties (except id) are created by drawin
 
 Additionally, each agent has a 'trust' in each other agent, ranging from being convinced that the other agent is always correct to being convinced that the other agent is always wrong.
 These values are updated at each step and initialised by drawing from a uniform random distribution with limits [0.5, 1].
+
+There is an ongoing debate about whether these kinds of advice models should support expectations of lying. 
+Some models implement agents whose lowest trust value for another agent indicates that they expect that agent's advice will be useless \mccorrect{!TODO[Cite, perhaps from collinsBidirectionalRelationshipSource2018 sources]}.
+Other models allow for agents to consider other agents as deliberately misleading, i.e. offering advice which reliably directs them away from the truth. 
+[@collinsBidirectionalRelationshipSource2018] offer initial evidence that advice can be considered misleading in some cases \mccorrect{!TODO[There must be others!?]}.
+The models tread a hybrid path between these positions, by initialising the trust weights such that the lowest level of starting trust is equivalent to considering the advice as random (containing no information about the truth), but allowing trust weights to decrease following interaction so that advice is considered as pointing away from the truth.
 
 Agents are created in the [`make_agents`](https://github.com/oxacclab/adviseR/blob/master/R/make-agents.R) function.
 
@@ -622,6 +655,8 @@ The R implementation is part of the [`simulationStep`](https://github.com/oxaccl
 
 The agents update their bias after each final decision, taking an average of their current bias and the feedback or their final decision, weighted by the agent's bias volatility ($\lambda^a$).
 They therefore adjust their prior expectations on the basis of their experience (and advice).
+Participants in perceptual decision experiments can update their prior expectations in response to base rates, even when feedback is not provided [@zylberbergCounterfactualReasoningUnderlies2017].
+Indeed, [@haddaraImpactFeedbackPerceptual2020] suggest part of the effect of feedback is to reduce bias.
 
 $$b'~^a_{t+1} = b^a \cdot (1 - \lambda^a) + f^a_t \cdot \lambda^a$$
 
@@ -687,7 +722,8 @@ Many parameters are held constant across runs.
 Within reasonable tolerances, these parameters do not have substantial effects upon the model dynamics.
 An detailed exploration of the model space is beyond the scope of this work, but all parameters were varied in some way during model development.
 The main parameters which might vary but are held constant are:
-* `feedback_probability` and `feedback_proportion`, which force the agents' biases to remain closer to the optimal value of 0.5  
+* `feedback_probability` and `feedback_proportion`, which force the agents' biases to remain closer to the optimal value of 0.5.
+The bias reduction effect is as expected from [@haddaraImpactFeedbackPerceptual2020].  
 * $B^\mu$, which increases polarisation and homophily by separating the mean of the agent groups  
 * $B^\sigma$, which has little effect independent of $B^\mu$, but can increase the frequency of extreme and moderate biases  
 * $S^\mu$ and $S^\sigma$, which interact with `truth_sd` and $C^\mu$, $C^\sigma$ to determine agreement rates given a constant bias, increasing or decreasing the power of weighted sampling to shape network dynamics  
@@ -765,7 +801,8 @@ agents.all %>%
 ```{r nw-r-weight-by-bias-evolution, fig.caption="Shared bias-weight correlation evolution for each model.  Each row of graphs is a family of models, defined by shared settings (burn_in, weighted_selection), and each column is the graph for that family run with the indicated random seed.  Each graph shows the mean correlation between shared weight between agents and trust weights at each decision.  The model family key is BI|FS (burn_in = Burn in/Flat start), weighted_sampling (mean (sd)/sampled empirical values).", fig.asp=1.5}
 # Plot the correlation between shared bias and weight over time
 agents.all %>%
-  nest(d = -c(trust_weights, weighted_sampling, model_num, burnIn)) %>%
+  filter(random_seed == min(random_seed)) %>%
+  nest(d = -c(trust_weights, weighted_sampling, model_num, burnIn, random_seed)) %>%
   mutate(cors = map(
     model_num, 
     function(.x) {
@@ -782,8 +819,8 @@ agents.all %>%
   ggplot(aes(x = decision)) +
   geom_rect(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf, fill = 'grey95') +
   geom_hline(yintercept = 0, linetype = 'dashed') +
-  geom_errorbar(aes(ymin = ciL, ymax = ciH), width = 0) +
-  geom_point(aes(y = r, colour = p < .05)) +
+  geom_errorbar(aes(ymin = ciL, ymax = ciH)) +
+  geom_path(aes(y = r, colour = p < .05)) +
   scale_y_continuous(limits = c(NA, 1), breaks = c(0, .5, 1)) +
   facet_grid(weighted_sampling ~ trust_weights)
 
@@ -842,7 +879,6 @@ ggs[[1]] <- models.all %>%
     group = paste(random_seed, trust_weights),
     colour = trust_weights
   )) +
-  geom_violin(alpha = .1, fill = 'black', colour = NA) +
   geom_line(alpha = .5) +
   scale_y_continuous(
     limits = c(1, ceiling(max(models.all$group_ratio_empirical) / 10) * 10)
@@ -862,7 +898,6 @@ ggs[[2]] <- models.all %>%
     group = paste(random_seed, trust_weights),
     colour = trust_weights
   )) +
-  geom_violin(alpha = .1, fill = 'black', colour = NA) +
   geom_line(alpha = .5) +
   scale_y_continuous(limits = c(0, .5)) +
   labs(y = "Bias magnitude") +
@@ -929,4 +964,13 @@ agents.all %>%
 
 ## Discussion
 
+### Limitations
+
+* Lots of interactivity stuff isn't modelled:  
+  * Agents don't try to make their advice more paletable/be selected more [@hertzNeuralComputationsUnderpinning2017]
+  * Agents don't know or care what happens to their advice  
+  * Advice is absolute, doesn't include confidence  
+  * Agents basically use advice rationally  
+    * No explicit modelling of confirmation bias beyond the Bayes  
+    * No overuse (intentional - dietvorstIntentionallyBiasedPeople2019 - or otherwise) of advice  
 

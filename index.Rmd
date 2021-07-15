@@ -10,23 +10,24 @@ knit: (function(input, ...) {
     thesis_formats <- "pdf";
     
     source("scripts_and_filters/knit-functions.R");
-    knit_thesis(input, thesis_formats, ...)
+    knit_thesis(input, thesis_formats, envir = .GlobalEnv, ...)
   })
 
 #####################
 ## thesis metadata ##
 #####################
-title: |
+title: Exploring Social Metacognition 
+#  the role of confidence in updating estimates of advisor reliability with and without feedback.
+
 university: University of Oxford
 university-logo: templates/beltcrest.pdf
 university-logo-width: 5cm
-submitted-text: A thesis submitted for the degree of
-  Exploring Social Metacognition: \
-  the role of confidence in updating estimates of advisor reliability with and without feedback.
+submitted-text: A thesis submitted for the degree of 
+
 author: Matt Jaquiery
 college: Wolfson College
 degree: Doctor of Philosophy
-degreedate: Michaelmas 2020
+degreedate: Trinity 2021
 abstract: |
   `r paste(readLines("front-and-back-matter/_abstract.Rmd"), collapse = '\n  ')`
 acknowledgements: |
@@ -46,8 +47,8 @@ dedication: For TBC
 # set masters-submission: true for an alternative, anonymous title page with 
 # candidate number and word count
 masters-submission: false
-candidate-number: 123456
-word-count: "10,052"
+candidate-number: 235086
+# word-count: "10,052"
 
 # if you want to use a different title page altogether, provide a path to a 
 # .tex file here and it will override the default Oxford one
@@ -150,7 +151,7 @@ output:
       - templates/corrections.css # remove to stop highlighting corrections
     theme:
       primary: "#6D1919"
-    repo: https://github.com/ulyngs/oxforddown
+    repo: https://github.com/mjaquiery/oxforddown
     pandoc_args: "--lua-filter=scripts_and_filters/colour_and_highlight.lua"
   bookdown::gitbook:
     css: templates/style.css
@@ -164,10 +165,15 @@ documentclass: book
 always_allow_html: true #this allows html stuff in word (.docx) output
 ---
 
-```{r, echo = F, include = F}
+```{r install packages, echo = F, include = F}
 # When knitting, do the whole shebang
 options(
-  ESM.recalculate = F # Whether to recalculate the very computationally expensive chunks
+  # Setting ESM.recalculate to T or a positive integer will recreate cached 
+  # files. This can be very time-consuming.
+  # F ~ 10min
+  # 1 ~ 1h
+  # 2 ~ 6h
+  ESM.recalculate = F
 )
 if (!dir.exists('cache')) {
   dir.create('cache')
@@ -175,14 +181,16 @@ if (!dir.exists('cache')) {
   dir.create('cache/network-models/emp')
 }
 
-```{r install_packages, include=FALSE}
 source('scripts_and_filters/install_packages_if_missing.R')
 ```
 
 ```{r create_chunk_options, include=FALSE, eval=knitr::is_latex_output()}
-source('scripts_and_filters/create_chunk_options.R')
+# source('scripts_and_filters/create_chunk_options.R')
 source('scripts_and_filters/wrap_lines.R')
-source('scripts_and_filters/general_setup.R')
+```
+
+```{r general setup, include=FALSE}
+# source('scripts_and_filters/general_setup.R')
 ```
 
 <!--

@@ -104,8 +104,17 @@ These differences are likely caused by the greater accuracy participants display
 This explanation is wholly consistent with an account of advisor trust which uses agreement as a proxy for accuracy when better information is unavailable.
 This explanation entails a prediction that longer-term experience with the High accuracy advisor should eventually engender a systematic preference for that advisor, provided participants' guesses are more accurate than chance.
 
+### Variability between participants
+
+As noted above, participants displayed a range of preferences. 
+Most participants in most conditions in most studies demonstrated fairly balanced picking behaviour; perhaps motivated by a sense of fairness or novelty, or perhaps as a result of random selection. \mccorrect{!TODO[We could take a quick look at whether participants tend to always pick the advisor in the first/second position, and how that correlates with preference strength. Could relate to choice-induced bias for advisor position: zajkowskiCrossDomainEffectsChoiceInduced2021]}
+Where effects appear in the data, they show up as a fat tail on a skewed distribution: a sizeable minority select a given advisor on most trials, and almost no one selects the other advisor on most of the trials.
+
+This heterogeneity is seldom measured in population models of influence dynamics. 
+In the [following chapter](#chapter-network-effects), we explore the effects of including this kind of heterogeneity in agent-based models of advice giving.
+
 ### Strengths
 
 ### Limitations
 
-### Implications for modelling work
+### Conclusion

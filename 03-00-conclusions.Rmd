@@ -14,7 +14,7 @@ params:
   corrections: true 
 ---
 
-# (PART) Conclusion {-}
+<!-- # (PART) Conclusion {-} -->
 
 # Conclusion {#chapter-conclusion}
 \adjustmtc 

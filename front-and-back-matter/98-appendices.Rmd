@@ -1,5 +1,8 @@
 `r if(knitr:::is_latex_output()) '\\startappendices'`
 
+<!-- # (PART) Appendices {-} -->
+\minitoc <!-- this will include a mini table of contents-->
+
 `r if(!knitr:::is_latex_output()) '# (APPENDIX) Appendix {-}'` 
 
 <!-- If you feel it necessary to include an appendix, it goes here. The first appendix should include the commands above. -->

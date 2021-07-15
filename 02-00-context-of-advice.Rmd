@@ -14,7 +14,7 @@ params:
   corrections: true 
 ---
 
-# (PART) Context of advice {-}
+<!-- # (PART) Context of advice {-} -->
 \minitoc <!-- this will include a mini table of contents-->
 
 # Context of Advice {#chapter-context}

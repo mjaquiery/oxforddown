@@ -5,6 +5,8 @@ output:
   bookdown::word_document2: default
   bookdown::html_document2: default
 documentclass: book
+bibliography: 
+  - bibliography/references.bib
 ---
 
 ```{r setup 01-01, echo = F, include = F}
