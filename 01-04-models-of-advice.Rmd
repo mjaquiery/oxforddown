@@ -89,19 +89,33 @@ Models say this will go horribly wrong.
 #' including save and load time, this works out at about 5 hours or so.
 #' Don't run the original unless you're _sure_ you want this.
 cacheRoot <- 'cache/network-models'
+can_download_cache <- 
+  tryCatch(
+    {
+      .f <- \(x) attr(curlGetHeaders(x, timeout = 5), 'status') == 200
+      all(
+        .f('https://sandbox.zenodo.org/record/882215/files/network-models-emp.rda?download=1'),
+        .f('https://sandbox.zenodo.org/record/882215/files/network-models.rda?download=1')
+      )
+    }, 
+    error = \(e) F
+  )
+  
 must_rerun_models <- 
   (!is.null(getOption('ESM.recalculate')) && getOption('ESM.recalculate') >= 2) ||
-  !length(list.files(paste0(cacheRoot, '/'), pattern = '.rda'))
+  (!length(list.files(paste0(cacheRoot, '/'), pattern = '.rda')) &&
+     !file.exists(paste0(cacheRoot, '.rda')) && !can_download_cache)
 must_rerun_models.emp <- 
   (!is.null(getOption('ESM.recalculate')) && getOption('ESM.recalculate') >= 2) ||
-  !length(list.files(paste0(cacheRoot, '/emp/'), pattern = '.rda'))
+  (!length(list.files(paste0(cacheRoot, '/emp/'), pattern = '.rda')) &&
+     !file.exists(paste0(cacheRoot, '-emp.rda')) && !can_download_cache)
 can_use_cache <- 
   (is.null(getOption('ESM.recalculate')) || !getOption('ESM.recalculate')) &&
-  file.exists(paste0(cacheRoot, '.rda')) &&
+  (file.exists(paste0(cacheRoot, '.rda')) || can_download_cache) &&
   !must_rerun_models
 can_use_cache.emp <- 
   (is.null(getOption('ESM.recalculate')) || !getOption('ESM.recalculate')) &&
-  file.exists(paste0(cacheRoot, '-emp.rda')) &&
+  (file.exists(paste0(cacheRoot, '-emp.rda')) || can_download_cache) &&
   !must_rerun_models.emp
 
 n_reps <- 5
@@ -224,6 +238,13 @@ if (must_rerun_models) {
 t1 <- Sys.time()
 fName <- paste0(cacheRoot, '.rda')
 if (can_use_cache) {
+  if (!file.exists(fName)) {
+    # Download cached data
+    curl::curl_download(
+      'https://sandbox.zenodo.org/record/882215/files/network-models.rda?download=1',
+      fName
+    )
+  }
   load(fName)
 } else {
   # Gather data and bind into an analysable data frame
@@ -358,6 +379,13 @@ if (must_rerun_models.emp) {
 t1 <- Sys.time()
 fName <- paste0(cacheRoot, '-emp.rda')
 if (can_use_cache.emp) {
+  if (!file.exists(fName)) {
+    # Download cached data
+    curl::curl_download(
+      'https://sandbox.zenodo.org/record/882215/files/network-models-emp.rda?download=1',
+      fName
+    )
+  }
   load(fName)
 } else {
   # Gather data and bind into an analysable data frame
