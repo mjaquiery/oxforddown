@@ -59,15 +59,17 @@ While little support is found for the metacognitive mechanisms underpinning the 
 Next, the effects of advisor agreement are explored in terms of influence using a different decision-making domain; a date estimation rather than perceptual decision task.
 Again, people denied objective feedback on the quality of advice are shown to attend to agreement.
 The work above demonstrates how the influence of advice depends upon the reputation of an advisor built up over time.
+
+These results highlight the heterogeneity of individuals' tendencies to change their trust in advisors and select advisors on the basis of that trust. 
+Agent-based modelling is used to explore the effects of this heterogeneity on how the whole population's opinions and advice-seeking behaviour evolve over time.
+This modelling work demonstrates that heterogeneity may stabilise these networks, slowing the emergence of polarised echo chamber-like structures.
+
 In a second line of experiments, reputations of advisors are established at the outset and the responses to different pieces of advice are explored.
-People consider both the properties of advice and the properties of advisors, placing less trust in advice which appears suspicious or which comes from a suspicious source.
-These behavioural results support implications from evolutionary models which demonstrate that the presence of even a few bad actors in a population can mean that distrusting all advice from all sources a little is adaptive.
+Evolutionary modelling demonstrates that the presence of a few bad actors in a population can mean that distrusting all advice from all sources a little is adaptive.
 The evolutionary models are extended to show that this kind of general distrust, known as egocentric discounting, emerges as adaptive even where none of the agents deliberately mislead others, and even where all agents are equally skilled and fully cooperative.
-Finally, network effects arising from interconnected networks of agents are explored.
-Agents are based on the empirical results heretofore presented, and the consequences are explored for networks with various starting structures characterised by sparsity and homogeneity, under varying rates and reliabilities of external feedback.
-\mccorrect{!TODO[results of this]}.
-The resulting network characteristics are compared with network structures from real online networks from social media websites.
-\mccorrect{!TODO[results of this]}.
+
+Example behavioural experiments are reported which support the implications from the evolutionary models.
+Participants considered both the properties of advice and the properties of advisors, placing less trust in advice which appeared suspicious or which came from a suspicious source.
 
 ## Advice {-}
 
@@ -179,7 +181,7 @@ While such considerations affect the conclusions one draws from egocentric disco
 Homophily is the ubiquitous phenomenon that individuals more closely connected to one another within a social network tend to be more similar to one another than would be expected by chance across numerous dimensions, from demographics to attitudes [@mcphersonBirdsFeatherHomophily2001].
 Whether homophily in virtual social networks is responsible for increases in polarisation is debated.
 Proponents point to increases in polarisation (e.g.
-in politics: \mccorrect{!TODO[`Pew Research Center, 2014`]}), to empirical studies demonstrating homophily in virtual social networks [@cardosoTopicalHomophilyOnline2017; @colleoniEchoChamberPublic2014], and to studies examining selective exposure online [@kobayashiSELECTIVEEXPOSUREPOLITICAL2009], and to echo chambers: egregious examples of highly homophilous networks with pathological polarisation [@sunsteinRepublicCom2002; @sunsteinRepublicDividedDemocracy2018].
+in politics: \mccorrect{!TODO[`Pew Research Center, 2014`]}), to empirical studies demonstrating homophily in virtual social networks [@cardosoTopicalHomophilyOnline2017; @colleoniEchoChamberPublic2014], and to studies examining selective exposure online [@kobayashiSelectiveExposurePolitical2009], and to echo chambers: egregious examples of highly homophilous networks with pathological polarisation [@sunsteinRepublicCom2002; @sunsteinRepublicDividedDemocracy2018].
 The empirical components of the argument are contested, with evidence that virtual social networks are less homogenous than offline social networks [and hence depolarising, @barberaHowSocialMedia2015], and that selective exposure is a somewhat dubious finding which does not show up clearly online [@garrettEchoChambersOnline2009; @garrettPoliticallyMotivatedReinforcement2009; @nelsonMythPartisanSelective2017; @searsSelectiveExposureInformation1967].
 Modelling work demonstrates, however, that where there is a bias in assimilation of information, homophily exacerbates polarisation [@dandekarBiasedAssimilationHomophily2013].
 Where polarisation in turn increases homophily, for example through selective exposure or avoidance, a self-reinforcing spiral emerges wherein social connections become increasingly homogenous and attitudes increasingly extreme [@songDynamicSpiralsPut2017].

@@ -10,7 +10,6 @@ editor_options:
   chunk_output_type: inline
   
 bibliography: 
-  - references.bib
   - bibliography/references.bib
 bibliography-heading-in-pdf: Works Cited
 params:
@@ -32,17 +31,16 @@ library(patchwork)
 
 ## Introduction
 
-* We saw in Section II that advisor choice is varied among individuals.
-
-* We know from previous modelling work that source selection behaviour produces homophilic network dynamics (e.g. echo chambers).
-
-* We wonder what the variability observed in Section II will have on network dynamics.
+The behavioural experiments in the previous chapter, along with predecessors from others in our lab [@pescetelliUseMetacognitiveSignals2017], indicate that people show preferences for selecting advisors who agree with them and treat advice which agrees with their initial judgements as more valuable. 
+Previous modelling work has shown that either of these properties is sufficient to produce echo-chamber-like structures in networks wherein individuals increasingly disregard information from those likely to disagree with them \mccorrect{!TODO[citations]}.
+In this chapter, similar models are constructed, with the parameters controlling the agents' trust updating and advice seeking behaviour based on values fitted to the participants in the behavioural experiments.
+The models indicate that heterogeneity within the population may act as a brake on echo chamber formation, with individuals who are slow to trust or balanced in their advice-seeking behaviour exhibiting less pull towards extremes.
 
 ## Mini-review of networking models
 
 * Niccolo showed source selection is pathological (unless judgements are uncorrelated) in absence of bias updating
   - True whether or not confidence weights updating
-* Large networks of rational agents form echoChambers (Bayesian updating = confirmation bias) madsenLargeNetworksRational2018a
+* Large networks of rational agents form echoChambers (Bayesian updating = confirmation bias) [@madsenLargeNetworksRational2018a]
   
 ## Goals of this approach
 
@@ -55,32 +53,6 @@ library(patchwork)
   - Mean 0 vs mean derived from parameter estimation
   - Mean derived from parameter estimation vs Mean + SD derived from parameter estimation
   - Mean + SD derived from parameter estimation vs samping estimated values
-  
-## Limitations
-
-* This is an initial exploration only
-  - Models are time-consuming to run (even with key components written in C++)
-  - Parameter space is huge and dynamics dependent upon parameter interactions
-* But it should serve to highlight whether and how heterogeneity could matter for dynamics
-* ...and indicate directions for further study
-
-## Old stuff
-
-<!-- Models suggest interactions between agents exascerbate problems, especially where source selection and info weighting combine. -->
-
-\mccorrect{!TODO[extend the simulation/agreement-effects-analysis stuff a bit and it will fill this chapter out well.]}
-
-* Even when biases don't change (Niccolo covered that), source selection on the basis of agreement is inherently pathological (unless judgements are uncorrelated).  
-  - This is true whether or not confidence weights updating. 
-
-* Why should we care if it's not changing biases (i.e. opinions?)  
-  - because it reinforces final decisions through agreement instead of attenuating them through disagreement. 
-
-* Our psychological mechanisms from Section II thus produce bad network effects when feedback is absent. 
-
-* Can we relate the networks back to the advice-giving environments from Section III?
-
-Models say this will go horribly wrong.
 
 ```{r nw-r-run-basic, include = F}
 
@@ -992,6 +964,18 @@ agents.all %>%
 
 ## Discussion
 
+* Even when biases don't change (Niccolo covered that), source selection on the basis of agreement is inherently pathological (unless judgements are uncorrelated).  
+  - This is true whether or not confidence weights updating. 
+
+* Why should we care if it's not changing biases (i.e. opinions?)  
+  - because it reinforces final decisions through agreement instead of attenuating them through disagreement. 
+
+* Our psychological mechanisms from Section II thus produce bad network effects when feedback is absent. 
+
+* Can we relate the networks back to the advice-giving environments from Section III?
+
+Models say this will go horribly wrong.
+
 ### Limitations
 
 * Lots of interactivity stuff isn't modelled:  
@@ -1001,4 +985,10 @@ agents.all %>%
   * Agents basically use advice rationally  
     * No explicit modelling of confirmation bias beyond the Bayes  
     * No overuse (intentional - dietvorstIntentionallyBiasedPeople2019 - or otherwise) of advice  
-
+* The parameters we 'recover' might not be stable features of individuals  
+  * (can we do a comparison of variability for participants who saw multiple pairs of advisors?)  
+* Even if they are stable, they are unlikely to be on the same scale as the rest of the network stuff  
+* Picking between one and many is definitely not the same  
+* Basically, this is all illustration and you can't lean on it too heavily  
+* Models are time-consuming to run (even with key components written in C++)  
+* Parameter space is huge and dynamics dependent upon parameter interactions  

@@ -7,7 +7,6 @@ output:
 documentclass: book
 
 bibliography: 
-  - references.bib
   - bibliography/references.bib
 bibliography-heading-in-pdf: Works Cited
 params:
@@ -29,7 +28,9 @@ Here should be a detailed introduction.
 Niccolo's stuff about advice-taking, and then demonstrate similar results in my Dates Task.
 -->
 
-## \mccorrect{!TODO[Cite Niccolo's best paper on his thesis advice-use experiments]}
+## Previous work in our lab 
+
+\mccorrect{!TODO[Cite Niccolo's best paper on his thesis advice-use experiments]}
 
 \mccorrect{!TODO[Describe Niccolo's stuff, especially why accuracy vs agreement might be a good target for replication with a new experimental design.]}
 
@@ -290,7 +291,7 @@ ggplot(tmp, aes(x = advisor0idDescription, y = advisor0WOA,
   filter_if(is.numeric, ~ !is.na(.)) %>%
   as.data.frame() %$%
   md.ttest(x = Accurate, y = Agreeing, 
-           labels = c('*M*$_{Accurate|¬Feedback}$', '*M*$_{Agreeing|¬Feedback}$'), 
+           labels = c('*M*$_{Accurate|\lnot Feedback}$', '*M*$_{Agreeing|\lnot Feedback}$'), 
            paired = T)
 
 tmp <- rename(tmp, 
