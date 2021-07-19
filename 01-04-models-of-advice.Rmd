@@ -29,30 +29,64 @@ library(patchwork)
 # Network effects of advisor choice {#chapter-network-effects}
 \adjustmtc 
 
-## Introduction
+## Introduction {#ne-i}
 
 The behavioural experiments in the previous chapter, along with predecessors from others in our lab [@pescetelliUseMetacognitiveSignals2017], indicate that people show preferences for selecting advisors who agree with them and treat advice which agrees with their initial judgements as more valuable. 
 Previous modelling work has shown that either of these properties is sufficient to produce echo-chamber-like structures in networks wherein individuals increasingly disregard information from those likely to disagree with them \mccorrect{!TODO[citations]}.
 In this chapter, similar models are constructed, with the parameters controlling the agents' trust updating and advice seeking behaviour based on values fitted to the participants in the behavioural experiments.
 The models indicate that heterogeneity within the population may act as a brake on echo chamber formation, with individuals who are slow to trust or balanced in their advice-seeking behaviour exhibiting less pull towards extremes.
 
-## Mini-review of networking models
+### Similar models in the literature {#ne-i-lit}
+
+These models share a foundation in a general theory of advice-taking in which people increase or decrease their trust in others consequent on the perceived value of the information they impart. 
 
 * Niccolo showed source selection is pathological (unless judgements are uncorrelated) in absence of bias updating
   - True whether or not confidence weights updating
 * Large networks of rational agents form echoChambers (Bayesian updating = confirmation bias) [@madsenLargeNetworksRational2018a]
   
-## Goals of this approach
+### Current model {#ne-i-model}
 
-* Characterise models which implement basic effects
-  - Polarisation/attractors
-  - Echo chambers (burn-in period)
-  - Agents based on same model used for behavioural data
+The model used here is also underpinned by the update-from-information theoretical approach described above.
+Thus, like in other models, agents interact with one another to share information, process that information differently depending on its source, and refine their opinion of the source from the information provided. 
+
+In the current model, the agents face a perceptual decision in which they integrate sensory evidence with prior expectations in a Bayesian manner to produce an initial decision. 
+The agents then receive advice from another agent, whom they choose on the basis of their trust in that agent compared to all the other agents combined with their preference for receiving advice from more trusted advisors.
+'Trust' as encapsulated in the model is double-ended: very untrustworthy advisors can give reliable information because they are firmly expected to give the wrong answer (and therefore contain information about the correct answer because the decision is a binary one). 
+The advice is integrated with the initial decision, again in a Bayesian manner, to produce a final decision. 
+The final decision is used to update the agent's perception of the world and their advisor. 
+The agent's bias drifts towards the final decision answer by weighted averaging, while the trust they have in their advisor increases (or decreases) depending upon whether (or not) the advice is in agreement with the final decision.
+
+The initial decision -- advice -- final decision -- update cycle is repeated thousands of times.
+The models illustrate they dynamics of advice interactions: we can observe how prior expectations change over time and whether and how polarisation or consensuses emerge; and how agents' trust in one another changes as they gain experience with one another.
+
+#### Model development and validation
+
+
   
-* Explore dynamics when using different values of weighted selection
-  - Mean 0 vs mean derived from parameter estimation
-  - Mean derived from parameter estimation vs Mean + SD derived from parameter estimation
-  - Mean + SD derived from parameter estimation vs samping estimated values
+### Goals of this approach {#ne-i-goals}
+
+There are two parts to the modelling work in this chapter: exploring the characteristics of participants' recovered model parameters; and exploring the effects of those parameters on the dynamics of the agent-based models.
+
+In the first part, models parameters are recovered from the behavioural data for each participant using a gradient descent algorithm.
+The two free parameters estimated during the parameter recovery process are: how rapidly trust updates; and the extent to which more trusted advisors are preferred.
+
+The model and parameter recovery process are both tested using simulation. 
+The parameter recovery process is tested by attempting to recover data from simulated data (where the parameters are know), and shows a reasonable level of accuracy in recovering parameters from data, suggesting that the recovered values for participants are likely to capture some aspects of participants' behaviour on the task.
+The model itself is tested by comparing errors for fitted parameters to errors for those same parameters when fitted to data that has had the advisor agreement information scrambled.
+Given the models are driven by the advisors' agreement with the judge's initial decision, scrambling this column should break the temporal relationship between experience and trust updating, leading to worse parameter fits. 
+This is indeed the case. 
+\mccorrect{!TODO[Talk about the other part of the shuffled validation - comparing best fits of shuffled data to best fits of original data]}
+
+The parameter recovery results, distributions and correlations of the coefficients, illustrate the heterogeneity of the participants. 
+Some participants' data does not fit well to the model, indicating that these participants may have used strategies which bear little resemblance to the model the data are fit to.
+
+We then explore the behaviour of the agent-based models (within a narrow area of their parameter space), varying the way agents' preferences for more trusted advisors are determined.
+The baseline model assigns all agents no preference for more trusted advisors, meaning that they sample from all possible advisors at random. 
+The Homogenous model applies the mean of the recovered parameter distribution to all agents. 
+The Heterogeneous model draws values from a distribution defined by the mean and standard deviation of the recovered parameter distribution. 
+The Empirical model selects values from those observed in the recovered parameter data (with replacement).
+For the first three models, trust update values are sampled from a distribution with the mean and standard deviation of the recovered parameters, while in the Empirical model the agents receive the trust update value for the agent whose preference strength coefficient they received.
+Two versions of each model are run, one which starts with a random trust network and one which starts with a homophilic trust network.
 
 ```{r nw-r-run-basic, include = F}
 
@@ -264,66 +298,67 @@ Sys.time() - t1
 ```
 
 ```{r nw-r-run-empirical, include = F}
-load('cache/thesis-parameter-estimation.rda')
-
-# Fetch the unique parameter combinations for the models we just ran
-parameters.emp <- agents %>%
-  select(
-    n_agents:confidence_weighted,
-    -starts_with('trust_volatility'),
-    -starts_with('weighted_sampling'),
-    -starting_graph_type
-  ) %>%
-  unique() %>%
-  rowid_to_column() %>%
-  nest(d = -rowid) %>%
-  mutate(
-    model = map(d, function(.) {
-      withr::with_seed(
-        .$.random_seed_agents,
-        do.call(adviseR:::makeAgents, select(
-          ., 
-          -bias_update_slope, -starts_with('feedback'), 
-          -contains('random_seed'), -truth_sd, -confidence_weighted
-        ))
-      )
-    })
-  ) %>%
-  # Substitute trust_volatility and weighted_sampling coefficients from estimates
-  mutate(
-    model = map2(model, d, function(.x, .y) {
-      p <- withr::with_seed(
-        .y$.random_seed_agents,
-        slice_sample(recovered_parameters, n = .y$n_agents, replace = T)
-      )
-      .x$agents <- .x$agents %>%
-        mutate(
-          trust_volatility = rep(p$tu_end, .y$n_decisions),
-          weighted_sampling = rep(p$ws_end, .y$n_decisions)
-        )
-      .x
-    })
-  ) %>% 
-  unnest(cols = d) %>%
-  mutate(
-    decision_flags = map(
-      n_decisions,
-      function(.) {
-        if (. > nD) c(rep(1, nBI), rep(3, . - nBI)) else rep(3, .)
-      }
-    ),
-    starting_graph = parameters$starting_graph[1],
-    model = map2(model, n_agents, function(.x, .y) {
-      g <- parameters$starting_graph[[1]](tibble(x = 1:.y))
-      .x$graphs <- list(g)
-      .x
-    })
-  ) %>%
-  select(-rowid)
-
-nCores <- 3
 
 if (must_rerun_models.emp) {
+  load('cache/thesis-parameter-estimation.rda')
+  
+  # Fetch the unique parameter combinations for the models we just ran
+  parameters.emp <- agents %>%
+    select(
+      n_agents:confidence_weighted,
+      -starts_with('trust_volatility'),
+      -starts_with('weighted_sampling'),
+      -starting_graph_type
+    ) %>%
+    unique() %>%
+    rowid_to_column() %>%
+    nest(d = -rowid) %>%
+    mutate(
+      model = map(d, function(.) {
+        withr::with_seed(
+          .$.random_seed_agents,
+          do.call(adviseR:::makeAgents, select(
+            ., 
+            -bias_update_slope, -starts_with('feedback'), 
+            -contains('random_seed'), -truth_sd, -confidence_weighted
+          ))
+        )
+      })
+    ) %>%
+    # Substitute trust_volatility and weighted_sampling coefficients from estimates
+    mutate(
+      model = map2(model, d, function(.x, .y) {
+        p <- withr::with_seed(
+          .y$.random_seed_agents,
+          slice_sample(recovered_parameters, n = .y$n_agents, replace = T)
+        )
+        .x$agents <- .x$agents %>%
+          mutate(
+            trust_volatility = rep(p$tu_end, .y$n_decisions),
+            weighted_sampling = rep(p$ws_end, .y$n_decisions)
+          )
+        .x
+      })
+    ) %>% 
+    unnest(cols = d) %>%
+    mutate(
+      decision_flags = map(
+        n_decisions,
+        function(.) {
+          if (. > nD) c(rep(1, nBI), rep(3, . - nBI)) else rep(3, .)
+        }
+      ),
+      starting_graph = parameters$starting_graph[1],
+      model = map2(model, n_agents, function(.x, .y) {
+        g <- parameters$starting_graph[[1]](tibble(x = 1:.y))
+        .x$graphs <- list(g)
+        .x
+      })
+    ) %>%
+    select(-rowid)
+  
+  nCores <- 3
+
   unlink(list.files(paste0(cacheRoot, '/emp/'), pattern = '.rda'))
   for (i in 1:ceiling(nrow(parameters.emp) / nCores)) {
     n <- (i - 1) * nCores + 1
@@ -908,6 +943,7 @@ ggs[[1]] / ggs[[2]]
 ```
 
 Having observed the patterns at the level of individual models, we can draw more useful conclusions at a higher level from considering them as a set. 
+Summarising the results in this way means that we can observe some general features of the models by comparing otherwise-similar models over the different parameters.
 In this analysis we attend to two properties of primary interest: 
 First, how accurate are agents over time? 
 This is represented by the mean bias magnitude. 
@@ -915,8 +951,6 @@ In ideal circumstances, this should be very low, indicating that agents are larg
 Second, to what extent are agents more likely to trust advice from agents who share their bias?
 This is captured by the ratio between trust in agents with the same versus different bias. 
 This value is not always well defined - where all agents eventually acquire the same bias, the mean weight of out-group advisors is undefined.
-
-Summarising the results in this way means that we can observe some general features of the models by comparing otherwise-similar models over the different parameters.
 
 Mean bias magnitude is less pronounced where the starting trust weights are random, although this is likely due to there being less time after burn-in for the biases to update. 
 Burn-in time tends to decrease the homophily of the models, judging by final bias, but to increase it judging by initial bias. 
@@ -964,20 +998,56 @@ agents.all %>%
 
 ## Discussion
 
-* Even when biases don't change (Niccolo covered that), source selection on the basis of agreement is inherently pathological (unless judgements are uncorrelated).  
-  - This is true whether or not confidence weights updating. 
+As with the other simulation-based approaches ([§Similar models in the literature](#ne-i-lit)), this work showed that echo chambers and polarisation can occur in networks of agents using heuristics that appear from the agent's perspective to be rational. 
+This emergence of collective irrationality from the interaction of rational individuals is similar to the well-known phenomenon of the Tragedy of the Commons, in which individual rewards purchased with distributed costs results in everyone becoming poorer \mccorrect{!TODO[citation]}.
+An example of the Tragedy of the Commons is the height of trees - trees have to be tall because they compete for sunlight with other trees; it is always rational for individual trees to (have offspring which) grow taller than their neighbours, but collectively a huge amount of resources is squandered in growing tall instead of reproducing.
 
-* Why should we care if it's not changing biases (i.e. opinions?)  
-  - because it reinforces final decisions through agreement instead of attenuating them through disagreement. 
+### Weighted selection
 
-* Our psychological mechanisms from Section II thus produce bad network effects when feedback is absent. 
+The models indicate that weighted selection, the extent to which agents prefer to receive advice from those whom they consider most trustworthy, \mccorrect{!TODO[Describe the basic effect of weighted sampling: what does it do (speed up the dynamics/nothing)?; does it need unrealistically high values to work?; etc.]}
 
-* Can we relate the networks back to the advice-giving environments from Section III?
+### Heterogeneity
 
-Models say this will go horribly wrong.
+Beyond the basic effects of including weighted selection, some models used agents whose weighted selection coefficients were heterogeneous. 
+In both the Heterogeneous and Empirical models, heterogeneous weighted selection coefficients led to the emergence of hold-out groups -- small subsets of the population who formed their own minority consensus at the opposite extreme to the majority consensus. 
+The 
 
-### Limitations
+Where the models had evolved trust networks prior to beginning their bias updates, polarisation was common, and heterogeneous weighted selection coefficients sped up this process. 
+They also appeared to make it harder for agents to maintain low biases, although many of the agents in the Empirical model managed to maintain these moderate biases for the duration. 
 
+These effects, the presence of hold-out groups and the speeding up of polarisation, suggest that other models of advice dynamics may underestimate the speed with which polarisation occurs while overestimating the degree to which it takes over.
+
+The hold-out groups captured in the heterogeneity models is an observable feature of opinion networks in the real world. 
+For each consensus opinion there is likely to be an outspoken minority who cling resolutely to the opposite opinion. 
+The models presented here cannot tell us how such heterogeneity comes about, but they do underscore its importance in the wider ecosystem of opinion interactions, and invite questions concerning its origins. 
+One suggestion we raise here is that being contrarian may be a stable sub-strategy within an environment where consensus dominates. 
+\mccorrect{!TODO[what do we mean by this, exactly? Can we offer an example?]}
+
+\mccorrect{!TODO[Are these contrarians related to the people who don't take advice in our studies - can we do stats to find out (relate low trust update and/or weighted sampling to low influence? Ideally among people who show a strong preference for one or another advisor to avoid people who just aren't engaged skewing the analysis)]}
+
+### Considerations
+
+There are several considerations which should be borne in mind while interpreting the results of the models.
+These considerations fall into several different categories, from technical constraints to limitations on generalisability.
+
+#### Context
+Polarisation and homophily are not inherently bad features.
+In some discussions (e.g. debates about whether slave ownership is morally permisable) we can be glad that near-universal opinion reigns on the issue, despite its once being a contested issue.
+In others (e.g. discussion concerning the extent to which the state should be involved in individuals' lives) it is helpful to have a range of opinion to maintain the diversity of approaches \mccorrect{!TODO[Cite Guns, Germs, and Steel or one of its references on balance of homogeneity/heterogeneity]}.
+
+This means that the context must be considered when evaluating the implications of these models. 
+The mathematics and computational results will remain the same, but the real-life implications would change dramatically depending upon the context which the models were chosen to represent. 
+Contexts for mathematically similar models have included \mccorrect{!TODO[explain some framings of agent-based modelling papers]}
+The model presented here could be considered a model of any and all of these processes, despite their obvious differences, and the implications may be considered beneficial in some cases and harmful in others.
+
+#### Generalisabilty
+* Real people probably don't polarise as much as all this! (Sunder Katwala on opinion bell curves/most people are moderates)
+
+* The parameters we 'recover' might not be stable features of individuals  
+  * (can we do a comparison of variability for participants who saw multiple pairs of advisors?)  
+* Even if they are stable, they are unlikely to be on the same scale as the rest of the network stuff  
+
+#### Known psychological aspects which are left out
 * Lots of interactivity stuff isn't modelled:  
   * Agents don't try to make their advice more paletable/be selected more [@hertzNeuralComputationsUnderpinning2017]
   * Agents don't know or care what happens to their advice  
@@ -985,10 +1055,26 @@ Models say this will go horribly wrong.
   * Agents basically use advice rationally  
     * No explicit modelling of confirmation bias beyond the Bayes  
     * No overuse (intentional - dietvorstIntentionallyBiasedPeople2019 - or otherwise) of advice  
-* The parameters we 'recover' might not be stable features of individuals  
-  * (can we do a comparison of variability for participants who saw multiple pairs of advisors?)  
-* Even if they are stable, they are unlikely to be on the same scale as the rest of the network stuff  
+    
+#### Differences between experiments and models
 * Picking between one and many is definitely not the same  
-* Basically, this is all illustration and you can't lean on it too heavily  
-* Models are time-consuming to run (even with key components written in C++)  
+
+#### Technical constraints
 * Parameter space is huge and dynamics dependent upon parameter interactions  
+  * Models are time-consuming to run (even with key components written in C++)
+
+* Basically, this is all illustration and you can't lean on it too heavily   
+
+## How to choose an examiner
+* You want them to read your thesis because...  
+  * You want their insight about some aspect  
+  * You want to impress them  
+
+### Internal
+* From the department/a closely allied one  
+* i.e. a psychologist
+
+### External
+* Fewer constraints  
+* A couple of choices would be nice  
+
