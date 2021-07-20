@@ -36,14 +36,44 @@ Previous modelling work has shown that either of these properties is sufficient 
 In this chapter, similar models are constructed, with the parameters controlling the agents' trust updating and advice seeking behaviour based on values fitted to the participants in the behavioural experiments.
 The models indicate that heterogeneity within the population may act as a brake on echo chamber formation, with individuals who are slow to trust or balanced in their advice-seeking behaviour exhibiting less pull towards extremes.
 
+### Agent-based models
+
+Agent-based models are models in which numerous discrete decision-making agents interact to produce a model state, typically used to investigate emergent phenomena [@bonabeauAgentbasedModelingMethods2002; @smithAgentBasedModelingNew2007].
+Unlike typical models, which describe the overall behaviour of the system using equations, in an agent-based model each component agent (taken to represent an atom, a neuron, a starling, a person, etc.) has equations describing its behaviour at each time step.
+Crucially, the equations governing agents' behaviour will have terms relating to other agents, and the outcome of the equations will produce changes in those properties. For example, a neuron might have inputs indicating whether or not a neighbouring neuron is in action potential, and the equations will determine whether or not the neuron itself triggers an action potential. 
+
+Agent-based modelling is a powerful approach, because it can connect system-level phenomena to individuals' decision rules and incorporate individuals with outlying or different decision rules [@bonabeauAgentbasedModelingMethods2002.
+The power of agent-based modelling also comes with drawbacks [@jonesAgentbasedModellingUse2007]. 
+The intuitive nature of its explanations means that it is easy to lose touch with ecological validity (because even non-ecologically valid implementations seem valid when expressed in agent-based terms) and easy to overclaiming on the basis of results.
+The interactivity and emergent behaviours that it produces can mean that some models are unstable: it is important to demonstrate robustness of emergent behaviours by running repeated tests on families of models.
+Furthermore, the dispersed nature of the models means that there are more features to describe; modellers must make sure that the models are precisely specified and that those specifications are shared accurately so that others are able to reproduce and explore the models [@jonesAgentbasedModellingUse2007; @bruchAgentBasedModelsEmpirical2015].
+
+In social science research, agent-based models are best used to investigate "the implications for social dynamics of one or more empirical observations or stylized facts" [@bruchAgentBasedModelsEmpirical2015].
+The models used here are employed to investigate the effects of introducing the advisor selection phenomena documented in the previous chapter into network models of social influence.
+@bruchAgentBasedModelsEmpirical2015 argue strongly that agent-based models would benefit from greater empirical realism, and others, including @bonabeauAgentbasedModelingMethods2002, have called for greater ecological validity.
+This chapter provides some evidence for this discussion by demonstrating the effects of implementing agents which copy individual participants versus drawing agents' coefficients from an empirically-defined distribution.
+
 ### Similar models in the literature {#ne-i-lit}
 
-These models share a foundation in a general theory of advice-taking in which people increase or decrease their trust in others consequent on the perceived value of the information they impart. 
+The use of agent-based models has increased substantially in many fields in recent decades.
+Rather than attempt to present a full picture of agent-based models in which agents advise one another, this section briefly covers modles that include a tendency for agents to seek out advice from likeminded others and compare the effects of varying this property. 
+Models such as @songDynamicSpiralsPut2017 that include inter-agent influence but no variation in this propensity are not discussed.
 
-* Niccolo showed source selection is pathological (unless judgements are uncorrelated) in absence of bias updating
-  - True whether or not confidence weights updating
-* Large networks of rational agents form echoChambers (Bayesian updating = confirmation bias) [@madsenLargeNetworksRational2018a]
-  
+@pescetelliRoleDecisionConfidence2021 present a model which is a conceptual predecessor for the current model.
+In their model, agents make a single binary decision at each step on the basis of a perception of the true value and an idiosyncratic (static) bias.
+Agents then consult another agent for advice, and update their final decision by integrating that advice with their own opinion, weighted by the trust they have in their advisor. 
+Model parameters varied according to whether or not agents received feedback, and whether or not agents sought out other agents in whom they had higher trust (similar to weighted sampling in our model).
+They showed a cluster of interesting results, starting with the demonstration that using agreement as a proxy for accuracy in the absence of feedback is beneficial provided biases are uncorrelated.
+Secondly, they found that agents' trust weights aggregated into separate camps defined by shared biases where feedback was infrequent.
+Lastly, they observed that agents' biases tended to polarise in the absence of feedback when biased agents preferentially sought likeminded advice.
+Key differences between this model and the current model are that the current model allows for more heterogeneity in agents' properties and draws all agents' biases from a normal rather than uniform or point distribution.
+
+In a similar vein, @madsenLargeNetworksRational2018a demonstrated that echo chambers could form within large networks of rational agents.
+Their models used Bayesian agents whose likelihood of accepting advice was dependent upon the similarity of the advice to their own prior beliefs. 
+Under a range of parameters, at at a range of network sizes from 50 to 1000 agents, they showed that echo chambers formed consistently in most cases.
+
+@gaoDiffusionOpinionsComplex2015 report that agents preferring to hear from likeminded others allowed stable minority opinion to persist where agents had to subscribe to one or other opinion^[This paper is extremely brief in its reporting of the agent-based model, and it is difficult to determine precisely what was done.]
+
 ### Current model {#ne-i-model}
 
 The model used here is also underpinned by the update-from-information theoretical approach described above.
@@ -1032,11 +1062,11 @@ These considerations fall into several different categories, from technical cons
 
 #### Context
 Polarisation and homophily are not inherently bad features.
-In some discussions (e.g. debates about whether slave ownership is morally permisable) we can be glad that near-universal opinion reigns on the issue, despite its once being a contested issue.
+In some discussions (e.g. debates about whether slave ownership is morally permissable) we can be glad that near-universal opinion reigns on the issue, despite its once being a contested issue.
 In others (e.g. discussion concerning the extent to which the state should be involved in individuals' lives) it is helpful to have a range of opinion to maintain the diversity of approaches \mccorrect{!TODO[Cite Guns, Germs, and Steel or one of its references on balance of homogeneity/heterogeneity]}.
 
 This means that the context must be considered when evaluating the implications of these models. 
-The mathematics and computational results will remain the same, but the real-life implications would change dramatically depending upon the context which the models were chosen to represent. 
+The mathematics and computational results will remain the same, but the real-life implications would change dramatically depending upon the context which the models were chosen to represent^[In one exchange in the literature, @jonesAgentbasedModellingUse2007 view a model as showing drinking behaviour over a day, while the authors, @mezicMezicRespond2007, see each tick in the model as representing a day!]. 
 Contexts for mathematically similar models have included \mccorrect{!TODO[explain some framings of agent-based modelling papers]}
 The model presented here could be considered a model of any and all of these processes, despite their obvious differences, and the implications may be considered beneficial in some cases and harmful in others.
 
@@ -1044,24 +1074,49 @@ The model presented here could be considered a model of any and all of these pro
 * Real people probably don't polarise as much as all this! (Sunder Katwala on opinion bell curves/most people are moderates)
 
 * The parameters we 'recover' might not be stable features of individuals  
-  * (can we do a comparison of variability for participants who saw multiple pairs of advisors?)  
+  * (can we do a comparison of variability for participants who saw multiple pairs of advisors?) 
+  * This is what @bruchAgentBasedModelsEmpirical2015 would term 'input uncertainty'  
 * Even if they are stable, they are unlikely to be on the same scale as the rest of the network stuff  
 
 #### Known psychological aspects which are left out
-* Lots of interactivity stuff isn't modelled:  
+The modelling work in this chapter follows the recommendations of @bruchAgentBasedModelsEmpirical2015, who suggest that modelling is best used to characterise the effects on system dynamics of a particular effect derived from empirical observation, and @jacksonAgentBasedModelingGuide2017, who advocate for simplicity where possible. 
+Consequently, many decision-making and advice-taking phenomena reported in the literature are left out.
+@eastImprovingAgentbasedModels2016 argue that an agent-based model only achieves sufficiency by including "all relevant processes and conditions". 
+To allow the reader to determine whether the omissions are important, here is the list of omitted phenomena and features:
+* Agents don't know or care what happens to their advice  
   * Agents don't try to make their advice more paletable/be selected more [@hertzNeuralComputationsUnderpinning2017]
-  * Agents don't know or care what happens to their advice  
-  * Advice is absolute, doesn't include confidence  
-  * Agents basically use advice rationally  
-    * No explicit modelling of confirmation bias beyond the Bayes  
-    * No overuse (intentional - dietvorstIntentionallyBiasedPeople2019 - or otherwise) of advice  
+* Advice is absolute, doesn't include confidence  
+* Agents basically use advice rationally  
+  * No explicit modelling of confirmation bias beyond the Bayes  
+  * No overuse (intentional - dietvorstIntentionallyBiasedPeople2019 - or otherwise) of advice
+  
+#### Paths not taken
+
+There are several other implementation questions for which empirical evidence is slight or absent, but which represent potentially important decisions and which further extensions may wish to implement.
+
+It is common for models of social interactions to use connectivity graphs that reflect structural features common to social networks.
+The most common of these structures for the kinds of social interactions modelled here is the small-world network [@wattsCollectiveDynamicsSmallWorld1998], in which each agent is connected to several others such that the network is constructed of small clusters with a low average path length (the minimum number of steps required to connect two nodes, for all pairs of nodes in the network).
+In some cases, the small-world networks also implement a scale-free power law structure, in which a few nodes are highly connected while most are less well connected \mccorrect{!TODO[find cannonical citation for SWSF networks]}.
+The networks used here do not have these properties, and are instead fully-connected networks, wherein each agent is connected to each other agent, and the likelihood of two agents interacting is goverened by their trust weights for one another.
+These implementations are not mutally exclusive, but there are several reasons why fully-connected networks are used here rather than small-world or small-world scale-free networks.
+
+Firstly, the impetus for this work arose from @pescetelliRoleDecisionConfidence2021, in which fully-connected networks were used.
+Secondly, small-world scale-free networks are not necessary for exploring the role of weighted sampling in agent interactions.
+Thirdly, using non-fully-connected structures with trust weight updating would mean that agents ought to be able to drop and forge new connections, transforming the conceptualisation about what is being modelled and inviting open-ended questions of how this is implemented and how it relates to trust weight updating. 
+These issues, and similar questions about whether new connections and/or dropped connections ought to prompt reciprocal connections create a fascinating but extremely large problem space.
+Lastly, using non-fully-connected networks means that it becomes important to understand how an agent's position within the network affects their behaviour [@mcclainPathwayForwardsSocial2016], which requires a full investigation beyond the scope of this thesis.
+
+* Normalisation of trust weights or decay of trust over time  
     
 #### Differences between experiments and models
 * Picking between one and many is definitely not the same  
 
 #### Technical constraints
 * Parameter space is huge and dynamics dependent upon parameter interactions  
-  * Models are time-consuming to run (even with key components written in C++)
+  * Models are time-consuming to run (even with key components written in C++)  
+  * This is what @bruchAgentBasedModelsEmpirical2015 call 'model uncertainty' and we did try to reduce it a bit by exploring different stuff in development, but ultimately it's a computational resources issue  
+* Some models are pretty huge (n ~ 2000 is common). These are smaller to remain computationally tractable and because 100 is enough to see the phenomena we wish to model.  
+  * It would be possible to extend the models, but the very large models have to run extremely slowly for computational tractability reasons (write to disk rather than storing in RAM; could be rewritten but n ~ 100 was part of the original design hence why they are how they are).  
 
 * Basically, this is all illustration and you can't lean on it too heavily   
 

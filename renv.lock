@@ -572,6 +572,13 @@
       "Repository": "CRAN",
       "Hash": "9ace652bffef34af558eb5d70903ac2f"
     },
+    "here": {
+      "Package": "here",
+      "Version": "1.0.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "24b224366f9c2e7534d2344d10d59211"
+    },
     "highr": {
       "Package": "highr",
       "Version": "0.9",
