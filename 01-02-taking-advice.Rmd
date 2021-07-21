@@ -233,7 +233,7 @@ for (E in c(.GlobalEnv, .prevStudy)) {
 
 ```
 
-```{r}
+```{r ai-ava-r-anova}
 bf <- tmp %>% 
   nest(d = -c(feedbackCondition, `Feedback condition`)) %>%
   mutate(
@@ -291,7 +291,7 @@ ggplot(tmp, aes(x = advisor0idDescription, y = advisor0WOA,
   filter_if(is.numeric, ~ !is.na(.)) %>%
   as.data.frame() %$%
   md.ttest(x = Accurate, y = Agreeing, 
-           labels = c('*M*$_{Accurate|\lnot Feedback}$', '*M*$_{Agreeing|\lnot Feedback}$'), 
+           labels = c('*M*$_{Accurate|\\lnot Feedback}$', '*M*$_{Agreeing|\\lnot Feedback}$'), 
            paired = T)
 
 tmp <- rename(tmp, 

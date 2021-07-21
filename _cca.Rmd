@@ -7,7 +7,7 @@ Pescetelli provided evidence for this model in the domain of advisor influence (
 
 ### Dots Task {#ac-cca-dots}
 
-```{r include = F}
+```{r ac-cca-dots-load, include = F}
 
 rm(list = ls()); source('scripts_and_filters/general_setup.R')
 
@@ -83,7 +83,7 @@ kable(agr.table, caption = "\\label{tab:ac-cca-dots-profiles}Confidence-continge
 
 ##### Exclusions
 
-```{r}
+```{r ac-cca-dots-r-clean}
 nMaxOutliers <- 2
 zThresh <- 3
 accuracyRange <- c(.6, .85)
@@ -143,7 +143,7 @@ Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded,
 
 ##### Task performance
 
-```{r}
+```{r ac-cca-dots-r-performance}
 
 familiarization <- trials %>%
   filter(typeName == "force", adviceType %in% c(3,4)) %>%
@@ -701,7 +701,7 @@ We place participants in a similar paradigm in which they are given a choice bet
 
 #### Method {#ac-cca-lab-m}
 
-```{r load exp1 data, include = F}
+```{r ex1-load, include = F}
 
 rm(list = ls()); source('scripts_and_filters/general_setup.R')
 

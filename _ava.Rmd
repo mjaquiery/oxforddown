@@ -9,7 +9,7 @@ We expect that participants provided with feedback will be able to identify the 
 
 ### Dots Task {#ac-ava-dots}
 
-```{r include = F}
+```{r ac-ava-dots-load, include = F}
 
 rm(list = ls()); source('scripts_and_filters/general_setup.R')
 
@@ -84,7 +84,7 @@ kable(agr.table, caption = "\\label{tab:ac-ava-dots-m-profiles}Advisor advice pr
 
 ##### Exclusions
 
-```{r}
+```{r ac-ava-dots-r-exclusions}
 nMaxOutliers <- 2
 zThresh <- 3
 accuracyRange <- c(.6, .85)
@@ -714,7 +714,7 @@ While several participants did develop very strong preferences, picking one or t
 
 ### Dates Task {#ac-ava-dates}
 
-```{r include = F}
+```{r ac-ava-dates-load, include = F}
 
 rm(list = ls()); source('scripts_and_filters/general_setup.R')
 
@@ -780,7 +780,7 @@ These 'off-brand' trials allow the response to the advisors to be disentangled f
 
 ##### Exclusions
 
-```{r}
+```{r ac-ava-dates-r-clean}
 maxTrialRT <- 60000   # trials take < 1 minute
 minTrials <- 11       # at least 11 trials completed
 minChangeRate <- .1   # some advice taken on 10%+ of trials
@@ -827,7 +827,7 @@ Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded,
 
 ##### Task performance
 
-```{r}
+```{r ac-ava-dates-r-performance}
 
 for (E in c(.GlobalEnv, .prevStudy)) 
   E$Familiarization <- E$AdvisedTrial %>%

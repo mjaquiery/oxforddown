@@ -10,7 +10,7 @@ The ability to distinguish between accurate advisors in these experiments is imp
 
 ### Dots Task {#ac-acc-dots}
 
-```{r include = F}
+```{r ac-acc-dots-load include = F}
 
 select_experiment(
   project = 'dotstask',
@@ -84,7 +84,7 @@ kable(agr.table, caption = "\\label{tab:ac-acc-dots-m-profiles}Advisor advice pr
 
 ##### Exclusions
 
-```{r}
+```{r ac-acc-dots-r-clean}
 nMaxOutliers <- 2
 zThresh <- 3
 accuracyRange <- c(.6, .85)
@@ -145,7 +145,7 @@ Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded,
 
 ##### Task performance
 
-```{r}
+```{r ac-acc-dots-r-performance}
 
 familiarization <- trials %>%
   filter(typeName == "force", adviceType %in% c(5,6)) %>%
@@ -815,7 +815,7 @@ The modal choice remained at chance level (.5), but almost all participants mani
 
 ### Dates Task {#ac-acc-dates}
 
-```{r include = F}
+```{r ac-acc-dates-load, include = F}
 
 rm(list = ls()); source('scripts_and_filters/general_setup.R')
 
@@ -892,7 +892,7 @@ kable(agr.table, caption = "\\label{tab:ac-acc-dates-m-profiles}Advisor advice p
 
 ##### Exclusions
 
-```{r}
+```{r ac-acc-dates-r-clean}
 maxTrialRT <- 60000   # trials take < 1 minute
 minTrials <- 11       # at least 11 trials completed
 minChangeRate <- .1   # some advice taken on 10%+ of trials
@@ -932,7 +932,7 @@ Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded,
 
 ##### Task performance
 
-```{r}
+```{r ac-acc-dates-r-performance}
 
 Familiarization <- AdvisedTrial %>%
   filter(is.na(advisorChoice) | !advisorChoice) %>%
