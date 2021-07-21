@@ -31,8 +31,8 @@ library(patchwork)
 
 ## Introduction {#ne-i}
 
-The behavioural experiments in the previous chapter, along with predecessors from others in our lab [@pescetelliUseMetacognitiveSignals2017], indicate that people show preferences for selecting advisors who agree with them and treat advice which agrees with their initial judgements as more valuable. 
-Previous modelling work has shown that either of these properties is sufficient to produce echo-chamber-like structures in networks wherein individuals increasingly disregard information from those likely to disagree with them \mccorrect{!TODO[citations]}.
+The behavioural experiments in the previous chapter, along with predecessors from others in our lab [@pescetelliRoleDecisionConfidence2021], indicate that people show preferences for selecting advisors who agree with them and treat advice which agrees with their initial judgements as more valuable. 
+Previous modelling work has shown that either of these properties is sufficient to produce echo-chamber-like structures in networks wherein individuals increasingly disregard information from those likely to disagree with them [@pescetelliRoleDecisionConfidence2021; @madsenLargeNetworksRational2018a].
 In this chapter, similar models are constructed, with the parameters controlling the agents' trust updating and advice seeking behaviour based on values fitted to the participants in the behavioural experiments.
 The models indicate that heterogeneity within the population may act as a brake on echo chamber formation, with individuals who are slow to trust or balanced in their advice-seeking behaviour exhibiting less pull towards extremes.
 
@@ -42,9 +42,9 @@ Agent-based models are models in which numerous discrete decision-making agents 
 Unlike typical models, which describe the overall behaviour of the system using equations, in an agent-based model each component agent (taken to represent an atom, a neuron, a starling, a person, etc.) has equations describing its behaviour at each time step.
 Crucially, the equations governing agents' behaviour will have terms relating to other agents, and the outcome of the equations will produce changes in those properties. For example, a neuron might have inputs indicating whether or not a neighbouring neuron is in action potential, and the equations will determine whether or not the neuron itself triggers an action potential. 
 
-Agent-based modelling is a powerful approach, because it can connect system-level phenomena to individuals' decision rules and incorporate individuals with outlying or different decision rules [@bonabeauAgentbasedModelingMethods2002.
+Agent-based modelling is a powerful approach, because it can connect system-level phenomena to individuals' decision rules and incorporate individuals with outlying or different decision rules [@bonabeauAgentbasedModelingMethods2002].
 The power of agent-based modelling also comes with drawbacks [@jonesAgentbasedModellingUse2007]. 
-The intuitive nature of its explanations means that it is easy to lose touch with ecological validity (because even non-ecologically valid implementations seem valid when expressed in agent-based terms) and easy to overclaiming on the basis of results.
+The intuitive nature of its explanations means that it is easy to lose touch with ecological validity (because even non-ecologically valid implementations may seem valid when expressed in agent-based terms) and easy to overclaim on the basis of results.
 The interactivity and emergent behaviours that it produces can mean that some models are unstable: it is important to demonstrate robustness of emergent behaviours by running repeated tests on families of models.
 Furthermore, the dispersed nature of the models means that there are more features to describe; modellers must make sure that the models are precisely specified and that those specifications are shared accurately so that others are able to reproduce and explore the models [@jonesAgentbasedModellingUse2007; @bruchAgentBasedModelsEmpirical2015].
 
@@ -56,12 +56,12 @@ This chapter provides some evidence for this discussion by demonstrating the eff
 ### Similar models in the literature {#ne-i-lit}
 
 The use of agent-based models has increased substantially in many fields in recent decades.
-Rather than attempt to present a full picture of agent-based models in which agents advise one another, this section briefly covers modles that include a tendency for agents to seek out advice from likeminded others and compare the effects of varying this property. 
+Rather than attempt to present a full picture of agent-based models in which agents advise one another, this section briefly covers models that include a tendency for agents to seek out advice from likeminded others and compare the effects of varying this property. 
 Models such as @songDynamicSpiralsPut2017 that include inter-agent influence but no variation in this propensity are not discussed.
 
 @pescetelliRoleDecisionConfidence2021 present a model which is a conceptual predecessor for the current model.
-In their model, agents make a single binary decision at each step on the basis of a perception of the true value and an idiosyncratic (static) bias.
-Agents then consult another agent for advice, and update their final decision by integrating that advice with their own opinion, weighted by the trust they have in their advisor. 
+In this model, agents make a single binary decision at each step on the basis of a perception of the true value and an idiosyncratic (static) bias.
+Agents then consult another agent for advice, and reach a final decision by integrating that advice with their initial estimate, weighted by the trust they have in their advisor. 
 Model parameters varied according to whether or not agents received feedback, and whether or not agents sought out other agents in whom they had higher trust (similar to weighted sampling in our model).
 They showed a cluster of interesting results, starting with the demonstration that using agreement as a proxy for accuracy in the absence of feedback is beneficial provided biases are uncorrelated.
 Secondly, they found that agents' trust weights aggregated into separate camps defined by shared biases where feedback was infrequent.
@@ -76,29 +76,22 @@ Under a range of parameters, at at a range of network sizes from 50 to 1000 agen
 
 ### Current model {#ne-i-model}
 
-The model used here is also underpinned by the update-from-information theoretical approach described above.
-Thus, like in other models, agents interact with one another to share information, process that information differently depending on its source, and refine their opinion of the source from the information provided. 
-
-In the current model, the agents face a perceptual decision in which they integrate sensory evidence with prior expectations in a Bayesian manner to produce an initial decision. 
+In the current model, the agents face a perceptual decision in which they integrate sensory evidence with prior expectations in a Bayesian manner to produce an initial estimate 
 The agents then receive advice from another agent, whom they choose on the basis of their trust in that agent compared to all the other agents combined with their preference for receiving advice from more trusted advisors.
 'Trust' as encapsulated in the model is double-ended: very untrustworthy advisors can give reliable information because they are firmly expected to give the wrong answer (and therefore contain information about the correct answer because the decision is a binary one). 
-The advice is integrated with the initial decision, again in a Bayesian manner, to produce a final decision. 
+The advice is integrated with the initial estimate, again in a Bayesian manner, to produce a final decision. 
 The final decision is used to update the agent's perception of the world and their advisor. 
 The agent's bias drifts towards the final decision answer by weighted averaging, while the trust they have in their advisor increases (or decreases) depending upon whether (or not) the advice is in agreement with the final decision.
 
-The initial decision -- advice -- final decision -- update cycle is repeated thousands of times.
-The models illustrate they dynamics of advice interactions: we can observe how prior expectations change over time and whether and how polarisation or consensuses emerge; and how agents' trust in one another changes as they gain experience with one another.
+The estimate-advice-decision-update cycle is repeated thousands of times.
+The models illustrate the dynamics of advice interactions: how prior expectations change over time and whether and how polarisation or consensuses emerge; and how agents' trust in one another changes as they gain experience with one another.
 
-#### Model development and validation
-
-
-  
 ### Goals of this approach {#ne-i-goals}
 
 There are two parts to the modelling work in this chapter: exploring the characteristics of participants' recovered model parameters; and exploring the effects of those parameters on the dynamics of the agent-based models.
 
 In the first part, models parameters are recovered from the behavioural data for each participant using a gradient descent algorithm.
-The two free parameters estimated during the parameter recovery process are: how rapidly trust updates; and the extent to which more trusted advisors are preferred.
+The two free parameters estimated during the parameter recovery process are: how rapidly trust updates (_trust volatility_); and the extent to which more trusted advisors are preferred (_weighted selection_).
 
 The model and parameter recovery process are both tested using simulation. 
 The parameter recovery process is tested by attempting to recover data from simulated data (where the parameters are know), and shows a reasonable level of accuracy in recovering parameters from data, suggesting that the recovered values for participants are likely to capture some aspects of participants' behaviour on the task.
@@ -138,19 +131,19 @@ can_download_cache <-
   )
   
 must_rerun_models <- 
-  (!is.null(getOption('ESM.recalculate')) && getOption('ESM.recalculate') >= 2) ||
+  ESM.recalculate >= 2 ||
   (!length(list.files(paste0(cacheRoot, '/'), pattern = '.rda')) &&
      !file.exists(paste0(cacheRoot, '.rda')) && !can_download_cache)
 must_rerun_models.emp <- 
-  (!is.null(getOption('ESM.recalculate')) && getOption('ESM.recalculate') >= 2) ||
+  ESM.recalculate >= 2 ||
   (!length(list.files(paste0(cacheRoot, '/emp/'), pattern = '.rda')) &&
      !file.exists(paste0(cacheRoot, '-emp.rda')) && !can_download_cache)
 can_use_cache <- 
-  (is.null(getOption('ESM.recalculate')) || !getOption('ESM.recalculate')) &&
+  !ESM.recalculate &&
   (file.exists(paste0(cacheRoot, '.rda')) || can_download_cache) &&
   !must_rerun_models
 can_use_cache.emp <- 
-  (is.null(getOption('ESM.recalculate')) || !getOption('ESM.recalculate')) &&
+  !ESM.recalculate &&
   (file.exists(paste0(cacheRoot, '-emp.rda')) || can_download_cache) &&
   !must_rerun_models.emp
 
@@ -519,9 +512,9 @@ models.all <- agents.all %>%
 
 Agent-based modelling is used to simulate the interactive effects of repeated paired decision-making.
 The agents in the model perform a cycle of making an initial decision, selecting one of the other agents as an advisor, making a final decision, and updating their trust in their advisor and their internal beliefs about the world.
-The task the agents face is roughly analogous to the task faced by human participants in the Dots Task experiments [§Perceptual decision (Dots Task)](#m-p-dots), where the participants make a decision about which of two rapidly and simultaneously presented grids contained more dots.
+The task the agents face is roughly analogous to the task faced by human participants in the Dots Task experiments ([§Perceptual decision (Dots Task)](#m-p-dots)), where the participants make a decision about which of two rapidly and simultaneously presented grids contained more dots.
 
-Each model consists of a population of agents implementing the same mathematical model of decision-making, trust-updating, and advisor selection, with different coefficients for parameters of that mathematical model (\@ref(tab:nw-r-agent-properties-table)) drawn from appropriate distributions.
+Each model consists of a population of agents implementing the same mathematical model of decision-making, trust-updating, and advisor selection, with different coefficients for parameters of that mathematical model (Table \@ref(tab:nw-r-agent-properties-table)) drawn from appropriate distributions.
 
 ### \OpenScience{materials} Open code
 
@@ -530,7 +523,7 @@ The agent-based modelling is performed using a custom-written R package.
 The functions which implement each of the steps below are listed in the (non-exported) simulation loop function [`simulationStep`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L261). 
 Each of these sub-functions includes unit tests to verify its behaviour.
 For readers who prefer to follow along with code rather than maths, each section below includes details of the function implementing the equations.
-These small functions are not exported by the package, so links are to source-code rather than package documentation.
+These small functions are not exported by the package, so links are to source code rather than package documentation.
 
 ### Model details
 
@@ -545,7 +538,8 @@ When the agent is created, the parameter defining its sensitivity distribution (
 
 #### Creating agents
 
-Each agent has the following properties:
+Each agent has the properties listed in Table \@ref(tab:nw-r-agent-properties-table).
+An agent's values for each of these properties (except id) are created by drawing values from normal distributions defined by parameters in the model settings (Table \@ref(tab:nw-r-model-properties-table)).
 
 ```{r nw-r-agent-properties}
 
@@ -559,13 +553,14 @@ tribble(
   "$\\text{w}^a$", "Extent of agent's preference for trusted advisors", "No",
   "$b^a_t$", "Agent's prior expectation about the task answer", "Yes"
 ) %>%
-  kable(caption = "\\label{tab: nw-r-agent-properties-table}Agent properties")
+  kable(
+    caption = "\\label{tab:nw-r-agent-properties-table}Agent properties",
+    escape = F
+  )
 
 ```
 
-An agent's values for each of these properties (except id) are created by drawing values from normal distributions defined by parameters in the model settings.
-
-Additionally, each agent has a 'trust' in each other agent, ranging from being convinced that the other agent is always correct to being convinced that the other agent is always wrong.
+Additionally, each agent has a 'trust' in each other agent: an estimate of that agent's reliability ranging from being convinced that the other agent is always correct to being convinced that the other agent is always wrong.
 These values are updated at each step and initialised by drawing from a uniform random distribution with limits [0.5, 1].
 
 There is an ongoing debate about whether these kinds of advice models should support expectations of lying. 
@@ -751,14 +746,14 @@ These can be broadly divided into parameters which govern the distributions from
 
 tribble(
   ~ `Property`, ~ `Description`, ~ `Type`,
-  "`n_agents`", "Number of agents to simulate", "model",
-  "`n_steps`", "Number of decisions to simulate", "model",
-  "`decision_flags`", "Binary flags indicating whether trust and/or bias update at each step", "model",
-  "`feedback_probability`", "Probability feedback is provided each step", "model",
-  "`feedback_proportion`", "Proportion of the population receiving feedback when provided", "model",
-  "`random_seed`", "Seed used for the pseudorandom number generator to allow repetition of runs", "model",
-  "`truth_sd`", "Mean, standard deviation for true world values", "model",
-  "`confidence_weighted`", "Whether agents use their own confidence to modify their trust updates", "model",
+  "\\texttt{n\\_agents}", "Number of agents to simulate", "model",
+  "\\texttt{n\\_steps}", "Number of decisions to simulate", "model",
+  "\\texttt{decision\\_flags}", "Binary flags indicating whether trust and/or bias update at each step", "model",
+  "\\texttt{feedback\\_probability}", "Probability feedback is provided each step", "model",
+  "\\texttt{feedback\\_proportion}", "Proportion of the population receiving feedback when provided", "model",
+  "\\texttt{random\\_seed}", "Seed used for the pseudorandom number generator to allow repetition of runs", "model",
+  "\\texttt{truth\\_sd}", "Mean, standard deviation for true world values", "model",
+  "\\texttt{confidence\\_weighted}", "Whether agents use their own confidence to modify their trust updates", "model",
   "$B^\\mu, B^\\sigma$", "Mean, standard deviation of distribution of agents' biases", "agents",
   "$S^\\mu, S^\\sigma$", "Mean, standard deviation of distribution of agents' sensitivities", "agents",
   "$T^\\mu, T^\\sigma$", "Mean, standard deviation of distribution of agents' trust volatilities", "agents",
@@ -766,7 +761,10 @@ tribble(
   "$C^\\mu, C^\\sigma$", "Mean, standard deviation of distribution of agents' confidence scaling", "agents",
   "$W^\\mu, W^\\sigma$", "Mean, standard deviation of distribution of agents' trusted advisor preference", "agents"
 ) %>%
-  kable(caption = "\\label{tab: nw-r-model-properties-table}Model properties")
+  kable(
+    caption = "\\label{tab:nw-r-model-properties-table}Model properties",
+    escape = F
+  )
 
 ```
 
@@ -786,9 +784,10 @@ The exact specification of how these parameters are varied can be seen in the [s
 Many parameters are held constant across runs. 
 Within reasonable tolerances, these parameters do not have substantial effects upon the model dynamics.
 An detailed exploration of the model space is beyond the scope of this work, but all parameters were varied in some way during model development.
-The main parameters which might vary but are held constant are:
+The main parameters which might vary but are held constant are:  
+
 * `feedback_probability` and `feedback_proportion`, which force the agents' biases to remain closer to the optimal value of 0.5.
-The bias reduction effect is as expected from [@haddaraImpactFeedbackPerceptual2020].  
+The bias reduction effect is as expected from @haddaraImpactFeedbackPerceptual2020.  
 * $B^\mu$, which increases polarisation and homophily by separating the mean of the agent groups  
 * $B^\sigma$, which has little effect independent of $B^\mu$, but can increase the frequency of extreme and moderate biases  
 * $S^\mu$ and $S^\sigma$, which interact with `truth_sd` and $C^\mu$, $C^\sigma$ to determine agreement rates given a constant bias, increasing or decreasing the power of weighted sampling to shape network dynamics  
@@ -823,11 +822,21 @@ Overwhelmingly, the fitting error on the shuffled data tended to be higher than 
 Secondly, the fitting error for coefficients based on the participants' data were compared to fitting errors for coefficients fitted to shuffled data. 
 Error values for the shuffled data tended to be higher than values for the original data, suggesting that participants' behaviour shared some features with the model's expectations.
 
+\mccorrect{!TODO[Include graphs to this effect, which we may shove in the appendix later]}
+
 ## Results
+
+### Participants' coefficients
+
+\mccorrect{!TODO[Histogram of coefficients]}
+
+\mccorrect{!TODO[Correlation of trust update and weighted selection]}
+
+\mccorrect{!TODO[Other stuff of interest -- maybe we want to relate the variables to participants' ability to do the task or propensity to pick one advisor over another?]}
 
 ### Validity of the model
 
-```{r  nw-r-bias-evolution, fig.caption="Bias evolution within each model.  Each row of graphs is a family of models, defined by shared settings (burn_in, weighted_selection), and each column is the graph for that family run with the indicated random seed.  Each graph shows the evolution of each agent's bias over time, with agents coloured according to whether their starting bias was less than or greater than 0.5.  The model family key is BI|FS (burn_in = Burn in/Flat start), weighted_sampling (mean (sd)/sampled empirical values).", fig.asp=1.5}
+```{r  nw-r-bias-evolution, fig.caption="Bias evolution within each model.  Each plot shows a model run with a different combination of starting trust weights and weighted selection values. Each line shows the bias of a single agent, coloured according to whether the agent's starting bias was more or less than 0.5. In the Evolved weights graphs the evolution period prior to biases being allowed to shift is truncated (and marked with grey shading)."}
 # Plot bias evolution
 agents.all %>%
   filter(decision > -100, random_seed == min(random_seed)) %>%
@@ -835,11 +844,12 @@ agents.all %>%
   geom_rect(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf, fill = 'grey95', colour = NA) +
   geom_line(alpha = .2) +
   scale_y_continuous(limits = 0:1, breaks = c(0, .5, 1)) +
-  facet_grid(weighted_sampling ~ trust_weights)
+  facet_grid(weighted_sampling ~ trust_weights) +
+  theme(aspect.ratio = 1/3, strip.text.y = element_text(angle = 0))
 
 ```
 
-```{r nw-r-weight-distribution, fig.caption="Distribution of final weights for each model.  Each row of graphs is a family of models, defined by shared settings (burn_in, weighted_selection), and each column is the graph for that family run with the indicated random seed.  Each graph is a histogram of the agents' final trust weights.  The model family key is BI|FS (burn_in = Burn in/Flat start), weighted_sampling (mean (sd)/sampled empirical values).", fig.asp=1.5}
+```{r nw-r-weight-distribution, fig.caption="Distribution of final weights for each model.  Each plot shows a model run with a different combination of starting trust weights and weighted selection values."}
 # Plot final weights
 agents.all %>%
   nest(d = -c(trust_weights, weighted_sampling, random_seed, model_num)) %>%
@@ -859,11 +869,12 @@ agents.all %>%
   ggplot(aes(x = weight)) +
   geom_histogram(binwidth = .01) +
   scale_x_continuous(breaks = c(0, .5, 1)) +
-  facet_grid(weighted_sampling ~ trust_weights)
+  facet_grid(weighted_sampling ~ trust_weights) +
+  theme(aspect.ratio = 1/3, strip.text.y = element_text(angle = 0))
 
 ```
 
-```{r nw-r-weight-by-bias-evolution, fig.caption="Shared bias-weight correlation evolution for each model.  Each row of graphs is a family of models, defined by shared settings (burn_in, weighted_selection), and each column is the graph for that family run with the indicated random seed.  Each graph shows the mean correlation between shared weight between agents and trust weights at each decision.  The model family key is BI|FS (burn_in = Burn in/Flat start), weighted_sampling (mean (sd)/sampled empirical values).", fig.asp=1.5}
+```{r nw-r-weight-by-bias-evolution, fig.caption="Shared bias-weight correlation evolution for each model.  Each plot shows a model run with a different combination of starting trust weights and weighted selection values. Each graph shows the mean correlation between shared weight between agents and trust weights at each decision."}
 # Plot the correlation between shared bias and weight over time
 agents.all %>%
   filter(random_seed == min(random_seed)) %>%
@@ -887,7 +898,8 @@ agents.all %>%
   geom_errorbar(aes(ymin = ciL, ymax = ciH)) +
   geom_path(aes(y = r, colour = p < .05)) +
   scale_y_continuous(limits = c(NA, 1), breaks = c(0, .5, 1)) +
-  facet_grid(weighted_sampling ~ trust_weights)
+  facet_grid(weighted_sampling ~ trust_weights) +
+  theme(aspect.ratio = 1/3, strip.text.y = element_text(angle = 0))
 
 ```
 
@@ -915,7 +927,7 @@ Secondly, agents develop greater trust in agents who share their bias.
 
 ### Consistency of the models
 
-Each model was run `r length(unique(agents$random_seed))` times with different random seeds to check which features were consistent across runs. 
+Each model was run `r length(unique(agents$random_seed))` times with different random seeds to check which features were consistent across runs, indicating the level of stochastic uncertainty [@bruchAgentBasedModelsEmpirical2015]. 
 The features described above were all consistent across runs, as can be seen by observing the minimal variability within rows in Figures \mccorrect{!TODO[link figures]}.
 
 For parameter sets in which all agents' biases tend towards the same extreme, which extreme was favoured varied according to the random seed used. 
@@ -934,7 +946,8 @@ Where a burn-in period is present, a large proportion of the agents occupy unsta
 
 ### Analysis of all models
 
-```{r nw-r-all-models-summary, fig.caption="Model final decision group ratio and mean final bias magnitude.  Each model is represented by a single line. Some models have no group ratio because there is only one group at the final decision (because all agents in the model have the same direction of bias), which means that the ratio of weights is undefined."}
+```{r nw-r-all-models-summary, fig.caption="Model final decision group ratio and mean final bias magnitude.  Each model is represented by a single line. Some models have no group ratio because there is only one group at the final decision (because all agents in the model have the same direction of bias), which means that the ratio of weights is undefined.", warning=FALSE}
+# warning=FALSE here because some values of group_ratio_empirical are undefined
 ggs <- list()
 
 ggs[[1]] <- models.all %>%
@@ -1082,13 +1095,14 @@ The model presented here could be considered a model of any and all of these pro
 The modelling work in this chapter follows the recommendations of @bruchAgentBasedModelsEmpirical2015, who suggest that modelling is best used to characterise the effects on system dynamics of a particular effect derived from empirical observation, and @jacksonAgentBasedModelingGuide2017, who advocate for simplicity where possible. 
 Consequently, many decision-making and advice-taking phenomena reported in the literature are left out.
 @eastImprovingAgentbasedModels2016 argue that an agent-based model only achieves sufficiency by including "all relevant processes and conditions". 
-To allow the reader to determine whether the omissions are important, here is the list of omitted phenomena and features:
+To allow the reader to determine whether the omissions are important, here is the list of omitted phenomena and features:  
+
 * Agents don't know or care what happens to their advice  
-  * Agents don't try to make their advice more paletable/be selected more [@hertzNeuralComputationsUnderpinning2017]
+  * Agents don't try to make their advice more paletable/be selected more [@hertzNeuralComputationsUnderpinning2017]  
 * Advice is absolute, doesn't include confidence  
 * Agents basically use advice rationally  
   * No explicit modelling of confirmation bias beyond the Bayes  
-  * No overuse (intentional - dietvorstIntentionallyBiasedPeople2019 - or otherwise) of advice
+  * No overuse (intentional - dietvorstIntentionallyBiasedPeople2019 - or otherwise) of advice  
   
 #### Paths not taken
 

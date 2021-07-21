@@ -67,6 +67,10 @@ knitr::opts_chunk$set(
   messages = F
 )
 
+# Options -----------------------------------------------------------------
+
+ESM.recalculate <- 
+  if (is.null(getOption('ESM.recalculate'))) 0 else getOption('ESM.recalculate')
 
 # Plot theme --------------------------------------------------------------
 
