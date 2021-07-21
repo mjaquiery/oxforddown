@@ -111,7 +111,7 @@ The Empirical model selects values from those observed in the recovered paramete
 For the first three models, trust update values are sampled from a distribution with the mean and standard deviation of the recovered parameters, while in the Empirical model the agents receive the trust update value for the agent whose preference strength coefficient they received.
 Two versions of each model are run, one which starts with a random trust network and one which starts with a homophilic trust network.
 
-```{r nw-r-run-basic, include = F}
+```{r nw-m-run-basic, include = F}
 
 #' Note:
 #' these blocks which run models take 5-10 minutes/model to run. For 40 models,
@@ -263,7 +263,7 @@ if (must_rerun_models) {
 }
 ```
 
-```{r nw-r-load-basic, include = F}
+```{r nw-m-load-basic, include = F}
 t1 <- Sys.time()
 fName <- paste0(cacheRoot, '.rda')
 if (can_use_cache) {
@@ -320,7 +320,7 @@ agents <- agents %>%
 Sys.time() - t1
 ```
 
-```{r nw-r-run-empirical, include = F}
+```{r nw-m-run-empirical, include = F}
 
 if (must_rerun_models.emp) {
   load('cache/thesis-parameter-estimation.rda')
@@ -405,7 +405,7 @@ if (must_rerun_models.emp) {
 }
 ```
 
-```{r nw-r-load-empirical, include = F}
+```{r nw-m-load-empirical, include = F}
 t1 <- Sys.time()
 fName <- paste0(cacheRoot, '-emp.rda')
 if (can_use_cache.emp) {
@@ -454,7 +454,7 @@ if (can_use_cache.emp) {
 Sys.time() - t1
 ```
 
-```{r nw-r-bind, include = F}
+```{r nw-m-bind, include = F}
 agents.all <- bind_rows(
   agents, 
   agents.emp %>% mutate(model_num = model_num + max(agents$model_num))
@@ -514,7 +514,7 @@ Agent-based modelling is used to simulate the interactive effects of repeated pa
 The agents in the model perform a cycle of making an initial decision, selecting one of the other agents as an advisor, making a final decision, and updating their trust in their advisor and their internal beliefs about the world.
 The task the agents face is roughly analogous to the task faced by human participants in the Dots Task experiments ([§Perceptual decision (Dots Task)](#m-p-dots)), where the participants make a decision about which of two rapidly and simultaneously presented grids contained more dots.
 
-Each model consists of a population of agents implementing the same mathematical model of decision-making, trust-updating, and advisor selection, with different coefficients for parameters of that mathematical model (Table \@ref(tab:nw-r-agent-properties-table)) drawn from appropriate distributions.
+Each model consists of a population of agents implementing the same mathematical model of decision-making, trust-updating, and advisor selection, with different coefficients for parameters of that mathematical model (Table \@ref(tab:nw-m-agent-properties-table)) drawn from appropriate distributions.
 
 ### \OpenScience{materials} Open code
 
@@ -527,7 +527,7 @@ These small functions are not exported by the package, so links are to source co
 
 ### Model details
 
-Each model is defined by a set of model parameters (\@ref(tab:nw-r-model-properties-table)), which are assigned capital letters in the equations below. 
+Each model is defined by a set of model parameters (\@ref(tab:nw-m-model-properties-table)), which are assigned capital letters in the equations below. 
 These parameters are used to generate further parameters which govern agents' tendencies, and these are assigned lower-case letters and superscripted with the agent to whom they belong. 
 Variables which change over the course of the model have a subscript indicating which step of the model they belong to.
 
@@ -538,10 +538,10 @@ When the agent is created, the parameter defining its sensitivity distribution (
 
 #### Creating agents
 
-Each agent has the properties listed in Table \@ref(tab:nw-r-agent-properties-table).
-An agent's values for each of these properties (except id) are created by drawing values from normal distributions defined by parameters in the model settings (Table \@ref(tab:nw-r-model-properties-table)).
+Each agent has the properties listed in Table \@ref(tab:nw-m-agent-properties-table).
+An agent's values for each of these properties (except id) are created by drawing values from normal distributions defined by parameters in the model settings (Table \@ref(tab:nw-m-model-properties-table)).
 
-```{r nw-r-agent-properties}
+```{r nw-m-agent-properties}
 
 tribble(
   ~ `Property`, ~ `Description`, ~ `Updates each step`,
@@ -554,7 +554,7 @@ tribble(
   "$b^a_t$", "Agent's prior expectation about the task answer", "Yes"
 ) %>%
   kable(
-    caption = "\\label{tab:nw-r-agent-properties-table}Agent properties",
+    caption = "\\label{tab:nw-m-agent-properties-table}Agent properties",
     escape = F
   )
 
@@ -742,7 +742,7 @@ Trust updates are accomplished using the [`newWeightsByDrift`](https://github.co
 The models have a large number of parameters.
 These can be broadly divided into parameters which govern the distributions from which the agents' parameters are drawn, and parameters which define the operation of the model.
 
-```{r  nw-r-model-properties}
+```{r  nw-m-model-properties}
 
 tribble(
   ~ `Property`, ~ `Description`, ~ `Type`,
@@ -752,7 +752,7 @@ tribble(
   "\\texttt{feedback\\_probability}", "Probability feedback is provided each step", "model",
   "\\texttt{feedback\\_proportion}", "Proportion of the population receiving feedback when provided", "model",
   "\\texttt{random\\_seed}", "Seed used for the pseudorandom number generator to allow repetition of runs", "model",
-  "\\texttt{truth\\_sd}", "Mean, standard deviation for true world values", "model",
+  "\\texttt{truth\\_sd}", "Standard deviation for true world values", "model",
   "\\texttt{confidence\\_weighted}", "Whether agents use their own confidence to modify their trust updates", "model",
   "$B^\\mu, B^\\sigma$", "Mean, standard deviation of distribution of agents' biases", "agents",
   "$S^\\mu, S^\\sigma$", "Mean, standard deviation of distribution of agents' sensitivities", "agents",
@@ -762,7 +762,7 @@ tribble(
   "$W^\\mu, W^\\sigma$", "Mean, standard deviation of distribution of agents' trusted advisor preference", "agents"
 ) %>%
   kable(
-    caption = "\\label{tab:nw-r-model-properties-table}Model properties",
+    caption = "\\label{tab:nw-m-model-properties-table}Model properties",
     escape = F
   )
 
@@ -772,7 +772,8 @@ These parameters can be seen in full by inspecting the parameters for the [`runS
 
 #### Parameters varied between model runs
 
-There are three parameters which are varied between runs:
+There are three parameters which are varied between runs:  
+
 * $B^\sigma$, the standard deviation of the agents' biases
 * `decision_flags`, whether or not there is time for the random network weights to update before agents' biases begin to update
 * $W^\mu, W^\sigma$, the agents' weighted selection values
@@ -787,11 +788,11 @@ An detailed exploration of the model space is beyond the scope of this work, but
 The main parameters which might vary but are held constant are:  
 
 * `feedback_probability` and `feedback_proportion`, which force the agents' biases to remain closer to the optimal value of 0.5.
-The bias reduction effect is as expected from @haddaraImpactFeedbackPerceptual2020.  
-* $B^\mu$, which increases polarisation and homophily by separating the mean of the agent groups  
-* $B^\sigma$, which has little effect independent of $B^\mu$, but can increase the frequency of extreme and moderate biases  
-* $S^\mu$ and $S^\sigma$, which interact with `truth_sd` and $C^\mu$, $C^\sigma$ to determine agreement rates given a constant bias, increasing or decreasing the power of weighted sampling to shape network dynamics  
-* $\Lambda ^\mu$ and $\Lambda ^\sigma$, which increase the speed of the network dynamics (so that similar trajectories occur over fewer generations)  
+The bias reduction effect is as expected from @haddaraImpactFeedbackPerceptual2020.
+* $B^\mu$, which increases polarisation and homophily by separating the mean of the agent groups
+* $B^\sigma$, which has little effect independent of $B^\mu$, but can increase the frequency of extreme and moderate biases
+* $S^\mu$ and $S^\sigma$, which interact with `truth_sd` and $C^\mu$, $C^\sigma$ to determine agreement rates given a constant bias, increasing or decreasing the power of weighted sampling to shape network dynamics
+* $\Lambda ^\mu$ and $\Lambda ^\sigma$, which increase the speed of the network dynamics (so that similar trajectories occur over fewer generations)
 * and `confidence_weighted`, which decreases the speed of the network dynamics.
 
 It is plausible that there are interactions between these and other model parameters that were not detected during model development. 
@@ -827,6 +828,9 @@ Error values for the shuffled data tended to be higher than values for the origi
 ## Results
 
 ### Participants' coefficients
+
+The mathematical model was fit to participant each participant's data using a gradient descent algorithm.
+The resulting coefficients can be seen in 
 
 \mccorrect{!TODO[Histogram of coefficients]}
 
@@ -915,13 +919,13 @@ Secondly, agents develop greater trust in agents who share their bias.
 
 #### Homophily
 
-* Burn-in time also leads to more dichotomous final networks (captured by group ratio where that number is defined). 
+* Burn-in time also leads to more dichotomous final networks (captured by group ratio where that number is defined).
   * This effect is most clearly seen where networks diverge after biases are allowed to vary.
 
 #### Effect of weighted selection
 
 * Weighted selection increases the likelihood agents select similarly-minded agents for their advisors (or dissimilarly-minded if the coefficient is negative).
-  * Its effects on bias dynamics can be chaotic. 
+  * Its effects on bias dynamics can be chaotic.
   * Without burn-in it allows individuals, or small clusters, to resist an emerging consensus.
   * Where burn-in allows homophily to emerge before biases update, weighted selection accelerates polarisation.
 
@@ -1074,6 +1078,7 @@ There are several considerations which should be borne in mind while interpretin
 These considerations fall into several different categories, from technical constraints to limitations on generalisability.
 
 #### Context
+
 Polarisation and homophily are not inherently bad features.
 In some discussions (e.g. debates about whether slave ownership is morally permissable) we can be glad that near-universal opinion reigns on the issue, despite its once being a contested issue.
 In others (e.g. discussion concerning the extent to which the state should be involved in individuals' lives) it is helpful to have a range of opinion to maintain the diversity of approaches \mccorrect{!TODO[Cite Guns, Germs, and Steel or one of its references on balance of homogeneity/heterogeneity]}.
@@ -1084,25 +1089,33 @@ Contexts for mathematically similar models have included \mccorrect{!TODO[explai
 The model presented here could be considered a model of any and all of these processes, despite their obvious differences, and the implications may be considered beneficial in some cases and harmful in others.
 
 #### Generalisabilty
-* Real people probably don't polarise as much as all this! (Sunder Katwala on opinion bell curves/most people are moderates)
 
-* The parameters we 'recover' might not be stable features of individuals  
-  * (can we do a comparison of variability for participants who saw multiple pairs of advisors?) 
-  * This is what @bruchAgentBasedModelsEmpirical2015 would term 'input uncertainty'  
-* Even if they are stable, they are unlikely to be on the same scale as the rest of the network stuff  
+* Real people probably don't polarise as much as all this! (Sunder Katwala on opinion bell curves/most people are moderates)
+* The parameters we 'recover' might not be stable features of individuals
+  * (can we do a comparison of variability for participants who saw multiple pairs of advisors?)
+  * This is what @bruchAgentBasedModelsEmpirical2015 would term 'input uncertainty'
+* Even if they are stable, they are unlikely to be on the same scale as the rest of the network stuff
 
 #### Known psychological aspects which are left out
 The modelling work in this chapter follows the recommendations of @bruchAgentBasedModelsEmpirical2015, who suggest that modelling is best used to characterise the effects on system dynamics of a particular effect derived from empirical observation, and @jacksonAgentBasedModelingGuide2017, who advocate for simplicity where possible. 
 Consequently, many decision-making and advice-taking phenomena reported in the literature are left out.
 @eastImprovingAgentbasedModels2016 argue that an agent-based model only achieves sufficiency by including "all relevant processes and conditions". 
-To allow the reader to determine whether the omissions are important, here is the list of omitted phenomena and features:  
+To allow the reader to determine whether the omissions are important, this section briefly covers those aspects which are left out of the models.  
 
-* Agents don't know or care what happens to their advice  
-  * Agents don't try to make their advice more paletable/be selected more [@hertzNeuralComputationsUnderpinning2017]  
-* Advice is absolute, doesn't include confidence  
-* Agents basically use advice rationally  
-  * No explicit modelling of confirmation bias beyond the Bayes  
-  * No overuse (intentional - dietvorstIntentionallyBiasedPeople2019 - or otherwise) of advice  
+Advice in the models, as in the experiments, is a one-way transaction. 
+The agents giving advice are unaffected by having given the advice, except by the roundabout route of potentially causing other agents to give advice in the future which is likely to make them appear trustworthy to the agent. 
+This means that there is no deliberate reciprocity to advice-seeking behaviours [@mahmoodiEqualityBiasImpairs2015], and agents do not alter their advice to appear more paletable to others or so that they are selected as advisors more frequently [@hertzNeuralComputationsUnderpinning2017; @hertzIntrinsicValueSocial2018].
+
+Advice is given as an absolute recommendation, as in the Dot task experiments for which the model task in an analogue.
+This means that \mccorrect{!TODO[does this actually have a relevant implication?]}
+
+The agents use advice rationally, given their estimation of the trustworthiness of their advisor.
+A plethora of research has shown that people do not do this in practice.
+Most research has documented processes which result in the underweighting of advice [e.g. @yanivAdviceTakingDecision2000 and many others], while some has indicated conditions under which people are over-reliant on advice [@schultzeInabilityIgnoreUseless2017; @dietvorstIntentionallyBiasedPeople2019].
+This literature is reviewed in the chapter on the [Context of Advice](#chapter-context).  
+
+* Agents don't have a drive for novelty \mccorrect{!TODO[Cite something about the attractiveness of novelty for humans; talk about people perhaps picking randomly where they don't have a preference?]}
+* Agents don't get bored with the task \mccorrect{!TODO[Something on attentional effects in psychophysics/cognitive tasks]}
   
 #### Paths not taken
 
@@ -1120,21 +1133,32 @@ Thirdly, using non-fully-connected structures with trust weight updating would m
 These issues, and similar questions about whether new connections and/or dropped connections ought to prompt reciprocal connections create a fascinating but extremely large problem space.
 Lastly, using non-fully-connected networks means that it becomes important to understand how an agent's position within the network affects their behaviour [@mcclainPathwayForwardsSocial2016], which requires a full investigation beyond the scope of this thesis.
 
-* Normalisation of trust weights or decay of trust over time  
+Another implementation question concerns the behaviour of trust weights for non-selected advisors.
+In the current model, trust weights for an advisor do not change unless advice is received from that advisor.
+This is not the only approach.
+An alternate valid approach would be implementing a small decay of trust over time towards a default value, although because only one advisor is selected at each step this can quite rapidly remove most trust information from the model.
+A different alternative would be normalisation of trust weights such that the sum of an agent's  trust weights for all their advisors remains constant.
+This would mean that as an advisor becomes more trustworthy they slightly decrease the trust weights for other advisors (either proportionally or equally).
+In practice this happens in the current model for the likelihood that advisors are selected (based on trust weights and preference strength for more trusted advisors), but not with the trust weights themselves.
+Whether or not increased trust in one advisor diminishes trust in other advisors is an empirical question (and may change based on context), but we do not expect the results of the model would be substantially different if trust weights were updated in this way.
     
-#### Differences between experiments and models
-* Picking between one and many is definitely not the same  
+#### Differences between experiments and model
+
+For the most part, the task in the model was analogous to that facing the participants in the Dots task experiments. 
+The key difference in task terms was in the choice of advisor.
+Participants in the experiments were offered a choice of two advisors (with whom they had recently had blocked practice), whereas agents in the model chose freely from all other agents in the model and begin with a knowledge of how trustworthy they consider each of those potential advisors.
 
 #### Technical constraints
-* Parameter space is huge and dynamics dependent upon parameter interactions  
-  * Models are time-consuming to run (even with key components written in C++)  
-  * This is what @bruchAgentBasedModelsEmpirical2015 call 'model uncertainty' and we did try to reduce it a bit by exploring different stuff in development, but ultimately it's a computational resources issue  
-* Some models are pretty huge (n ~ 2000 is common). These are smaller to remain computationally tractable and because 100 is enough to see the phenomena we wish to model.  
-  * It would be possible to extend the models, but the very large models have to run extremely slowly for computational tractability reasons (write to disk rather than storing in RAM; could be rewritten but n ~ 100 was part of the original design hence why they are how they are).  
 
-* Basically, this is all illustration and you can't lean on it too heavily   
+* Parameter space is huge and dynamics dependent upon parameter interactions
+  * Models are time-consuming to run (even with key components written in C++)
+  * This is what @bruchAgentBasedModelsEmpirical2015 call 'model uncertainty' and we did try to reduce it a bit by exploring different stuff in development, but ultimately it's a computational resources issue
+* Some models are pretty huge (n ~ 2000 is common). These are smaller to remain computationally tractable and because 100 is enough to see the phenomena we wish to model.
+  * It would be possible to extend the models, but the very large models have to run extremely slowly for computational tractability reasons (write to disk rather than storing in RAM; could be rewritten but n ~ 100 was part of the original design hence why they are how they are).
+* Basically, this is all illustration and you can't lean on it too heavily
 
 ## How to choose an examiner
+
 * You want them to read your thesis because...  
   * You want their insight about some aspect  
   * You want to impress them  
