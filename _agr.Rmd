@@ -848,7 +848,7 @@ kable(agr.table, caption = "\\label{tab:ac-agr-dates-m-profiles}Advisor advice p
 
 ##### Exclusions
 
-```{rac-agr-dates-r-clean}
+```{r ac-agr-dates-r-clean}
 maxTrialRT <- 60000   # trials take < 1 minute
 minTrials <- 11       # at least 11 trials completed
 minChangeRate <- .1   # some advice taken on 10%+ of trials
@@ -889,7 +889,7 @@ Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded,
 
 ##### Task performance
 
-```{rac-agr-dates-r-performance}
+```{r ac-agr-dates-r-performance}
 
 Familiarization <- AdvisedTrial %>%
   filter(is.na(advisorChoice) | !advisorChoice) %>%

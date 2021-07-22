@@ -10,7 +10,7 @@ The ability to distinguish between accurate advisors in these experiments is imp
 
 ### Dots Task {#ac-acc-dots}
 
-```{r ac-acc-dots-load include = F}
+```{r ac-acc-dots-load, include = F}
 
 select_experiment(
   project = 'dotstask',

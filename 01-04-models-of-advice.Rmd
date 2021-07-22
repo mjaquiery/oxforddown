@@ -19,6 +19,9 @@ params:
 ```{r setup 01-04, echo = F, include = F}
 source('scripts_and_filters/general_setup.R')
 library(adviseR)
+library(broom)
+library(ggtext)
+library(ggpp)
 library(igraph)
 library(BayesFactor)
 library(magrittr)
@@ -110,6 +113,40 @@ The Heterogeneous model draws values from a distribution defined by the mean and
 The Empirical model selects values from those observed in the recovered parameter data (with replacement).
 For the first three models, trust update values are sampled from a distribution with the mean and standard deviation of the recovered parameters, while in the Empirical model the agents receive the trust update value for the agent whose preference strength coefficient they received.
 Two versions of each model are run, one which starts with a random trust network and one which starts with a homophilic trust network.
+
+```{r nw-m-run-fitting, include = F}
+t1 <- Sys.time()
+# !TODO[Change this to link to Zenodo version when uploaded]
+fName <- "cache/thesis-parameter-estimation.rda"
+fURL <- "https://sandbox.zenodo.org/record/885781/files/thesis-parameter-estimation.rda?download=1"
+can_download_pe <- 
+  tryCatch(attr(curlGetHeaders(fURL, timeout = 5), 'status') == 200)
+must_rerun_pe <- 
+  ESM.recalculate >= 3 || 
+  (!file.exists(fName) && !can_download_pe)
+
+if (must_rerun_pe) {
+  source("https://raw.githubusercontent.com/oxacclab/arc_thesis-parameter-estimation/master/parameterRecovery.R")
+  parameterRecovery(
+    savePath = fName,
+    nShuffles = 9,
+    fixedParameters = c(NA, NA),
+    customFilter = \(x) x,
+    nCores = parallel::detectCores(),
+    installPackages = FALSE,
+    verbosity = 2
+  )
+} else {
+  if (!file.exists(fName)) {
+    curl::curl_download(fURL, fName)
+  }
+}
+
+load(fName)
+
+print("Parameter fit data ready.")
+Sys.time() - t1
+```
 
 ```{r nw-m-run-basic, include = F}
 
@@ -780,7 +817,7 @@ There are three parameters which are varied between runs:
 
 The exact specification of how these parameters are varied can be seen in the [source code for this document](https://github.com/mjaquiery/oxforddown/blob/dockertest/03-01-network-effects.Rmd) \mccorrect{Zenodo thesis code when it's all working}.
 
-#### Constant parameters
+#### Constant parameters {#nw-m-constant-parameters}
 
 Many parameters are held constant across runs. 
 Within reasonable tolerances, these parameters do not have substantial effects upon the model dynamics.
@@ -829,12 +866,110 @@ Error values for the shuffled data tended to be higher than values for the origi
 
 ### Participants' coefficients
 
+```{r nw-r-pe-hist, fig.caption="Histograms of recovered parameters."} 
+
+recovered_parameters %>%
+  select(uid, `Weighted selection` = ws_end, `Trust volatility` = tu_end) %>%
+  pivot_longer(-uid, values_to = "Coefficient") %>%
+  ggplot(aes(x = Coefficient)) +
+  geom_histogram(bins = 200) +
+  facet_wrap(~name, scales = "free_x")
+
+```
+```{r nw-r-pe-cor, fig.caption="Correlation of recovered parameters.  Two outliers with extremely low trust volatility values (z < -5) have been dropped, and are shown on the inset plot for context. Each point is a participant, and the solid blue line shows the overall relationship (with 95% confidence intervals shaded in grey). The formula for the line is given in the top-left. Dashed line indicates a 1:1 correlation."} 
+
+tmp.full <- recovered_parameters %>%
+  select(uid, ends_with("_end")) %>%
+  mutate(
+    `z(Weighted selection)` = scale(ws_end), 
+    `z(Trust volatility)` = scale(tu_end)
+  )
+
+tmp <- tmp.full %>%
+  filter(`z(Trust volatility)` > -5) 
+
+x <- lm(`z(Weighted selection)` ~ `z(Trust volatility)`, data = tmp)
+r <- glue(
+  "y = {a}{round(d$estimate[2], 2)}{a}x + {b}{round(d$estimate[1], 2)}{b}",
+  "; adj R^2 = {round(g$adj.r.squared, 3)}",
+  d = tidy(x),
+  g = glance(x),
+  a = ifelse(d$p.value[2] < .05, '**', ''),
+  b = ifelse(d$p.value[1] < .05, '**', '')
+)
+
+x.full <- lm(`z(Weighted selection)` ~ `z(Trust volatility)`, data = tmp.full)
+r.full <- glue(
+  "y = {a}{round(d$estimate[2], 2)}{a}x + {b}{round(d$estimate[1], 2)}{b}",
+  "; adj R^2 = {round(g$adj.r.squared, 3)}",
+  d = tidy(x.full),
+  g = glance(x.full),
+  a = ifelse(d$p.value[2] < .05, '**', ''),
+  b = ifelse(d$p.value[1] < .05, '**', '')
+)
+
+full <- tmp.full %>%
+  ggplot(aes(y = `z(Trust volatility)`, x = `z(Weighted selection)`)) +
+  geom_rect(
+    fill = "grey95", colour = NA, 
+    xmin = -Inf, ymin = -Inf, xmax = Inf, ymax = -5
+  ) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+  geom_smooth(method = 'lm', formula = y ~ x) +
+  geom_point(alpha = .1) +
+  geom_point(
+    colour = "red", 
+    data = filter(tmp.full, `z(Trust volatility)` < -5)
+  ) +
+  annotate(
+    geom = 'richtext', 
+    label = r.full, 
+    y = -15, 
+    x = mean(range(tmp.full$`z(Weighted selection)`)),
+    vjust = .5, 
+    hjust = .5,
+    fill = NA
+  ) +
+  theme(
+    text = element_blank(), 
+    axis.line = element_blank(),
+    axis.ticks = element_blank(),
+    plot.background = element_rect(
+      colour = "black", size = 1
+    )
+  )
+
+tmp %>%
+  ggplot(aes(y = `z(Trust volatility)`, x = `z(Weighted selection)`)) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+  geom_smooth(method = 'lm', formula = y ~ x) +
+  geom_point(alpha = .1) +
+  annotate(
+    geom = 'richtext', 
+    label = r, 
+    y = max(tmp$`z(Trust volatility)`), 
+    x = min(tmp$`z(Weighted selection)`),
+    vjust = 1, 
+    hjust = 0,
+    fill = NA
+  ) +
+  coord_fixed() +
+  scale_y_continuous(limits = c(-5, NA)) +
+  annotate(
+    geom = 'plot', 
+    label = full, 
+    x = 2.5, 
+    y = -5, 
+    vjust = 0, 
+    hjust = .5, 
+    vp.height = .5
+  )
+
+```
+
 The mathematical model was fit to participant each participant's data using a gradient descent algorithm.
-The resulting coefficients can be seen in 
-
-\mccorrect{!TODO[Histogram of coefficients]}
-
-\mccorrect{!TODO[Correlation of trust update and weighted selection]}
+The resulting coefficients were clustered close to zero for most participants, with a roughly gaussian distribution, as shown in Figure \@ref(fig:nw-r-pe-hist).
+There was a slight correlation between trust volatility and weighted selection, though this was only significant when excluding two participants with outlying trust volatility coefficients (Figure \@ref(fig:nw-r-pe-cor)).
 
 \mccorrect{!TODO[Other stuff of interest -- maybe we want to relate the variables to participants' ability to do the task or propensity to pick one advisor over another?]}
 
@@ -849,6 +984,36 @@ agents.all %>%
   geom_line(alpha = .2) +
   scale_y_continuous(limits = 0:1, breaks = c(0, .5, 1)) +
   facet_grid(weighted_sampling ~ trust_weights) +
+  theme(aspect.ratio = 1/3, strip.text.y = element_text(angle = 0))
+
+```
+
+
+```{r nw-r-weight-by-bias-evolution, fig.caption="Shared bias-weight correlation evolution for each model.  Each plot shows a model run with a different combination of starting trust weights and weighted selection values. Each graph shows the mean correlation between shared weight between agents and trust weights at each decision."}
+# Plot the correlation between shared bias and weight over time
+agents.all %>%
+  filter(random_seed == min(random_seed)) %>%
+  nest(d = -c(trust_weights, weighted_sampling, model_num, burnIn, random_seed)) %>%
+  mutate(cors = map(
+    model_num, 
+    function(.x) {
+      gs <- graphs.all[[.x]]
+      m <- list(
+        model = list(graphs = gs), 
+        parameters = list(n_decisions = length(gs))
+      )
+      adviseR:::.biasCorrelation(m)
+    }
+  )) %>%
+  unnest(cols = cors) %>%
+  mutate(decision = ifelse(burnIn, decision - nBI, decision)) %>%
+  ggplot(aes(x = decision)) +
+  geom_rect(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf, fill = 'grey95') +
+  geom_hline(yintercept = 0, linetype = 'dashed') +
+  geom_errorbar(aes(ymin = ciL, ymax = ciH)) +
+  geom_path(aes(y = r, colour = p < .05)) +
+  scale_y_continuous(limits = c(NA, 1), breaks = c(0, .5, 1)) +
+  facet_grid(weighted_sampling ~ trust_weights, scales = "free_x") +
   theme(aspect.ratio = 1/3, strip.text.y = element_text(angle = 0))
 
 ```
@@ -878,79 +1043,8 @@ agents.all %>%
 
 ```
 
-```{r nw-r-weight-by-bias-evolution, fig.caption="Shared bias-weight correlation evolution for each model.  Each plot shows a model run with a different combination of starting trust weights and weighted selection values. Each graph shows the mean correlation between shared weight between agents and trust weights at each decision."}
-# Plot the correlation between shared bias and weight over time
-agents.all %>%
-  filter(random_seed == min(random_seed)) %>%
-  nest(d = -c(trust_weights, weighted_sampling, model_num, burnIn, random_seed)) %>%
-  mutate(cors = map(
-    model_num, 
-    function(.x) {
-      gs <- graphs.all[[.x]]
-      m <- list(
-        model = list(graphs = gs), 
-        parameters = list(n_decisions = length(gs))
-      )
-      adviseR:::.biasCorrelation(m)
-    }
-  )) %>%
-  unnest(cols = cors) %>%
-  mutate(decision = ifelse(burnIn, decision - nBI, decision)) %>%
-  ggplot(aes(x = decision)) +
-  geom_rect(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf, fill = 'grey95') +
-  geom_hline(yintercept = 0, linetype = 'dashed') +
-  geom_errorbar(aes(ymin = ciL, ymax = ciH)) +
-  geom_path(aes(y = r, colour = p < .05)) +
-  scale_y_continuous(limits = c(NA, 1), breaks = c(0, .5, 1)) +
-  facet_grid(weighted_sampling ~ trust_weights) +
-  theme(aspect.ratio = 1/3, strip.text.y = element_text(angle = 0))
 
-```
-
-The model reproduces key effects of interest. 
-Firstly, agents reinforce one another's biases, leading to the emergence of extreme biases.
-Secondly, agents develop greater trust in agents who share their bias.
-
-#### Emergence of extreme biases
-
-* Where there is a burn-in time, the population usually polarises quickly to opposite extremes when biases are allowed to vary.
-  * Without burn-in, the tendency is for the whole network to collapse on one or other extreme.
-  * (Not shown) high levels of feedback can prevent this collapse.
-
-#### Homophily
-
-* Burn-in time also leads to more dichotomous final networks (captured by group ratio where that number is defined).
-  * This effect is most clearly seen where networks diverge after biases are allowed to vary.
-
-#### Effect of weighted selection
-
-* Weighted selection increases the likelihood agents select similarly-minded agents for their advisors (or dissimilarly-minded if the coefficient is negative).
-  * Its effects on bias dynamics can be chaotic.
-  * Without burn-in it allows individuals, or small clusters, to resist an emerging consensus.
-  * Where burn-in allows homophily to emerge before biases update, weighted selection accelerates polarisation.
-
-### Consistency of the models
-
-Each model was run `r length(unique(agents$random_seed))` times with different random seeds to check which features were consistent across runs, indicating the level of stochastic uncertainty [@bruchAgentBasedModelsEmpirical2015]. 
-The features described above were all consistent across runs, as can be seen by observing the minimal variability within rows in Figures \mccorrect{!TODO[link figures]}.
-
-For parameter sets in which all agents' biases tend towards the same extreme, which extreme was favoured varied according to the random seed used. 
-This stochasticity is akin to placing a ball on a gabled roof: tiny variations in the initial conditions affect which way it will roll, but it will always roll down one pitch or the other.
-
-Similarly, in some of these models, adding in weighted selection switches which bias extreme is adopted.
-This effect is not consistent between runs with different random seeds, and is an outsized effect of minor differences to early states, analogous to a breath of wind nudging the ball in the previous example one way or another.
-
-Output of the models with different random seeds can be visualised by tweaking the source code for this chapter, but their derived final values are included in the summary figure below.
-
-#### Descriptive observations of individual models
-
-As with the simulations with heterogeneous weighted sampling values, some agents resist the consensus extreme. 
-As compared to those simulations, though, more agents occupy a middle-ground, and can cross more easily from one extreme to another.
-Where a burn-in period is present, a large proportion of the agents occupy unstable middle-ground positions, preventing clear polarisation or consensus in the population.
-
-### Analysis of all models
-
-```{r nw-r-all-models-summary, fig.caption="Model final decision group ratio and mean final bias magnitude.  Each model is represented by a single line. Some models have no group ratio because there is only one group at the final decision (because all agents in the model have the same direction of bias), which means that the ratio of weights is undefined.", warning=FALSE}
+```{r nw-r-all-models-summary, fig.caption="Model final decision group ratio and mean final bias magnitude.  Each of the trust weights and weighted selection sampling combinations in the figures above was run multiple times with different random seeds. Each of these runs is represented by a single line. Some models have no group ratio because there is only one group at the final decision (because there is a consensus wherein all agents have the same direction of bias), which means that the ratio of weights is undefined and consequently the line is broken.", warning=FALSE}
 # warning=FALSE here because some values of group_ratio_empirical are undefined
 ggs <- list()
 
@@ -962,6 +1056,7 @@ ggs[[1]] <- models.all %>%
     colour = trust_weights
   )) +
   geom_line(alpha = .5) +
+  geom_point(alpha = .25) +
   scale_y_continuous(
     limits = c(1, ceiling(max(models.all$group_ratio_empirical) / 10) * 10)
   ) +
@@ -981,6 +1076,7 @@ ggs[[2]] <- models.all %>%
     colour = trust_weights
   )) +
   geom_line(alpha = .5) +
+  geom_point(alpha = .25) +
   scale_y_continuous(limits = c(0, .5)) +
   labs(y = "Bias magnitude") +
   theme(legend.position = 'none')
@@ -989,59 +1085,58 @@ ggs[[1]] / ggs[[2]]
 
 ```
 
-Having observed the patterns at the level of individual models, we can draw more useful conclusions at a higher level from considering them as a set. 
-Summarising the results in this way means that we can observe some general features of the models by comparing otherwise-similar models over the different parameters.
-In this analysis we attend to two properties of primary interest: 
-First, how accurate are agents over time? 
-This is represented by the mean bias magnitude. 
-In ideal circumstances, this should be very low, indicating that agents are largely unbiased. 
-Second, to what extent are agents more likely to trust advice from agents who share their bias?
-This is captured by the ratio between trust in agents with the same versus different bias. 
-This value is not always well defined - where all agents eventually acquire the same bias, the mean weight of out-group advisors is undefined.
+The model reproduces key effects of interest. 
+Firstly, agents reinforce one another's biases, leading to the emergence of extreme biases and echoing the effects in the literature.
+This can be seen in Figure \@ref(fig:nw-r-bias-evolution) where the biases of all but a handful of agents reach and remain at extreme values. 
+Secondly, agents develop greater trust in agents who share their bias, as shown by @pescetelliRoleDecisionConfidence2021.
+This can be seen in Figure \@ref(fig:nw-r-weight-by-bias-evolution) where the correlations between agents' shared bias with an advisor and their trust in that advisor rises over time.
 
-Mean bias magnitude is less pronounced where the starting trust weights are random, although this is likely due to there being less time after burn-in for the biases to update. 
-Burn-in time tends to decrease the homophily of the models, judging by final bias, but to increase it judging by initial bias. 
-This suggests that polarisation occurs, but that many middle-ground agents change which camp they end up in.
+#### Random vs evolved trust networks
 
-Weighted selection has little effect where the mean is increased, but a clearer effect where variation is introduced. 
-The clustering of weights suggests that there is less homophily where agents are more selective about whom they consult for advice. 
+The model shows a substantial effect of whether or not the agents' trust weights have a chance to evolve prior to biases being allowed to shift. 
+The models in @pescetelliRoleDecisionConfidence2021 implemented this approach, and, like the current model, demonstrated group polarisation where agents selectively sampled from their own groups and thereby increased their bias.
 
-Weighted sampling interacts with the lead-in time.
-Lead-in time is a proxy for the starting asymmetry of the connections in the network.
-The figure shows that, as networks start off with more homophilic structures, weighted selection increases the effect of homophily. 
-Note that sufficiently homophilic networks will continue to exhibit echo chamber structures regardless of the level of weighted sampling, and that even very strong weighted sampling does not produce echo chambers in networks which start off perfectly symmetrical. 
+Where the models are started with random trust weights, agents also tend towards extremes, but there is a single consensus for all agents in the model.
+When this happens, the population is no more accurate than in other models, but _is_ more unified.
 
-The key finding of interest from the models thus far is that source selection may exacerbate echo chamber formation. 
-This finding is in line with similar findings from others who have produced these models \mccorrect{!TODO[citations galore]}.
-We are now in a position to see whether these models continue to exhibit these features when we parametrise them based on the data we observed in our participants' behavioural data.
+Figure \@ref(fig:nw-r-all-models-summary) shows an overview of this pattern for multiple runs with different random seeds: the evolved trust weight runs tend to show higher group ratios, indicating greater polarisation.
 
-##### Bias x TrustUpdate
+#### Effect of weighted selection
 
-```{r}
+Providing the agents with weighted selection has little effect, likely because the mean value estimated from the Dots task participants was small.
+There is virtually no effect on bias trajectories, and only a slight one on the distribution of trust weights (Figure \@ref(fig:nw-r-weight-distribution)), with fewer very low weights in the weighted selection runs.
+The most notable effect was in the correlation between shared bias and trust weight where trust weights are random.
+In this case, the correlation between shared bias and trust weight does not increase as fast or get as high when weighted selection is introduced. 
+The group ratio, which is the ratio of agents' weights for their ingroup members to their weights for their outgroup members, is nearly always lower when weighted selection is introduced. 
 
-agents.all %>% 
-  filter(
-    weighted_sampling == "Empirical",
-    decision == max(decision),
-    abs(trust_volatility) < .2
-  ) %>%
-  ggplot(aes(x = trust_volatility, y = abs(bias - .5))) +
-  geom_smooth(method = 'lm', formula = y ~ x) + 
-  geom_point(alpha = .25) +
-  scale_y_continuous(limits = c(0, .5)) 
+These effects are due to agents becoming increasingly unlikely to sample advice from advisors as the trust in those advisors decreases, which in turn means that only the higher trust weights are likely to be adjusted. 
+In effect, when weighted selection occurs the lower tail is ignored, meaning that trust remains unchanged whether the shared bias is moderate or low, and thus reducing the correlation between them.
+In this sense, the effects of weighted selection itself are more a feature of the operationalisation than the underlying model.
 
-agents.all %>% 
-  filter(
-    weighted_sampling == "Empirical",
-    decision == max(decision),
-    abs(ws_agent) < 55
-  ) %>%
-  ggplot(aes(x = ws_agent, y = abs(bias - .5))) +
-  geom_smooth(method = 'lm', formula = y ~ x) + 
-  geom_point(alpha = .25) +
-  scale_y_continuous(limits = c(0, .5)) 
+#### Heterogeneity
 
-```
+Allowing heterogeneity in weighted selection coefficients has a more pronounced effect.
+Whether the heterogeneity comes from sampling from the distribution of estimated participant coefficients (Heterogeneous) or sampling the values themselves (Empirical), varied weighted selection values create subsets of agents who polarise away from the consensus value formed when starting trust weights are random.
+
+There are differences, too, between the Heterogeneous and Empirical sampling approaches.
+Compared to the Heterogeneous sampling, the model with Empirical sampling shows more moderate biases and more extreme weights (Figure \@ref(fig:nw-r-all-models-summary)).
+This apparently contradictory finding is explicable because agents in the Empirical runs include both positive and negative weighted sampling coefficients. 
+This leads to the peaks of weights at both the 0 and 1 end of the histogram for evolved weights.
+The negative weighted selection values can also drive agents to sample advice that is likely to disagree with them, moderating their biases as seen by a larger minority of agents with moderate biases in the Empirical run than in other runs.
+@madsenLargeNetworksRational2018a termed agents with this advice-seeking strategy 'Socratic' because they aimed to engage with others of a different opinion.
+
+### Consistency of the models
+
+Each model was run `r length(unique(agents$random_seed))` times with different random seeds to check which features were consistent across runs, indicating the level of stochastic uncertainty [@bruchAgentBasedModelsEmpirical2015]. 
+The features described above were all consistent across runs, as can be seen by observing the minimal variability within rows in Figures \mccorrect{!TODO[link figures]}.
+
+For parameter sets in which all agents' biases tend towards the same extreme, which extreme was favoured varied according to the random seed used. 
+This stochasticity is akin to placing a ball on a gabled roof: tiny variations in the initial conditions affect which way it will roll, but it will always roll down one pitch or the other.
+
+Similarly, in some of these models, adding in weighted selection switches which bias extreme is adopted.
+This effect is not consistent between runs with different random seeds, and is an outsized effect of minor differences to early states, analogous to a breath of wind nudging the ball in the previous example one way or another.
+
+Output of the models with different random seeds can be visualised by tweaking the source code for this chapter, but their derived final values are included in the summary figure below.
 
 ## Discussion
 
@@ -1150,12 +1245,23 @@ Participants in the experiments were offered a choice of two advisors (with whom
 
 #### Technical constraints
 
-* Parameter space is huge and dynamics dependent upon parameter interactions
-  * Models are time-consuming to run (even with key components written in C++)
-  * This is what @bruchAgentBasedModelsEmpirical2015 call 'model uncertainty' and we did try to reduce it a bit by exploring different stuff in development, but ultimately it's a computational resources issue
-* Some models are pretty huge (n ~ 2000 is common). These are smaller to remain computationally tractable and because 100 is enough to see the phenomena we wish to model.
-  * It would be possible to extend the models, but the very large models have to run extremely slowly for computational tractability reasons (write to disk rather than storing in RAM; could be rewritten but n ~ 100 was part of the original design hence why they are how they are).
-* Basically, this is all illustration and you can't lean on it too heavily
+Agent-based models are computationally expensive to run because each step in the model depends upon the step before. 
+This poses some challenges for sources of uncertainty @bruchAgentBasedModelsEmpirical2015 term 'stochastic uncertainty' and 'model uncertainty'.
+Stochastic uncertainty refers to the consistency of a model's dynamics when different random numbers are selected in places where they are required. 
+Model uncertainty refers to the consistency of a model's dynamics to variation in parameters other than those selected for exploration.
+Stochastic uncertainty has been addressed to the extent it is possible given temporal and computational constraints by running each model `r models.all$random_seed %>% unique() %>% length()` times with different random seeds.
+
+Model uncertainty is more difficult to address. 
+There are certainly values for model parameters which have substantial effects on dynamics.
+A trivial example is that when agents are given feedback on every decision they tend towards very low bias magnitudes.
+Feedback and other parameters were explored to some extent during the development of the model, as documented in [§Constant parameters](#nw-m-constant-parameters).
+Despite this, readers should be aware that the parameter space is very large, and there are likely to be substantial interaction effects which were not found during development.
+
+Many models in the literature use very large populations. 
+While the models discussed in [§Similar models in the literature](#ne-i-lit) had smaller sizes, the largest being 1000 agents, it is not uncommon to see models with 2-3000 agents \mccorrect{!TODO[cite some]}.
+The size of the current model runs seems sufficient to illustrate the effects of interest, but it is possible that different effects may emerge in larger populations. 
+Smaller populations examined during testing showed less consistent effects.
+For very large models the underlying package code would have to be adjusted and the data extracted from model runs sampled much more sparsely. 
 
 ## How to choose an examiner
 
