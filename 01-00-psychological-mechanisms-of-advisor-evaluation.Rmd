@@ -174,7 +174,7 @@ This likely happens as an analogue of reinforcement learning, where feedback all
 
 While many experiments have established the existence reinforcement learning in humans and other animals, it is unclear whether reinforcement learning operates in the social domain in which advising takes place.
 It is not obvious that there are many situations in the course of everyday relationships which can be characterised by the rapid advice-feedback cycle required to learn about advisor ability in the manner modelled above.
-@feldmanhallViewingAdaptiveSocial2019 argued in a review that a wide variety of social phenomena could be explained via reinforcement learning processes.
+@feldmanhallViewingAdaptiveSocial2019 argued in a review that a wide variety of social phenomena could be explained via reinforcement learning processes, and @behrensAssociativeLearningSocial2008 demonstrated that a Bayesian reinforcement learning model provided a good fit to behavioural data from a social influence task.
 Additionally, @heyesKnowingOurselvesTogether2020 have argued that social learning is wholly explicable in terms of general reinforcement learning processes paired with attentional biases to social stimuli.
 Reinforcement learning in the social domain operates on the basis of rapid feedback, just as in the non-social domain.
 Below, the advisor evaluation model is extended to cases where objective feedback is not available by substituting the decision-maker's confidence for objective feedback.

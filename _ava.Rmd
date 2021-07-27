@@ -7,7 +7,7 @@ Here we introduce a discrepancy between advisors' objective performance (accurac
 By playing off accuracy against agreement we can explore whether participants continue to prefer agreement when there is a cost associated with agreement through a reduction in overall accuracy.
 We expect that participants provided with feedback will be able to identify the accurate advisor and ignore the agreeing advisor, while participants denied feedback will gravitate towards the agreeing advisor who, from their perspective, appears more accurate.
 
-### Dots Task {#ac-ava-dots}
+### Experiment 3A: Dots Task {#ac-ava-dots}
 
 ```{r ac-ava-dots-load, include = F}
 
@@ -34,20 +34,16 @@ trials <- annotate_responses(trials)
 
 #### Open scholarship practices
 
-\indent\indent\OpenScience{prereg} `r unique(dotstask$preregistration)`
+This experiment was preregistered at `r unique(dotstask$preregistration)`.
+The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from https://osf.io/y47ec/.
+A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/c18c26b5da3622988e2261433cf256aae4d19f39/AdvisorChoice/ava.html.
 
-\OpenScience{data} \mccorrect{!TODO[OSFify data for these studies]}
+#### Unanalysed data
 
-\OpenScience{materials} https://github.com/oxacclab/ExploringSocialMetacognition/blob/c18c26b5da3622988e2261433cf256aae4d19f39/AdvisorChoice/ava.html
-
-##### Unanalysed data
-
-Two versions of this experiment have unanalysed data (`r paste0(.dropEnv$DROP_V, collapse = ', ')`). 
-The Pilot data was collected to ensure the study functioned properly. 
-The v1 Mixed design data was conducted and run as a proper experiment in which participants learned about both advisors simultaneously (preregistered at https://osf.io/5z2fp), but there were no effects in the data. 
+An initial version of this study was conducted and run as a proper experiment in which participants learned about both advisors simultaneously (preregistered at https://osf.io/5z2fp), but there were no effects in the data. 
 We suspected the absence of effects was because participants had difficulty distinguishing the advisors when they were presented together. 
 The version of the experiment reported here presented one advisor per block in the familiarisation phase.
-The `r .dropEnv$DROP_P` participants whose data was collected in these versions is not included in analysis.
+Data for the unreported null study can be found in the `esmData::` R package and at https://osf.io/26yut/.
 
 #### Method {#ac-ava-dots-m}
 
@@ -144,7 +140,7 @@ exclusions %>%
 
 ```
 
-Participants' data could be excluded from analysis where they have an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, do not have trials in all confidence categories, have fewer than `r minTrialsPerCategory` trials in each confidence category, or finish the experiment after `r preRegParticipants` participants have already submitted data which passed the other exclusion tests. 
+In line with the pre-registration, participants' data were excluded from analysis where they have an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, do not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), have fewer than `r minTrialsPerCategory` trials in each confidence category, or finish the experiment after `r preRegParticipants` participants have already submitted data which passed the other exclusion tests. 
 Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-ava-dots-exclusions).
 
 ##### Task performance
@@ -712,7 +708,7 @@ ggplot(tmp, aes(x = '', y = pChooseAcc)) +
 Despite the influence differences observed above, Figure \@ref(fig:ac-ava-dots-r-graph) shows that there was no consistent picking preference in favour of either the High accuracy or the High agreement advisor.
 While several participants did develop very strong preferences, picking one or the other advisor nearly all the time, these preferences were not systematically oriented towards either advisor (`r .T`).
 
-### Dates Task {#ac-ava-dates}
+### Experiment 3B: Dates Task {#ac-ava-dates}
 
 ```{r ac-ava-dates-load, include = F}
 
@@ -752,18 +748,12 @@ for (E in c(.GlobalEnv, .prevStudy)) {
 
 #### Open scholarship practices
 
-\indent\indent\OpenScience{prereg} `r unique(datequiz$preregistration)`
+This experiment was preregistered at `r unique(datequiz$preregistration)`.
+The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from \mccorrect{!TODO[OSFify Dates task data]}.
+A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/ed13951c488e1996df7ff53d48629843bacfd074/ACv2/ac.html.
 
-\OpenScience{data} \mccorrect{!TODO[OSFify data for these studies]}
-
-\OpenScience{materials} https://github.com/oxacclab/ExploringSocialMetacognition/blob/ed13951c488e1996df7ff53d48629843bacfd074/ACv2/ac.html
-
-##### Unanalysed data
-
-The first version of this experiment (v0-0-5) included a bug in which the advisor choice options were not recorded, making it difficult or impossible to work out which trials included a choice of advisor. 
-The second version (v0-0-6) worked perfectly, and the data reported below belong to a preregistered replication of this version.
-The `r .dropEnv$DROP_P` participants whose data was collected in these versions is not included in analysis.
-The v0-0-5 participants could be included in a study which was agnostic about advisor choice, and the v0-0-6 participants could be included in an aggregated analysis, but here I report only the preregistered replication.
+This is a replication of a study of identical design. 
+The data for the original study can be obtained from the `esmData::` R package or from \mccorrect{!TODO[OSFify]}
 
 #### Method {#ac-ava-dates-m}
 

@@ -34,7 +34,7 @@ Niccolo's stuff about advice-taking, and then demonstrate similar results in my 
 
 \mccorrect{!TODO[Describe Niccolo's stuff, especially why accuracy vs agreement might be a good target for replication with a new experimental design.]}
 
-## Extending results to the Dates task
+## Experiment 0: Extending results to the Dates task
 
 ### Introduction {#ai-ava-i}
 
@@ -165,7 +165,7 @@ for (E in c(.GlobalEnv, .prevStudy)) {
 
 ```
 
-Participants' data could be excluded from analysis where they fail attention checks, fail to complete the entire experiment, or have more than `r nMaxOutliers` outlying trials. Outlying trials are calculated after excluding participants who failed to complete the experiment, and are defined as trials for which the total trial time was greater than `r zThresh` standard deviations away from the mean of all trials from all participants.
+In line with the preregistration, participants' data were excluded from analysis where they fail attention checks, fail to complete the entire experiment, or have more than `r nMaxOutliers` outlying trials. Outlying trials are calculated after excluding participants who failed to complete the experiment, and are defined as trials for which the total trial time was greater than `r zThresh` standard deviations away from the mean of all trials from all participants.
 
 A browser compatibility issue in this study meant that any participants completing the study using the Safari family of browsers had to be excluded because the advice was not presented appropriately. 
 
@@ -370,4 +370,4 @@ Can we run a version which does its job properly and provide actual evidence for
 
 Participants appeared to pay more attention to the advice than the advisor.
 In other words, participants distinguished between individual pieces of advice but did not translate these distinctions into distinctions between advisors.
-This study thus provided no evidence in favour of the confidence-weighting adjustement to the agreement model.
+This study thus provided no evidence in favour of the confidence-weighting adjustment to the agreement model.

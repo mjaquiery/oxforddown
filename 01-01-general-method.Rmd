@@ -366,6 +366,40 @@ For a full list of packages and software environment information, see \mccorrect
 Appendix?
 Also link to a containerized version of this.]}
 
+#### Unanalysed data
+
+Early versions of several experiments had bugs in the experiment code made the results unreliable.
+The data collected during these runs is available alongside the data collected in the final versions of experiments.
+For details on what went wrong with the experiments in which bugs were found, see the description column of the data files in the `esmData::` R package.
+While not useful for the hypotheses of the experiments for which the data were collected, some excluded data can be used for other purposes such as analysing responses to advice.
+
+\mccorrect{!TODO[Appendix these?]}
+
+##### Experiment 1A
+The earliest versions contained a bug where advisors instructed to agree with a participant instead provided advice identifying the correct answer.
+Other versions had a bug in the staircasing code used to titrate the difficulty of the task was converging on too high a value (74% initial decision accuracy as opposed to 71%).
+Once the staircasing bug was fixed, two more experiments were run, one with 60 practice trials in which participants did not quite reach the desired accuracy before the beginning of the main experiment, and one with 120 practice trials which constitutes the data analysed below.
+
+##### Experiments 1B and 2B
+Early versions included a bug which prevented feedback from being shown during the familiarisation phase even to participants in the Feedback condition.
+These participants could theoretically be included in the No feedback condition regardless of their condition label in the data, but this is not done here.
+
+##### Experiment 3A
+
+Pilot data was collected to ensure the study functioned properly, and so the data are not analysed with regard to the hypotheses. 
+The v1 Mixed design data was conducted and run as a proper experiment in which participants learned about both advisors simultaneously (preregistered at https://osf.io/5z2fp), but there were no effects in the data. 
+
+##### Experiment 3B
+
+The first version included a bug in which the advisor choice options were not recorded, making it difficult or impossible to work out which trials included a choice of advisor. 
+Data for these participants could be included in a study that was agnostic about advisor choice.
+
+##### Experiment 4A
+
+The first version had a bug which meant that the advisors were identical in the familiarisation phase.
+Both the first and second versions had a bug in which advisors who were supposed to agree with the participant's initial estimate gave the correct answer rather than agreeing.
+These participants' data could be included in an analysis which used a participant's actual experience of advice to predict their advice-taking and source selection behaviour, provided appropriate care was taken to reconstruct the advice data from the raw values instead of relying on the reported summaries.
+
 ## Open science approach {#open-science}
 
 ### Open science {#os-introduction}
@@ -382,7 +416,7 @@ The meaning of open science varies within each sub-discipline, and this section 
 ### Badges {#os-badges}
 
 Following the Center for Open Science (https://cos.io), this thesis uses a series of badges to indicate adherence to particular aspects of open science.
-Three badges, _preregistration_, _open materials_, and _open data_, are adopted directly from the Centre and used according to the Centre's rules (https://osf.io/tvyxz/wiki/1.%20View%20the%20Badges/).
+Three badges, _preregistration_, _open materials_, and _open data_, are adopted directly from the Centre and used according to the [Centre's rules](https://osf.io/tvyxz/wiki/1.%20View%20the%20Badges/).
 Studies which qualify for a badge will have the badge displayed immediately below their title.
 Each badge will contain a link to online resources which provide the content for which the badge is awarded.
 
@@ -413,6 +447,8 @@ Theories are the output of science as a whole, but data are the output of any in
 Sharing data directly allows other scientists to check and extend the data analysis conducted, to reuse the data in meta-analyses, and to repurpose the data for other investigations.
 This increases the robustness of the results, and increases the efficiency of science as a whole.
 The links accompanying the open data badge point to online storage where the data can be obtained for a study, along with appropriate metadata.
+
+\mccorrect{!TODO[Explain something about unanalysed data etc. because we're cutting out the unanalyzed stuff from the main chapters.]}
 
 ### Thesis workflow
 

@@ -20,6 +20,8 @@ params:
 
 <!-- 
 We may also want to have chapters looking more into the choice-influence relationships, perhaps with experiments which examine both simultaneously. Additionally, we could perhaps look into framing effects for advice - anecdotally it's possible that, when asked to choose between two rewarding options, people prefer advisors who offer advice in terms of which option to take rather than which option to avoid, and vice-versa for negatively reinforcing options (c.f. Kahneman's framing effects/loss aversion/etc.).
+
+"No one wants a long conclusion" - Nick
 -->
 
 I haven't wasted 3 years of my life and Nick's time.
@@ -47,5 +49,3 @@ I haven't wasted 3 years of my life and Nick's time.
 * Frequency of advice-seeking as characterised in the thesis.
 
 * (Why) do people lump group advice together before discounting - this seems idiotic even with the adapativeness of discounting...
-
-\mccorrect{!TODO[Chronological account of advisor choice experiments. Perhaps in that chapter, perhaps appendix. Be nice + transparent to present stuff in best scientific order in thesis but have a record of the actual narrative.]}

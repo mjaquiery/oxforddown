@@ -1,14 +1,15 @@
 
-## Accuracy {#ac-acc}
+## Effects of Advice Accuracy on Advisor Selection {#ac-acc}
 
-\mccorrect{!TODO[check Niccolo covered this]} 
+@pescetelliRoleDecisionConfidence2021 demonstrated that more accurate advisors are more trusted and more influential (regardless of the presence of feedback) in a lab-based perceptual decision-making task.
+We attempted to extend this finding to the domain of advisor selection in two online tasks: a 'Dots Task' requiring similar perceptual decision-making, and an estimation-based 'Dates Task'.
+We predicted that participants would choose a more accurate advisor over a less accurate one, and would do so even in the absence of objective feedback (based on the hypothesis that they can infer accuracy from differing agreement rates).
 
-Pescetelli and Yeung \mccorrect{!TODO[cite new paper]} demonstrated that more accurate advisors are more influential (regardless of the presence of feedback) in a lab-based perceptual decision-making task.
-We attempted to extend this finding to the domain of advisor selection in two online tasks: a 'Dots Task' requiring similar perceptual decision-making to the task used by Pescetelli and Yeung, and an estimation-based 'Dates Task'.
+The ability to distinguish between accurate advisors in these experiments is important because discrimination based on accuracy is crucial to the phenomenon we are attempting to explain: rational advice-seeking behaviour in the absence of feedback.
+@pescetelliRoleDecisionConfidence2021 demonstrated that people could identify and exploit more accurate advice, and these experiments seek to determine whether people will use that ability to obtain advice from a more reliable source.
+Experiment 1A§\@ref(ac-acc-dots) addressed this issue using the same perceptual decision task as use by @pescetelliRoleDecisionConfidence2021; Experiment 1B§\@ref(ac-acc-dates) extended the approach in a task asking participants to estimate historical dates.
 
-The ability to distinguish between accurate advisors in these experiments is important because they relate directly to the phenomenon we are attempting to explain: rational advice-seeking behaviour in the absence of feedback.
-
-### Dots Task {#ac-acc-dots}
+### Experiment 1A: Dots Task {#ac-acc-dots}
 
 ```{r ac-acc-dots-load, include = F}
 
@@ -32,29 +33,23 @@ trials <- annotate_responses(trials)
 
 #### Open scholarship practices
 
-\indent\indent\OpenScience{prereg} `r unique(dotstask$preregistration)`
-
-\OpenScience{data} \mccorrect{!TODO[OSFify data for these studies]}
-
-\OpenScience{materials} https://github.com/oxacclab/ExploringSocialMetacognition/blob/9932543c62b00bd96ef7ddb3439e6c2d5bdb99ce/AdvisorChoice/index.html
-
-##### Unanalysed data
-
-Several early versions of this experiment were run where bugs in the experiment code made the results unreliable.
-The earliest versions contained a bug where advisors instructed to agree with a participant instead provided advice identifying the correct answer.
-Other versions had a bug in the staircasing code used to titrate the difficulty of the task was converging on too high a value (74% initial decision accuracy as opposed to 71%).
-Once the staircasing bug was fixed, two more experiments were run, one with 60 practice trials in which participants did not quite reach the desired accuracy before the beginning of the main experiment, and one with 120 practice trials which constitutes the data analysed below.
-Overall, `r .dropEnv$DROP_P` participants' data was collected in these excluded versions and not included in analysis.
-While not useful for the hypothesis of this experiment, the excluded data can be used for analysing responses to advice, provided care is taken with the very early versions to ensure advice is interpreted correctly.
+This experiment was preregistered at `r unique(dotstask$preregistration)`.
+The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from https://osf.io/kn23p/.
+A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/9932543c62b00bd96ef7ddb3439e6c2d5bdb99ce/AdvisorChoice/index.html.
 
 #### Method {#ac-acc-dots-m}
+
+\mccorrect{NICK:Include participant numbers; include number of trials, blocks, etc. and how they were organised. Any forced advisor trials in the main experiemnt? Even though it's in the title able "Dots task", it's helpful for the reader to include this detail in the text as a brief reminder: e.g. "Participants performed the dot count perceptual decision task in XX blocks of YY trials, with the choice between two advisors on each trial after their initial decision". Useful to make explicit (here or in the general methods) what the participants were told about advisors, if anything. E.g. were they told that the advisors would differ and it was up to them (the participants) to figure out whose advice they wanted? How many familiarisation trials etc.}
 
 \mccorrect{!TODO[clarify any methodological differences from the main methods chapter]}
 
 ##### Advice profiles
 
 The two advisor profiles (Table \@ref(tab:ac-acc-dots-m-profiles)) used in the experiment were High accuracy and Low accuracy.
-The High accuracy advisor was correct 80% of the time while the Low accuracy advisor was correct 20% of the time.
+The advisors' advice was stochastically generated according to the participant's response.
+The High accuracy advisor predominantly agreed with correct participant responses and disagreed with incorrect ones.
+The Low accuracy advisor did likewise, but was less likely to agree with correct responses and more likely to agree with incorrect ones.
+Overall, given an expected participant accuracy of 71% obtained by the staircasing procedure, the High accuracy advisor was correct 80% of the time while the Low accuracy advisor was correct 60% of the time.
 The advisor profiles were not balanced for overall agreement rates.
 
 ```{r ac-acc-dots-m-profiles-r} 
@@ -140,7 +135,7 @@ exclusions %>%
 
 ```
 
-Participants' data could be excluded from analysis where they have an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, do not have trials in all confidence categories, have fewer than `r minTrialsPerCategory` trials in each confidence category, or have completed the experiment after the preregistered amount of data has already been collected. 
+In line with the preregistration, participants' data were excluded from analysis where they have an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, do not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), have fewer than `r minTrialsPerCategory` trials in each confidence category, or have completed the experiment after the preregistered amount of data has already been collected. 
 Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-acc-dots-exclusions).
 
 ##### Task performance
@@ -367,14 +362,14 @@ tmp %>%
 
 ###### Metacognitive ability
 
-Where performance on the underlying task is held constant, as here, metacognitive sensitivity can be measured in a bias-free way by plotting Receiver Operating Characteristic (ROC) curves for metacognitive responses [@flemingHowMeasureMetacognition2014].
+Where performance on the underlying task is held constant, as here at least for participants' initial pre-advice decisions, metacognitive sensitivity can be measured in a bias-free way by plotting Receiver Operating Characteristic (ROC) curves for metacognitive responses [@flemingHowMeasureMetacognition2014].
 [^The constant underlying task performance is only true for initial estimates in the paradigm used here, and thus the ROC curves for final decisions should be interpreted with caution because they cannot be proven to be unaffected by metacognitive bias.]
 ROC curves are obtained by calculating at each of a number of different points on a confidence scale, the probability that the confidence is at least that high for correct versus incorrect answers. 
 The area under the ROC curve gives a measure of the ability of confidence ratings to distinguish correct and incorrect responses.
 An area under the ROC curve of .5 indicates chance performance, and a value of 1 indicates perfect discrimination.
 
 As shown by Figure \@ref(fig:ac-acc-dots-r-roc), almost all participants showed above-chance metacognitive sensitivity for initial estimates and final decisions.
-Participants generally showed higher metacognitive sensitivity for final decisions, although this may be an artefact of a change in metacognitive bias.
+Participants generally showed higher metacognitive sensitivity for final decisions, in line with their improved performance on these trials.
 Participants' metacognitive sensitivity was not particularly high \mccorrect{!TODO[What are typical values we might expect in the dots task and similar tasks? Is there a useful mapping between meta-d' and Type II ROC to compare with e.g. Roualt's stuff?]}.
 There was no evidence of participants' metacognitive sensitivity being correlated with their task performance (Figure \@ref(fig:ac-acc-dots-r-roc-cor)). 
 This is expected when task performance is tightly controlled, because under these conditions variation in task performance reflects variation in ability within a participant rather than between participants. 
@@ -523,14 +518,14 @@ acc %>%
 
 ```
 
-###### Confidence change {#ac-dots-r-confidence-change}
+###### Influence of advice {#ac-dots-r-influence}
 
-The extent and manner of confidence changes is an important indicator of the extent to which participants treat advice as informative (Figure \@ref(fig:ac-acc-dots-r-confidence-change)).
+The extent and manner of decision and confidence changes from before to after advice is an important indicator of the extent to which participants treat the advice as informative (Figure \@ref(fig:ac-acc-dots-r-influence)).
 As expected from participants who are paying attention to the task and attempting to maximize the calibration and accuracy of their final decisions, when participants receive agreeing advice they tend to increase their confidence in their initial response. 
 Likewise, where participants receive disagreeing advice, they tend to reduce their confidence in their answer. 
 Somewhat surprisingly, when participants change their decision (a relatively uncommon event) they quite often make their final decision with a confidence equivalent to their initial estimate, producing a distinctive off-diagonal pattern along the $y = -x$ line.
 
-```{r ac-acc-dots-r-confidence-change, fig.caption="Confidence change on the Dots task with in/accurate advisors.  Each point shows the initial and final confidence on a single trial. Final confidence is coded relative to initial confidence so that increasing confidence in the opposite decision (i.e. confidence on trials where the participant changed their mind) is increasingly negative. Points above the dashed y = x line represent increased confidence, while those below it give decreased confidence. Points close to the y = x line indicate relatively little change, while points further away indicate relatively greater change. The shaded grey area shows the zone outside which influence is capped (by moving vertically towards the grey zone boundary) when using the capped influence measure. Agreement and disagreement trials are plotted seperately, with trials coloured according to whether the initial decision was correct."}
+```{r ac-acc-dots-r-influence, fig.caption="Advice influence on the Dots task with in/accurate advisors.  Each point shows the initial and final confidence on a single trial. Final confidence is coded relative to initial confidence so that increasing confidence in the opposite decision (i.e. confidence on trials where the participant changed their mind) is increasingly negative. Points above the dashed y = x line represent increased confidence, while those below it give decreased confidence. Points close to the y = x line indicate relatively little change, while points further away indicate relatively greater change. The shaded grey area shows the zone outside which influence is capped (by moving vertically towards the grey zone boundary) when using the capped influence measure. Agreement and disagreement trials are plotted seperately, with trials coloured according to whether the initial decision was correct."}
 
 # These polygon points define a triangle marking the limits for the capped influence
 df.poly <- data.frame(    
@@ -810,10 +805,17 @@ ggplot(tmp, aes(x = '', y = pChooseHigh)) +
 
 ```
 
-As shown in Figure \@ref(fig:ac-acc-dots-r-graph), participants selected the High accuracy advisor at a rate greater than would be expected if their choosing were random (`r .T`).
+With basic task performance as expected, our key analysis focused on participants' choice of advisors. 
+As predicted, and as shown in Figure \@ref(fig:ac-acc-dots-r-graph), participants selected the High accuracy advisor at a rate greater than would be expected if their choosing were random (`r .T`).
 The modal choice remained at chance level (.5), but almost all participants manifesting a preference preferred the High accuracy advisor.
 
-### Dates Task {#ac-acc-dates}
+##### Summary/Discussion
+
+\mccorrect{NICK:Add a brief summary/discussion here. Note key results, and end with statement that we were next interested if we'd see the same result in a different task context.}
+
+### Experiment 1B: Dates Task {#ac-acc-dates}
+
+This experiment \mccorrect{NICK:provided a basic exploration of advice seeking and advice use in the Dates Task {if it's the first one reported}, and aimed to replicate the results of Experiment X in the context of this task.}
 
 ```{r ac-acc-dates-load, include = F}
 
@@ -842,22 +844,13 @@ AdvisedTrial <- annotate_responses(AdvisedTrial)
 
 #### Open scholarship practices
 
-\indent\indent\OpenScience{prereg} `r unique(datequiz$preregistration)`
-
-\OpenScience{data} \mccorrect{!TODO[OSFify data for these studies]}
-
-\OpenScience{materials} https://github.com/oxacclab/ExploringSocialMetacognition/blob/master/ACBin/acc.html
-
-##### Unanalysed data
-
-Early versions of this experiment (`r paste0(.dropEnv$DROP_V, collapse = ', ')`) included a bug which prevented feedback from being shown during the familiarisation phase even to participants in the Feedback condition.
-The `r .dropEnv$DROP_P` participants whose data was collected in these versions is not included in analysis.
-These participants could theoretically be included in the No feedback condition regardless of their condition label in the data, but this is not done here.
-
+This experiment was preregistered at `r unique(datestask$preregistration)`.
+The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from \mccorrect{!TODO[OSFify Dates task data]}.
+A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/master/ACBin/acc.html.
 
 #### Method {#ac-acc-dates-m}
 
-This study used the binary version of the Dates Task (§\@ref(m-p-dates-b)).
+This study used the binary version of the Dates Task (§\@ref(m-p-dates-b)) in which \mccorrect{NICK:XX} participants \mccorrect{NICK:did XYZ}.
 
 ##### Advice profiles
 
@@ -927,7 +920,8 @@ exclusions %>%
 
 ```
 
-Individual trials were screened to remove those that took longer than `r maxTrialRT/1000`s to complete. Participants were then excluded for having fewer than `r minTrials` trials remaining, fewer than `r minKeyTrials` trials on which they had a choice of advisor, or for giving the same initial and final response on more than `r (1 - minChangeRate) * 100`% of trials. 
+Individual trials were screened to remove those that took longer than `r maxTrialRT/1000`s to complete. 
+Participants were then excluded for having fewer than `r minTrials` trials remaining, fewer than `r minKeyTrials` trials on which they had a choice of advisor, or for giving the same initial and final response on more than `r (1 - minChangeRate) * 100`% of trials. 
 Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-acc-dates-exclusions).
 
 ##### Task performance
@@ -1016,8 +1010,9 @@ tmp %>%
 
 ###### Accuracy
 
-Unlike in the Dots version of the task, participant accuracy is not controlled.
-Participants managed to improve their performance from their initial estimates to their final decisions with both advisors (Figure \@ref(fig:ac-acc-dates-r-accuracy)). 
+Unlike in the Dots version of the task, participant accuracy is not controlled because it depends on participants' existing knowledge (and guesses) across a relatively small and varied set of questions. 
+Correspondingly, accuracy varied substantially across participants (Figure \@ref(fig:ac-acc-dates-r-accuracy)). 
+Also apparent in (Figure \@ref(fig:ac-acc-dates-r-accuracy)), participants managed to improve their performance from their initial estimates to their final decisions with both advisors. 
 This is likely because the advisors themselves were more accurate than the participants, so following their advice was generally a good strategy, and the difficulty of the task meant that participants were very willing to be influenced by advice.
 
 ```{r ac-acc-dates-r-accuracy, fig.caption="Response accuracy for the Dates task with in/accurate advisors.  Faint lines show individual participant means, for which the violin and box plots show the distributions. The dashed line indicates chance performance. Dotted violin outlines show the distribution of actual advisor accuracy.  Because there were relatively few trials, the proportion of correct trials for a participant generally falls on one of a few specific values. This produces the lattice-like effect seen in the graph. Some participants had individual trials excluded for over-long response times, meaning that the denominator in the accuracy calculations is different, and thus producing accuracy values which are slightly offset from others'."}
@@ -1137,7 +1132,7 @@ tmp %>%
 
 ###### Metacognitive ability
 
-The participants' metacognitive abilities were highly variable, with many participants displaying below-chance metacognitive ability (Figure \@ref(fig:ac-acc-dates-r-roc)).
+Estimates of the participants' metacognitive abilities were highly variable, with many participants displaying below-chance metacognitive ability (Figure \@ref(fig:ac-acc-dates-r-roc)).
 While this may appear concerning, recall that metacognitive sensitivity and bias vary substantially and cannot be reliably estimated using ROC curves where performance accuracy on the underlying task is highly variable, so it is not necessarily the case that these values give cause for alarm.
 The correlation between performance on the underlying task and metacognitive ability (Figure \@ref(fig:ac-acc-dates-r-roc-cor)) shows that, as one might expect, participants with a greater ability to perform the Dates task have a greater insight into their performance on the Dates task.
 This in turn suggests that, despite the low number of trials on the task, we are able to obtain meaningful insights into participants' metacognitive abilities, albeit without being able to precisely estimate the metacognitive sensitivity or bias for an individual participant.
@@ -1295,15 +1290,15 @@ acc %>%
 
 ```
 
-###### Confidence change
+###### Influence of advice
 
-The extent and manner of confidence changes is an important indicator of the extent to which participants treat advice as informative (Figure \@ref(fig:ac-acc-dates-r-confidence-change)).
-As with the Dots task (Figure \@ref(fig:ac-acc-dots-r-confidence-change), when participants receive agreeing advice they tend to increase their confidence in their initial response, suggesting they are paying attention to the task and attempting to maximize the calibration and accuracy of their final decisions. 
+The extent and manner of decision and confidence changes is an important indicator of the extent to which participants treat advice as informative (Figure \@ref(fig:ac-acc-dates-r-influence)).
+As with the Dots task (Figure \@ref(fig:ac-acc-dots-r-influence), when participants receive agreeing advice they tend to increase their confidence in their initial response, suggesting they are paying attention to the task and attempting to maximize the calibration and accuracy of their final decisions. 
 Likewise, where participants receive disagreeing advice, they tend to reduce their confidence in their answer. 
 As before, when participants change their decision (a relatively uncommon event) they quite often make their final decision with a confidence equivalent to their initial estimate, producing the distinctive off-diagonal pattern along the $y = -x$ line. 
 This pattern was explained as largely an artefact of aggregating data from multiple individual participants in the Dots task, but the same explanation is less tenable here.
 
-```{r ac-acc-dates-r-confidence-change, fig.caption="Confidence change on the Dates task with in/accurate advisors.  Each point shows the initial and final confidence on a single trial. Final confidence is coded relative to initial confidence so that increasing confidence in the opposite decision (i.e. confidence on trials where the participant changed their mind) is increasingly negative. Points above the dashed y = x line represent increased confidence, while those below it give decreased confidence. Points close to the y = x line indicate relatively little change, while points further away indicate relatively greater change. The shaded grey area shows the zone outside which influence is capped (by moving vertically towards the grey zone boundary) when using the capped influence measure. Agreement and disagreement trials are plotted seperately, with trials coloured according to whether the initial decision was correct."}
+```{r ac-acc-dates-r-influence, fig.caption="Advice influence on the Dates task with in/accurate advisors.  Each point shows the initial and final confidence on a single trial. Final confidence is coded relative to initial confidence so that increasing confidence in the opposite decision (i.e. confidence on trials where the participant changed their mind) is increasingly negative. Points above the dashed y = x line represent increased confidence, while those below it give decreased confidence. Points close to the y = x line indicate relatively little change, while points further away indicate relatively greater change. The shaded grey area shows the zone outside which influence is capped (by moving vertically towards the grey zone boundary) when using the capped influence measure. Agreement and disagreement trials are plotted seperately, with trials coloured according to whether the initial decision was correct."}
 
 # These polygon points define a triangle marking the limits for the capped influence
 df.poly <- data.frame(    
