@@ -26,6 +26,8 @@ library(ggridges)
 library(ggpmisc)
 library(ggtext)
 library(broom)
+library(patchwork)
+library(ez)
 ```
 
 # Psychology of source selection {#chapter-advisor-choice}

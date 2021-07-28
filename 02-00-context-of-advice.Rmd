@@ -208,7 +208,7 @@ Both advisors whose expertise was experienced as low were weighted less heavily,
 #### Familiarity of advisors
 
 So far as I can ascertain, no one has reported on a Judge-Advisor system in which comparable advice is received from friends and non-friends. 
-@sniezekTrustConfidenceExpertise2001 and @swolFactorsAffectingAcceptance2005 found a correlation between the amount classmates had interacted and ratings of trust in those classmates as advisors, but they did not use a measure of advice-taking which allows calculation of advice weighting. 
+@sniezekTrustConfidenceExpertise2001 and @vanswolFactorsAffectingAcceptance2005 found a correlation between the amount classmates had interacted and ratings of trust in those classmates as advisors, but they did not use a measure of advice-taking which allows calculation of advice weighting. 
 @minsonTwoTangoEffects2011 had long-term dance partners make estimates about their own dance performances in relation to professional assessment, and saw normal levels of egocentic discounting.
 ^[The partners' estimates in this study were highly correlated, meaning that they were not independent and thus did not necessarily bracket the correct answer. 
 This means that both partners assigning positive weight to the other's advice is not likely to approach the correct answer.]
