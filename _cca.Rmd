@@ -1,11 +1,22 @@
 
-## Confidence-contingent advice {#ac-cca}
+## Effects of confidence-contingent advice {#ac-cca}
+
+\mccorrect{NICK: Start with brief description of the context of previous experiments: Previous studies have shown that people prefer accurate over inaccuate advisors when there's feedback, and agreeing vs. disagreeing advisors when feedback is absent. Here we test whether advice selection can depend on a more sophisticated mechanism when feedback is absent -> agreement-in-confidence effect.}
 
 Pescetelli and Yeung's model of advisor evaluation (§\@ref(confidence-weighted-agreement)) of advisor evaluation weights the updating of trust in an agreeing advisor using the confidence of the judge's initial estimate.
-This model can be directly tested by using advisors who have different agreement rates contingent upon the judge's initial estimate confidence.
+This model can be directly tested by using advisors who have different agreement rates contingent upon the judge's initial estimate: \mccorrect{NICK: remind briefly what this means -> learn to distrust advisors who disagree with one's confident decisions and strongly held views.}.
 Pescetelli provided evidence for this model in the domain of advisor influence (\mccorrect{!TODO[Reference Niccolo's actual paper]}), and here a very similar design is used to explore this effect in the domain of advisor choice.
+\mccorrect{NICK: Make explicit it's only done for the dots task, and explain why -> can't achieve the necessary precise control in Dates}
 
-### Experiment 4A: Dots Task {#ac-cca-dots}
+\mccorrect{NICK: Things got a bit confusing from here. I didn't really understand why you present the online replication study before the lab study, and I struggled to follow the narrative. I'm guessing this is a combination of two separate bits of work -- a description of the online studies that follows the structure and format of the earlier ones in this chapter, and then text from your transfer report for the in-lab study. I think it needs work to streamline and harmonise before I can provide useful comments. My overall suggestions would be:
+1- Present the studies in the opposite order
+2- Start with the in-lab study which has some suggestive results: significant effect where we originally planned to look, in medium confidence trials, but not convincing and not really obvious why the preference shouldn't be there for other confidence levels. For this study, consider which analyses you really need to tell the story. The aim here in the thesis is different to the transfer report / earlier write up. There's quite a bit of exploratory analysis that was useful at the time in terms of us understanding the data, but that doesn't really fit the narrative focus now developed in the rest of this chapter.
+3- Then the online replication: can we find evidence in a larger online sample. (no)
+4- Discussion: no confidence-weighted effect? Is it plausible people could learn it in real life? Or are pick rates too variable to reveal subtle differences in advisor preference. (The latter is consistent with the high variability we see -- the preferences have to be quite strong at the group level to see anything)}
+
+### Experiment 4A: Confidence-contingent advice effects in the Dots Task {#ac-cca-dots}
+
+\mccorrect{NICK: Here give a brief overview: Here advice was carefully controlled as a function of participants' initial decisions and confidence. Following P&Y's design, their confidence on each trial was assessed (as being low/med/hi for them). One advisor agreed more often when participants expressed high confidence than low; the other did the opposite; agreement was matched for medium confidence.}
 
 ```{r ac-cca-dots-load, include = F}
 
@@ -503,6 +514,8 @@ acc %>%
 The advice is generated probabilistically from the rules described previously in Table \@ref(tab:ac-cca-dots-m-profiles).
 It is thus important to get a sense of the actual advice experienced by the participants.
 
+\mccorrect{NICK: cut figures, replace with simple tables and brief description.}
+
 ###### Advisor accuracy
 
 As shown in Figure \@ref(fig:ac-cca-dots-r-advice-acc), the advisors were designed to have the same accuracy, and the actual variation experienced by participants was relatively slight.
@@ -667,7 +680,7 @@ While source selection and advice-taking are different domains, the previous exp
 On this basis, following Pecesetilli and Yeung \mccorrect{CITE Niccolo and Nick}, we would expect to see a preference for picking the Bias sharing advisor. 
 We do not see this preference, and, insofar as we see any preference at all, we see the opposite.
 
-### Dates task
+### Confidence-contingent advice effects in the Dates task
 
 The Dates task was not used to study confidence-contingent advice because such advice requires both a precise control over the relative agreement and accuracy rates of the advisors and the ability to estimate confidence in responses. 
 The advisors' agreement (and hence accuracy) profiles depend on the participant's performance, and this is unknown a priori in the Dates task whereas it is controlled in the Dots task using a staircase procedure.
@@ -675,7 +688,7 @@ Different approaches to estimating participants' confidence were trialled, inclu
 
 \mccorrect{!TODO[If this study was worth reporting on, report on it (as a null manipulation). If not, why mention it? With the Marker use studies this probably works out as quite a lot of work and worth describing, at least. Probably worth detailing some of the attempts that were made to adapt Dates to Confidence-contingent advice.]}
 
-### Lab study {#ac-cca-lab}
+### Lab study of confidence-contingent advice {#ac-cca-lab}
 
 This experiment was preregistered at https://aspredicted.org/ze3tn.pdf.
 The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from https://osf.io/vgcnb/. \mccorrect{!TODO[Use a sensible archive format for this study data, archive on OSF, and produce data dictionary]}

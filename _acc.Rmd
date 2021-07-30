@@ -9,7 +9,7 @@ The ability to distinguish between accurate advisors in these experiments is imp
 @pescetelliRoleDecisionConfidence2021 demonstrated that people could identify and exploit more accurate advice, and these experiments seek to determine whether people will use that ability to obtain advice from a more reliable source.
 Experiment 1A§\@ref(ac-acc-dots) addressed this issue using the same perceptual decision task as use by @pescetelliRoleDecisionConfidence2021; Experiment 1B§\@ref(ac-acc-dates) extended the approach in a task asking participants to estimate historical dates.
 
-### Experiment 1A: Dots Task {#ac-acc-dots}
+### Experiment 1A: Advice accuracy effects in the Dots Task {#ac-acc-dots}
 
 ```{r ac-acc-dots-load, include = F}
 
@@ -39,9 +39,37 @@ A snapshot of the state of the code for running the experiment at the time the e
 
 #### Method {#ac-acc-dots-m}
 
-\mccorrect{NICK:Include participant numbers; include number of trials, blocks, etc. and how they were organised. Any forced advisor trials in the main experiemnt? Even though it's in the title able "Dots task", it's helpful for the reader to include this detail in the text as a brief reminder: e.g. "Participants performed the dot count perceptual decision task in XX blocks of YY trials, with the choice between two advisors on each trial after their initial decision". Useful to make explicit (here or in the general methods) what the participants were told about advisors, if anything. E.g. were they told that the advisors would differ and it was up to them (the participants) to figure out whose advice they wanted? How many familiarisation trials etc.}
+```{r ac-acc-dots-m-structure}
+tmp <- trials %>% 
+  group_by(block, pid) %>% 
+  summarise(
+    n = n(), 
+    typeName = paste(unique(typeName)), 
+    practice = sum(practice),
+    .groups = 'drop'
+  ) %>% 
+  select(-pid) %>% 
+  unique()
+```
 
-\mccorrect{!TODO[clarify any methodological differences from the main methods chapter]}
+`r length(unique(trials$pid))` participants each completed `r sum(tmp$n)` trials over `r nrow(tmp)` blocks of a perceptual decision-making task.
+Each trial consisted of three phases: participants gave an initial estimate (with confidence) of which of two briefly presented boxes contained more dots; received advice on their decision from an advisor; and made a final decision (again, with confidence).
+
+Participants started with `r sum(tmp$typeName == "catch")` blocks of `r tmp %>% filter(typeName == "catch") %>% mutate(n = n - (n %% 4)) %>% .$n %>% unique()` trials that contained no advice to allow them to familiarise themselves with the task; to allow the staircasing process to titrate the difficulty to their ability in order to maintain approximately 71% initial estimate accuracy; and to allow estimating of participants' idiosyncratic confidence reporting style.
+The first three trials were introductory trials that explained the task.
+All trials in this section included feedback indicating whether or not the participant's response was correct.
+
+Participants then did `r tmp %>% filter(typeName == "force" & practice) %>% .$n %>% sum()` trials with a practice advisor to get used to receiving advice.
+They were informed that they would "get **advice** from an advisor to help you make your decision", and that "advice is not always correct, but it is there to help you: if you use the advice you will perform better on the task."
+
+```{r ac-acc-dots-m-structure-main}
+tmp <- tmp %>% filter(!practice)
+```
+
+Participants then performed `r sum(tmp$typeName == "choice")` sets of `r nrow(tmp) / sum(tmp$typeName == "choice")` blocks each.
+These sets consisted of `r sum(tmp$typeName == "force") / sum(tmp$typeName == "choice")` familiarisation block of `r tmp %>% filter(typeName == "force") %>% .$n %>% unique()` trials in which participants were assigned one of two advisors.
+The familiarisation block was followed with a test block of `r tmp %>% filter(typeName == "choice") %>% .$n %>% unique()` trials in which participants could choose between the advisors they encountered in the familiarisation block.
+The participants saw different pairs of advisors in each set, with each pair consisting of one advisor with each of the advice profiles.
 
 ##### Advice profiles
 
@@ -789,8 +817,8 @@ The advisors' actual accuracies matched the target accuracies (Table \@ref(tab:a
 
 During the Familiarization stage of the experiment, participants were assigned advisors by fiat. 
 Although participants were primarily learning about the advisors at this time, we can nonetheless look at differences in the influence of the advisors without the confound of advisor choice.
-As shown in Figure \@ref(fig:ac-acc-dots-r-influence-graph), the level of influence was equivalent between advisors, with most participants being almost exactly equally influenced by both advisors.
-\mccorrect{Do we want to perhaps look at the last half of the trials on these blocks for influence, so we can make the argument that they've had a chance to get to know the advisors a little? How long are the blocks?}
+As shown in Figure \@ref(fig:ac-acc-dots-r-performance)E, the level of influence was equivalent between advisors, with most participants being almost exactly equally influenced by both advisors.
+\mccorrect{TODO: Do we want to perhaps look at the last half of the trials on these blocks for influence, so we can make the argument that they've had a chance to get to know the advisors a little? How long are the blocks?}
 
 ##### \OpenScience{prereg} Hypothesis test {#ac-acc-dots-r-h}
 
@@ -910,7 +938,8 @@ ggplot(tmp, aes(x = Difference, y = pPickHigh)) +
 
 
 As noted above, the stochastic nature of the advisors' advice meant that there was some variation in the participants' experience of the advisors.
-Despite this difference, there was no evidence of a relationship between participants' advisor preference and their experience of either advisor accuracy ($BF_{10}=$ `r bf2str(exp(r_acc@bayesFactor$bf))`) or advisor agreement ($BF_{10}=$ `r bf2str(exp(r_agr@bayesFactor$bf))`).
+Despite this difference, there was no evidence of a relationship between participants' advisor preference and their experience of either advisor accuracy ($BF_{10}=$ `r bf2str(exp(r_acc@bayesFactor$bf))`) or advisor agreement ($BF_{10}=$ `r bf2str(exp(r_agr@bayesFactor$bf))`), with the latter indicating an absence of a relationship. 
+This is not entirely surprising because, as with the accuracy correlations discussed above, there was relatively little variation in experience of advisors so effects might be expected to be small and difficult to detect.
 
 ```{r}
 tmp <- test %>%
@@ -944,9 +973,12 @@ The Bayes factor for this t-test indicated good evidence of no difference in pic
 
 ##### Summary/Discussion
 
-\mccorrect{NICK:Add a brief summary/discussion here. Note key results, and end with statement that we were next interested if we'd see the same result in a different task context.}
+In the absence of feedback, it should be possible for a person to evaluate advice using the proxy of whether or not the advice accords with their initial opinion, at least given some reasonable assumptions about the independence of the initial opinion and the advice.
+In this experiment, we tested whether participants would be able to exploit this heuristic to detect that one advisor was more useful than another, and whether they would choose to hear advice from the more useful advisor.
+Participants showed a tendency, where they had a preference, to prefer the High accuracy advisor. 
+In the next experiment, we aimed to replicate the results in a different task.
 
-### Experiment 1B: Dates Task {#ac-acc-dates}
+### Experiment 1B: Advice accuracy effects in the Dates Task {#ac-acc-dates}
 
 This experiment \mccorrect{NICK:provided a basic exploration of advice seeking and advice use in the Dates Task (if it's the first one reported), and aimed to replicate the results of Experiment X in the context of this task. For the reader, a brief orientation sentence or two is helpful, even if it seems redundant.}
 

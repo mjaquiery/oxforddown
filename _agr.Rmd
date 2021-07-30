@@ -1,14 +1,16 @@
 
-## Agreement {#ac-agr}
+## Effects of Advisor Agreement on Advisor Selection {#ac-agr}
 
-\mccorrect{!TODO[check Niccolo covered this]} 
+The next pair of experiments investigated how advice preferences are shaped by advisors’ likelihood of giving advice that agrees vs. disagrees with participants’ own initial estimates. 
+Pescetelli and Yeung \mccorrect{NICK: Niccolo Exp 2 in the JEP:G paper. He found (in terms of influence) a big effect of agreement and a much smaller effect of accuracy when there was no feedback. When feedback was provided, accuracy had maybe a bit bigger effect than agreement, but both effects were clear.} demonstrated that advisors who agree \mccorrect{NICK: somewhere we need to talk about what we mean by agreement, how Niccolo defined it, how we define it (varies between binary/continuous tasks), etc. Remind the reader what we mean by agreement in Method} more frequently are more influential (regardless of the presence of feedback) in a lab-based perceptual decision-making task.}
+\mccorrect{NICK: Here we explored the impact of agreement on participants’ choice of advisor. Experiment X looks at this effect in the Dots task, while Experiment Y does the same for the Dates task.}
 
-Pescetelli and Yeung \mccorrect{!TODO[cite new paper]} demonstrated that advisors who agree \mccorrect{!TODO[somewhere we need to talk about what we mean by agreement, how Niccolo defined it, how we define it (varies between binary/continuous tasks), etc.]} more frequently are more influential (regardless of the presence of feedback) in a lab-based perceptual decision-making task.
-
-There were differences in how participants selected the advisors between the Dots task (which has no feedback) and the No feedback condition of the Dates task for High versus Low accuracy advisors.
+Experiments 1A§\@ref(ac-acc-dots) and 1B§\@ref(ac-acc-dates) revealed differences in how participants selected the advisors between the Dots task (which has no feedback) and the No feedback condition of the Dates task for High versus Low accuracy advisors. 
 We may expect more pronounced effects in the absence of feedback when contrasting High versus Low agreement advisors, because we expect that agreement is the driving force behind the accuracy differences where feedback is not provided.
 
-### Experiment 2A: Dots Task {#ac-agr-dots}
+### Experiment 2A: Advisor agreement effects in the Dots Task {#ac-agr-dots}
+
+\mccorrect{NICK: In this experiment, the advice provided was no longer independent of participants’ own initial decisions. Instead, advice was provided contingent on those decisions, such that the two advisors varied in their likelihood…etc. I think it's worth making the point explicit, to begin to suggest how we can dissociate agreement and accuracy.}
 
 ```{r ac-agr-dots-load, include = F}
 
@@ -31,7 +33,37 @@ A snapshot of the state of the code for running the experiment at the time the e
 
 #### Method {#ac-agr-dots-m}
 
-\mccorrect{!TODO[clarify any methodological differences from the main methods chapter]}
+```{r ac-agr-dots-m-structure}
+tmp <- trials %>% 
+  group_by(block, pid) %>% 
+  summarise(
+    n = n(), 
+    typeName = paste(unique(typeName)), 
+    practice = sum(practice),
+    .groups = 'drop'
+  ) %>% 
+  select(-pid) %>% 
+  unique()
+```
+
+`r length(unique(trials$pid))` participants each completed `r sum(tmp$n)` trials over `r nrow(tmp)` blocks of a perceptual decision-making task.
+Each trial consisted of three phases: participants gave an initial estimate (with confidence) of which of two briefly presented boxes contained more dots; received advice on their decision from an advisor; and made a final decision (again, with confidence).
+
+Participants started with `r sum(tmp$typeName == "catch")` blocks of `r tmp %>% filter(typeName == "catch") %>% mutate(n = n - (n %% 4)) %>% .$n %>% unique()` trials that contained no advice to allow them to familiarise themselves with the task; to allow the staircasing process to titrate the difficulty to their ability in order to maintain approximately 71% initial estimate accuracy; and to allow estimating of participants' idiosyncratic confidence reporting style.
+The first three trials were introductory trials that explained the task.
+All trials in this section included feedback indicating whether or not the participant's response was correct.
+
+Participants then did `r tmp %>% filter(typeName == "force" & practice) %>% .$n %>% sum()` trials with a practice advisor to get used to receiving advice.
+They were informed that they would "get **advice** from an advisor to help you make your decision", and that "advice is not always correct, but it is there to help you: if you use the advice you will perform better on the task."
+
+```{r ac-agr-dots-m-structure-main}
+tmp <- tmp %>% filter(!practice)
+```
+
+Participants then performed `r sum(tmp$typeName == "choice")` sets of `r nrow(tmp) / sum(tmp$typeName == "choice")` blocks each.
+These sets consisted of `r sum(tmp$typeName == "force") / sum(tmp$typeName == "choice")` familiarisation block of `r tmp %>% filter(typeName == "force") %>% .$n %>% unique()` trials in which participants were assigned one of two advisors.
+The familiarisation block was followed with a test block of `r tmp %>% filter(typeName == "choice") %>% .$n %>% unique()` trials in which participants could choose between the advisors they encountered in the familiarisation block.
+The participants saw different pairs of advisors in each set, with each pair consisting of one advisor with each of the advice profiles.
 
 ##### Advice profiles
 
@@ -39,7 +71,6 @@ A snapshot of the state of the code for running the experiment at the time the e
 
 pCor <- .71
 agr <- matrix(c(.84, .61, .66, .17), 2, 2)
-
 
 agr.table <- tribble(
   ~`Advisor`, ~`Participant correct`, ~`Participant incorrect`, ~`Overall`, ~`Overall accuracy`,
@@ -51,6 +82,8 @@ agr.table <- tribble(
 tmp <- sapply(1:ncol(agr), function(i) sum(agr[, i] * c(pCor, 1 - pCor)))
 
 ```
+
+\mccorrect{NICK: Maybe frame in terms of overall aims: Advisors were defined in terms of their likelihood of agreement with participants' correct vs. incorrect initial decisions, while being matched in terms of their objective accuracy. Then give the numbers. This gives a bit of context for numbers that otherwise seem a bit arbitrary.}
 
 The two advisor profiles (Table \@ref(tab:ac-agr-dots-m-profiles)) used in the experiment were High agreement and Low agreement
 The High agreement advisor gave advice that endorsed the same answer side as the participant's initial estimate `r round(tmp[1] * 100, 1)`% of the time while the Low agreement advisor agreed with the participant `r round(tmp[2] * 100, 1)`% of the time.
@@ -462,194 +495,9 @@ gg$acc + gg$conf + gg$roc + gg$auroc + gg$inf +
 
 ```
 
-Before exploring the interaction between the participants' responses and the advisors' advice, and the participants' advisor selection behaviour, it is useful to verify that participants interacted with the task in a sensible way, and that the task manipulations worked as expected.
-In this section, task performance is explored during the Familiarization phase of the experiment where participants received advice from a pre-specified advisor on each trial. 
-There were an equal number of these trials for each participant for each advisor.
+\mccorrect{NICK: Replace all of the sections below with a single summary paragraph, that includes relevant statistics to support key points (i.e., also cutting all the figures, and I'd suggest leaving out RTs altogether), prefaced by a simple statement: "Basic behavioural performance was similar to that observed with the same Dots task in Experiment X: initial decision accuracy converged on the target 71%, participants benefitted from advice in terms of their final decisions being more accurate than... their initial decisions (STATS); they were more confident in their correct answers than their incorrect ones (STATS), etc.}
 
-###### Response times
-
-Participants made two decisions during each trial. 
-Neither of these decisions had a maximum response time. 
-Each participant's response times for both initial and final decisions can be seen in Figure \@ref(fig:ac-agr-dots-r-response-times).
-
-```{r ac-agr-dots-r-response-times, fig.caption="Response times for the Dots task with in/accurate advisors.  Each point shows a response relative to the start of the trial. Each row indicates a single participant's trials. The ridges show the distribution of the underlying points, with initial estimates and final decisions shown in different colours. The grey numbers on the right show the number of trials whose response times were more than 3 standard deviations away from the mean of all final response times (rounded to the next 10s)."}
-
-tmp <- familiarization %>% 
-  transmute(
-    pid = factor(pid),
-    `Initial estimate` = timeInitialResponse - timeInitialStart,
-    `Final decision` = timeFinalResponse - timeInitialStart
-  ) %>%
-  pivot_longer(c(`Initial estimate`, `Final decision`),
-               names_to = "Event", 
-               values_to = "Time") %>%
-  filter(!is.na(Event) & !is.na(Time)) %>%
-  rename(Participant = pid)
-
-max_rt <- tmp %>% 
-  filter(Event == 'Final decision') %>%
-  mutate(zTime = scale(Time)) %>%
-  filter(zTime > 3) %>%
-  filter(zTime == min(zTime)) %>% 
-  pull(Time) %>% 
-  .[1]
-# round to 10s
-max_rt <- ceiling(max_rt / 10000) * 10000
-  
-
-# Replace out-of-scale values with a count of dropped values
-dropped <- tmp %>%
-  group_by(Participant) %>%
-  filter(Time > max_rt) %>%
-  transmute(n = n())
-
-tmp <- tmp %>% 
-  filter(Time <= max_rt) %>% 
-  mutate(
-    Participant = fct_reorder(Participant, Time, .desc = T),
-    Event = factor(Event)
-  ) %>%
-  order_factors()
-
-ggplot(tmp, aes(y = Participant, x = Time, fill = Event, colour = Event)) +
-  geom_density_ridges(alpha = .25, colour = NA) +
-  geom_point(alpha = .25, size = .25) +
-  geom_text(aes(label = paste0('+', dropped$n), y = Participant),
-            inherit.aes = F, x = max_rt, colour = 'grey', hjust = 1, 
-            data = dropped) +
-  scale_x_continuous(limits = c(0, max_rt), expand = c(0, 0)) +
-  labs(x = 'Time since trial start') +
-  theme(
-    axis.text.y = element_blank(),
-    axis.ticks.y = element_blank(),
-    legend.position = 'top',
-    plot.margin = 
-  ) +
-  coord_fixed(max_rt/length(unique(tmp$Participant)))
-
-```
-
-All participants had similar patterns: initial and final responses were approximately normally distributed, with final responses having a higher variance due to incorporating the initial responses within them.
-Most participants show some trials on which initial or final responses took substantially longer than usual.
-
-###### Accuracy
-
-```{r ac-agr-dots-r-accuracy}
-tmp <- familiarization %>% 
-  transmute(
-    pid = factor(pid),
-    initialAnswerCorrect,
-    finalAnswerCorrect,
-    Advisor
-  ) %>%
-  group_by(pid, Advisor) %>%
-  summarise(
-    initial = mean(initialAnswerCorrect), 
-    final = mean(finalAnswerCorrect), 
-    .groups = 'drop'
-  ) %>%
-  pivot_longer(
-    c(initial, final), 
-    names_to = 'Decision', 
-    values_to = 'accuracy'
-  ) %>%
-  mutate(Decision = factor(Decision))
-  
-
-aov_acc <- ez::ezANOVA(
-  tmp, 
-  dv = accuracy,
-  wid = pid,
-  within = c(Advisor, Decision)
-)
-
-tmp <- aov_acc$ANOVA %>%
-  nest(d = -Effect) %>%
-  mutate(s = map(d, ~ glue(
-    "F({.$DFn},{.$DFd})={num2str(.$F, 2)}, p={prop2str(.$p, minPrefix = '<')}"
-  )))
-```
-
-Accuracy of initial decisions was controlled by a staircasing procedure which aimed to pin accuracy to 71%.
-The accuracy of final decisions was free to vary according to the ability of the participant to take advantage of the advice on offer.
-As Figure \@ref(fig:ac-agr-dots-r-performance)A shows, participants' accuracy scores for initial decisions were close to the target values.
-Participants did not tend to improve the accuracy of their responses following advice from High agreement advisors, while the evidence was unclear as to whether there was any difference in response accuracy with Low agreement advice.
-The distribution of initial estimate accuracy for trials with the High agreement advisor is slightly unusual, with an almost-bimodal structure and a median somewhat higher than the target value. 
-There is no obvious reason why this should be the case.
-
-###### Confidence
-
-```{r ac-agr-dots-r-confidence}
-
-df <- familiarization %>% 
-  transmute(
-    pid = factor(pid),
-    initialConfidence,
-    finalConfidence,
-    Advisor,
-    initialAnswerCorrect,
-    finalAnswerCorrect
-  ) %>%
-  pivot_longer(
-    cols = c(initialConfidence, finalConfidence),
-    names_to = "Decision", 
-    names_pattern = "(.+)Confidence",
-    values_to = "Confidence"
-  ) %>%
-  mutate(
-    Correct = if_else(
-      Decision == "initialConfidence", 
-      initialAnswerCorrect,
-      finalAnswerCorrect
-    ),
-    Correct = factor(Correct),
-    Decision = factor(str_to_sentence(Decision))
-  ) %>%
-  select(-ends_with('AnswerCorrect')) %>%
-  group_by(pid, Advisor, Decision, Correct) %>%
-  summarise(
-    Confidence = mean(Confidence), 
-    .groups = 'drop'
-  )
-
-aov_acc <- ez::ezANOVA(
-  df, 
-  dv = Confidence,
-  wid = pid,
-  within = c(Advisor, Decision, Correct)
-)
-
-tmp <- aov_acc$ANOVA %>%
-  nest(d = -Effect) %>%
-  mutate(s = map(d, ~ glue(
-    "F({.$DFn},{.$DFd})={num2str(.$F, 2)}, p={prop2str(.$p, minPrefix = '<')}"
-  )))
-
-# 3-way interaction
-m <- df %>% 
-  group_by(Advisor, Correct, Decision) %>% 
-  summarise(conf = mean(Confidence), .groups = 'drop') %>%
-  pivot_wider(names_from = Decision, values_from = conf) %>%
-  mutate(Difference = Final - Initial) %>%
-  select(-Final, -Initial) %>%
-  pivot_wider(names_from = Correct, values_from = Difference) %>%
-  mutate(Split = `TRUE` - `FALSE`) %>%
-  select(Advisor, Split)
-
-```
-
-Generally, we expect participants to be more confident on trials on which they are correct compared to trials on which they are incorrect.
-Participants were systematically more confident on correct as compared to incorrect trials for both initial estimates and final decisions.
-
-###### Metacognitive ability
-
-As shown by Figure \@ref(fig:ac-agr-dots-r-performance)C, almost all participants showed above-chance metacognitive sensitivity for both initial estimates and final decisions.
-Participants generally showed higher metacognitive sensitivity for final decisions, although this may be an artefact of a change in metacognitive bias.
-Participants' metacognitive sensitivity was not particularly high \mccorrect{!TODO[What are typical values we might expect in the dots task and similar tasks? Is there a useful mapping between meta-d' and Type II ROC to compare with e.g. Roualt's stuff?]}.
-There was no evidence of participants' metacognitive sensitivity being correlated with their task performance (Figure \@ref(fig:ac-agr-dots-r-performance)D). 
-This is expected when task performance is tightly controlled, because under these conditions variation in task performance reflects variation within a participant rather than between participants. 
-
-##### Influence of advice
+\mccorrect{NICK: f you were keeping one figure, I'd suggest it was the scatterplot of pre- vs. post-advice confidence. It's a nice visual illustration again of how people use advice.}
 
 ```{r ac-agr-dots-r-influence, fig.caption="Advice influence on the Dots task with in/accurate advisors.  Each point shows the initial and final confidence on a single trial. Final confidence is coded relative to initial confidence so that increasing confidence in the opposite decision (i.e. confidence on trials where the participant changed their mind) is increasingly negative. Points above the dashed y = x line represent increased confidence, while those below it give decreased confidence. Points close to the y = x line indicate relatively little change, while points further away indicate relatively greater change. The shaded grey area shows the zone outside which influence is capped (by moving vertically towards the grey zone boundary) when using the capped influence measure. Agreement and disagreement trials are plotted seperately, with trials coloured according to whether the initial decision was correct."}
 
@@ -684,64 +532,14 @@ familiarization %>%
 
 ```
 
-As with the High vs Low accuracy experiment (§\@ref(ac-dots-r-confidence-change)), there was an evident off-diagonal pattern in the disagreement trials, indicating a tendency for some participants to change their minds while preserving their confidence. 
-
-As before, inspection of individual participant plots for disagreement trials where participants changed their minds (Figure \@ref(fig:ac-agr-dots-r-confidence-change-p)), this pattern is more likely due to aggregation than a behaviour of any particular individual. 
-There were, however, more participants who showed off-diagonal-like patterns than with the Accuracy experiment.
-
-```{r ac-agr-dots-r-confidence-change-p, fig.caption="Change-of-mind confidence updating on the Dots task.  Each facet shows data from a single participant for trials where they changed their mind on the categorical decision between the initial estimate and the final decision. Participants who never changed their mind are not included. Each point shows the initial and final confidence on a single trial. All final confidence scores are negative because they are coded relative to initial confidence; increasing confidence in the final decision is increasingly negative.  Lines show the best fit for a linear prediction of final from initial confidence, with solid lines indicating that the slope is significantly different from zero at alpha = .05. Points are coloured according to the value of the slope parameter. The grey line is the y = x - 1 line that shows the expected fit line according to the intuitive model of confidence updating.", fig.width = 7, fig.height = 7}
-
-# Take trials where decision switches
-crossers <- familiarization %>% 
-  filter(initialAnswer != finalAnswer) %>%
-  mutate(initialConfidenceScore = abs(initialConfidenceScore),
-         finalConfidenceScore = -abs(finalConfidenceScore)) %>%
-  # How good a predictor is initial confidence of final confidence by participant?
-  nest(d = -pid) %>%
-  filter(map_int(d, nrow) > 2) %>%
-  mutate(
-    m = map(d, ~ lm(finalConfidenceScore ~ initialConfidenceScore, data = .)),
-    m = map(m, broom::tidy),
-    m = map(m, ~ pivot_wider(., names_from = term, values_from = -term) %>%
-              transmute(intercept = `estimate_(Intercept)`, 
-                        slope = estimate_initialConfidenceScore, 
-                        `p<.05` = p.value_initialConfidenceScore < .05))
-  ) %>%
-  unnest(cols = m) %>%
-  arrange(desc(slope)) %>%
-  mutate(p = paste0('p', pid),
-         p = factor(p),
-         p = fct_reorder(p, desc(slope)),
-         `p<.05` = if_else(`p<.05`, 'p < .05', 'p >= .05'),
-         Beta = cut(slope, 
-                      breaks = c(-Inf, -1/3, 0, 1/3, Inf),
-                      labels = c('< -1/3', '-1/3:0', '0:1/3', '> 1/3')))
-
-crossers %>%
-  unnest(cols = d) %>%
-  ggplot(aes(initialConfidenceScore, finalConfidenceScore, colour = Beta)) +
-  geom_abline(slope = 1, intercept = -1, colour = 'grey', size = 1) +
-  geom_abline(aes(slope = slope, intercept = intercept, linetype = `p<.05`), 
-              data = crossers) +
-  geom_point(alpha = 1/3) +
-  facet_wrap(~p) +
-  coord_fixed() +
-  scale_y_continuous(breaks = c(0, -.5, -1), expand = c(0,.05)) +
-  scale_x_continuous(breaks = c(0, .5, 1), expand = c(0,.05)) +
-  scale_linetype_manual(name = '', values = c('solid', 'dashed')) +
-  theme(panel.spacing = unit(1, 'lines'), 
-        legend.position = 'bottom',
-        plot.margin = unit(c(0, 0, 1, 0), 'lines')) +
-  labs(x = 'Initial confidence', y = 'Final confidence')
-
-```
-
 ##### Experience with advisors
 
 The advice is generated probabilistically from the rules described previously in Table \@ref(tab:ac-agr-dots-m-profiles).
 It is thus important to get a sense of the actual advice experienced by the participants.
 
 ###### Advisor accuracy
+
+\mccorrect{NICK: cut figures, replace with simple tables and brief description.}
 
 As shown in Figure \@ref(fig:ac-agr-dots-r-advice-acc), the advisors were similarly accurate on average as expected. 
 Nevertheless, some participants experienced in practice 10-20% differences in advisor accuracy (although neither advisor was systematically more accurate across participants). 
@@ -909,11 +707,13 @@ ggplot(tmp, aes(x = '', y = pChooseHigh)) +
 
 ```
 
-The results of the advisor choice (Figure \@ref(fig:ac-agr-dots-r-graph)) were the same as those for the Dots task with High versus Low accuracy advisors (§\@ref(ac-acc-r-h)).
-The High agreement advisor was preferred at a rate greater than that expected by chance (`r .T`).
-The modal preference remained at chance, although, as in the accuracy experiment, almost all participants who manifested a preference preferred the High agreement advisor.
+Consistent with the key prediction of this experiment, advisor choice varied significantly as a function of advisor agreement rate (Figure \@ref(fig:ac-agr-dots-r-graph)): The High agreement advisor was preferred at a rate greater than that expected by chance (`r .T`).
+The modal preference remained at chance, but almost all participants who manifested a preference preferred the High agreement advisor. 
+Altogether, these results are in line with the effects of advisor accuracy in the same task as found in Experiment 1A§\@ref(ac-acc-dots). 
+Of interest next was whether this pattern would also be apparent in the Dates task.
 
-### Experiment 2B: Dates Task {#ac-agr-dates}
+### Experiment 2B: Advisor agreement effects in the Dates Task {#ac-agr-dates}
+
 
 ```{r ac-agr-dates-load, include = F}
 
@@ -941,7 +741,6 @@ AdvisedTrial <- annotate_responses(AdvisedTrial)
 ```
 
 #### Open scholarship practices
-
 
 This experiment was preregistered at `r unique(datequiz$preregistration)`.
 The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from \mccorrect{!TODO[OSFify Dates task data]}.
