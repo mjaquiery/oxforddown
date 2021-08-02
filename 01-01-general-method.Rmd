@@ -113,8 +113,15 @@ knitr::include_graphics("figures/methods/dots.jpg")
 The Dots Task stimuli can be customised to make the discrimination easier or more difficult.
 This means that the stimuli can be adjusted to maintain a specific accuracy for each individual participant, allowing confidence to be examined in the absence of confounds with the probability of being correct.
 Stimuli were continually adjusted throughout the experiment to maintain an initial estimate accuracy of around 72% using a 2-down-1-up staircase procedure.
-There were a substantial number \mccorrect{!TODO[how many?]} of trials in the practice block so that participants could eliminate practice effects and thus experience a more stable objective difficulty during the core trial blocks.
+There were a substantial number of trials in the practice block so that participants could eliminate practice effects and thus experience a more stable objective difficulty during the core trial blocks.
+The specific number of practice trials differed between experiments as we sought to balance minimising the participant time requirement with minimising practice effects.
+
+Throughout the experiment a progress bar provided a graphical indication of the number of trials remaining in the experiment.
 After each block participants were told what percentage of the final decisions they had provided were correct and allowed to take a short, self-paced break.
+
+At the end of the experiment participants were presented with a questionnaire asking them to rate their advisors' likeability, ability, and benevolence [@mayerIntegrativeModelOrganizational1995], and offering them the opportunity to provide free-text comments on the advisors and the experiment in general.
+These questionnaire responses are not analysed because they were generally uninformative.
+Some free text responses may be redacted in the open data to prevent participants being identifiable.
 
 ##### Specific limitations
 
