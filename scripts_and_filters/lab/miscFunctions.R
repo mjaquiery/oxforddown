@@ -9,13 +9,13 @@
 #' @return string with neatly printed mean
 prettyPrint <- function(results, d = NULL, doPrint = T) {
   es <- NULL
-  if(!is.null(d))
+  if (!is.null(d))
     es <- paste0(' , d = ', round(d,2))
   out <- paste0('t(',results$parameter,') = ',round(results$statistic,2),
                 ' [',round(attr(results$conf.int, "conf.level")*100),'%CI: ',
                 round(results$conf.int[[1]],2), ', ', round(results$conf.int[[2]],2),'],',
                 ' p = ',prop2str(results$p.value,3), es)
-  if(doPrint)
+  if (doPrint)
     print(out)
   return(out)
 }
@@ -41,7 +41,7 @@ printMean <- function(vector, label = 'Mean', doPrint = T, conf.int = .95, na.rm
   out <- paste0(label,'=', precisionFun(mu,decimals), ' [', precisionFun(conf.int*100,decimals,F), '%CI: ',
                 precisionFun(ci.low,decimals), ', ', precisionFun(ci.high,decimals),'] [Range: ',
                 r[[1]], ', ', r[[2]], ']')
-  if(doPrint)
+  if (doPrint)
     print(out)
   return(out)
 }
@@ -60,7 +60,7 @@ quickCompareVectors <- function(v1, v2, label1 = 'Vector 1', label2 = 'Vector2',
   bf <- ttestBF(v1, v2, paired = paired)
   out <- paste0(printMean(v1, label1, F), ' \n', printMean(v2, label2, F))
   out <- paste0(out, ' \n', prettyPrint(result, d, doPrint = F), ', BF = ', round(exp(bf@bayesFactor$bf),3))
-  if(doPrint) {
+  if (doPrint) {
     printMean(v1, label1)
     printMean(v2, label2)
     print(paste0(prettyPrint(result, d, doPrint = F), ', BF = ', round(exp(bf@bayesFactor$bf),3)))
@@ -122,11 +122,11 @@ style.long <- style + theme(legend.position = 'none')
 aggregateMissing <- function(df, id.colName, factor.colNames) {
   out <- NULL
   lvls <- 1
-  for(x in factor.colNames) {
+  for (x in factor.colNames) {
     lvls <- lvls * length(levels(df[ , x]))
   }
-  for(id in unique(df[ , id.colName])) {
-    if(sum(df[ , id.colName] == id) < lvls)
+  for (id in unique(df[ , id.colName])) {
+    if (sum(df[ , id.colName] == id) < lvls)
       out <- c(out, id)
   }
   return(out)
@@ -139,10 +139,10 @@ aggregateMissing <- function(df, id.colName, factor.colNames) {
 #' @param obj ezANOVA output (supports return_aov = T|F)
 prettifyEZ <- function(obj) {
   # if there's a $ANOVA item use that instead
-  if(!is.null(obj$ANOVA))
+  if (!is.null(obj$ANOVA))
     return(prettifyEZ(obj$ANOVA))
   okayCols <- c('F', 'p', 'ges') %in% colnames(obj)
-  if(!all(okayCols)) {
+  if (!all(okayCols)) {
     colString <- paste0(c('F', 'p', 'ges')[!okayCols], collapse = ', ')
     msg <- paste0('Expected column', ifelse(sum(!okayCols) < 2, ' (', 's ('),
                   colString, 

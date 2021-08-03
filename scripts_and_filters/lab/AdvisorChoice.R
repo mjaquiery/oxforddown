@@ -15,6 +15,9 @@
 # --NON-Preregistered stuff--
 # 6) Descriptives
 
+
+# Load utility functions
+
 ## Packages and citations:
 library(esmData)
 library(reshape2)
@@ -25,6 +28,8 @@ library(BayesFactor)
 library(scoring)
 library(ez)
 library(Hmisc)
+source('scripts_and_filters/lab/utilityFunctions.R')
+source("scripts_and_filters/lab/miscFunctions.R")
 
 ## i) Get Data ####################################################################################
 print('Loading data')

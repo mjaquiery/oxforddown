@@ -408,15 +408,15 @@
     },
     "esmData": {
       "Package": "esmData",
-      "Version": "0.1.4",
+      "Version": "0.1.5",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "esmData",
       "RemoteUsername": "oxacclab",
-      "RemoteRef": "master",
-      "RemoteSha": "544d2a374c47b206a704cc490549c886a1a31dcd",
-      "Hash": "db5c064f7330f2f2fe9bc3e16c003879"
+      "RemoteRef": "HEAD",
+      "RemoteSha": "26832de2e32305ac62a2a250cf8e53c104ea6443",
+      "Hash": "10e08e02c61cfa57366519c19561b3af"
     },
     "evaluate": {
       "Package": "evaluate",

@@ -48,28 +48,138 @@ The code for running the experiment can be obtained from https://github.com/mjaq
 
 #### Method {#ac-cca-lab-m}
 
+```{r ac-ex1-load, include = F}
+
+rm(list = ls()); source('scripts_and_filters/general_setup.R')
+
+data("dotstask_lab")
+
+dotstask_lab <- lapply(dotstask_lab, \(x) rename(x, pid = participantId))
+
+# unpack
+participants <- dotstask_lab$participants
+advisors <- dotstask_lab$advisors
+trials <- dotstask_lab$trials
+questionnaires <- dotstask_lab$questionnaires
+
+advisors <- advisors %>%
+  filter(advice.type != "", pid %in% participants$pid) %>%
+  mutate(Advisor = case_when(
+    advice.type == 0 ~ 'Neutral',
+    advice.type == 1 ~ 'Bias-sharing',
+    advice.type == 2 ~ 'Anti-bias'
+  ))
+
+trials <- trials %>% 
+  filter(pid %in% participants$pid) %>%
+  left_join(
+    select(advisors, pid, id, Advisor), 
+    by = c('pid', advisorId = 'id')
+  ) %>%
+  mutate( 
+    # Rename and correct to zero-indexing
+    choice1 = map_dbl(choice, ~ .[1]), choice2 = map_dbl(choice, ~ .[2]),
+    initialConfidence = abs(cj1), finalConfidence = abs(cj2),
+    initialAnswer = int1 - 1, finalAnswer = int2 - 1,
+    switch = int1 != int2,
+    correctAnswer = wherelarger - 1,
+    confidenceCategory = case_when(
+      step == -1 ~ "Low",
+      step == 0 ~ "Medium",
+      step == 1 ~ "High"
+    ),
+    adviceSide = case_when(
+      obsacc == 1 ~ correctAnswer,
+      obsacc == 0 ~ 1 - correctAnswer
+    )
+  ) %>%
+  select(
+    pid, id, block, practice, feedback, correctAnswer, matches('^initial'), 
+    confidenceCategory, advisorId, Advisor, adviceSide, obsacc, agree,
+    matches('^final'), switch, matches('choice[12]'), step, contains('time')
+  ) %>% 
+  annotate_responses(max_conf = 55)
+
+old.trials <- read.csv('_old-influence-anova.csv') %>% mutate(across(c(pid, agree, hasChoice, advisor), factor))
+tmp <- trials %>% arrange(pid, id) %>% filter(advisorId %in% 1:2) %>% transmute(pid = factor(pid), agree = factor(agree), hasChoice = factor((choice1 + choice2) == 3), advisor = factor(advisorId), adviceInfluence = round(adviceInfluence * 55), initialAnswer, finalAnswer, initialConfidence, finalConfidence, adviceInfluenceCapped = round(adviceInfluenceCapped * 55)) %>% arrange(pid, adviceInfluence)
+tmp %>% View()
+
+old.trials <- old.trials %>% arrange(pid, inf) %>% select(-pid)
+old.trials %>% select(-pid)
+
+a <- apply(tmp, 1, \(x) paste0(x, collapse = "|"))
+b <- apply(old.trials, 1, \(x) paste0(x, collapse = "|"))
+
+which(a %in% b)
+
+
+ezANOVA(old.trials, dv = inf, wid = pid, within = c(agree, hasChoice, advisor))
+ezANOVA(tmp, dv = adviceInfluence, wid = pid, within = c(agree, hasChoice, advisor))
+
+```
+
+```{r ac-ex1-exclusions}
+
+# Exclusions
+accuracyRange <- c(.6, .9)
+preRegParticipants <- 24
+
+tmp <- trials %>% 
+  nest(d = -pid) %>%
+  mutate(d = map_dbl(d, ~ mean(.$initialAnswerCorrect)))
+
+exclusions <- tibble(pid = unique(trials$pid)) %>%
+  mutate(
+    `Accuracy too low` = pid %in% filter(tmp, d < accuracyRange[1])$pid,
+    `Accuracy too high` = pid %in% filter(tmp, d > accuracyRange[2])$pid
+  )
+
+do_exclusions(exclusions)
+
+tmp <- trials %>% 
+  nest(d = -pid) %>% 
+  rowid_to_column() %>% 
+  filter(rowid > preRegParticipants)
+
+exclusions <- exclusions %>% mutate(`Too many participants` = pid %in% tmp$pid)
+
+do_exclusions(exclusions, backup = F)
+
+
+# Filter out practice trials and excluded participants
+trials <- trials %>% 
+  filter(
+    !practice,
+    block > 2,
+    pid %in% participants$pid
+  )
+
+```
+
 The method for the lab study was different in many small ways from the general method used for the Dots task online.
 The basic trial experience was the same: participants saw two boxes of dots flashed breifly on the screen, and were asked to indicate which box had more dots, along with how confident they were in this initial estimate. 
 Participants then received advice and provided a final decision.
-On some trials participants were able to choose which of their advisors would provide the advice (Figure \@ref(fig:ex1-paradigm)).
+On some trials participants were able to choose which of their advisors would provide the advice (Figure \@ref(fig:ac-ex1-paradigm)).
 
-```{r ex1-paradigm, fig.align='center', fig.caption="Experiment 1 procedure.  The task began with a blank screen containing only a fixation cross and progress bar. Momentarily prior to the onset of the stimuli the fixation cross flickered. The stimuli, two rectangles containing approximately 200 dots each, appeared for 0.16s, one on either side of the fixation cross. Once the stimuli disappeared, a response-collection screen appeared and prompted the participant to indicate their initial decision and its confidence by selecting a point within one of two regions. The left region indicated a decision that the target was on the left, and increasingly-leftwards points within that region indicated increasing confidence in that decision. The right region indicated a decision that the target was on the right, and increasingly-rightwards points within that region indicated increasing confidence in that decision.  Next, the participant was presented with a choice screen. The choice screen displayed two images, one at the top of the screen and one at the bottom. The images were one of the following: an advisor portrait, a silhouette, or a red cross. The red cross was not selectable, forcing participants to choose the other option. The silhouette offered no advice, and was only ever offered as a forced choice. Selecting an advisor image provided the participant with the opinion of that advisor on the trial.  Having heard the advice, the participant was again presented with the response-collection screen, with a yellow indicator marking their original response. A second (final) judgement was collected using this screen (except on catch trials), and the trial concluded.", out.width="100%"}
+```{r ac-ex1-paradigm, fig.align='center', fig.caption="Experiment 1 procedure.  The task began with a blank screen containing only a fixation cross and progress bar. Momentarily prior to the onset of the stimuli the fixation cross flickered. The stimuli, two rectangles containing approximately 200 dots each, appeared for 0.16s, one on either side of the fixation cross. Once the stimuli disappeared, a response-collection screen appeared and prompted the participant to indicate their initial decision and its confidence by selecting a point within one of two regions. The left region indicated a decision that the target was on the left, and increasingly-leftwards points within that region indicated increasing confidence in that decision. The right region indicated a decision that the target was on the right, and increasingly-rightwards points within that region indicated increasing confidence in that decision.  Next, the participant was presented with a choice screen. The choice screen displayed two images, one at the top of the screen and one at the bottom. The images were one of the following: an advisor portrait, a silhouette, or a red cross. The red cross was not selectable, forcing participants to choose the other option. The silhouette offered no advice, and was only ever offered as a forced choice. Selecting an advisor image provided the participant with the opinion of that advisor on the trial.  Having heard the advice, the participant was again presented with the response-collection screen, with a yellow indicator marking their original response. A second (final) judgement was collected using this screen (except on catch trials), and the trial concluded.", out.width="100%"}
 knitr::include_graphics("figures/experiment_01_MATLAB/paradigm.jpg")
 ```
 
-Overall, `r nrow(participants)` participants (M~age~ = `r num2str(mean(participants$age))` ±SD `r num2str(sd(participants$age), 1)`, `r sum(tolower(participants$gender) == 'm')` male, `r sum(tolower(participants$gender) == 'f')` female, `r sum(tolower(participants$gender) != 'm' & tolower(participants$gender) != 'f')` other) recruited from the University of Oxford participant recruitment platforms took part in the experiment.
-An additional 2 participants attended experimental sessions but their data were not analysed because they were in excess of the number stated in preregistration.
+Overall, `r nrow(exclusions) + 1` participants were recruited from the University of Oxford participant recruitment platforms took part in the experiment and attended experimental sessions.
+`r nrow(exclusions) - nrow(participants)` participant was excluded because the preregistered sample size had already been met when their data were collected, and one participant's data was lost due to technical issues.
+The remaining participants had an average age of `r num2str(mean(participants$age))` (±SD `r num2str(sd(participants$age), 1)`).
+Their self-identified genders were give as `r sum(tolower(participants$gender) == 'm')` male, `r sum(tolower(participants$gender) == 'f')` female, `r sum(tolower(participants$gender) != 'm' & tolower(participants$gender) != 'f')` other.
 Participants were compensated for their time with either course credit for a psychology degree, or 10GBP.
 
 Each participant completed 363 trials (51 practice trials over 2 blocks + 12 x 26-trial experimental blocks).
-Prior to the first experimental block, after the final experimental block, and after the 4th and 8th experimental blocks, participants were presented with a questionnaire (Figure \@ref(fig:ex1-questionnaire)).
+Prior to the first experimental block, after the final experimental block, and after the 4th and 8th experimental blocks, participants were presented with a questionnaire (Figure \@ref(fig:ac-ex1-questionnaire)).
 The questionnaire contained 4 questions for each advisor.
 The questions asked for the judge’s assessment of the advisor’s likeability, trustworthiness, influence, and ability to do the task.
 The questions presented before the first experimental block were worded prospectively (e.g.
 ‘How much are you going to like this person?’ as opposed to ‘How much do you like this person?’).
 Answers were provided by moving a sliding scale below the advisor’s portrait towards the right for more favourable responses (marked ‘extremely’) or towards the left for less favourable responses (marked ‘not at all’).
 
-```{r ex1-questionnaire, fig.align='center', fig.caption="Experiment 1 advisor questionnaire.  Participants rated advisors on a number of different dimensions.", out.width="100%"}
+```{r ac-ex1-questionnaire, fig.align='center', fig.caption="Experiment 1 advisor questionnaire.  Participants rated advisors on a number of different dimensions.", out.width="100%"}
 knitr::include_graphics("figures/experiment_01_MATLAB/questionnaire.jpg")
 ```
 
@@ -84,216 +194,225 @@ The experiment was programmed in MATLAB R2017b [@MATLAB2017] using the Psychtool
 There were several differences from the online version of the task that are worth mentioning.
 First, there were more trials and the experiment took longer to complete.
 Second, when the participant was forced to have advice from one or other advisor, they were presented with the advisor choice screen and one of the options was a blank advisor that they were unable to select.
+This meant that advisor influence on the forced trials could be analysed as compared to choice trials.
 Third, 8% of trials were catch trials on which no advice was offered.
 Fourth, the questionnaires were more detailed and more numerous, and contained no free text fields.
 Fifth, participants had the opportunity to discuss the experiment with the experimenter after the experiment was complete, although none made use of this opportunity.
 
-```{r ex1-load, include = F}
-
-rm(list = ls()); source('scripts_and_filters/general_setup.R')
-
-data("dotstask_lab")
-
-dotstask_lab <- lapply(dotstask_lab, \(x) rename(x, pid = participantId))
-
-# unpack
-participants <- dotstask_lab$participants
-advisors <- dotstask_lab$advisors
-trials <- dotstask_lab$trials
-questionnaires <- dotstask_lab$questionnaires
-
-# Filter out practice trials and excluded participants
-advisors <- advisors %>%
-  filter(advice.type != "", pid %in% participants$pid) %>%
-  mutate(Advisor = case_when(
-    advice.type == 0 ~ 'Neutral',
-    advice.type == 1 ~ 'Bias-sharing',
-    advice.type == 2 ~ 'Anti-bias'
-  ))
-
-trials <- trials %>% 
-  filter(
-    !practice,
-    block > 2,
-    pid %in% participants$pid
-  ) %>%
-  left_join(
-    select(advisors, pid, id, Advisor), 
-    by = c('pid', advisorId = 'id')
-  ) %>%
-  mutate( 
-    choice1 = map_dbl(choice, ~ .[1]), choice2 = map_dbl(choice, ~ .[2]),
-    initialConfidence = cj1, finalConfidence = cj2,
-    initialAnswerCorrect = cor1, finalAnswerCorrect = cor,
-    initialAnswer = int1, finalAnswer = int2,
-    correctAnswer = wherelarger,
-    confidenceCategory = case_when(
-      step == -1 ~ "Low",
-      step == 0 ~ "Medium",
-      step == 1 ~ "High"
-    )
-  ) %>%
-  select(
-    pid, id, block, feedback, obsacc, agree, step, advisorId, Advisor,
-    matches('choice[12]'), matches('^(initial|final)'),
-    confidenceCategory, correctAnswer = wherelarger, contains('time')
-  )
-
-
-# These scripts are kinda old and crappy, but they should do the correct analyses
-
-# Load utility functions
-source('scripts_and_filters/lab/utilityFunctions.R')
-source("scripts_and_filters/lab/miscFunctions.R")
-# Run script
-source("scripts_and_filters/lab/AdvisorChoice.R")
-
-```
 ##### Advice profiles {#ex1-m-profiles}
 
 The two advisor profiles used in the experiment were Bias sharing and Anti-bias.
 The advisors are balanced for their overall accuracy and agreement rates, but the Bias sharing advisor agrees more frequently with participants when their initial estimate is correct and made with relatively high confidence.
-The Anti-bias advisor agrees more frequently with participants when their initial estimate is correct and made with relatively low confidence (Table \@ref(tab:ex1-advisor-profiles)).
+The Anti-bias advisor agrees more frequently with participants when their initial estimate is correct and made with relatively low confidence (Table \@ref(tab:ac-ex1-advisor-profiles)).
 Note that the overall correctness and agreement rates of the advisers are equivalent.
 Importantly, on a large minority of trials, the middle 40%, the advisers are exactly equivalent, meaning these trials can be compared directly without confounds arising from agreement rates and initial confidence.
 
-\mccorrect{TODO: This table looks sensible, but has the same variable across 2 different columns. Reformat it so we can tie it neatly to the observed values in the Results.}
-
-```{r ex1-advisor-profiles-r} 
+```{r ac-ex1-advisor-profiles-r} 
 
 ex1.table <- tribble(
-  ~` `, ~`  `, ~`Bias Sharing`, ~`Anti Bias`,
-  "Participant correct", "High (top 30%)", 80, 60,
-  "Participant correct", "Medium (middle 40%)", 70, 70,
-  "Participant correct", "Low (bottom 30%)", 60, 80,
-  "Participant incorrect", "Any", 30, 30,
-  "Total agreement", "Participant correct", 70, 70,
-  "Total agreement", "Participant incorrect", 30, 30
-)
+  ~ Advisor, ~ Low, ~ Medium, ~ High, ~ `Correct`, ~ `Incorrect`, ~ Overall, ~ Accuracy,
+  "Bias-sharing", 60, 70, 80, 70, 30, 70 * .71 + 30 * .29, 70 * .71 + 70 * .29,
+  "Anti-bias", 80, 70, 60, 70, 30, 70 * .71 + 30 * .29, 70 * .71 + 70 * .29
+) %>%
+  rename_with(~ paste(., footnote_marker_alphabet(2)), .cols = c(Low, High)) %>% 
+  rename_with(~ paste(., footnote_marker_alphabet(3)), .cols = Medium) %>%
+  rename_with(~ paste(., footnote_marker_alphabet(4)), .cols = Correct) %>% 
+  rename_with(~ paste(., footnote_marker_alphabet(5)), .cols = Overall) %>% 
+  rename_with(~ paste(., footnote_marker_alphabet(6)), .cols = Accuracy)
 
-kable(ex1.table, caption = "\\label{tab:ex1-advisor-profiles}Experiment 1 advisor advice profiles") %>%
+kable(ex1.table, caption = "\\label{tab:ac-ex1-advisor-profiles}Advisor advice profiles for Lab experiment") %>%
   kable_styling() %>%
-  column_spec(1, bold = T) %>%
-  row_spec(0, bold = F) %>%
-  collapse_rows(columns = 1, valign = "top") %>%
-  add_header_above(c(" ", 
-                     "Initial decision confidence", 
-                     "Probability of agreement (%)" = 2))
+  column_spec(7, bold = T) %>%
+  add_header_above(tribble(
+    ~ entry, ~ colspan,
+    "", 1,
+    paste0("Initial estimate confidence ", footnote_marker_alphabet(1)), 3, 
+    "Subtotals by initial estimate correctness", 2,
+    "", 2
+  )) %>%
+  add_header_above(c("", "Agreement" = 6, "")) %>%
+  add_footnote(
+    c(
+      "Only correct trials received confidence-contingent advice",
+      "30\\% of trials",
+      "40\\% of trials",
+      "Average correct agreement is the weigthed average of the previous three columns",
+      "Overall agreement is p(correct) * p(agree|correct) + p(¬correct) * p(agree|¬correct)",
+      "Overall accuracy is p(correct) * p(agree|correct) + p(¬correct) * p(¬agree|¬correct)"
+    )
+  )
 
 ```
 
-#### Results {#ex1-r}
+#### Results {#ac-ex1-r}
 
-##### Descriptive statistics {#ex1-r-descriptives}
+##### Exclusions
 
-`r nrow(participants) + 2` participants took part in the study.
-One participant was unable to complete the experiment due to technical difficulties.
-Preregistration of the study analysis stated that data would be collected from 24 participants, so the final (overbooked) subject tested was excluded from analysis.
-Descriptive statistics for the `r nrow(participants)` participants included in the analysis are presented in Table \@ref(tab:ex1-descriptives).
+Participants could be excluded for having initial estimate accuracy below 60% or above 90%, or for performing the experiment after the stated sample size had been reached. 
+No participants were excluded for having accuracy out of range. 
+`r nrow(exclusions) - nrow(participants)` participant was excluded for being extraneous.
 
-```{r ex1-descriptives-r} 
+##### Experience with advisors
 
-bind_rows(
-  # Correct trials
+```{r ac-ex1-r-advice} 
+
+left_join(
+  left_join(
+    # By confidence
+    trials %>% 
+      filter(as.logical(initialAnswerCorrect)) %>%
+      group_by(Advisor, confidenceCategory, initialAnswerCorrect, pid) %>%
+      summarise(agr = mean(agree, na.rm = T), .groups = 'drop') %>%
+      group_by(Advisor, confidenceCategory, initialAnswerCorrect) %>%
+      summarise(agr = mean(agr, na.rm = T), .groups = 'drop') %>%
+      filter(!is.na(confidenceCategory)) %>%
+      select(-initialAnswerCorrect) %>% 
+      pivot_wider(names_from = confidenceCategory, values_from = agr) %>%
+      select(Advisor, Low, Medium, High),
+    # By correctness
+    trials %>% 
+      filter(!is.na(Advisor)) %>%
+      mutate(
+        initialAnswerCorrect = if_else(
+          as.logical(initialAnswerCorrect), 
+          "Correct", 
+          "Incorrect"
+        )
+      ) %>%
+      group_by(Advisor, initialAnswerCorrect, pid) %>%
+      summarise(agr = mean(agree, na.rm = T), .groups = 'drop') %>%
+      group_by(Advisor, initialAnswerCorrect) %>%
+      summarise(agr = mean(agr, na.rm = T), .groups = 'drop') %>%
+      pivot_wider(names_from = initialAnswerCorrect, values_from = agr),
+    by = "Advisor"
+  ),
+  # Overall
   trials %>% 
-    filter(as.logical(initialAnswerCorrect)) %>%
-    group_by(Advisor, confidenceCategory, initialAnswerCorrect, pid) %>%
-    summarise(agr = mean(agree, na.rm = T), .groups = 'drop') %>%
-    group_by(Advisor, confidenceCategory, initialAnswerCorrect) %>%
-    summarise(agr = mean(agr, na.rm = T), .groups = 'drop') %>%
-    filter(!is.na(confidenceCategory)),
-  # Incorrect trials
-  trials %>% 
-    filter(!as.logical(initialAnswerCorrect), !is.na(Advisor)) %>%
-    group_by(Advisor, initialAnswerCorrect, pid) %>%
-    summarise(agr = mean(agree, na.rm = T), .groups = 'drop') %>%
-    group_by(Advisor, initialAnswerCorrect) %>%
-    summarise(agr = mean(agr, na.rm = T), .groups = 'drop'),
-  # Total
-  trials %>% 
-    filter(!as.logical(initialAnswerCorrect), !is.na(Advisor)) %>%
-    group_by(Advisor, initialAnswerCorrect, pid) %>%
-    summarise(agr = mean(agree, na.rm = T), .groups = 'drop') %>%
-    group_by(Advisor, initialAnswerCorrect) %>%
-    summarise(agr = mean(agr, na.rm = T), .groups = 'drop')
+    filter(!is.na(Advisor)) %>%
+    group_by(Advisor, pid) %>%
+    summarise(
+      agr = mean(agree, na.rm = T), 
+      acc = mean(obsacc, na.rm = T),
+      .groups = 'drop'
+    ) %>%
+    group_by(Advisor) %>%
+    summarise(
+      agr = mean(agr, na.rm = T), 
+      acc = mean(acc, na.rm = T),
+      .groups = 'drop'
+    ) %>%
+    rename(Overall = agr, Accuracy = acc),
+  by = "Advisor"
 )  %>% 
   mutate(
-    ` ` = case_when(
-      initialAnswerCorrect == 1 ~ "Participant correct",
-      initialAnswerCorrect == 0 ~ "Participant incorrect",
-      T ~ "Total agreement"
-    ),
-    agr = prop2str(agr)
+    across(-Advisor, ~ num2str(. * 100, 1)),
+    Advisor = glue("{Advisor}")
   ) %>%
-  rename() %>%
-  kable(caption = "\\label{tab:ex1-descriptives}Descriptive statistics for Experiment 1",
-        align = c('l', 'l', 'l', 'r', 'r', 'r', 'r'), 
+  bind_rows(
+    ex1.table %>%
+      mutate(
+        across(-Advisor, as.character),
+        Advisor = glue("{Advisor} (Target)")
+      ) %>%
+      rename_with(~ str_extract(., '\\w+'))
+  ) %>%
+  arrange(Advisor) %>%
+  kable(caption = "\\label{tab:ac-ex1-r-advice}Advisor agreement for Lab experiment",
+        align = c('l', 'r', 'r', 'r', 'r', 'r', 'r'), 
         escape = F) %>%
-  column_spec(1:2, bold = T, width = "3.25cm") %>%
-  collapse_rows(columns = 1:2, valign = "top") %>%
-  add_header_above(c(" " = 5, "95% CI" = 2)) %>%
-  kable_styling()
+  kable_styling() %>%
+  row_spec(c(2, 4), italic = T) %>%
+  add_header_above(tribble(
+    ~ entry, ~ colspan,
+    "", 1,
+    "Initial estimate confidence", 3, 
+    "Subtotals by initial estimate correctness", 2,
+    "", 2
+  )) %>%
+  add_header_above(c("", "Agreement" = 6, ""))
 
 ```
 
-The descriptive statistics demonstrate the contingent agreement of the advisers, with the Bias Sharing and Anti Bias advisers both agreeing at close to the target rate for most participants.
-While the ranges overall patterns are as designed, the variation in individual experience means some participants may have experienced by chance an advisor profile which contradicted the generative pattern (e.g.
-a Bias Sharing advisor who agreed on fewer high-confidence trials than mid-confidence trials).
-This is especially likely to be true of contingencies with fewer trials per participant, such as the incorrect trials.
-Overall, however, both the mean and 95% confidence intervals suggest the pattern was as desired for most participants most of the time.
-
-Participants’ revisions to their confidence were mostly in the direction of the advice, symmetrical across left and right responses, and usually relatively small, especially in agreement trials (Figure \@ref(fig:ex1-confidence)).
-
-```{r ex1-confidence, fig.align='center', fig.caption="Initial vs final confidence.  Influence of the advisors is evident in the deviation from the dashed y = x line. Points lying below the line indicate a more leftward response from initial to final judgement. Points above the line indicate a more rightward response in the final judgement. The further away from the y = x line, the greater the change from initial to final judgement. Separate plots show agreement vs disagreement trials (between the advisor and judge), and separate colours indicate whether the judge's final decision was correct or incorrect.  The shaded area indicates the boundary for the symmetrical influence measure. Points outside this area are truncated by moving them vertically until they meet the grey area.", out.width="100%"}
-
-graph.confidence +
-  labs(title = NULL, subtitle = NULL) +
-  scale_y_continuous(limits = c(-60, 60), expand = c(0, 0)) +
-  scale_x_continuous(limits = c(-60, 60), expand = c(0, 0))
-
-```
+The advisors agreed with the participants' initial estimates at close to target rates in all confidence categories, and were as accurate on average as expected (Table \@ref(tab:ac-ex1-r-advice)).
 
 ##### \OpenScience{prereg} Advisor selection
 
+```{r ac-ex1-r-h}
+
+test <- trials %>% 
+  filter(
+    !is.na(Advisor), 
+    !is.na(confidenceCategory),
+    choice1 %in% 1:2, 
+    choice2 %in% 1:2
+  )
+
+bs_pick <- test %>%
+  group_by(pid) %>%
+  summarise(pPickBS = mean(Advisor == "Bias-sharing"))
+
+```
+
 We hypothesised that the participants would display different pick rates for the Bias Sharing advisor versus the Anti Bias advisor.
 This hypothesis was evaluated by calculating the proportion of choice trials on which each participant picked the Bias Sharing advisor, and then testing these values as a one-sample t-test against the null hypothesis that the pick rates would be 0.5.
-No support was found for this hypothesis (`r cat(md.ttest(participants$aicPickRate, mu = .5, labels = "M~P(BiasSharing)~"))`; Figure \@ref(fig:ex1-selection)), although the Bayesian test indicated that the data were not sufficient to conclude that no effect was present.
-There was considerable variability across participants in the overall pick rate for the Bias Sharing advisor (range = [`r range(participants$aicPickRate) %>% num2str(isProportion = T) %>% paste(collapse = ", ")`]).
+No support was found for this hypothesis (`r cat(md.ttest(bs_pick$pPickBS, mu = .5, labels = "M~P(BiasSharing)~"))`; Figure \@ref(fig:ac-ex1-r-selection)), although the Bayesian test indicated that the data were not sufficient to conclude that no effect was present.
+There was considerable variability across participants in the overall pick rate for the Bias Sharing advisor (range = [`r range(bs_pick$pPickBS) %>% num2str(isProportion = T) %>% paste(collapse = ", ")`]).
 
-```{r ex1-selection, fig.align='center', fig.caption="Advisor selection.  Proportion of the time each participant picked the Bias Sharing advisor. Faint lines and dots indicate data from individual participants, while the large dot indicates the mean proportion across all participants. The dashed reference line indicates picking both advisors equally, as would be expected by chance. Error bars give 95\\% confidence intervals.", out.width="100%"}
+```{r ac-ex1-r-selection, fig.align='center', fig.caption="Advisor selection.  Proportion of the time each participant picked the Bias Sharing advisor. Faint lines and dots indicate data from individual participants, while the large dot indicates the mean proportion across all participants. The dashed reference line indicates picking both advisors equally, as would be expected by chance. Error bars give 95\\% confidence intervals.", out.width="100%"}
 
-melt(participants[,c("participantId","aicPickRate.lowConf","aicPickRate.medConf","aicPickRate.highConf")],
-            id.vars = 'participantId') %>%
-  mutate(variable = recode(variable, 
-                           "aicPickRate.lowConf" = 'Low', 
-                           "aicPickRate.medConf" = 'Medium', 
-                           "aicPickRate.highConf" = 'High'),
-         participantId = as.factor(participantId)) %>%
-  ggplot(aes(x = variable, y = value)) +
-  geom_hline(linetype = "dashed", color = "black", yintercept = .5, size = 1) +
-  # Confidence categories
-  geom_line(aes(group = factor(participantId)), alpha = 0.25) +
-  stat_summary(geom = "errorbar", fun.data = "mean_cl_boot", width = 0) +
-  stat_summary(geom = "point", fun.y = "mean", fill = "black", size = 4) +
-  # Overall
-  geom_violin(data = participants, fill = "lightgrey", color = NA, alpha = 0.25, 
-              aes(x = "Overall", y = aicPickRate), width = 1.75) +
-  geom_point(position = position_nudge(x = .03), alpha = .25,
-             aes(x = "Overall", y = aicPickRate), data = participants) +
-  stat_summary(geom = "errorbar", fun.data = mean_cl_normal, width = 0,
-               aes(x = "Overall", y = aicPickRate), data = participants,
-               position = position_nudge(x = -.03)) +
-  stat_summary(geom = "point", fun.y = mean, fill = "black", 
-               size = 4, data = participants,
-               aes(x = "Overall", y = aicPickRate),
-               position = position_nudge(x = -.03)) +
-  scale_y_continuous(limits = c(0,1), expand = c(0,0)) +
-  scale_x_discrete(expand = c(0,0.5), limits = c('Low', 'Medium',
-                                               'High', 'Overall'),
-                   labels = c("Low", "Medium", "High", "All")) +
-  theme(panel.border = element_blank()) +
-  labs(x = "Confidence category",
-       y = "P(Bias Sharing selected)") 
+pick <- test %>%
+  group_by(pid, confidenceCategory) %>%
+  summarise(pPickBS = mean(Advisor == "Bias-sharing"), .groups = 'drop') %>%
+  bind_rows(bs_pick %>% mutate(confidenceCategory = "All")) %>%
+  mutate(
+    `Feedback condition` = "No feedback",
+    confidenceCategory = factor(
+      confidenceCategory, 
+      levels = c("Low", "Medium", "High", "All"),
+      ordered = T
+    )
+  )
+
+bf <- ttestBF(bs_pick$pPickBS, mu = .5)
+
+pick %>%
+  ggplot(aes(x = confidenceCategory, y = pPickBS)) +
+  geom_hline(linetype = 'dashed', yintercept = .5) +
+  geom_line(
+    aes(group = factor(pid)), 
+    alpha = .25,
+    data = filter(pick, confidenceCategory != "All")
+  ) +
+  stat_summary(
+    geom = "errorbar",
+    fun.data = mean_cl_boot,
+    width = 0,
+    data = filter(pick, confidenceCategory != "All")
+  ) +
+  stat_summary(
+    geom = "point",
+    fun = mean,
+    size = 4,
+    data = filter(pick, confidenceCategory != "All")
+  ) +
+  geom_violindot(
+    size_dots = .4, 
+    data = filter(pick, confidenceCategory == "All")
+  ) +
+  geom_violinhalf(
+    aes(fill = `Feedback condition`, colour = `Feedback condition`), 
+    data = filter(pick, confidenceCategory == "All")
+  ) +
+  annotate(
+    geom = 'label', 
+    label = paste0('BF vs chance\n', bf2str(exp(bf@bayesFactor$bf))),
+    x = 4, 
+    y = 1.1
+  ) +
+  scale_y_continuous(limits = c(0, 1.15), breaks = seq(0, 1, length.out = 5)) +
+  scale_x_discrete(limits = levels(pick$confidenceCategory)) +
+  labs(y = 'p(Choose Bias-sharing advisor)', x = "Confidence category") +
+  theme(axis.ticks.x = element_blank(), axis.line.x = element_blank())
 
 ```
 
@@ -301,46 +420,85 @@ melt(participants[,c("participantId","aicPickRate.lowConf","aicPickRate.medConf"
 
 The advisers differed in their advice-giving as a function of the judge’s initial confidence.
 In trials where the judge’s initial decision was made with medium confidence, however, the advisers were equal on judge confidence and agreement rate.
-Comparing selection rates for these trials alone revealed a clear preference for the Bias Sharing advisor (`r cat(md.ttest(participants$aicPickRate.medConf, mu = .5, labels = "M~P(BiasSharing)~"))`; Figure \@ref(fig:ex1-selection) "Medium" confidence category), although the Bayesian analysis again indicated an insensitive result, albeit in the hypothesised direction.
+Comparing selection rates for these trials alone revealed a clear preference for the Bias Sharing advisor (`r cat(md.ttest(pick %>% filter(confidenceCategory == "Medium") %>% pull(pPickBS), mu = .5, labels = "M~P(BiasSharing)~"))`; Figure \@ref(fig:ac-ex1-selection) "Medium" confidence category), although the Bayesian analysis again indicated an insensitive result, albeit in the hypothesised direction.
 
 ##### \OpenScience{prereg} Advisor influence {#ex1-influence}
 
-Previous work in our lab demonstrated that the agree-in-confidence advisor exerted greater influence on the judges’ final decisions than the agree-in-uncertainty advisor [@pescetelliUseMetacognitiveSignals2017].
-Influence was examined with a 2x2x2 (Bias Sharing versus Anti Bias advisor; choice versus forced trials; agreement versus disagreement trials) ANOVA (Figure \@ref(fig:ex1-influence-r)).
-No main effect was found for advisor \mccorrect{!TODO[stats]}, meaning that the previous finding was not replicated.
-As shown in Table \@ref(tab:ex1-influence-t), the only statistically significant effect was the main effect of agreement, with disagreement producing higher influence than agreement \mccorrect{!TODO[marginal means]}.
+```{r ac-ex1-r-influence-aov}
 
-```{r ex1-influence-r, fig.align='center', fig.caption="Advisor influence.  Influence of advice from each advisor by advisor, agreement, and trial type. Faint lines and indicate data from individual participants, while the dots indicate the mean proportion across all participants. Error bars give 95\\% confidence intervals.  Note: vertical axis is truncated to show group differences more clearly, the theoretical maximum influence given the scale is 110. The minimum is 0 as shown.", out.width="100%"}
+tmp <- trials %>%
+  filter(!is.na(Advisor), !is.na(confidenceCategory), !practice) %>%
+  mutate(
+    pid = factor(pid),
+    Advisor = factor(Advisor),
+    agree = factor(agree),
+    trialType = factor(
+      case_when(
+        choice1 %in% 1:2 & choice2 %in% 1:2 ~ "Choice",
+        T ~ "Force"
+      )
+    ),
+    inf = adviceInfluenceCapped * 55
+  ) %>%
+  group_by(pid, Advisor, trialType, agree) %>%
+  summarise(inf = mean(inf), .groups = 'drop')
 
-trials %>% 
-  select(participantId, advisorId, cor1, choice, agree, influence) %>%
-  filter(!is.nan(cor1), !is.nan(influence), !is.nan(advisorId)) %>%
-  mutate(advisor = if_else(advisorId == 1, "Bias Sharing", "Anti Bias"),
-         choice = sapply(choice, sum) == 3,
-         agree = if_else(agree == 0, "Disagree", "Agree"),
-         influence = abs(influence),
-         participantId = factor(participantId)) %>%
-  group_by(participantId, advisor, choice, agree) %>%
-  summarise_if(is.numeric, mean) %>%
-  mutate(g = paste(participantId, advisor, sep = ":")) %>%
-  ggplot(aes(x = agree, y = influence, colour = advisor, group = g)) +
-  geom_line(alpha = 0.25) +
-  stat_summary(aes(group = advisor), geom = "line", fun.y = mean,
-               position = position_dodge(width = .25), size = 1) + 
-  stat_summary(aes(group = advisor), geom = "errorbar", fun.data = mean_cl_normal, 
-               width = 0, size = 1, position = position_dodge(width = .25)) +
-  stat_summary(aes(group = advisor), geom = "point", fun.y = mean, 
-               size = 4, position = position_dodge(width = .25)) +
-  scale_y_continuous(limits = c(0, NA)) +
-  facet_grid(~choice, labeller = label_both) +
-  labs(x = "Agreement between advisor and participant",
-       y = "Influence of the advice") 
+aov_inf <- tmp %>%
+  ezANOVA(
+    dv = inf,
+    wid = pid,
+    within = c(Advisor, trialType, agree)
+  )
+
+aov_inf <- aov_inf$ANOVA %>% 
+  mutate(
+    Effect = str_replace_all(Effect, "trialType", "Trial type"),
+    Effect = str_replace_all(Effect, "agree", "Advisor agreement"),
+    s = glue("F({DFn},{DFd})={num2str(F)}, p={prop2str(p)}")
+  ) 
+
+kableANOVA(
+  aov_inf, 
+  caption = "\\label{tab:ac-ex1-influence-t}ANOVA of Advisor influence in Lab experiment"
+)
+
+# Relevant marginal means
+mmAdvisor <- trials %>%
+  filter(!is.na(Advisor), !is.na(confidenceCategory), !practice) %>%
+  group_by(pid, Advisor) %>% 
+  summarise(inf = mean(adviceInfluenceCapped), .groups = 'drop') %>%
+  group_by(Advisor) %>%
+  summarise(inf = mean(inf), .groups = 'drop') %>%
+  mutate(inf = num2str(inf))
 
 ```
 
-```{r ex1-influence-anova} 
-kableANOVA(anova.influence$ANOVA, 
-           caption = "\\label{tab:ex1-influence-t}ANOVA of Advisor influence in Experiment 1")
+Previous work in our lab demonstrated that the agree-in-confidence advisor exerted greater influence on the judges’ final decisions than the agree-in-uncertainty advisor [@pescetelliRoleDecisionConfidence2021].
+Influence was examined with a 2x2x2 (Bias-sharing versus Anti-bias advisor; choice versus forced trials; agreement versus disagreement trials) ANOVA (Figure \@ref(fig:ac-ex1-influence-r)).
+No main effect was found for advisor (`r aov_inf$s[1]`, M~Bias-sharing~=`r mmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(inf)`, M~Anti-bias~=`r mmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(inf)`), meaning that the previous finding was not replicated.
+As shown in Table \@ref(tab:ac-ex1-influence-t), the only statistically significant effect was the main effect of agreement, with disagreement producing higher influence than agreement \mccorrect{!TODO[marginal means]}.
+
+```{r ac-ex1-influence-r, fig.align='center', fig.caption="Advisor influence.  Influence of advice from each advisor by advisor, agreement, and trial type. Faint lines and indicate data from individual participants, while the dots indicate the mean proportion across all participants. Error bars give 95\\% confidence intervals.  Note: vertical axis is truncated to show group differences more clearly, the theoretical maximum influence given the scale is 110. The minimum is 0 as shown.", out.width="100%"}
+
+tmp %>%
+  mutate(
+    trialType = glue("{trialType} trials"),
+    agree = case_when(agree == 1 ~ "Agreement", agree == 0 ~ "Disagreement")
+  ) %>%
+  ggplot(aes(x = agree, y = inf, colour = Advisor)) +
+  geom_hline(yintercept = 0, linetype = 'dashed') +
+  geom_line(alpha = .25, aes(group = paste0(Advisor, pid))) +
+  stat_summary(aes(group = Advisor), geom = "line", fun = mean,
+               position = position_dodge(width = .25), size = 1) +
+  stat_summary(aes(group = Advisor), geom = "errorbar", fun.data = mean_cl_normal,
+               width = 0, size = 1, position = position_dodge(width = .25)) +
+  stat_summary(aes(group = Advisor), geom = "point", fun = mean,
+               size = 4, position = position_dodge(width = .25)) +
+  # scale_y_continuous(limits = c(-1, 1)) +
+  facet_grid(~trialType) +
+  labs(x = "Agreement between advisor and participant",
+       y = "Influence of the advice") 
+
 ```
 
 ###### \OpenScience{prereg} Advisor influence on medium confidence trials
@@ -379,7 +537,6 @@ We hypothesised that this subjective trust measure would change over the course 
 As indicated by Table \@ref(tab:ex1-subjective-assessment), however, no such effects were found: subjective assessments of the advisers did not differ post-experiment.
 
 ```{r ex1-subjective-assessment}
-library(broom)
 
 tmp <- questionnaires %>% 
   mutate_if(is.list, unlist) %>%
