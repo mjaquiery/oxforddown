@@ -100,22 +100,6 @@ trials <- trials %>%
   ) %>% 
   annotate_responses(max_conf = 55)
 
-old.trials <- read.csv('_old-influence-anova.csv') %>% mutate(across(c(pid, agree, hasChoice, advisor), factor))
-tmp <- trials %>% arrange(pid, id) %>% filter(advisorId %in% 1:2) %>% transmute(pid = factor(pid), agree = factor(agree), hasChoice = factor((choice1 + choice2) == 3), advisor = factor(advisorId), adviceInfluence = round(adviceInfluence * 55), initialAnswer, finalAnswer, initialConfidence, finalConfidence, adviceInfluenceCapped = round(adviceInfluenceCapped * 55)) %>% arrange(pid, adviceInfluence)
-tmp %>% View()
-
-old.trials <- old.trials %>% arrange(pid, inf) %>% select(-pid)
-old.trials %>% select(-pid)
-
-a <- apply(tmp, 1, \(x) paste0(x, collapse = "|"))
-b <- apply(old.trials, 1, \(x) paste0(x, collapse = "|"))
-
-which(a %in% b)
-
-
-ezANOVA(old.trials, dv = inf, wid = pid, within = c(agree, hasChoice, advisor))
-ezANOVA(tmp, dv = adviceInfluence, wid = pid, within = c(agree, hasChoice, advisor))
-
 ```
 
 ```{r ac-ex1-exclusions}
@@ -427,7 +411,10 @@ Comparing selection rates for these trials alone revealed a clear preference for
 ```{r ac-ex1-r-influence-aov}
 
 tmp <- trials %>%
-  filter(!is.na(Advisor), !is.na(confidenceCategory), !practice) %>%
+  filter(
+    !is.na(Advisor), 
+    !practice
+  ) %>%
   mutate(
     pid = factor(pid),
     Advisor = factor(Advisor),
@@ -438,7 +425,8 @@ tmp <- trials %>%
         T ~ "Force"
       )
     ),
-    inf = adviceInfluenceCapped * 55
+    inf = adviceInfluence,
+    cappedInf = adviceInfluenceCapped
   ) %>%
   group_by(pid, Advisor, trialType, agree) %>%
   summarise(inf = mean(inf), .groups = 'drop')
@@ -457,6 +445,19 @@ aov_inf <- aov_inf$ANOVA %>%
     s = glue("F({DFn},{DFd})={num2str(F)}, p={prop2str(p)}")
   ) 
 
+aov_inf_cap <- tmp %>% 
+  ezANOVA(
+    dv = cappedInf,
+    wid = pid, 
+    within = c(Advisor, trialType, agree)
+  ) %>%
+  .$ANOVA %>% 
+  mutate(
+    Effect = str_replace_all(Effect, "trialType", "Trial type"),
+    Effect = str_replace_all(Effect, "agree", "Advisor agreement"),
+    s = glue("F({DFn},{DFd})={num2str(F)}, p={prop2str(p)}")
+  )
+
 kableANOVA(
   aov_inf, 
   caption = "\\label{tab:ac-ex1-influence-t}ANOVA of Advisor influence in Lab experiment"
@@ -464,19 +465,55 @@ kableANOVA(
 
 # Relevant marginal means
 mmAdvisor <- trials %>%
-  filter(!is.na(Advisor), !is.na(confidenceCategory), !practice) %>%
+  filter(!is.na(Advisor), !practice) %>%
   group_by(pid, Advisor) %>% 
-  summarise(inf = mean(adviceInfluenceCapped), .groups = 'drop') %>%
-  group_by(Advisor) %>%
-  summarise(inf = mean(inf), .groups = 'drop') %>%
-  mutate(inf = num2str(inf))
+  summarise(
+    inf = mean(adviceInfluence),
+    infCapped = mean(adviceInfluenceCapped),
+    .groups = 'drop'
+  ) %>%
+  nest(d = -Advisor) %>%
+  mutate(
+    inf = map(d, ~ mean_cl_normal(.$inf)),
+    infCapped = map(d, ~ mean_cl_normal(.$infCapped))
+  ) %>% 
+  select(-d) %>%
+  unnest(cols = c(inf, infCapped), names_sep = "_") %>%
+  mutate(
+    across(-Advisor, num2str),
+    s = glue("M~{Advisor}~={inf_y} [95%CI {inf_ymin}, {inf_ymax}]"),
+    sCapped = glue("M~{Advisor}~={infCapped_y} [95%CI {infCapped_ymin}, {infCapped_ymax}]")
+  )
+
+mmAgree <- trials %>%
+  filter(!is.na(agree), !practice) %>%
+  group_by(pid, agree) %>% 
+  summarise(
+    inf = mean(adviceInfluence),
+    infCapped = mean(adviceInfluenceCapped),
+    .groups = 'drop'
+  ) %>%
+  nest(d = -agree) %>%
+  mutate(
+    inf = map(d, ~ mean_cl_normal(.$inf)),
+    infCapped = map(d, ~ mean_cl_normal(.$infCapped))
+  ) %>% 
+  select(-d) %>%
+  unnest(cols = c(inf, infCapped), names_sep = "_") %>%
+  mutate(
+    agree = case_when(agree == 0 ~ "Disagree", agree == 1 ~ "Agree"),
+    across(-agree, num2str),
+    s = glue("M~{agree}~={inf_y} [95%CI {inf_ymin}, {inf_ymax}]"),
+    sCapped = glue("M~{agree}~={infCapped_y} [95%CI {infCapped_ymin}, {infCapped_ymax}]")
+  )
 
 ```
 
 Previous work in our lab demonstrated that the agree-in-confidence advisor exerted greater influence on the judges’ final decisions than the agree-in-uncertainty advisor [@pescetelliRoleDecisionConfidence2021].
 Influence was examined with a 2x2x2 (Bias-sharing versus Anti-bias advisor; choice versus forced trials; agreement versus disagreement trials) ANOVA (Figure \@ref(fig:ac-ex1-influence-r)).
+This was chronologically the first experiment we ran, and the analysis was preregistered prior to the development of the capped influence measure designed to allow agreement and disagreement to be compared more fairly.
 No main effect was found for advisor (`r aov_inf$s[1]`, M~Bias-sharing~=`r mmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(inf)`, M~Anti-bias~=`r mmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(inf)`), meaning that the previous finding was not replicated.
-As shown in Table \@ref(tab:ac-ex1-influence-t), the only statistically significant effect was the main effect of agreement, with disagreement producing higher influence than agreement \mccorrect{!TODO[marginal means]}.
+As shown in Table \@ref(tab:ac-ex1-influence-t), the only statistically significant effect was the main effect of agreement, with disagreement producing higher influence than agreement (M~).
 
 ```{r ac-ex1-influence-r, fig.align='center', fig.caption="Advisor influence.  Influence of advice from each advisor by advisor, agreement, and trial type. Faint lines and indicate data from individual participants, while the dots indicate the mean proportion across all participants. Error bars give 95\\% confidence intervals.  Note: vertical axis is truncated to show group differences more clearly, the theoretical maximum influence given the scale is 110. The minimum is 0 as shown.", out.width="100%"}
 
@@ -494,7 +531,6 @@ tmp %>%
                width = 0, size = 1, position = position_dodge(width = .25)) +
   stat_summary(aes(group = Advisor), geom = "point", fun = mean,
                size = 4, position = position_dodge(width = .25)) +
-  # scale_y_continuous(limits = c(-1, 1)) +
   facet_grid(~trialType) +
   labs(x = "Agreement between advisor and participant",
        y = "Influence of the advice") 
@@ -1607,7 +1643,7 @@ The advisors were similarly influential (Figure \@ref(fig:ac-cca-dots-r-influenc
 Influence is only measured here during the Familiarization phase, when participants are forced to see the advice of one or another advisor, and participants are still learning about advisors' advice styles while this measure is being taken. 
 This means that no strong conclusions should be drawn from this analysis.
 
-```{r ac-cca-dots-r-influence-graph, fig.caption="Dot task advisor influence for bias sharing/anti-bias advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2].", fig.width = 4, fig.height = 6}
+```{r ac-cca-dots-r-influence-graph, fig.caption="Dot task advisor influence for bias sharing/anti-bias advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 1].", fig.width = 4, fig.height = 6}
 
 tmp <- familiarization %>% 
   group_by(pid, Advisor) %>%
