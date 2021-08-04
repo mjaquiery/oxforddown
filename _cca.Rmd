@@ -429,7 +429,7 @@ tmp <- trials %>%
     cappedInf = adviceInfluenceCapped
   ) %>%
   group_by(pid, Advisor, trialType, agree) %>%
-  summarise(inf = mean(inf), .groups = 'drop')
+  summarise(across(contains('inf'), mean), .groups = 'drop')
 
 aov_inf <- tmp %>%
   ezANOVA(
@@ -486,7 +486,7 @@ mmAdvisor <- trials %>%
   )
 
 mmAgree <- trials %>%
-  filter(!is.na(agree), !practice) %>%
+  filter(!is.na(Advisor), !practice) %>%
   group_by(pid, agree) %>% 
   summarise(
     inf = mean(adviceInfluence),
@@ -507,13 +507,42 @@ mmAgree <- trials %>%
     sCapped = glue("M~{agree}~={infCapped_y} [95%CI {infCapped_ymin}, {infCapped_ymax}]")
   )
 
+mmTrialType <- trials %>%
+  filter(!is.na(Advisor), !practice) %>%
+  mutate(
+    trialType = case_when(
+        choice1 %in% 1:2 & choice2 %in% 1:2 ~ "Choice",
+        T ~ "Force"
+      )
+  ) %>%
+  group_by(pid, trialType) %>% 
+  summarise(
+    inf = mean(adviceInfluence),
+    infCapped = mean(adviceInfluenceCapped),
+    .groups = 'drop'
+  ) %>%
+  nest(d = -trialType) %>%
+  mutate(
+    inf = map(d, ~ mean_cl_normal(.$inf)),
+    infCapped = map(d, ~ mean_cl_normal(.$infCapped))
+  ) %>% 
+  select(-d) %>%
+  unnest(cols = c(inf, infCapped), names_sep = "_") %>%
+  mutate(
+    across(-trialType, num2str),
+    s = glue("M~{trialType}~={inf_y} [95%CI {inf_ymin}, {inf_ymax}]"),
+    sCapped = glue("M~{trialType}~={infCapped_y} [95%CI {infCapped_ymin}, {infCapped_ymax}]")
+  )
+
 ```
 
 Previous work in our lab demonstrated that the agree-in-confidence advisor exerted greater influence on the judges’ final decisions than the agree-in-uncertainty advisor [@pescetelliRoleDecisionConfidence2021].
 Influence was examined with a 2x2x2 (Bias-sharing versus Anti-bias advisor; choice versus forced trials; agreement versus disagreement trials) ANOVA (Figure \@ref(fig:ac-ex1-influence-r)).
 This was chronologically the first experiment we ran, and the analysis was preregistered prior to the development of the capped influence measure designed to allow agreement and disagreement to be compared more fairly.
-No main effect was found for advisor (`r aov_inf$s[1]`, M~Bias-sharing~=`r mmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(inf)`, M~Anti-bias~=`r mmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(inf)`), meaning that the previous finding was not replicated.
-As shown in Table \@ref(tab:ac-ex1-influence-t), the only statistically significant effect was the main effect of agreement, with disagreement producing higher influence than agreement (M~).
+No main effect was found for advisor (`r aov_inf$s[1]`, `r mmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(s)`, `r mmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(s)`), meaning that the previous finding was not replicated.
+As shown in Table \@ref(tab:ac-ex1-influence-t), the only statistically significant effect was the main effect of agreement, with disagreement producing higher influence than agreement (`r aov_inf$s[4]`, `r mmAgree %>% filter(agree == "Agree") %>% pull(s)`, `r mmAgree %>% filter(agree == "Disagree") %>% pull(s)`).
+
+When this analysis was repeated with the capped influence values \mccorrect{TODO: Link general method} the effect of agreement was still significant, but less so (`r aov_inf_cap$s[1]`, `r mmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(sCapped)`, `r mmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(sCapped)`), and a main effect of trial type also emerged (raw influence: `r aov_inf$s[2]`, `r mmTrialType %>% filter(trialType == "Choice") %>% pull(s)`, `r mmTrialType %>% filter(trialType == "Force") %>% pull(s)`; capped influence: `r aov_inf_cap$s[2]`, `r mmTrialType %>% filter(trialType == "Choice") %>% pull(sCapped)`, `r mmTrialType %>% filter(trialType == "Force") %>% pull(sCapped)`).
 
 ```{r ac-ex1-influence-r, fig.align='center', fig.caption="Advisor influence.  Influence of advice from each advisor by advisor, agreement, and trial type. Faint lines and indicate data from individual participants, while the dots indicate the mean proportion across all participants. Error bars give 95\\% confidence intervals.  Note: vertical axis is truncated to show group differences more clearly, the theoretical maximum influence given the scale is 110. The minimum is 0 as shown.", out.width="100%"}
 
@@ -533,7 +562,7 @@ tmp %>%
                size = 4, position = position_dodge(width = .25)) +
   facet_grid(~trialType) +
   labs(x = "Agreement between advisor and participant",
-       y = "Influence of the advice") 
+       y = "Influence of the advice (raw)") 
 
 ```
 
