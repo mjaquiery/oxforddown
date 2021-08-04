@@ -22,27 +22,23 @@ The second version was a replication run online and with a larger sample size an
 For ease of reference, the lab study is referred to as 'Lab study', while the online study retains the numbering and lettering used previously, meaning it is designated Experiment 4A.
 There is no Experiment 4B, because it was not possible to use the Dates task with this design of advisors.^[The lab version of this study was the first one performed in chronological order. The results were not as anticipated, so a replication was run online (Experiment 4A). These results were also odd, so other experiments were run to investigate the stability of the basic effects (Experiments 1A, 2A, and 3A).] 
 
-\mccorrect{NICK: Things got a bit confusing from here. I didn't really understand why you present the online replication study before the lab study, and I struggled to follow the narrative. I'm guessing this is a combination of two separate bits of work -- a description of the online studies that follows the structure and format of the earlier ones in this chapter, and then text from your transfer report for the in-lab study. I think it needs work to streamline and harmonise before I can provide useful comments. My overall suggestions would be:
-1- Present the studies in the opposite order
-2- Start with the in-lab study which has some suggestive results: significant effect where we originally planned to look, in medium confidence trials, but not convincing and not really obvious why the preference shouldn't be there for other confidence levels. For this study, consider which analyses you really need to tell the story. The aim here in the thesis is different to the transfer report / earlier write up. There's quite a bit of exploratory analysis that was useful at the time in terms of us understanding the data, but that doesn't really fit the narrative focus now developed in the rest of this chapter.
-3- Then the online replication: can we find evidence in a larger online sample. (no)
-4- Discussion: no confidence-weighted effect? Is it plausible people could learn it in real life? Or are pick rates too variable to reveal subtle differences in advisor preference. (The latter is consistent with the high variability we see -- the preferences have to be quite strong at the group level to see anything)}
-
 ### Lab study of confidence-contingent advice {#ac-cca-lab}
 
-@pescetelliRoleDecisionConfidence2021 showed that, in the absence of objective feedback, advice was more influential coming from an advisor who agrees with a participant when that participant is confident (_Bias Sharing_) than coming from an advisor who agrees with a participant when that participant is unconfident (_Anti Bias_).
-This provides evidence of a metacognitive sensitivity in the tracking of advice and the updating of advisor utility.
-Here we investigate whether these effects show up in the domain of advisor selection.
-
-@pescetelliRoleDecisionConfidence2021used a judge-advisor system to demonstrate that judges are influenced to a greater extent by advisers who share their biases.
+@pescetelliRoleDecisionConfidence2021 used a judge-advisor system to demonstrate that judges are influenced to a greater extent by advisers who share their biases.
 Participants played the role of judge in a judge-advisor system, while the advisers were virtual agents whose advice-giving was dependent upon the confidence and correctness of the judges' initial decisions.
-The advisers were balanced for overall agreement with the judge and objective correctness of advice.
+The advisers were balanced for both overall agreement with the judge and objective correctness of advice.
+This was achieved by varying the agreement rates for the advisors contingent on the confidence of the judge's initial estimate. 
+The Bias-sharing advisor would agree more frequently when the participant expressed high confidence in their initial estimate and less frequently when the participant expressed low confidence in their initial decision.
+The Anti-bias advisor did the opposite.
+Crucially, advisors performed identically on the largest minority of trials (when judges were moderately confident in their initial estimates), allowing the advisors to be compared directly on these trials [@pescetelliRoleDecisionConfidence2021].
 We place participants in a similar paradigm in which they are given a choice between advisers, and hypothesise that they will more frequently seek advice from the _Bias Sharing_ advisor than from the _Anti Bias_ advisor.
 We predict that, given a choice, judges will prefer to receive advice from a _Bias Sharing_ advisor over receiving advice from an advisor who does not share the judge’s bias.
 
 #### Open scholarship practices
 
 This experiment was preregistered at https://aspredicted.org/ze3tn.pdf.
+One analysis in the preregistration is not reported here because the results are non-significant and they represented a branch of analysis that we sidelined in other experiments. 
+This analysis explored participants' subjective assessments of advisors.
 The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from https://osf.io/vgcnb/.
 The code for running the experiment can be obtained from https://github.com/mjaquiery/nofeedback_trust.
 
@@ -542,7 +538,7 @@ This was chronologically the first experiment we ran, and the analysis was prere
 No main effect was found for advisor (`r aov_inf$s[1]`, `r mmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(s)`, `r mmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(s)`), meaning that the previous finding was not replicated.
 As shown in Table \@ref(tab:ac-ex1-influence-t), the only statistically significant effect was the main effect of agreement, with disagreement producing higher influence than agreement (`r aov_inf$s[4]`, `r mmAgree %>% filter(agree == "Agree") %>% pull(s)`, `r mmAgree %>% filter(agree == "Disagree") %>% pull(s)`).
 
-When this analysis was repeated with the capped influence values \mccorrect{TODO: Link general method} the effect of agreement was still significant, but less so (`r aov_inf_cap$s[1]`, `r mmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(sCapped)`, `r mmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(sCapped)`), and a main effect of trial type also emerged (raw influence: `r aov_inf$s[2]`, `r mmTrialType %>% filter(trialType == "Choice") %>% pull(s)`, `r mmTrialType %>% filter(trialType == "Force") %>% pull(s)`; capped influence: `r aov_inf_cap$s[2]`, `r mmTrialType %>% filter(trialType == "Choice") %>% pull(sCapped)`, `r mmTrialType %>% filter(trialType == "Force") %>% pull(sCapped)`).
+When this analysis was repeated with the capped influence values (General Method - Capped influence§\@ref(m-analysis-dv-influence)) the effect of agreement was still significant, but less so (`r aov_inf_cap$s[1]`, `r mmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(sCapped)`, `r mmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(sCapped)`), and a main effect of trial type also emerged (raw influence: `r aov_inf$s[2]`, `r mmTrialType %>% filter(trialType == "Choice") %>% pull(s)`, `r mmTrialType %>% filter(trialType == "Force") %>% pull(s)`; capped influence: `r aov_inf_cap$s[2]`, `r mmTrialType %>% filter(trialType == "Choice") %>% pull(sCapped)`, `r mmTrialType %>% filter(trialType == "Force") %>% pull(sCapped)`).
 
 ```{r ac-ex1-influence-r, fig.align='center', fig.caption="Advisor influence.  Influence of advice from each advisor by advisor, agreement, and trial type. Faint lines and indicate data from individual participants, while the dots indicate the mean proportion across all participants. Error bars give 95\\% confidence intervals.  Note: vertical axis is truncated to show group differences more clearly, the theoretical maximum influence given the scale is 110. The minimum is 0 as shown.", out.width="100%"}
 
@@ -568,529 +564,313 @@ tmp %>%
 
 ###### \OpenScience{prereg} Advisor influence on medium confidence trials
 
-The agree-in-confidence and agree-in-uncertainty advisers differed by design in the frequency with which they agree with the participant as a function of the participant’s confidence in their initial estimate.
-To control for the effects of initial confidence on influence, the above analysis was repeated using only those trials on which the initial estimate was correct and given with medium confidence.
-Two participants were missing data in this analysis: one participant had zero mid-confidence choice trials in which the agree-in-confidence advisor disagreed with them; and the other had zero mid-confidence choice trials in which the agree-in-uncertainty advisor disagreed with them.
-These participants were removed from this analysis.
-As before, the only effect which was statistically significant was agreement.
-The low number of trials in some of the intersections meant the some participants had to be dropped.
-The analysis was rerun with forced trials only, \mccorrect{!TODO[stats]} 
-
-```{r ex1-influence-medconf-anova}
-dropIds <- participants.influence.medConf %>%
-  filter(is.nan(value)) %>% 
-  pull(participantId)
-
-tmp <- participants.influence.medConf %>% 
-  filter(!(participantId %in% dropIds)) %>%
-  mutate(participantId = factor(participantId))
-
-tmp.aov <- ezANOVA(data = tmp,
-                   dv = value, 
-                   wid = participantId,
-                   within = c('AiC', 'agree', 'hasChoice'),
-                   return_aov = T)
-
-tmp.aov$ANOVA %>%
-  kableANOVA(caption = "\\label{tab:ex1-influence-medconf}ANOVA of Advisor influence on medium confidence trials in Experiment 1")
-```
-
-##### \OpenScience{prereg} Subjective assessment of advisers
-
-Participants answered questionnaires about their trust in the advisers at four time points during the experiment.
-We hypothesised that this subjective trust measure would change over the course of the experiment, with the agree-in-confidence advisor becoming more preferred over time.
-As indicated by Table \@ref(tab:ex1-subjective-assessment), however, no such effects were found: subjective assessments of the advisers did not differ post-experiment.
-
-```{r ex1-subjective-assessment}
-
-tmp <- questionnaires %>% 
-  mutate_if(is.list, unlist) %>%
-  filter(timePoint %in% range(timePoint)) %>%
-  group_by(questionTextShort, adviceType, timePoint, questionText) 
-  
-x <- tmp %>%
-  do(
-    y = mean_cl_normal(.$answer)
+```{r ac-ex1-r-influence-med}
+tmp <- trials %>%
+  filter(
+    !is.na(Advisor), 
+    !practice,
+    confidenceCategory == "Medium"
   ) %>%
-  unnest(y)
-
-tmp <- tmp %>%
-  group_by(questionTextShort, timePoint) %>% 
-  group_nest() %>%
   mutate(
-    t = map(data, ~ t.test(answer ~ adviceType, data = .x, paired = T)),
-    b = map(data, ~ ttestBF(formula = answer ~ adviceType, 
-                            data = as.data.frame(.x))),
-    test = map(t, ~ tidy(.x)),
-    bf = map(b, ~ exp(.x@bayesFactor$bf))
+    pid = factor(pid),
+    Advisor = factor(Advisor),
+    agree = factor(agree),
+    trialType = factor(
+      case_when(
+        choice1 %in% 1:2 & choice2 %in% 1:2 ~ "Choice",
+        T ~ "Force"
+      )
+    ),
+    inf = adviceInfluence,
+    cappedInf = adviceInfluenceCapped
   ) %>%
-  unnest(test, bf) %>%
-  select(-data, -t) %>%
-  left_join(x, by = c('questionTextShort', 'timePoint'))
-  
-tmp <- tmp %>%
-  filter(adviceType == min(adviceType)) %>%
-  rename(y.bs = y, ymin.bs = ymin, ymax.bs = ymax) %>%
-  select(-adviceType) %>%
-  left_join(tmp %>% filter(adviceType != min(adviceType)),
-            by = c("questionTextShort", "timePoint", "estimate", "bf",
-                   "statistic", "p.value", "parameter", "conf.low", 
-                   "conf.high", "method", "alternative", "questionText"))
+  filter(trialType == "Force") %>%
+  group_by(pid, Advisor, trialType, agree) %>%
+  summarise(across(contains('inf'), mean), .groups = 'drop')
 
-# Print table 
-tmp.print <- tmp %>%
-  mutate(timePoint = factor(timePoint, labels = c("Pre-experiment",
-                                                  "Post-experiment")),
-         sig = p.value < .05,
-         questionText = str_replace(questionText,
-                                    '(accurate|like|influenced|trustworthy)',
-                                    '\\\\textbf{\\1}')) %>%
-  select(timePoint, questionText, y.bs, ymin.bs, ymax.bs, 
-         y, ymin, ymax, bf, estimate, p.value, sig) %>%
-  mutate(
-    p.value = prop2str(p.value),
-    bf = num2str(bf),
-    sig = if_else(sig == T, "$*$", "")
-  ) %>%
-  mutate_if(is.numeric, num2str, precision = 1) %>%
-  rename(
-    ` ` = timePoint,
-    Question = questionText,
-    Mean = y.bs, Low = ymin.bs, High = ymax.bs,
-    ` Mean ` = y, ` Low ` = ymin, ` High ` = ymax,
-    BF = bf, `$t$` = estimate, `$p$` = p.value, `  ` = sig
+aov_inf_m <- tmp %>%
+  ezANOVA(
+    dv = inf,
+    wid = pid,
+    within = c(Advisor, agree)
   )
 
-names(tmp.print)[str_detect(names(tmp.print), '\\$t\\$')] <- 
-  paste0('$t$(', tmp$parameter[1], ')')
-names(tmp.print)[str_detect(names(tmp.print), 'Question')] <-
-  paste0('Question', footnote_marker_alphabet(1))
-
-
-tmp.print %>%
-  arrange(` `) %>%
+aov_inf_m <- aov_inf_m$ANOVA %>% 
   mutate(
-    ` ` = cell_spec(` `, angle = 90)
+    Effect = str_replace_all(Effect, "agree", "Advisor agreement"),
+    s = glue("F({DFn},{DFd})={num2str(F)}, p={prop2str(p)}")
+  ) 
+
+aov_inf_cap_m <- tmp %>% 
+  ezANOVA(
+    dv = cappedInf,
+    wid = pid, 
+    within = c(Advisor, agree)
   ) %>%
-  kable(caption = "\\label{tab:ex1-subjective-assessment-t}Questionnaire responses pre- and post-experiment",
-        align = c('l', 'l', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'c'),
-        escape = F) %>%
-  collapse_rows(columns = 1, valign = 'top') %>%
-  column_spec(2, width = "7em") %>%
-  add_header_above(c(" " = 3, "95% CI" = 2, " " = 1, "95% CI" = 2, " " = 4)) %>%
-  add_header_above(c(" " = 2, "Bias sharing" = 3, "Anti bias" = 3, " " = 4)) %>%
-  footnote(alphabet_title = "", alphabet = "Emphasis added.")
-  
+  .$ANOVA %>% 
+  mutate(
+    Effect = str_replace_all(Effect, "agree", "Advisor agreement"),
+    s = glue("F({DFn},{DFd})={num2str(F)}, p={prop2str(p)}")
+  )
+
+# Relevant marginal means
+mmmAdvisor <- trials %>%
+  filter(!is.na(Advisor), !practice) %>%
+  group_by(pid, Advisor) %>% 
+  summarise(
+    inf = mean(adviceInfluence),
+    infCapped = mean(adviceInfluenceCapped),
+    .groups = 'drop'
+  ) %>%
+  nest(d = -Advisor) %>%
+  mutate(
+    inf = map(d, ~ mean_cl_normal(.$inf)),
+    infCapped = map(d, ~ mean_cl_normal(.$infCapped))
+  ) %>% 
+  select(-d) %>%
+  unnest(cols = c(inf, infCapped), names_sep = "_") %>%
+  mutate(
+    across(-Advisor, num2str),
+    s = glue("M~{Advisor}~={inf_y} [95%CI {inf_ymin}, {inf_ymax}]"),
+    sCapped = glue("M~{Advisor}~={infCapped_y} [95%CI {infCapped_ymin}, {infCapped_ymax}]")
+  )
+
+mmmAgree <- trials %>%
+  filter(!is.na(Advisor), !practice) %>%
+  group_by(pid, agree) %>% 
+  summarise(
+    inf = mean(adviceInfluence),
+    infCapped = mean(adviceInfluenceCapped),
+    .groups = 'drop'
+  ) %>%
+  nest(d = -agree) %>%
+  mutate(
+    inf = map(d, ~ mean_cl_normal(.$inf)),
+    infCapped = map(d, ~ mean_cl_normal(.$infCapped))
+  ) %>% 
+  select(-d) %>%
+  unnest(cols = c(inf, infCapped), names_sep = "_") %>%
+  mutate(
+    agree = case_when(agree == 0 ~ "Disagree", agree == 1 ~ "Agree"),
+    across(-agree, num2str),
+    s = glue("M~{agree}~={inf_y} [95%CI {inf_ymin}, {inf_ymax}]"),
+    sCapped = glue("M~{agree}~={infCapped_y} [95%CI {infCapped_ymin}, {infCapped_ymax}]")
+  )
+
 ```
+
+The agree-in-confidence and agree-in-uncertainty advisers differed by design in the frequency with which they agree with the participant as a function of the participant’s confidence in their initial estimate.
+To control for the effects of initial confidence on influence, the above analysis was repeated using only those trials on which the initial estimate was correct and given with medium confidence.
+In a deviation from preregistration, this analysis was constrained to only forced trials because some participants had missing data for some advisor-trial type-agreement contingencies in the Medium confidence trials.
+
+The results were qualitatively identical to those for the trials at all confidence levels: a main effect of agreement (raw influence: `r aov_inf_m$s[2]`, `r mmmAgree %>% filter(agree == "Agree") %>% pull(s)`, `r mmmAgree %>% filter(agree == "Disagree") %>% pull(s)`; capped influence: `r aov_inf_cap_m$s[2]`, `r mmmAgree %>% filter(agree == "Agree") %>% pull(sCapped)`, `r mmmAgree %>% filter(agree == "Disagree") %>% pull(sCapped)`); and no signifcant effect of advisor (raw influence: `r aov_inf_m$s[1]`, `r mmmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(s)`, `r mmmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(s)`; capped influence: `r aov_inf_cap_m$s[1]`, `r mmmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(sCapped)`, `r mmmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(sCapped)`) or interaction (raw influence: `r aov_inf_m$s[3]`; capped influence: `r aov_inf_cap_m$s[3]`)
 
 ##### \OpenScience{prereg} Sensitivity to the manipulation
 
-Finally, we planned to investigate the hypothesis that participants’ choice of advisor would be sensitive to the differential agreement strategies of the advisers, e.g.
-participants might preferentially select the advisor with the greater likelihood of agreement given their initial confidence.
-This was investigated by testing the participants’ mean bias sharing advisor pick rate in low- versus high-confidence trials.
-Pick rates did not differ (`r cat(md.ttest(participants$aicPickRate.lowConf, participants$aicPickRate.highConf, paired = T, labels = c('M~low confidence~', 'M~high confidence~')))`); Figure \@ref(fig:ex1-selection)).
+```{r ac-ex1-r-sensitivity}
 
-##### Exploratory analyses
-
-Below are reported analyses which were not part of the preregistration, but which were pursued to gain a greater insight into the behaviour of participants in the experiment.
-
-##### Effect of initial agreement
-
-```{r ex1-initial-agreement-equation}
-
-equation.ar <- lm(aicPickRate.notBlock3 ~ agreeRateDifference.block3, data = participants.byBlock)
-equationText <- lmToStr(equation.ar, c('x'), roundTo = 2)
-equationSummary <- summary(equation.ar)
-
-kableLM(equation.ar, 
-        caption = "\\label{tab:ex1-initial-agreement-t}Linear regression of pick rate in later blocks by initial agreement difference")
+tmp <- test %>%
+  group_by(pid, confidenceCategory) %>%
+  summarise(pPickBS = mean(Advisor == "Bias-sharing"), .groups = 'drop') %>%
+  pivot_wider(names_from = confidenceCategory, values_from = pPickBS)
 
 ```
 
-The hypothesised effect of the different advice-giving profiles of the advisers on their pick rates was not found, and we hypothesised that initial exposure to the advisers may have overshadowed information in subsequent blocks.
+Finally, we planned to investigate the hypothesis that participants’ choice of advisor would be sensitive to the differential agreement strategies of the advisers, e.g. participants might preferentially select the advisor with the greater likelihood of agreement given their initial confidence.
+This was investigated by testing the participants’ mean Bias-sharing advisor pick rate in high- versus low-confidence trials.
+Pick rates did not differ (`r cat(md.ttest(tmp$High, tmp$Low, paired = T, labels = c('M~High confidence~', 'M~Low confidence~')))`); Figure \@ref(fig:ex1-selection)).
+
+##### Follow-up tests
+
+##### Effect of initial agreement
+
+This experiment was run in the lab, and was longer than the online experiments to help justify participants' travelling time.
+This meant that the experiment contained multiple blocks, and consequently that we could explore the effects of early experience of advice on subsequent advisor preferences.
+We hypothesised that one reason we found no weak evidence for different pick rates for different advisors was that initial exposure to the advisers may have overshadowed information in subsequent blocks.
 To investigate this possibility, we examined the effect that agreement in the first experimental block had upon choices throughout the rest of the experiment (Figure \@ref(fig:ex1-initial-agreement)).
-A simple regression (Table \@ref(tab:ex1-initial-agreement-t)) indicated that the extent to which the Bias Sharing advisor agreed with the judge more frequently than the Anti Bias advisor in the first experimental block (Block 3) was a significant predictor of the preference for picking the Bias Sharing advisor in subsequent blocks.
+A simple regression (Table \@ref(tab:ex1-initial-agreement-t)) indicated that the extent to which the Bias-sharing advisor agreed with the participant more frequently than the Anti-bias advisor in the first experimental block (Block 3) was a significant predictor of the preference for picking the Bias-sharing advisor in subsequent blocks.
 
-```{r ex1-initial-agreement, fig.align='center', fig.caption="Initial agreement and subsequent preference.  figure shows the relationship between the agreement rate of the Bias Sharing advisor in the first experimental block (relative to the Anti Bias advisor) and the proportion of the time the participant picked the Bias Sharing advisor in later blocks. The dashed line shows the best-fit regression line, with shaded 99\\% confidence intervals.", out.width="100%"}
+```{r ex1-initial-agr}
 
-txt <- paste0(equationText, '; p ',
-              lteq(prop2str(equationSummary$coefficients[2, 4])))
+tmp <- trials %>%
+  filter(
+    !is.na(Advisor),
+    block > 2
+  ) %>%
+  mutate(firstBlock = if_else(block == 3, "firstBlock", "later")) %>%
+  nest(d = -c(pid, firstBlock)) %>%
+  mutate(
+    pPickBS = map_dbl(d, ~ mean(.$Advisor == "Bias-sharing")),
+    agreeDiff = map_dbl(d, function(.) {
+      mean(.$agree[.$Advisor == "Bias-sharing"]) -
+        mean(.$agree[.$Advisor == "Anti-bias"])
+    })
+  ) %>%
+  select(-d) %>%
+  pivot_wider(names_from = firstBlock, values_from = c(pPickBS, agreeDiff))
 
-ggplot(participants.byBlock, aes(x = agreeRateDifference.block3, 
-                                 y = aicPickRate.notBlock3)) +
-  geom_point() +
+eq <- lm(pPickBS_later ~ agreeDiff_firstBlock, data = tmp)
+
+kableLM(
+  eq, 
+  caption = "\\label{tab:ex1-initial-agreement-t}Linear regression of pick rate in later blocks by initial agreement difference"
+)
+
+```
+
+
+```{r ex1-initial-agreement, fig.align='center', fig.caption="Initial agreement and subsequent preference.  figure shows the relationship between the agreement rate of the Bias Sharing advisor in the first experimental block (relative to the Anti Bias advisor) and the proportion of the time the participant picked the Bias Sharing advisor in later blocks. The dashed line shows the best-fit regression line, with shaded 99\\% confidence intervals."}
+
+eq <- tidy(eq)
+eqTxt <- glue(
+    "y = {a}{num2str(x)}{a}x + {b}{num2str(i)}{b}",
+    i = eq$estimate[1],
+    x = eq$estimate[2], 
+    b = ifelse(eq$p.value[1] < .05, "**", ""),
+    a = ifelse(eq$p.value[2] < .05, "**", "")
+)
+
+ggplot(tmp, aes(x = agreeDiff_firstBlock, y = pPickBS_later)) +
+  geom_smooth(method = 'lm', formula = y ~ x, fullrange = T) +
+  geom_point(alpha = .25) +
   scale_y_continuous(limits = c(0,1), expand = c(0,0)) +
   scale_x_continuous(limits = c(-1,1), expand = c(0,0)) +
-  geom_smooth(method = 'lm', formula = y ~ x, fullrange = T, level = .99, 
-              color = "black", linetype = "dashed", fill = "grey", 
-              alpha = 0.2) +
-  annotate(geom = 'label', label = txt, colour = 'black', 
-            size = 5, x = .15, y = .1) +
-  labs(x = "Block 3 Bias Sharing agreement rate difference",
-       y = "P(Bias Sharing chosen | Block > 3)") +
+  annotate(geom = 'richtext', label = eqTxt, colour = 'black',
+           x = 0, y = .99, vjust = 1) +
+  labs(x = "Block 3 Bias-sharing agreement rate difference",
+       y = "P(Bias-sharing chosen | Block > 3)") +
   coord_fixed()
 
 ```
 
-The relationship between early experience of advisor agreement and overall advisor preference may be modified by an initial preference for one or the other advisor.
-We investigated this by adding advisor pick rate into the regression giving:
-
-\begin{equation}
-\text{PickRate}_{block>3} = \beta_1 \cdot \text{AgreementDifference}_{block=3} + 
-  \beta_2 \cdot \text{PickRate}_{block=3} + 
-  \beta_3 \cdot \text{AgreementDifference}_{block=3} \cdot \text{PickRate}_{block=3}
-(\#eq:ex1-initial-agreement-pick-rate)
-\end{equation}
-
-```{r ex1-initial-agreement-pick-rate}
-
-equation.arpr <- lm(aicPickRate.notBlock3 ~ 
-                      agreeRateDifference.block3 * aicPickRate.block3, 
-                    data = participants.byBlock)
-equationSummary <- summary(equation.arpr)
-
-kableLM(equation.arpr, 
-        caption = "\\label{tab:ex1-initial-agreement-pick-rate-t}Linear regression of pick rate in later blocks by initial agreement difference and preference")
-
-comp <- anova(equation.ar, equation.arpr)
-
-p <- lteq(prop2str(comp$`Pr(>F)`[2]))
-
-```
-
-This model (Table \@ref(tab:ex1-initial-agreement-pick-rate-t)) also fit the data well enough for interpretation, and represented an improvement on the previous model ($F$(`r comp$Res.Df[2]`, `r comp$Res.Df[1]`) = `r comp$F[2]`, $p$ `r p`).
-Early agreement difference remained predictive, and relative pick rate in block 3 was also predictive.
-Finally, the interaction between these predictors was also important to the model, although the negative sign of the interaction beta ($\beta_3$ = `r round(equationSummary$coefficients[4, 1], 2)`) was unexpected, and required further exploration.
-Figure \@ref(fig:ex1-initial-agreement-pick-rate-mm) shows a marginal means plot for the interaction with the predictors collapsed to binary measurements using a mean split.
-
-```{r ex1-initial-agreement-pick-rate-mm, fig.align='center', fig.caption="Initial agreement and preference predicting subsequent preference.  Figure shows the relationship between whether the agreement rate of the Bias Sharing advisor in the first experimental block (relative to the Anti Bias advisor) and the proportion of the time the participant picked the Bias Sharing advisor in later blocks, split by whether the participant picked the Bias Sharing or Anti Bias advisor more often in the first block. Splits are based on the sample means, and error bars give 95\\% confidence intervals.", out.width="100%"}
-
-tmp <- participants.byBlock[,c('participantId', 
-                               'aicPickRate.notBlock3', 
-                               'aicPickRate.block3',
-                               'agreeRateDifference.block3')]
-tmp$aicPickRate.block3.binary <- as.factor(tmp$aicPickRate.block3 > mean(tmp$aicPickRate.block3))
-levels(tmp$aicPickRate.block3.binary) <- c('Anti Bias', 'Bias Sharing')
-tmp$agreeRateDifference.binary <- as.factor(tmp$agreeRateDifference.block3 > mean(tmp$agreeRateDifference.block3))
-levels(tmp$agreeRateDifference.binary) <- c('Anti Bias advisor agrees more', 
-                                            'Bias Sharing advisor agrees more')
-
-dw <- .2
-
-ggplot(tmp, aes(x = agreeRateDifference.binary,
-                y = aicPickRate.notBlock3,
-                color = aicPickRate.block3.binary)) +
-  stat_summary(aes(group = aicPickRate.block3.binary), 
-               fun.y = mean, geom = "line", position = position_dodge(dw)) + 
-  stat_summary(geom = "errorbar", fun.data = mean_cl_normal, width = 0,
-               position = position_dodge(dw)) +
-  stat_summary(geom = "point", fun.y = mean, size = 5, 
-               position = position_dodge(dw)) +
-  # points with a nudge on the x axis (must be after axis is categorical)
-  geom_point(aes(x = as.numeric(agreeRateDifference.binary) - (dw / 4)), 
-             position = position_jitterdodge(dodge.width = dw, 
-                                             jitter.width = dw / 4), 
-             size = 1.5, alpha = .8) +
-  scale_color_discrete(name = 'Most picked in block 3:') +
-  scale_y_continuous(limits = c(0, 1)) + 
-  labs(x = "Relative advisor agreement in block 3",
-       y = "P(Bias Sharing chosen | Block > 3)")
-
-```
-
-```{r ex1-initial-agreement-metacog-r}
-
-participants.byBlock$agreeRateDifference.highConf.block3 <- 
-  participants.byBlock$aicAgreeRate.highConf.block3 - participants.byBlock$aiuAgreeRate.highConf.block3
-participants.byBlock$agreeRateDifference.medConf.block3 <- 
-  participants.byBlock$aicAgreeRate.medConf.block3 - participants.byBlock$aiuAgreeRate.medConf.block3
-participants.byBlock$agreeRateDifference.lowConf.block3 <- 
-  participants.byBlock$aicAgreeRate.lowConf.block3 - participants.byBlock$aiuAgreeRate.lowConf.block3
-
-participants.ar <- participants.byBlock %>% 
-  filter_at(vars(matches('aiuAgreeRate\\.(high|med|low)Conf\\.block3')), 
-            all_vars(!is.nan(.)))
-
-# Looking at the low/mid/high conf trials separately
-equation <- lm(aicPickRate.notBlock3 ~ agreeRateDifference.highConf.block3 + 
-                 agreeRateDifference.medConf.block3 + 
-                 agreeRateDifference.lowConf.block3 + 
-                 aicPickRate.block3, 
-               data = participants.ar)
-equationText <- lmToStr(equation, c('high', 'med', 'low'), roundTo = 2)
-equationSummary <- summary(equation)
-
-kableLM(equation, 
-        caption = "\\label{tab:ex1-initial-agreement-metacog}Linear regression of pick rate in later blocks by initial agreement difference by confidence")
-
-```
-
-The theoretical mechanism by which judges evaluate advisor accuracy in the absence of feedback is through their own metacognitive awareness.
-Thus, we would expect that, given preferences appear to be set by initial exposure to the advisors, those preferences would be more affected by high confidence agreement in block 3.
-This was tested using a regression model in which block 3 agree-in-confidence advisor agreement was used as a predictor split according to the three different levels of confidence.
-Several participants (`r nrow(participants.byBlock) - nrow(participants.ar)`) had no trials in block 3 for one or both advisors at one or more confidence levels; these participants were removed from the analysis.
-Neither the overall model fit nor any of the predictors in this model (Table \@ref(tab:ex1-initial-agreement-metacog)) were significant, but the low-confidence beta was substantially larger than the high- and medium-confidence betas.
-
-A prediction of the high weighting of initial exposure is that this weighting should drop off over time.
-This does not appear to be the case.
-Figure \@ref(fig:ex1-autoprediction-by-block) shows the regression coefficient for Bias Sharing advisor agreement in each block against the Bias Sharing overall pick proportion: no significant negative correlation was found between block number and the regression coefficient for relative agreement in that block predicting overall advisor preference.
-
-```{r ex1-autoprediction-by-block, fig.align='center', fig.caption="Block 3 agreement predicting pick rate in each block.  Figure shows the relationship between the agreement rate of the Bias Sharing advisor in the first experimental block (relative to the Anti Bias advisor) and the proportion of the time the participant picked the Bias Sharing advisor in each later block. Error bars give +/-1 standard error. Shaded area gives 95\\% confidence for the overall regression line.", out.width="100%"}
-
-agreementCoefs <- data.frame(block = integer(), coef = double(), coef.se = double())
-for (b in unique(trials$block)) {
-  eq <- as.formula(paste0('aicPickRate ~ agreeRateDifference.block',b))
-  mdl <- summary(lm(eq, data = participants.byBlock))    # we can rip the necessary stats from the summary
-  agreementCoefs <- rbind(agreementCoefs,
-                          data.frame(block = b,
-                                     coef = mdl$coef[2,1],
-                                     se = mdl$coef[2,2]))
-}
-equation <- lm(coef ~ block, data = agreementCoefs)
-equationText <- lmToStr(equation, c('x'), 3)
-
-txt <- paste0(equationText, '; p ',
-              lteq(prop2str(summary(equation)$coefficients[2, 4])))
-
-agreementCoefs$block <- factor(agreementCoefs$block)
-
-ggplot(agreementCoefs, aes(x = block, y = coef)) +
-  geom_errorbar(aes(x = block, ymin = coef - se, ymax = coef + se), width = 0) +
-  geom_point(size = 5) +
-  geom_smooth(method = 'lm', aes(x = as.numeric(block)), alpha = 0.2, 
-              colour = "black") +
-  annotate(geom = 'label', x = agreementCoefs$block[1], 
-           y = min(agreementCoefs$coef), label = txt,
-           hjust = 'left') +
-  labs(x = "Block",
-       y = "Agreement:Pick rate difference beta") 
-
-```
-
-##### Capped influence measure
-
-```{r ex1-influence-capping}
-
-trials <- trials %>% mutate(capped = influence != cappedInfluence)
-
-participants <- left_join(
-  participants, 
-  trials %>% 
-    group_by(participantId) %>%
-    summarise(cappedTrials = sum(capped, na.rm = T)),
-  by = 'participantId'
-  )
-
-```
-
-Preregistered analyses indicated that advisors are more influential when they disagree with the judge.
-This result may simply be an artefact of the scale: although the scale extends equally far in both directions, there is necessarily potential for adjusting answers to follow agreeing advice by virtue of the fact that the decision is not placed in the middle of the scale.
-To redress this balance, a capped measure of influence (§\@ref(ex1-m-analysis-influence)) was used.
-Of the `r sum(!is.nan(trials$agree))` trials on which judges received advice, `r sum(trials$capped, na.rm = T)` trials (`r num2str(sum(trials$capped, na.rm = T) / sum(!is.nan(trials$agree)) * 100, precision = 1)`%) had their influence scores capped by this process.
-These trials were predominantly disagreement trials^[Agreement trials can have capped values if the final decision goes in the opposite direction to the advice.] (`r sum(trials$capped & !trials$agree, na.rm = T)`, `r num2str(sum(trials$capped & !trials$agree, na.rm = T) / sum(trials$capped, na.rm = T) * 100, precision = 1)`%).
-The mean number of trials adjusted for each participant was `r md.mean(participants$cappedTrials, label = "$M_{TrialsAdjusted}$")`, though the distribution was highly positively skewed and `r sum(participants$cappedTrials == 0)` participants had no trials adjusted this way (Figure \@ref(fig:ex1-influence-cap-rates)).
-Analysis using the 2x2x2 (advice type/agreement/choice) ANOVA described above (§\@ref(ex1-influence)) no longer showed a significant effect of agreement.
-As before, neither interactions nor other main effects were significant (Table \@ref(tab:ex1-influence-cap-rates-t)).
-
-```{r ex1-influence-cap-rates, fig.align='center', fig.caption="Advisor influence capping frequency.  Histogram showing the number of trials in which influence was capped for each participant.", out.width="100%"}
-
-ggplot(participants, aes(cappedTrials)) +
-  geom_histogram(stat = 'count') +
-  coord_flip() +
-  labs(x = "Number of trials capped",
-       y = "Number of participants")
-
-```
-
-```{r ex1-influence-cap-rates-r} 
-kableANOVA(anova.influence.capped$ANOVA, 
-           caption = "\\label{tab:ex1-influence-cap-rates-t}ANOVA of Advisor influence with capped values in Experiment 1")
-```
-
 ##### Subjective assessment and choice of advisors
 
-We did not observe the hypothesized preference for the agree-in-confidence advisor, either as measured by pick rate or by questionnaire response.
-Nevertheless, it was possible to examine the relationship between the behavioural measure of pick rate and the self-reported questionnaire answers by examining the extent to which participants who picked the agree-in-confidence advisor more frequently rated that advisor more favourably.
-Questionnaire answers did not evolve systematically over the duration of the experiment, so the analysis was conducted on the final (post-experiment) answers.
-Correlations (Figure \@ref(fig:ex1-questionnaire-choice)) indicated that the hypothesized effect was present for the questionnaire dimensions of accuracy and trustworthiness, but not for influence or likeability.
+Participants were asked to complete short questionnaires at several points in the experiment.
+These questionnaires collected ratings on a 100 point scale for each advisor across four dimensions: three loosely inspired by @mayerIntegrativeModelOrganizational1995 accuracy, likeability, and influence; along with a general trustworthiness dimension. 
+We did not observe significant differences in subjective ratings of the advisors at any time point.
+While overall differences might not show up, it is plausible that participants who had stronger preferences for one or other advisor would pick that advisor more frequently.
+We tested this using linear regression to predict the extent to which participants picked the Bias-sharing advisor from the differences in subjective advisor ratings.
+The questionnaire answers did not evolve systematically over the duration of the experiment, so the analysis was conducted on the final (post-experiment) answers.
 
-```{r ex1-questionnaire-choice, fig.align='center', fig.caption="Behavioural and self-report consistency.  Relationship between questionnaire response scores on each item and overall pick rate for the Bias Sharing advisor. Lines show best-fit linear model and shaded areas give 95\\% confidence intervals for the parameters.", out.width="100%"}
+This analysis (Figure \@ref(fig:ex1-questionnaire-choice)) indicated that the association between subjective ratings and behavioural performance was present for the questionnaire dimensions of accuracy and trustworthiness, but not for influence or likeability.
 
-coefs <- questionnaires %>% 
-  group_by(questionTextShort) %>% 
-  summarise(equation = "", sig = NA)
+```{r ex1-questionnaire-choice, fig.caption="Behavioural and self-report consistency.  Relationship between questionnaire response scores on each item for the Bias-sharing advisor minus scores for the Anti-bias advisor and overall pick rate for the Bias-sharing advisor. Lines show best-fit linear model and shaded areas give 95\\% confidence intervals for the parameters. The theoretical limits on the horizontal axis are [-100, 100]."}
 
-v <- NULL
-sig <- NULL
-
-for (q in coefs$questionTextShort) {
-  m <- lm(answer ~ aicPickRate, 
-          data = questionnaires[which(questionnaires$questionTextShort == q 
-                                      & questionnaires$timePoint == 4
-                                      & questionnaires$adviceType == adviceTypes$AiC),])
-  s <- summary(m)
-  p <- pf(s$fstatistic[1], s$fstatistic[2], s$fstatistic[3], lower.tail = F)
-  v <- c(v, paste0(lmToStr(m, 'x', 2), '; p ', lteq(prop2str(p))))
-  sig <- c(sig, p < .05)
-}
-
-coefs$equation <- v
-coefs$sig <- sig
-
-questionnaires <- questionnaires %>% 
-  mutate(
-    sig = map(questionTextShort, ~ coefs$sig[coefs$questionTextShort == .]),
-    sig = unlist(sig)
-  )
-
-questionnaires %>%
-  filter(timePoint == 4, adviceType == adviceTypes$AiC) %>%
-  ggplot(aes(x = aicPickRate, y = answer)) +
-  geom_smooth(method = 'lm', aes(colour = sig), fullrange = T) + 
-  geom_point() + 
-  geom_label(aes(label = equation, x = 0.1, y = 95), 
-            data = coefs, hjust = 'left') +
-  facet_wrap(~questionTextShort) +
-  scale_y_continuous(limits = c(0, 100), expand = c(0,0)) +
-  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
-  scale_colour_manual(values = c('black', 'blue'), name = 'p < .05') +
-  # coord_fixed(1/100) +
-  labs(legend = NULL,
-       x = 'p(Bias Sharing advisor selected)',
-       y = "Questionnaire response") +
-  theme(panel.spacing.x = unit(1.75, "lines")) 
-
-```
-
-We supported this raw score analysis by comparing the pick rate for the Bias Sharing advisor (which is by construction comparative with the Anti Bias advisor) to a comparative version of the questionnaire responses obtained by subtracting scores for the Bias Sharing advisor from the equivalent score for the Anti Bias advisor.
-The results were highly similar (Figure \@ref(fig:ex1-questionnaire-choice-balanced)), with the explicit trust measures for the Bias Sharing advisor relative to the Anti Bias advisor correlating with the picking preference for the Bias Sharing advisor in the dimensions of accuracy and trustworthiness.
-Again, neither influence nor likeability showed the effect.
-
-```{r ex1-questionnaire-choice-balanced, fig.align='center', fig.caption="Behavioural and self-report consistency.  Relationship between questionnaire response scores on each item for the Bias Sharing advisor minus scores for the Anti Bias advisor and overall pick rate for the Bias Sharing advisor. Lines show best-fit linear model and shaded areas give 95\\% confidence intervals for the parameters.", out.width="100%"}
-
-tmp <- questionnaires %>%
+Q_diffs <- questionnaires %>%
   filter(timePoint == 4) %>%
-  select(participantId, aicPickRate, answer, questionTextShort, adviceType) %>%
-  spread(adviceType, answer) %>%
-  mutate(difference = `1` - `2`)
-
-coefs <- questionnaires %>% 
-  group_by(questionTextShort) %>% 
-  summarise(equation = "", sig = NA)
-
-v <- NULL
-sig <- NULL
-
-for (q in coefs$questionTextShort) {
-  m <- lm(difference ~ aicPickRate, 
-          data = tmp %>% filter(questionTextShort == q))
-  s <- summary(m)
-  p <- pf(s$fstatistic[1], s$fstatistic[2], s$fstatistic[3], lower.tail = F)
-  v <- c(v, paste0(lmToStr(m, 'x', 2), '; p ', lteq(prop2str(p))))
-  sig <- c(sig, p < .05)
-}
-
-coefs$equation <- v
-coefs$sig <- sig
-
-tmp <- tmp %>% 
-  mutate(
-    sig = map(questionTextShort, ~ coefs$sig[coefs$questionTextShort == .]),
-    sig = unlist(sig)
+  left_join(
+    select(advisors, pid, id, Advisor),
+    by = c("pid", advisorId = "id")
+  ) %>%
+  select(pid, Advisor, questionNumber, answer) %>%
+  pivot_wider(names_from = Advisor, values_from = answer) %>%
+  mutate(BSminusAB = `Bias-sharing` - `Anti-bias`) %>%
+  select(-`Bias-sharing`, -`Anti-bias`) %>%
+  pivot_wider(
+    names_from = questionNumber, 
+    values_from = BSminusAB, 
+    names_prefix = "Q"
+  ) %>%
+  left_join(
+    test %>% 
+      group_by(pid) %>%
+      summarise(pPickBS = mean(Advisor == "Bias-sharing")),
+    by = "pid"
+  ) %>%
+  rename_with(
+    ~ case_when(
+      . == "Q1" ~ "Accurate",
+      . == "Q2" ~ "Likeable",
+      . == "Q3" ~ "Trustworthy",
+      . == "Q4" ~ "Influential",
+      T ~ .
+    )
   )
-
-tmp %>%
-  ggplot(aes(x = aicPickRate, y = difference)) +
-  geom_smooth(method = 'lm', aes(colour = sig), fullrange = T) + 
-  geom_point() + 
-  geom_label(aes(label = equation, x = 0.1, y = 95), 
-            data = coefs, hjust = 'left') +
-  facet_wrap(~questionTextShort) +
-  scale_y_continuous() +
-  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
-  scale_colour_manual(values = c('black', 'blue'), name = 'p < .05') +
-  # coord_fixed(1/200) + 
-  labs(legend = NULL,
-       x = 'p(Bias Sharing advisor selected)',
-       y = "Questionnaire response") +
+  
+eqs <- Q_diffs %>%
+  pivot_longer(
+    -c(pid, pPickBS),
+    names_to = "Dimension", 
+    values_to = "Difference"
+  ) %>%
+  nest(d = -Dimension) %>%
+  mutate(
+    lm = map(d, ~ lm(pPickBS ~ Difference, data = .)),
+    s = map_chr(
+      lm, 
+      ~ {
+        . <- tidy(.)
+        glue(
+          "y = {a}{num2str(x, 3)}{a}x + {b}{num2str(i, 3)}{b}",
+          i = .$estimate[1],
+          x = .$estimate[2], 
+          b = ifelse(.$p.value[1] < .05, "**", ""),
+          a = ifelse(.$p.value[2] < .05, "**", "")
+        )
+      }
+    )
+  ) %>%
+  select(-d)
+  
+Q_diffs %>%
+  pivot_longer(
+    cols = -c(pid, pPickBS),
+    names_to = "Dimension",
+    values_to = "Difference"
+  ) %>%
+  ggplot(aes(x = Difference, y = pPickBS)) +
+  geom_smooth(method = 'lm', formula = y ~ x, fullrange = T) + 
+  geom_point(alpha = .25) + 
+  geom_richtext(
+    aes(label = s), 
+    x = 0, 
+    y = .99,
+    fill = NA,
+    data = eqs, 
+    vjust = 1
+  ) +
+  facet_wrap(~Dimension) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(
+    y = 'p(Bias Sharing advisor selected)',
+    x = "Questionnaire response difference"
+  ) +
   theme(panel.spacing.x = unit(1.75, "lines")) 
 
 ```
 
 ```{r}
-tmp <- questionnaires %>% 
-  as_tibble() %>%
-  filter(timePoint == 4) %>%
-  mutate(advisorId = unlist(advisorId)) %>%
-  select(participantId, advisorId, questionTextShort, answer) %>%
-  group_by(participantId, advisorId, questionTextShort) %>%
-  summarise(answer = mean(answer)) %>%
-  pivot_wider(names_from = questionTextShort, values_from = answer)
+
+r <- cor.test(Q_diffs$Accurate, Q_diffs$Trustworthy, paired = T) %>% tidy()
+
 ```
 
-There was a strong correlation between trustworthiness and accuracy ($r$ = `r prop2str(cor(tmp$Trustworthy, tmp$Accurate), minPrefix = NA)`), and thus it was probable that the variance in the questionnaire responses explained by advisor preference was principally driven by this shared component.
+There was a strong correlation between trustworthiness and accuracy ($r$=`r prop2str(r$estimate)`, p=`r prop2str(r$p.value)`), and thus it was probable that the variance in the questionnaire responses explained by advisor preference was principally driven by this shared component.
 This was borne out by nested multiple regression Table \@ref(tab:ex1-questionnaires-additive-variance-explained-t), which demonstrated that a model using accuracy to predict advisor preference was not significantly improved by including trustworthiness.
 
 ```{r ex1-questionnaires-additive-variance-explained-r}
 
-kableModelComparison(list(equation.1, equation.2, equation.3, equation.4),
-                     caption = "\\label{tab:ex1-questionnaires-additive-variance-explained-t}Iterative model comparison predicting advisor choice from questionnaire scores")
+kableModelComparison(
+  eqs$lm,
+  caption = "\\label{tab:ex1-questionnaires-additive-variance-explained-t}Iterative model comparison predicting advisor choice from questionnaire scores"
+)
 
 ```
 
-##### Subjective and objective measures of influence
+#### Discussion
 
-```{r}
+The lab experiment, chronologically the first of all the experiments,^[Later experiments were conducted to investigate why the hypothesised effects were not found in this experiment.] produced equivocal results. 
+While many of the expected relationships were found between participants' subjective perceptions of the advisors and their behaviour towards them, these did not reliably translate into differential picking rates for the Bias-sharing and Anti-bias advisors.
+There was a significant difference in pick rates in medium confidence trials (where the advisors were equivalent to one another), but the Bayesian test indicated that the evidence in favour of differential pick rates was weak.
+Furthermore, there was no convincing reason we could determine why the preference (if it were a real effect) would not show up at other confidence levels.
+The early experience of advisors did appear to predict their relative pick rates, with the advisor who agreed more with the participant in the initial experimental block being more likely to be picked more frequently on subsequent blocks.
 
-tmp <- participants[,c('participantId', 'aicInfluence', 'aiuInfluence')]
-tmp <- melt(tmp, id.vars = c('participantId'), value.name = 'influence', variable.name = 'advisor')
-levels(tmp$advisor) <- c(adviceTypes$AiC, adviceTypes$AiU)
-for (p in 1:dim(tmp)[1]) {
-  tmp$influence.Q[p] <- 
-    questionnaires$answer[
-      which(
-        questionnaires$participantId == tmp$participantId[p]
-        & questionnaires$questionNumber == questionnaireDimensions$influence
-        & questionnaires$adviceType == tmp$advisor[p]
-        & questionnaires$timePoint == 4
-        )
-      ]
-}
-
-equations <- NULL
-for (i in 1:2) {
-  equation <- lm(influence.Q ~ influence, data = tmp[which(tmp$advisor == i),])
-  s <- summary(equation)
-  equationText <- paste0(
-    lmToStr(equation, c('x'), roundTo = 2),
-    '; p ', lteq(prop2str(s$coefficients[2, 4], minPrefix = NA)),
-    '; R^2adj ', lteq(prop2str(s$adj.r.squared, minPrefix = NA))
-    )
-  equations <- rbind(equations, data.frame(advisor = i, str = equationText))
-}
-equations$advisor <- factor(equations$advisor)
-
-```
-
-Measures of influence were obtained in two distinct ways: through a self-report questionnaire and through observation of behaviour.
-To the extent that participants have an insight into their behaviour, these measures should correlate positively with one another.
-This proved to be the case (using the post-experiment responses for simplicity) for both the agree-in-confidence advisor and the agree-in-uncertainty advisor, as shown in Figure \@ref(fig:ex1-subjective-objective-influence).
-
-```{r ex1-subjective-objective-influence, fig.align='center', fig.caption="Behavioural and self-report measures of influence.  Scatterplot showing correlations between influence as measured by the change in confidence following advice vs self-report.", out.width="100%"}
-ggplot(tmp, aes(x = influence, y = influence.Q, color = advisor)) +
-  geom_point() +
-  geom_smooth(method = 'lm', aes(fill = advisor), alpha = 0.1, fullrange = T) +
-  scale_color_discrete(name = 'Advisor', labels = c('Bias Sharing', 'Anti Bias')) +
-  scale_fill_discrete(name = 'Advisor', labels = c('Bias Sharing', 'Anti Bias')) +
-  labs(x = 'Behavioural influence',
-       y = '"How much are you influenced by\nthe opinions of this person?"') +
-  geom_label(x = 10, aes(y = 30 + 20 * (advisor == 1), label = str), data = equations) 
-```
-
+Overall, these results were underwhelming and difficult to interpret.
+We conducted an online replication of this study so that we could collect data from more participants and hopefully determine more accurately whether or not participants were sensitive to the differences in the advisors.
 
 ### Experiment 4A: Confidence-contingent advice effects in the Dots Task {#ac-cca-dots}
 
-\mccorrect{NICK: Here give a brief overview: Here advice was carefully controlled as a function of participants' initial decisions and confidence. Following P&Y's design, their confidence on each trial was assessed (as being low/med/hi for them). One advisor agreed more often when participants expressed high confidence than low; the other did the opposite; agreement was matched for medium confidence.}
+\mccorrect{TODO: Brief lead-in for the Dots task online. Mostly following on from the previous paragraph - larger sample.}
 
 ```{r ac-cca-dots-load, include = F}
 
@@ -1762,7 +1542,8 @@ Different approaches to estimating participants' confidence were trialled, inclu
 
 \mccorrect{!TODO[If this study was worth reporting on, report on it (as a null manipulation). If not, why mention it? With the Marker use studies this probably works out as quite a lot of work and worth describing, at least. Probably worth detailing some of the attempts that were made to adapt Dates to Confidence-contingent advice.]}
 
-
 ### Discussion {#ac-cca-d}
+
+\mccorrect{NICK: No confidence-weighted effect? Is it plausible people could learn it in real life? Or are pick rates too variable to reveal subtle differences in advisor preference. (The latter is consistent with the high variability we see -- the preferences have to be quite strong at the group level to see anything)}
 
 The data are pretty equivocal here: there's no particularly solid reason for thinking that participants select Bias Sharing advisors more frequently than Anti Bias advisors.
