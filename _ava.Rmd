@@ -181,7 +181,7 @@ exclusions %>%
 
 ```
 
-In line with the pre-registration, participants' data were excluded from analysis where they have an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, do not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), have fewer than `r minTrialsPerCategory` trials in each confidence category, or finish the experiment after `r preRegParticipants` participants have already submitted data which passed the other exclusion tests. 
+In line with the pre-registration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, do not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), have fewer than `r minTrialsPerCategory` trials in each confidence category, or finish the experiment after `r preRegParticipants` participants have already submitted data which passed the other exclusion tests. 
 Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-ava-dots-exclusions).
 This number is somewhat higher than in the previous experiments, but this is largely due to collecting data in larger batches than previously: a large number of participants were excluded because their data was in excess of the preregistered sample size.
 
@@ -495,7 +495,7 @@ This indicates that in general the confidence changed in the direction of the ad
 
 There was no evidence of a correlation between initial estimate accuracy and confidence (`r bf2str(exp(out$conf_r_i@bayesFactor$bf))`), and no evidence for a correlation between final decision accuracy and confidence (`r bf2str(exp(out$conf_r_f@bayesFactor$bf))`).
 
-##### Experience with advisors
+##### Advisor performance
 
 The advice is generated probabilistically from the rules described previously in Table \@ref(tab:ac-ava-dots-m-profiles).
 It is thus important to get a sense of the actual advice experienced by the participants.
@@ -556,7 +556,7 @@ agr.table %>%
     `Target|incorrect`,
     `Actual|incorrect`
   ) %>%
-  kable(label = "\\label{tab:ac-agr-dots-r-advice-agr}Advisor agreement for Dots task Accuracy vs Agreement experiment")
+  kable(caption = "\\label{tab:ac-agr-dots-r-advice-agr-t}Advisor agreement for Dots task Accuracy vs Agreement experiment")
 
 ```
 
@@ -573,11 +573,11 @@ agr.table %>%
   select(Advisor, `Target accuracy` = `Overall accuracy`) %>%
   left_join(tmp, by = "Advisor") %>%
   mutate(`Mean accuracy` = prop2str(`Mean accuracy`)) %>%
-  kable(label = "\\label{tab:ac-acc-dots-r-advice-acc}Advisor accuracy for Dots task Accuracy vs Agreement experiment")
+  kable(caption = "\\label{tab:ac-acc-dots-r-advice-acc-t}Advisor accuracy for Dots task Accuracy vs Agreement experiment")
 
 ```
 
-The advisors agreed with the participants' initial estimates at close to target rates (Table \@ref(tab:ac-ava-dots-r-advice-agr)), and were as accurate on average as expected (Table \@ref(tab:ac-ava-dots-r-advice-acc)).  
+The advisors agreed with the participants' initial estimates at close to target rates (Table \@ref(tab:ac-ava-dots-r-advice-agr-t)), and were as accurate on average as expected (Table \@ref(tab:ac-ava-dots-r-advice-acc-t)).  
 `r n_ap`/`r length(unique(familiarization$pid))` participants experienced the intended relationship wherein the High agreement advisor agreed with them more than the High accuracy advisor and the High accuracy advisor gave more accurate advice than the High agreement advisor.
 
 ##### \OpenScience{prereg} Hypothesis test
@@ -1266,12 +1266,12 @@ ggplot(tmp, aes(x = feedbackCondition, y = pChooseAcc)) +
 .T.fb <- tmp %>%
   filter(feedbackCondition == 'Feedback') %>%
   pull(pChooseAcc) %>%
-  md.ttest(y = .5, labels = c('*M*$_{Feedback}$'))
+  md.ttest(y = .5, labels = c('M~Feedback~'))
 
 .T.Nfb <- tmp %>%
   filter(feedbackCondition != 'Feedback') %>%
   pull(pChooseAcc) %>%
-  md.ttest(y = .5, labels = c('*M*$_{No feedback}$'))
+  md.ttest(y = .5, labels = c('M~No feedback~'))
 
 ```
 

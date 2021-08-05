@@ -281,7 +281,7 @@ ggplot(tmp, aes(x = advisor0idDescription, y = advisor0WOA,
   filter_if(is.numeric, ~ !is.na(.)) %>%
   as.data.frame() %$%
   md.ttest(x = Accurate, y = Agreeing, 
-           labels = c('*M*$_{Accurate|Feedback}$', '*M*$_{Agreeing|Feedback}$'), 
+           labels = c('M~Accurate|Feedback~', 'M~Agreeing|Feedback~'), 
            paired = T)
 
 .T.Nfb <- tmp %>%
@@ -291,7 +291,7 @@ ggplot(tmp, aes(x = advisor0idDescription, y = advisor0WOA,
   filter_if(is.numeric, ~ !is.na(.)) %>%
   as.data.frame() %$%
   md.ttest(x = Accurate, y = Agreeing, 
-           labels = c('*M*$_{Accurate|\\lnot Feedback}$', '*M*$_{Agreeing|\\lnot Feedback}$'), 
+           labels = c('M~Accurate|!Feedback~', 'M~Agreeing|!Feedback~'), 
            paired = T)
 
 tmp <- rename(tmp, 

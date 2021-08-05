@@ -2,15 +2,18 @@
 ## Effects of Advisor Agreement on Advisor Selection {#ac-agr}
 
 The next pair of experiments investigated how advice preferences are shaped by advisors’ likelihood of giving advice that agrees vs. disagrees with participants’ own initial estimates. 
-Pescetelli and Yeung \mccorrect{NICK: Niccolo Exp 2 in the JEP:G paper. He found (in terms of influence) a big effect of agreement and a much smaller effect of accuracy when there was no feedback. When feedback was provided, accuracy had maybe a bit bigger effect than agreement, but both effects were clear.} demonstrated that advisors who agree \mccorrect{NICK: somewhere we need to talk about what we mean by agreement, how Niccolo defined it, how we define it (varies between binary/continuous tasks), etc. Remind the reader what we mean by agreement in Method} more frequently are more influential (regardless of the presence of feedback) in a lab-based perceptual decision-making task.}
-\mccorrect{NICK: Here we explored the impact of agreement on participants’ choice of advisor. Experiment X looks at this effect in the Dots task, while Experiment Y does the same for the Dates task.}
+Pescetelli and Yeung \mccorrect{NICK: Niccolo Exp 2 in the JEP:G paper. He found (in terms of influence) a big effect of agreement and a much smaller effect of accuracy when there was no feedback. When feedback was provided, accuracy had maybe a bit bigger effect than agreement, but both effects were clear.} demonstrated that advisors who agree  more frequently are more influential (regardless of the presence of feedback) in a lab-based perceptual decision-making task.
+
+\mccorrect{NICK: Here we explored the impact of agreement on choice of advisor. Experiment X looks at this effect in the Dots task, while Experiment Y does the same for the Dates task.}
+
+\mccorrect{NICK: somewhere we need to talk about what we mean by agreement, how Niccolo defined it, how we define it (varies between binary/continuous tasks), etc. Remind the reader what we mean by agreement in Method}
 
 Experiments 1A§\@ref(ac-acc-dots) and 1B§\@ref(ac-acc-dates) revealed differences in how participants selected the advisors between the Dots task (which has no feedback) and the No feedback condition of the Dates task for High versus Low accuracy advisors. 
 We may expect more pronounced effects in the absence of feedback when contrasting High versus Low agreement advisors, because we expect that agreement is the driving force behind the accuracy differences where feedback is not provided.
 
 ### Experiment 2A: Advisor agreement effects in the Dots Task {#ac-agr-dots}
 
-\mccorrect{NICK: In this experiment, the advice provided was no longer independent of participants’ own initial decisions. Instead, advice was provided contingent on those decisions, such that the two advisors varied in their likelihood…etc. I think it's worth making the point explicit, to begin to suggest how we can dissociate agreement and accuracy.}
+\mccorrect{NICK: In this experiment, the advice provided was no longer independent of initial decisions. Instead, advice was provided contingent on those decisions, such that the two advisors varied in their likelihood etc. I think it's worth making the point explicit, to begin to suggest how we can dissociate agreement and accuracy.}
 
 ```{r ac-agr-dots-load, include = F}
 
@@ -169,7 +172,7 @@ familiarization <- trials %>%
 
 ```
 
-In line with the pre-registration, participants' data were excluded from analysis where they have an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, do not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), have fewer than `r minTrialsPerCategory` trials in each confidence category, or finish the experiment after `r preRegParticipants` participants have already submitted data which passed the other exclusion tests. 
+In line with the pre-registration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, do not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), have fewer than `r minTrialsPerCategory` trials in each confidence category, or finish the experiment after `r preRegParticipants` participants have already submitted data which passed the other exclusion tests. 
 Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-agr-dots-exclusions).
 
 ##### Task performance
@@ -535,7 +538,7 @@ agr.table %>%
     `Target|incorrect`,
     `Actual|incorrect`
   ) %>%
-  kable(label = "\\label{tab:ac-agr-dots-r-advice-agr}Advisor agreement for Dots task Agreement experiment")
+  kable(caption = "\\label{tab:ac-agr-dots-r-advice-agr-t}Advisor agreement for Dots task Agreement experiment")
 
 ```
 
@@ -552,11 +555,11 @@ agr.table %>%
   select(Advisor, `Target accuracy` = `Overall accuracy`) %>%
   left_join(tmp, by = "Advisor") %>%
   mutate(`Mean accuracy` = prop2str(`Mean accuracy`)) %>%
-  kable(label = "\\label{tab:ac-acc-dots-r-advice-acc}Advisor accuracy for Dots task Agreement experiment")
+  kable(caption = "\\label{tab:ac-acc-dots-r-advice-acc-t}Advisor accuracy for Dots task Agreement experiment")
 
 ```
 
-The advisors agreed with the participants' initial estimates at close to target rates (Table \@ref(tab:ac-agr-dots-r-advice-agr)), and were as accurate on average as expected (Table \@ref(tab:ac-agr-dots-r-advice-acc)). 
+The advisors agreed with the participants' initial estimates at close to target rates (Table \@ref(tab:ac-agr-dots-r-advice-agr-t)), and were as accurate on average as expected (Table \@ref(tab:ac-agr-dots-r-advice-acc-t)). 
 Nevertheless, some participants experienced in practice 10-20% differences in advisor accuracy (although neither advisor was systematically more accurate across participants). 
 All participants experienced the intended relationship wherein the High agreement advisor agreed with them more than the Low agreement advisor.
 
@@ -1380,12 +1383,12 @@ ggplot(tmp, aes(x = feedbackCondition, y = pChooseHigh)) +
 .T.fb <- tmp %>%
   filter(feedbackCondition == 'Feedback') %>%
   pull(pChooseHigh) %>%
-  md.ttest(y = .5, labels = c('*M*$_{Feedback}$'))
+  md.ttest(y = .5, labels = c('M~Feedback~'))
 
 .T.Nfb <- tmp %>%
   filter(feedbackCondition != 'Feedback') %>%
   pull(pChooseHigh) %>%
-  md.ttest(y = .5, labels = c('*M*$_{No feedback}$'))
+  md.ttest(y = .5, labels = c('M~No feedback~'))
 
 ```
 
@@ -1412,7 +1415,5 @@ In both Dots and Dates tasks, where feedback is not provided on advisors' perfor
 
 \mccorrect{re: influence - 
 An alternative explanation for the data is that the 'offbrand' advice selected for analysis was more surprising when coming from the advisor who usually agrees, and that this increased salience increased its influence rather than increased trust in the advisor.}
-\mcorrect{NICK: Need explain what this is. But above in the corresponding Results section it seems like you're talking about influence of overall advice in the familiarisation phase. I'd forgotten this detail about "test" advice trials with offbrand advice. Remind the reader, even if the specifics are already explained in the general methods.
-In general, your discussion ought to focus first on pick rates. E.g., what do you take-away from the finding of more picks for agreeing advice in both tasks (without feedback)? Then comment on what happens with feedback -- the bonus for agreeing advice is (overall) lost. But you still see wide preferences: These could be just random picks, but it could also be something systematic -- some people really like agreement, others like disagreement (as a preview of your modelling of advisor choices).
-Any analysis of influence in this study (and in the series of experiments in general) has to be very tentative, given the designs really aren't optimised to measure it. I wouldn't put a lot of time into investigating influence differences.}
+\mccorrect{NICK: Need to explain what this is. But above in the corresponding Results section it seems like you are talking about influence of overall advice in the familiarisation phase. I had forgotten this detail about test advice trials with offbrand advice. Remind the reader, even if the specifics are already explained in the general methods. In general, your discussion ought to focus first on pick rates. E.g., what do you takeaway from the finding of more picks for agreeing advice in both tasks (without feedback)? Then comment on what happens with feedback -- the bonus for agreeing advice is (overall) lost. But you still see wide preferences: These could be just random picks, but it could also be something systematic -- some people really like agreement, others like disagreement (as a preview of your modelling of advisor choices). Any analysis of influence in this study (and in the series of experiments in general) has to be very tentative, given the designs are not optimised to measure it. I would not put a lot of time into investigating influence differences.}
 If that were the case then the same ought to be true for agreeing advice from a disagreeing advisor, and this is not the case \mccorrect{!TODO[Do we have/can we produce evidence for this? Perhaps look at our participants where advisors disagree with them by chance more than e.g. 70\% of the time and check for increased influence on agreement trials vs advisors who disagree less than 70\% of the time]}.

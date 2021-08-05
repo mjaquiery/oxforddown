@@ -223,7 +223,7 @@ do_exclusions <- function(exclusions, envir = .GlobalEnv, backup = T) {
 #' @return vector of type names
 advisor_profile_name <- function(advisorType) {
   case_when(
-    advisorType == 3 ~ 'Bias sharing',
+    advisorType == 3 ~ 'Bias-sharing',
     advisorType == 4 ~ 'Anti-bias',
     advisorType == 5 ~ 'High accuracy',
     advisorType == 6 ~ 'Low accuracy',
