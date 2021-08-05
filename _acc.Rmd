@@ -977,7 +977,11 @@ In the next experiment, we aimed to replicate the results in a different task.
 
 ### Experiment 1B: Advice accuracy effects in the Dates Task {#ac-acc-dates}
 
-This experiment \mccorrect{NICK:provided a basic exploration of advice seeking and advice use in the Dates Task (if it is the first one reported), and aimed to replicate the results of Experiment X in the context of this task.}
+This experiment attempted to replicate the results of the previous experiment using a different task.
+The replication used a binary version of the Dates task reported in Experiment 0§\@ref(ai-ava). 
+
+
+\mccorrect{QUESTION: Perhaps explain some of the appeal of the Dates task, or is that done well enough in the General Method/Taking Advice sections?}
 
 ```{r ac-acc-dates-load, include = F}
 
@@ -1000,7 +1004,8 @@ tada('datequiz', package = 'esmData', envir = .dropEnv)
                          filter(table == 'AdvisedTrial') %>% 
                          pull(N))
 
-AdvisedTrial <- annotate_responses(AdvisedTrial)
+AdvisedTrial <- annotate_responses(AdvisedTrial) %>%
+  filter(!is.na(block))
 
 ```
 
@@ -1012,7 +1017,42 @@ A snapshot of the state of the code for running the experiment at the time the e
 
 #### Method {#ac-acc-dates-m}
 
-This study used the binary version of the Dates Task (§\@ref(m-p-dates-b)) in which \mccorrect{NICK:XX} participants \mccorrect{NICK:did XYZ. Helpful here to give a brief reminder in a short sentence. Also: XX blocks of YY trials in which they chose between advisors on each trial, with ZZ trials beforehand of forced advice to familiarise them with the advisors.}.
+```{r ac-acc-dates-m-structure}
+
+tmp <- bind_rows(
+  mutate(practiceTrial, type = "practice", block = 0),
+  mutate(practiceAdvisedTrial, type = "advice_practice", block = 1),
+  mutate(Trial, type = "atn_check") %>% filter(!is.na(block)),
+  mutate(AdvisedTrial, type = "core") %>% filter(!is.na(block))
+) %>%
+  group_by(pid, type, block) %>%
+  summarise(n = n(), advisorChoice = sum(advisorChoice), .groups = "drop") %>%
+  group_by(type, block) %>%
+  summarise(across(-pid, mean), .groups = "drop") %>%
+  arrange(block)
+
+```
+
+`r length(unique(AdvisedTrial$pid))` participants each completed `r round(sum(tmp$n))` trials over `r max(tmp$block)` blocks of the binary version of the Dates Task (§\@ref(m-p-dates-b)).
+On each trial, participants were presented with an historical event that occurred on a specific year between 1900 and 2000.
+They were given a date and asked whether the event occurred before or after that date, indicating their confidence in their decision by selecting an appropriate point on the relevant answer bar.
+Participants then received advice indicating which of the two bars (before or after) was supposedly the correct answer.
+Participants could then mark a final response in the same manner as their original response.
+
+Participants started with `r sum(tmp$type == "practice")` blocks of `r tmp %>% filter(type == "practice") %>% pull(n) %>% round()` trials that contained no advice to allow them to familiarise themselves with the task.
+All trials in this section included feedback for all participants indicating whether or not the participant's response was correct.
+
+Participants then did `r tmp %>% filter(type == "advice_practice") %>% pull(n) %>% round()` trials with a practice advisor to get used to receiving advice.
+They also received feedback on these trials.
+They were informed that they would "receive advice from advisors" to "help you complete the task".
+They were told that the "advisors aren't always correct, but they are quite good at the task", and informed that they should "identify which advisors are best and to weigh their advice accordingly".
+
+Participants then performed `r sum(tmp$type == "core")` blocks of trials that constituted the main experiment.
+The first two of these were familiarization blocks where participants had a single advisor in each block for `r tmp %>% filter(block == 2, type == "core") %>% pull(n) %>% round()` trials, plus `r tmp %>% filter(block == 2, type == "atn_check") %>% pull(n) %>% round()` attention check.
+During these trials, participants either received feedback or did not receive feedback according to their experimental condition.
+
+Finally, participants performed a test block of `r tmp %>% filter(block == 4) %>% pull(n) %>% round()` trials that offered them a choice on each trial of which of the two advisors they had encountered over the last two blocks would give them advice.
+No participants received feedback during the test phase.
 
 ##### Advice profiles
 

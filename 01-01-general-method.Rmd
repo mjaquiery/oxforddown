@@ -147,7 +147,7 @@ knitr::include_graphics("figures/methods/dates.jpg")
 
 ##### Binary {#m-p-dates-b}
 
-
+* Anchor date from a roughly normal distribution with SD 8 around the correct answer, clamped to within [1900, 2000].  
 
 ```{r m-dates-binary, fig.align='center', fig.caption="Dates Task with binary responses.", out.width="100%"}
 knitr::include_graphics("figures/methods/dates-binary.jpg")

@@ -34,7 +34,7 @@ Niccolo's stuff about advice-taking, and then demonstrate similar results in my 
 
 \mccorrect{!TODO[Describe Niccolo's stuff, especially why accuracy vs agreement might be a good target for replication with a new experimental design.]}
 
-## Experiment 0: Extending results to the Dates task
+## Experiment 0: Extending results to the Dates task {#ai-ava}
 
 ### Introduction {#ai-ava-i}
 
@@ -111,12 +111,15 @@ zThresh <- 3
 for (E in c(.GlobalEnv, .prevStudy)) {
   E$exclusions <- tibble(pid = unique(E$AdvisedTrial$pid)) %>%
     mutate(
-      `Attention check` = map_lgl(pid, ~ 
-                                    !all(E$Trial$responseCorrect[E$Trial$pid == .]) |
-                                    any(E$Trial$responseMarkerWidth[E$Trial$pid == .] != 1)
+      atn_check = map_lgl(
+        pid, 
+        ~ !all(E$Trial$responseCorrect[E$Trial$pid == .]) |
+          any(E$Trial$responseMarkerWidth[E$Trial$pid == .] != 1)
       ),
+      `Attention check` = if_else(is.na(atn_check), T, atn_check),
       `Unfinished` = map_lgl(pid, ~ !(. %in% E$`debrief-advisors`$pid))
-    )
+    ) %>% 
+    select(-atn_check)
   
   do_exclusions(E$exclusions, envir = E)
   
