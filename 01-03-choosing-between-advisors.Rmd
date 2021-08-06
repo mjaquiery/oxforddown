@@ -80,7 +80,12 @@ In this chapter, we partially replicate the findings of @pescetelliRoleDecisionC
 
 We conducted a series of experiments to explore whether the advice-taking behaviour observed previously [@pescetelliRoleDecisionConfidence2021] would translate into preferential source selection behaviour.
 In these experiments participants were familiarised with different pairs of advisors, and then given the opportunity to select which advisor they would like to get advice from (General Method§\@ref(general-method)).
-The first of these pairs was a high accuracy advisor and a low accuracy advisor (Experiment 1A§\@ref(ac-acc-dots) and Experiment 1B§\@ref(ac-acc-dates)). 
+
+Each experiment was repeated using two different tasks: a perceptual decision-making "Dots task", extended from @pescetelliRoleDecisionConfidence2021; and a historical date estimation "Dates task" newly built for this project.
+To reduce expenditure, all participants in the Dots task experiments received no feedback on their answers while learning about advisors, because contrasting the presence and absence of feedback was done by @pescetelliRoleDecisionConfidence2021.
+In the Dates task, due to its novelty, participants were split into conditions based on whether or not they received feedback while learning about the advisors.
+
+The first of the advisor pairs was a high accuracy advisor and a low accuracy advisor (Experiment 1A§\@ref(ac-acc-dots) and Experiment 1B§\@ref(ac-acc-dates)). 
 We predicted that the high accuracy advisor would be selected more often, even where feedback was not available. 
 This experiment would demonstrate the minimum phenomenon of interest -- sensitivity to advisor accuracy in the absence of feedback translating into preferential advisor selection.
 
