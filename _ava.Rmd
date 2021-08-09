@@ -556,7 +556,7 @@ agr.table %>%
     `Target|incorrect`,
     `Actual|incorrect`
   ) %>%
-  kable(caption = "\\label{tab:ac-agr-dots-r-advice-agr-t}Advisor agreement for Dots task Accuracy vs Agreement experiment")
+  kable(caption = "\\label{tab:ac-ava-dots-r-advice-agr-t}Advisor agreement for Dots task Accuracy vs Agreement experiment")
 
 ```
 
@@ -573,7 +573,7 @@ agr.table %>%
   select(Advisor, `Target accuracy` = `Overall accuracy`) %>%
   left_join(tmp, by = "Advisor") %>%
   mutate(`Mean accuracy` = prop2str(`Mean accuracy`)) %>%
-  kable(caption = "\\label{tab:ac-acc-dots-r-advice-acc-t}Advisor accuracy for Dots task Accuracy vs Agreement experiment")
+  kable(caption = "\\label{tab:ac-ava-dots-r-advice-acc-t}Advisor accuracy for Dots task Accuracy vs Agreement experiment")
 
 ```
 

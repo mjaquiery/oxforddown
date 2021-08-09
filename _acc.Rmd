@@ -998,7 +998,7 @@ They were given a date and asked whether the event occurred before or after that
 Participants then received advice indicating which of the two bars (before or after) was supposedly the correct answer.
 Participants could then mark a final response in the same manner as their original response.
 
-Participants started with `r sum(tmp$type == "practice")` blocks of `r tmp %>% filter(type == "practice") %>% pull(n) %>% round()` trials that contained no advice to allow them to familiarise themselves with the task.
+Participants started with `r sum(tmp$type == "practice")` block of `r tmp %>% filter(type == "practice") %>% pull(n) %>% round()` trials that contained no advice to allow them to familiarise themselves with the task.
 All trials in this section included feedback for all participants indicating whether or not the participant's response was correct.
 
 Participants then did `r tmp %>% filter(type == "advice_practice") %>% pull(n) %>% round()` trials with a practice advisor to get used to receiving advice.
@@ -1028,14 +1028,15 @@ This mimics the hypothesised relationship wherein agreement between advisors and
 
 ```{r ac-acc-dates-m-profiles-r} 
 
+pCor <- .5
 agr <- matrix(c(.8, .2, .59, .41), 2, 2)
 
 agr.table <- tribble(
   ~`Advisor`, ~`Participant correct`, ~`Participant incorrect`, ~ `Overall`, ~`Overall accuracy`,
-  "High accuracy", agr[1, 1], agr[2, 1], agr[1,1]*.5 + (1 - agr[1,1])*.5, agr[1, 1],
-  "Low accuracy", agr[1, 2], agr[2, 2], agr[1,2]*.5 + (1 - agr[1,2])*.5, agr[1, 2]
+  "High accuracy", agr[1, 1], agr[2, 1], sum(agr[,1] * c(pCor, 1 - pCor)), sum(agr[1,1] * pCor, (1 - agr[2,1]) * (1 - pCor)),
+  "Low accuracy", agr[1, 2], agr[2, 2], sum(agr[,2] * c(pCor, 1 - pCor)), sum(agr[1,2] * pCor, (1 - agr[2,2]) * (1 - pCor))
 ) %>% 
-  rename_with(~ paste0(., footnote_marker_alphabet(1)), Overall) %>% 
+  rename_with(~ paste0(., footnote_marker_alphabet(1)), contains("Overall")) %>% 
   prop2str()
 
 kable(
@@ -1110,7 +1111,7 @@ These criteria led to no participants being excluded from this experiment.
 
 ##### Task performance
 
-```{r ac-acc-dates-r-performance}
+```{r ac-acc-dates-r-split}
 
 fb <- AdvisedTrial %>% 
   group_by(pid) %>%
@@ -1129,7 +1130,6 @@ tmp <- AdvisedTrial %>%
 Familiarization <- tmp %>% filter(is.na(advisorChoice) | !advisorChoice) 
 
 Test <- tmp %>% filter(advisorChoice)
-
 
 ```
 
@@ -1804,11 +1804,6 @@ crossers %>%
 
 ##### Advisor performance
 
-The advice is generated probabilistically from the rules described previously (Advice profiles§\@ref(ac-acc-dates-m-advice-profiles)).
-This advisors agreed with participants contingent on the accuracy of the participants' initial estimates at close to the target rates (Table \@ref(tab:ac-acc-dates-r-advice-agr-t)).
-This meant that advisors were as accurate overall as they were intended to be in the familiarization phase (Table \@ref(tab:ac-acc-dates-r-advice-acc-t)).
-Most (`r n_ap`/`r length(unique(Familiarization$pid))`, `r num2str(n_ap / length(unique(Familiarization$pid)) * 100)`%) participants experienced the High accuracy advisor as providing more accurate advice than the Low accuracy advisor.
-
 ```{r ac-acc-dates-r-advice-agr}
 
 tmp <- Familiarization %>% 
@@ -1868,12 +1863,17 @@ tmp <- tmp %>%
 
 # Note: agr.table defined in the Advice profile section
 agr.table %>% 
-  select(Advisor, `Target accuracy` = `Overall accuracy`) %>%
+  select(Advisor, `Target accuracy` = starts_with("Overall accuracy")) %>%
   left_join(tmp, by = "Advisor") %>%
   mutate(`Mean accuracy` = prop2str(`Mean accuracy`)) %>%
   kable(caption = "\\label{tab:ac-acc-dates-r-advice-acc-t}Advisor accuracy for Dates task Accuracy experiment")
 
 ```
+
+The advice is generated probabilistically from the rules described previously (Advice profiles§\@ref(ac-acc-dates-m-advice-profiles)).
+This advisors agreed with participants contingent on the accuracy of the participants' initial estimates at close to the target rates (Table \@ref(tab:ac-acc-dates-r-advice-agr-t)).
+This meant that advisors were as accurate overall as they were intended to be in the familiarization phase (Table \@ref(tab:ac-acc-dates-r-advice-acc-t)).
+Most (`r n_ap`/`r length(unique(Familiarization$pid))`, `r num2str(n_ap / length(unique(Familiarization$pid)) * 100)`%) participants experienced the High accuracy advisor as providing more accurate advice than the Low accuracy advisor.
 
 ##### Advisor influence
 
@@ -2049,17 +2049,38 @@ tmp <- left_join(
   by = "pid"
 ) 
 
+df <- tmp %>%
+  mutate(pid = factor(pid)) %>%
+  as.data.frame()
 lm_acc <- lm(
   formula = pPickHigh ~ Accuracy * Feedback,
   data = tmp
 )
-generalTestBF(formula = pPickHigh ~ Accuracy * Feedback + pid, data = mutate(tmp, pid = factor(pid)), whichRandom = "pid", whichModels = "top")
+lm_acc_bf <- generalTestBF(
+  formula = pPickHigh ~ Accuracy * Feedback + pid, 
+  data = df, 
+  whichRandom = "pid", 
+  whichModels = "top",
+  progress = F
+) %>% 
+  .@bayesFactor %>%
+  as_tibble(rownames = "model") %>%
+  transmute(model, bf = 1/exp(bf))
 
 lm_agr <- lm(
   formula = pPickHigh ~ Agreement * Feedback,
   data = tmp
 )
-generalTestBF(formula = pPickHigh ~ Agreement * Feedback + pid, data = mutate(tmp, pid = factor(pid)), whichRandom = "pid", whichModels = "top")
+lm_agr_bf <- generalTestBF(
+  formula = pPickHigh ~ Agreement * Feedback + pid, 
+  data = df, 
+  whichRandom = "pid", 
+  whichModels = "top",
+  progress = F
+) %>% 
+  .@bayesFactor %>%
+  as_tibble(rownames = "model") %>%
+  transmute(model, bf = 1/exp(bf))
 
 tmp <- tmp %>%
   pivot_longer(
@@ -2096,30 +2117,46 @@ ggplot(tmp, aes(x = Difference, y = pPickHigh)) +
   labs(y = "p(Choose High accuracy advisor)")
 
 ```
+
 ```{r ac-acc-dates-r-cors-acc}
 kableLM(
   lm_acc,
-  caption = "\\label{tab:ac-acc-dates-r-cors-acc}Experienced accuracy difference effects in the Dates task with in/accurate advisors"
+  caption = "\\label{tab:ac-acc-dates-r-cors-acc-t}Experienced accuracy difference effects in the Dates task with in/accurate advisors"
 )
 ```
 
 ```{r ac-acc-dates-r-cors-agr}
 kableLM(
   lm_agr,
-  caption = "\\label{tab:ac-acc-dates-r-cors-agr}Experienced agreement difference effects in the Dates task with in/accurate advisors"
+  caption = "\\label{tab:ac-acc-dates-r-cors-agr-t}Experienced agreement difference effects in the Dates task with in/accurate advisors"
 )
 ```
 
 The stochastic nature of the advisors' advice meant that there was some variation in the participants' experience of the advisors.
-Linear models were run predicting advisor selection behaviour based on experienced differences in accuracy (Table \@ref(tab:ac-acc-dates-r-cors-acc)) and agreement (Table \@ref(tab:ac-acc-dates-r-cors-agr)).
-These models were complex to interpret because the results were not clearly significant, 
-Despite this difference, there was no evidence of a relationship between participants' advisor preference and their experience of either advisor accuracy ($BF_{10}=$ `r bf2str(exp(r_acc@bayesFactor$bf))`) or advisor agreement ($BF_{10}=$ `r bf2str(exp(r_agr@bayesFactor$bf))`), with the latter indicating an absence of a relationship. 
-This is not entirely surprising because, as with the accuracy correlations discussed above, there was relatively little variation in experience of advisors so effects might be expected to be small and difficult to detect.
+Linear models were run predicting advisor selection behaviour based on experienced differences in accuracy (Table \@ref(tab:ac-acc-dates-r-cors-acc-t)) and agreement (Table \@ref(tab:ac-acc-dates-r-cors-agr-t)).
+Bayesian linear models were run obtaining Bayes Factors of leaving each component out of a model containing experienced agreement or accuracy difference, feedback condition, and their interaction, as well as a random factor for the participant's identity. 
+
+In aggregate, the models indicated that the feedback group had a stronger preference for the High accuracy advisor, regardless of the actual agreement or accuracy experienced (BF~Accuracy~=`r bf2str(lm_acc_bf$bf[3])`; BF~Agreement~=`r bf2str(lm_agr_bf$bf[3])`).
+There was no evidence of a relationship between participants' advisor preference and their experience of either advisor accuracy (BF=`r bf2str(lm_acc_bf$bf[4])`) or advisor agreement (BF=`r bf2str(lm_agr_bf$bf[4])`), but neither of these had evidence strong enough to suggest the absence of such a relationship. 
+The strongest evidence for the absence of an effect was for the interaction between feedback condition and experienced accuracy (BF=`r bf2str(lm_acc_bf$bf[1])`) or agreement (BF=`r bf2str(lm_agr_bf$bf[1])`), but this was also not beyond the stated threshold of 1/3.
+
+The vagueness of the results is is not entirely surprising because, as with the accuracy correlations discussed above, there was relatively little variation in experience of advisors so effects might be expected to be small and difficult to detect.
 
 ### Discussion {#ac-acc-d}
 
-\mccorrect{NICK: I suggest framing along the following lines: This study has mixed results in relation to original predictions. With feedback, people showed a clear preference for the accurate advisor. Without feedback, this was not seen -- in contrast to Exp 1. But note: fewer trials, and also much more varied agreement rates in Exp 2.
-Might also be worth noting how much pick rates varied again -- but particularly in the No Feedback case. Early highlighting of a theme of the results -> when there's no overall preference at the group level, the pattern seems to be wide variation in pick rate (rather than pick rates clustering around 0.5).}
+We investigated whether more accurate advisors would be preferentially selected by participants when participants were unable to use feedback to evaluate the quality of advisors.
+We performed two experiments using different tasks, and found mixed results.
+In the branch of the Dates task where feedback was provided, participants had a clear preference for the more accurate advisor.
+This preference was also seen in the Dots task, in which no participants received feedback. 
+Contrary to these results, however, participants in the Dates task who did not receive feedback did not show a systematic preference for either advisor.
 
-Where feedback is provided on advisors' performance, people seem to prefer high accuracy advisors to low accuracy advisors.
-Where feedback is not provided, people may need substantially more experience to learn that some advisors are more accurate than others, because this happens in the Dots task but not in the Dates task.
+In both tasks the advisor preferences included many participants whose preference was either neutral (all tasks) or in favour of the Low accuracy advisor (Dates task).
+This variability in pick rates from the participants in the No feedback condition of the Dates task, suggests that preferences are diverse both in terms of direction and strength in the absence of any systematic effects.
+There is substantial variability in pick rates for participants in the Feedback condition of the Dates task, too, indicating that, compared to the No feedback condition, everyone might have nudged their preference a bit towards the High accuracy advisor. 
+Pick rates in the Dots task were also varied, but rather than being evenly spread (as in the No feedback Dates task participants) or massed in favour of the High accuracy advisor with a long, fat tail including exclusive selection of the Low accuracy advisor, Dots task participants were massed in the centre with a long tail out to strong preference for the High accuracy advisor.
+The Dots task data may have reduced variability because there were more trials that offered the participants a choice of advisor, and the novelty value of the ignored advisor may have increased relative to the chosen advisor as the test phase progressed. 
+Alternatively, participants making repeated choices may have eventually felt that continuing to ignore one advisor was unfair, and that pragmatic reasons for including the opinion of a less expert voice outweighed the performance-maximisation reasons for not including that voice [@mahmoodiEqualityBiasImpairs2015].
+
+The results of these studies were mixed in terms of supporting our hypothesis that more expert advisors would be discriminated and preferentially picked by participants even in the absence of feedback.
+The underlying mechanism we believe to be responsible for evaluating advisors in the absence of feedback is agreement, and thus a more powerful test of the mechanism is to move from demonstrating the phenomenon (detection of accuracy differences without feedback) to demonstrating the mechanism (discrimination based on agreement differences). 
+This investigation of agreement as a mechanism for driving advisor evaluation in the absence of feedback is the subject of the next experiments.
