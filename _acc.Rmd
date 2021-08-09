@@ -194,7 +194,7 @@ save(dots_rt, file = paste0(tempdir(), "/.dot_rt.rda"))
 
 ```
 
-```{r ac-acc-dots-r-performance, fig.caption="Task performance for the Dots task with in/accurate advisors.  A: Response accuracy. Faint lines show individual participant means, for which the violin and box plots show the distributions. The half-width horizontal dashed lines show the level of accuracy which the staircasing procedure targeted, while the full width dashed line indicates chance performance. Dotted violin outlines show the distribution of actual advisor accuracy.  B: Confidence. Faint lines show individual participant means, for which the violin and box plots show the distributions.  C: Reciever Operator Characteristic (ROC) curves. Faint lines show individual participant data, while points and solid lines show mean data for all participants. Each participant's data are split into initial estimates and final decisions. For correct and incorrect responses seperately, the probability of a confidence rating being above a response threshold is calculated, with the threshold set to every possible confidence value in turn. This produces a point for each participant in each response for each possible confidence value indicating the probability of confidence being at least that high given the answer was correct, and the equivalent probability given the answer was incorrect. These points are used to create the faint lines, and averaged to produce the solid lines. The dashed line shows chance performance where the increasing confidence threshold leads to no increase in discrimination between correct and incorrect answers. The inset plot shows the distribution of areas under the ROC, and the label gives the mean value.  D: Area under ROC -- accuracy correlation. Points show individual participant data for their area under the ROC curve and their accuracy on initial estimates and final decisions. The blue lines and equation text show best-fit regression, and the shaded area gives its standard error. The equations give the regression equation plotted in blue, with bold coefficients being significant at p = .05.  E: Influence. Participants' weight on the advice for advisors in the Familiarization stage of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 1].", fig.height=10}
+```{r ac-acc-dots-r-performance, fig.caption="Task performance for the Dots task with in/accurate advisors.  A: Response accuracy. Faint lines show individual participant means, for which the violin and box plots show the distributions. The half-width horizontal dashed lines show the level of accuracy which the staircasing procedure targeted, while the full width dashed line indicates chance performance. Dotted violin outlines show the distribution of actual advisor accuracy.  B: Confidence. Faint lines show individual participant means, for which the violin and box plots show the distributions.  C: Reciever Operator Characteristic (ROC) curves. Faint lines show individual participant data, while points and solid lines show mean data for all participants. Each participant's data are split into initial estimates and final decisions. For correct and incorrect responses seperately, the probability of a confidence rating being above a response threshold is calculated, with the threshold set to every possible confidence value in turn. This produces a point for each participant in each response for each possible confidence value indicating the probability of confidence being at least that high given the answer was correct, and the equivalent probability given the answer was incorrect. These points are used to create the faint lines, and averaged to produce the solid lines. The dashed line shows chance performance where the increasing confidence threshold leads to no increase in discrimination between correct and incorrect answers. The inset plot shows the distribution of areas under the ROC, and the label gives the mean value.  D: Area under ROC -- accuracy correlation. Points show individual participant data for their area under the ROC curve and their accuracy on initial estimates and final decisions. The blue lines and equation text show best-fit regression, and the shaded area gives its standard error. The equations give the regression equation plotted in blue, with bold coefficients being significant at p = .05.  E: Influence. Participants' weight on the advice for advisors in the Familiarization stage of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2].", fig.height=10}
 
 gg <- list()
 
@@ -1114,8 +1114,8 @@ These criteria led to no participants being excluded from this experiment.
 
 fb <- AdvisedTrial %>% 
   group_by(pid) %>%
-  summarise(feedback = max(feedback)) %>%
-  mutate(Feedback = if_else(feedback == 1, "Feedback", "No feedback"))
+  summarise(Feedback = max(feedback)) %>%
+  mutate(Feedback = if_else(Feedback == 1, "Feedback", "No feedback"))
 
 tmp <- AdvisedTrial %>%
   left_join(fb, by = "pid") %>%
@@ -1230,7 +1230,7 @@ tmp %>%
 
 ```
 
-```{r ac-acc-dates-r-performance, fig.caption="Task performance for the Dates task with in/accurate advisors.  A: Response accuracy. Faint lines show individual participant means, for which the violin and box plots show the distributions. The dashed line indicates chance performance. Dotted violin outlines show the distribution of actual advisor accuracy.  Because there were relatively few trials, the proportion of correct trials for a participant generally falls on one of a few specific values. This produces the lattice-like effect seen in the graph. Some participants had individual trials excluded for over-long response times, meaning that the denominator in the accuracy calculations is different, and thus producing accuracy values which are slightly offset from others'.  B: Confidence. Faint lines show individual participant means, for which the violin and box plots show the distributions.  C: Reciever Operator Characteristic (ROC) curves. Faint lines show individual participant data, while points and solid lines show mean data for all participants. Each participant's data are split into initial estimates and final decisions. For correct and incorrect responses seperately, the probability of a confidence rating being above a response threshold is calculated, with the threshold set to every possible confidence value in turn. This produces a point for each participant in each response for each possible confidence value indicating the probability of confidence being at least that high given the answer was correct, and the equivalent probability given the answer was incorrect. These points are used to create the faint lines, and averaged to produce the solid lines. The dashed line shows chance performance where the increasing confidence threshold leads to no increase in discrimination between correct and incorrect answers. The inset plot shows the distribution of areas under the ROC, and the label gives the mean value.  D: Area under ROC -- accuracy correlation. Points show individual participant data for their area under the ROC curve and their accuracy on initial estimates and final decisions. The blue lines and equation text show best-fit regression, and the shaded area gives its standard error. The equations give the regression equation plotted in blue, with bold coefficients being significant at p =< .05.  E: Influence. Participants' weight on the advice for advisors in the Familiarization stage of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 1].", fig.height=10}
+```{r ac-acc-dates-r-performance, fig.caption="Task performance for the Dates task with in/accurate advisors.  A: Response accuracy. Faint lines show individual participant means, for which the violin and box plots show the distributions. The dashed line indicates chance performance. Dotted violin outlines show the distribution of actual advisor accuracy.  Because there were relatively few trials, the proportion of correct trials for a participant generally falls on one of a few specific values. This produces the lattice-like effect seen in the graph. Some participants had individual trials excluded for over-long response times, meaning that the denominator in the accuracy calculations is different, and thus producing accuracy values which are slightly offset from others'.  B: Confidence. Faint lines show individual participant means, for which the violin and box plots show the distributions.  C: Reciever Operator Characteristic (ROC) curves. Faint lines show individual participant data, while points and solid lines show mean data for all participants. Each participant's data are split into initial estimates and final decisions. For correct and incorrect responses seperately, the probability of a confidence rating being above a response threshold is calculated, with the threshold set to every possible confidence value in turn. This produces a point for each participant in each response for each possible confidence value indicating the probability of confidence being at least that high given the answer was correct, and the equivalent probability given the answer was incorrect. These points are used to create the faint lines, and averaged to produce the solid lines. The dashed line shows chance performance where the increasing confidence threshold leads to no increase in discrimination between correct and incorrect answers. The inset plot shows the distribution of areas under the ROC, and the label gives the mean value.  D: Area under ROC -- accuracy correlation. Points show individual participant data for their area under the ROC curve and their accuracy on initial estimates and final decisions. The blue lines and equation text show best-fit regression, and the shaded area gives its standard error. The equations give the regression equation plotted in blue, with bold coefficients being significant at p =< .05.  E: Influence. Participants' weight on the advice for advisors in the Familiarization stage of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2].", fig.height=10}
 
 gg <- list()
 
@@ -2047,7 +2047,21 @@ tmp <- left_join(
       Feedback = unique(Feedback)
     ),
   by = "pid"
-) %>%
+) 
+
+lm_acc <- lm(
+  formula = pPickHigh ~ Accuracy * Feedback,
+  data = tmp
+)
+generalTestBF(formula = pPickHigh ~ Accuracy * Feedback + pid, data = mutate(tmp, pid = factor(pid)), whichRandom = "pid", whichModels = "top")
+
+lm_agr <- lm(
+  formula = pPickHigh ~ Agreement * Feedback,
+  data = tmp
+)
+generalTestBF(formula = pPickHigh ~ Agreement * Feedback + pid, data = mutate(tmp, pid = factor(pid)), whichRandom = "pid", whichModels = "top")
+
+tmp <- tmp %>%
   pivot_longer(
     c(Accuracy, Agreement),
     names_to = "Dimension",
@@ -2069,17 +2083,6 @@ s <- tmp %>%
     )
   )
 
-cors <- lmerTest::lmer(
-  formula = pPickHigh ~ Feedback * Dimension + (1 | Difference),
-  data = tmp
-) %>% 
-  summary() %>%
-  .$coefficients %>%
-  as_tibble(rownames = "Effect") %>% 
-  mutate(
-    s = glue("{num2str(Estimate)}, t({num2str(df)})={num2str(`t value`)}, p={prop2str(`Pr(>|t|)`)}")
-  )
-
 ggplot(tmp, aes(x = Difference, y = pPickHigh)) +
   geom_vline(xintercept = 0, linetype = 'dashed') +
   geom_smooth(method = 'lm', formula = y ~ x, fullrange = T) +
@@ -2093,10 +2096,23 @@ ggplot(tmp, aes(x = Difference, y = pPickHigh)) +
   labs(y = "p(Choose High accuracy advisor)")
 
 ```
+```{r ac-acc-dates-r-cors-acc}
+kableLM(
+  lm_acc,
+  caption = "\\label{tab:ac-acc-dates-r-cors-acc}Experienced accuracy difference effects in the Dates task with in/accurate advisors"
+)
+```
 
-\mccorrect{TODO: Difficult to LM this maybe due to observations? Is there a heirarchical logistic regression we can use in lmer/R? Current one treats Difference as a random factor and we want it to be fixed slope. Participants nested within Feedback, but Feedback is a factor we're interested in.}
+```{r ac-acc-dates-r-cors-agr}
+kableLM(
+  lm_agr,
+  caption = "\\label{tab:ac-acc-dates-r-cors-agr}Experienced agreement difference effects in the Dates task with in/accurate advisors"
+)
+```
 
 The stochastic nature of the advisors' advice meant that there was some variation in the participants' experience of the advisors.
+Linear models were run predicting advisor selection behaviour based on experienced differences in accuracy (Table \@ref(tab:ac-acc-dates-r-cors-acc)) and agreement (Table \@ref(tab:ac-acc-dates-r-cors-agr)).
+These models were complex to interpret because the results were not clearly significant, 
 Despite this difference, there was no evidence of a relationship between participants' advisor preference and their experience of either advisor accuracy ($BF_{10}=$ `r bf2str(exp(r_acc@bayesFactor$bf))`) or advisor agreement ($BF_{10}=$ `r bf2str(exp(r_agr@bayesFactor$bf))`), with the latter indicating an absence of a relationship. 
 This is not entirely surprising because, as with the accuracy correlations discussed above, there was relatively little variation in experience of advisors so effects might be expected to be small and difficult to detect.
 
