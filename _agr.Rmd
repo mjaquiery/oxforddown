@@ -86,8 +86,6 @@ tmp <- sapply(1:ncol(agr), function(i) sum(agr[, i] * c(pCor, 1 - pCor)))
 
 ```
 
-\mccorrect{NICK: Maybe frame in terms of overall aims: Advisors were defined in terms of their likelihood of agreement with participants' correct vs. incorrect initial decisions, while being matched in terms of their objective accuracy. Then give the numbers. This gives a bit of context for numbers that otherwise seem a bit arbitrary.}
-
 The two advisor profiles (Table \@ref(tab:ac-agr-dots-m-profiles)) used in the experiment were High agreement and Low agreement.
 These advisors were defined in terms of their likelihood of agreement with participants' correct and incorrect initial estimates, while being matched for objective accuracy. 
 The High agreement advisor gave advice that endorsed the same answer side as the participant's initial estimate `r round(tmp[1] * 100, 1)`% of the time while the Low agreement advisor agreed with the participant `r round(tmp[2] * 100, 1)`% of the time.
@@ -1096,7 +1094,7 @@ out <- list()
 # Accuracy
 out$aov_acc <- acc %>%
   mutate(across(-Accuracy, factor)) %>%
-  ez::ezANOVA(
+  ezANOVA(
     dv = Accuracy,
     wid = pid,
     within = c(Advisor, Response)
@@ -1144,7 +1142,7 @@ out$acc_mmInt <- Familiarization %>%
 out$aov_conf <- conf %>%
   rename(initialCor = `Initial estimate accuracy`) %>%
   mutate(across(-Confidence, factor)) %>%
-  ez::ezANOVA(
+  ezANOVA(
     dv = Confidence,
     wid = pid,
     within = c(initialCor, Response)
@@ -1363,7 +1361,7 @@ bf <- tmp %>%
                         ttestBF(mu = .5))) 
 bf$bf <- sapply(1:nrow(bf), function(i) num2str(exp(pull(bf, bf)[[i]]@bayesFactor$bf)))
 
-bf.comp <- ttestBF(formula = pChooseHigh ~ feedbackCondition, data = tmp) %>%
+bf.comp <- ttestBF(formula = pChooseHigh ~ feedbackCondition, data = as.data.frame(tmp)) %>%
   .@bayesFactor %>% .$bf %>% exp() %>% num2str()
 
 ggplot(tmp, aes(x = feedbackCondition, y = pChooseHigh)) +
@@ -1388,30 +1386,197 @@ ggplot(tmp, aes(x = feedbackCondition, y = pChooseHigh)) +
   pull(pChooseHigh) %>%
   md.ttest(y = .5, labels = c('M~No feedback~'))
 
+# Binomial test of pick rate chance
+bn <- Test %>%
+  nest(d = -c(pid, Feedback)) %>%
+  mutate(
+    d = map(
+      d,
+      ~ binom.test(
+        sum(.$Advisor == "High agreement"), 
+        nrow(.)
+      ) %>% tidy()
+    )
+  ) %>%
+  unnest(d)
+
 ```
 
-Consistent with the result from the Dots task, in the No feedback condition participants' preferences for receiving advice from the High agreement advisor were greater than chance (`r .T.Nfb`).
-\mccorrect{NICK: You're presenting in-line stats here, in a break from what you've done above where the stats also appear in a figure. In-line stats are fine to me (and, as I mentioned earlier when we met, your examiners might be picky about requiring this). Anyway, be consistent about your formatting/presentation of stats.}
+Consistent with the result from the Dots task, the key analysis demonstrated that in the No feedback condition participants' preferences for receiving advice from the High agreement advisor were greater than chance (`r .T.Nfb`).
 The modal preference was to select the High agreement advisor on every Choice trial, and although some participants still showed a preference for hearing advice from the Low agreement advisor, preferences for the High agreement advisor were generally stronger and more frequent (Figure \@ref(fig:ac-agr-dates-r-graph)).
 
 In the Feedback condition, the mean of the participants' selection rates was equivalent to random picking (`r .T.fb`).
 This is consistent with a strategy which attempts to maximise the accuracy of final decisions, because neither advisor would help with this task systematically. 
 The null result here does indicate, however, that there is no strong and clear preference for agreement over and above its accuracy benefits.
-\mccorrect{NICK: This is true in one sense -> if we think about mean preference. However, individual participants do show clear preferences -- they're just not systematic across participants. Worth making this explicit, I think. E.g., you could calculate the binomial probability of generating pick rates as extreme as the ones you're seeing here in most partipants (i.e., give p(chooseA)=p(chooseB)=0.5 and N choices. Regardless, it's worth commenting explicitly on the variability in pick rate that you see.}
 
-\mccorrect{NICK: Suggest editing in line with the suggestions above: Make explicit this is the key analysis. Present this analysis before the one on influence. Consider exploring whether differences are predicted by differing experience of advisor accuracy/agreement.}
+Interestingly, despite different patterns of preferences when compared to chance, there was not enough evidence to demonstrate whether the preference patterns for the two conditions were or were not different from one another.
+This may be a consequence of the variability of preferences: as with the Dates task using High accuracy and Low accuracy advisors (Experiment 1B§\@ref(ac-acc-dates)), the participants in both Feedback and No feedback conditions spanned the entire gamut of preference strengths and directions. 
+One participant in the No feedback group here, for example, never chose the High agreement advisor. 
+Even where there were no systematic effects (No feedback condition in Experiment 1B, Feedback condition here), participants still had a range of preferences with some picking one or the other advisor exclusively.
+A substantial minority (`r num2str((bn$p.value < .05) * 100, 1)`%) of participants had preference strengths beyond those expected by chance when picking randomly.^[5% would be expected to have had strengths of these magnitudes if picking randomly.]
+As noted previously (Experiment 1: Discussion§\@ref(ac-acc-d)), this is in contrast to the behaviour in the Dots task, where preferences tend to mass towards even pick rates with a long tail differentiating the population preferences from chance.
 
-\mccorrect{NICK: Comment also on the lack of significant interaction, which limits what you can conclude. I think the overall story here is that without feedback, people prefer agreement, but with feedback their behaviour is much more variable (as opposed to consistently picking at random).}
+##### Follow-up tests
+
+```{r ac-agr-dates-r-follow-up, fig.caption="Preference predictors in the Dates task with dis/agreeing advisors.  Scatter plots of participants' experience with advisors in terms of agreement or accuracy rates. Differences are expressed as the experienced rate for the High agreement advisor minus the experienced rate for the Low agreement advisor during the Familiarization phase. Numbers in bold in the regression equations are significant at p < .05."}
+
+tmp <- left_join(
+  left_join(
+    Familiarization %>% 
+      group_by(pid, Advisor) %>%
+      summarise(
+        acc = mean(advisor0adviceSideCorrect),
+        Feedback = unique(Feedback),
+        .groups = 'drop'
+      ) %>%
+      pivot_wider(names_from = Advisor, values_from = acc) %>%
+      transmute(
+        pid, 
+        Accuracy = `High agreement` - `Low agreement`
+      ),
+    Familiarization %>% 
+      group_by(pid, Advisor) %>%
+      summarise(
+        agr = mean(advisor0adviceSide == responseAnswerSide), 
+        Feedback = unique(Feedback),
+        .groups = 'drop'
+      ) %>%
+      pivot_wider(names_from = Advisor, values_from = agr) %>%
+      transmute(
+        pid, 
+        Agreement = `High agreement` - `Low agreement`
+      ),
+    by = "pid"
+  ),
+  Test %>%
+    group_by(pid) %>%
+    summarise(
+      pPickHigh = mean(Advisor == "High agreement"),
+      Feedback = unique(Feedback)
+    ),
+  by = "pid"
+) 
+
+df <- tmp %>%
+  mutate(pid = factor(pid)) %>%
+  as.data.frame()
+lm_acc <- lm(
+  formula = pPickHigh ~ Accuracy * Feedback,
+  data = tmp
+)
+lm_acc_bf <- generalTestBF(
+  formula = pPickHigh ~ Accuracy * Feedback, 
+  data = df, 
+  whichModels = "top",
+  progress = F
+) %>% 
+  .@bayesFactor %>%
+  as_tibble(rownames = "model") %>%
+  transmute(model, bf = 1/exp(bf))
+
+lm_agr <- lm(
+  formula = pPickHigh ~ Agreement * Feedback,
+  data = tmp
+)
+lm_agr_bf <- generalTestBF(
+  formula = pPickHigh ~ Agreement * Feedback, 
+  data = df, 
+  whichModels = "top",
+  progress = F
+) %>% 
+  .@bayesFactor %>%
+  as_tibble(rownames = "model") %>%
+  transmute(model, bf = 1/exp(bf))
+
+tmp <- tmp %>%
+  pivot_longer(
+    c(Accuracy, Agreement),
+    names_to = "Dimension",
+    values_to = "Difference"
+  )
+
+s <- tmp %>%
+  nest(d = -c(Feedback, Dimension)) %>%
+  mutate(lm = map(d, ~ lm(pPickHigh ~ Difference, data = .) %>% tidy())) %>%
+  select(-d) %>%
+  unnest(cols = lm) %>%
+  mutate(term = str_match(term, "\\(?(.)")[,2]) %>%
+  pivot_wider(names_from = term, values_from = where(is.numeric)) %>%
+  mutate(
+    s = glue(
+      "y = {a}{num2str(estimate_D)}x{a} + {b}{num2str(estimate_I)}{b}",
+      a = if_else(p.value_D < .05, "**", ""),
+      b = if_else(p.value_I < .05, "**", "")
+    )
+  )
+
+ggplot(tmp, aes(x = Difference, y = pPickHigh)) +
+  geom_vline(xintercept = 0, linetype = 'dashed') +
+  geom_smooth(method = 'lm', formula = y ~ x, fullrange = T) +
+  geom_point(alpha = .25) +
+  scale_y_continuous(limits = 0:1) +
+  geom_richtext(
+    aes(label = s), data = s, y = 1, x = 0, fill = NA, 
+    hjust = 1.1, vjust = 1.1
+  ) +
+  facet_grid(Feedback~Dimension) +
+  labs(y = "p(Choose High agreement advisor)")
+
+```
+
+```{r ac-agr-dates-r-cors-acc}
+kableLM(
+  lm_acc,
+  caption = "\\label{tab:ac-agr-dates-r-cors-acc-t}Experienced accuracy difference effects in the Dates task with dis/agreeing advisors"
+)
+```
+
+```{r ac-agr-dates-r-cors-agr}
+kableLM(
+  lm_agr,
+  caption = "\\label{tab:ac-agr-dates-r-cors-agr-t}Experienced agreement difference effects in the Dates task with dis/agreeing advisors"
+)
+```
+
+There was variation in the relative agreement and accuracy rates of the advisors as experienced by each participant during the Familiarization phase. 
+This experienced difference could have led to detectable variation in picking behaviour because relative agreement rate is the mechanism we suspect to be driving picking behaviour differences.
+
+This did not appear to be the case either for accuracy (Table \@ref(tab:ac-agr-dates-r-cors-acc-t)) or agreement (Table \@ref(tab:ac-agr-dates-r-cors-agr-t)).
+As shown in Figure \@ref(fig:ac-agr-dates-r-follow-up), experienced accuracy difference was a significant predictor of picking preference for participants in the Feedback condition.
+This effect did not show up in the linear regression with agreement rate difference and feedback condition as predictors (Table \@ref(tab:ac-agr-dates-r-cors-acc-t)), and the evidence in the Bayesian equivalent was sub-threshold (BF=`r bf2str(lm_acc_bf$bf[3])`).
+Despite the possibility that this result is a false positive (running many individual regressions without familywise error correction will tend to indicate some significant relationships by chance alone), it does make sense because this relationship was argued to lie behind the result in Experiment 1B§\@ref(ac-acc-dates).
+Experiment 1B showed a preference for the High accuracy advisor in the picking behaviour, but not a relationship between that picking preference strength and experienced accuracy difference. 
+Experienced accuracy differences were tightly controlled in Experiment 1B, however, whereas here they have more room to vary and thus may be more likely to reveal relationships.
+
+Comparing the overall model fits to Experiment 1B, it is notable that the adjusted $R^2$, or the amount of variance in the dependent variable explained by the predictors, is much lower here. 
+Whatever is driving picking preference variation, it does not seem to be well captured by the variation in experienced agreement or accuracy rates, or by the difference between the experimental conditions.
 
 ### Discussion {#ac-agr-d}
 
 These two experiments investigated the impact of advisor agreement on choice of advice. 
-In both Dots and Dates tasks, where feedback is not provided on advisors' performance, participants prefer high agreement advisors to low agreement advisors.
-\mccorrect{NICK: Maybe need care in wording here. The feedback can be used to infer advisor performance, but strictly speaking the feedback is given in relation to what the participant decides.}
+In both Dots and Dates tasks, where the absence of feedback means advisors' performances cannot be evaluated objectively, participants preferred high agreement advisors to low agreement advisors.
+This is consistent with our underlying theory that agreement is used as a mechanism for evaluating advisors in the absence of objective feedback.
 
-\mccorrect{At least in the Dates task the low agreement advice is probably more interesting - we already know what the high agreement advisor is going to say!}
+When feedback was provided in the Dates task, advisors were selected at rates equivalent to chance overall.
+Despite this overall chance level of preference in the sample, individual participants had a wide range of preference strengths and directions, and this was true for both the experimental conditions.
+This contrasts with what we see in the Dots task data, for both Experiment 1A§\@ref(ac-acc-dots) and 2A§\@ref(ac-agr-dots), where the majority of participants' preferences are moderate, with a minority of participants' more marked preferences producing the systematic effects.
 
-\mccorrect{re: influence - 
-An alternative explanation for the data is that the 'offbrand' advice selected for analysis was more surprising when coming from the advisor who usually agrees, and that this increased salience increased its influence rather than increased trust in the advisor.}
-\mccorrect{NICK: Need to explain what this is. But above in the corresponding Results section it seems like you are talking about influence of overall advice in the familiarisation phase. I had forgotten this detail about test advice trials with offbrand advice. Remind the reader, even if the specifics are already explained in the general methods. In general, your discussion ought to focus first on pick rates. E.g., what do you takeaway from the finding of more picks for agreeing advice in both tasks (without feedback)? Then comment on what happens with feedback -- the bonus for agreeing advice is (overall) lost. But you still see wide preferences: These could be just random picks, but it could also be something systematic -- some people really like agreement, others like disagreement (as a preview of your modelling of advisor choices). Any analysis of influence in this study (and in the series of experiments in general) has to be very tentative, given the designs are not optimised to measure it. I would not put a lot of time into investigating influence differences.}
-If that were the case then the same ought to be true for agreeing advice from a disagreeing advisor, and this is not the case \mccorrect{!TODO[Do we have/can we produce evidence for this? Perhaps look at our participants where advisors disagree with them by chance more than e.g. 70\% of the time and check for increased influence on agreement trials vs advisors who disagree less than 70\% of the time]}.
+In the Dates task, as we saw in Experiment 1B§\@ref(ac-acc-dates), systematic effects show up as a general nudging of preferences in one direction rather than as every participant developing similar preferences.
+This wide variability with some systematic nudging is explicable in terms of the heterogeneity of the Dates task. 
+Participants will have a different level of knowledge on different questions, and we might expect advisors to occasionally offer implausible advice to questions participants consider easy.
+If this were to happen, participants might weight these occurrences highly, in line with the @pescetelliRoleDecisionConfidence2021 theory of metacognitive evaluation of advice.
+More frequently disagreeing advisors will be more likely to disagree on these subjectively easy questions and suffer the reputational consequences.
+This greater likelihood could mean that the wide spread of behaviour from participants is due to the greater frequency of these important events for the Low accuracy advisor, rather than a consistent effect of agreement alone.
+
+A challenge for this explanation is that in Experiment 1B§\@ref(ac-acc-dates) we observed participants in the No feedback condition demonstrating a range of preferences that were not systematically different from chance. 
+We would expect, provided participants' performance on subjectively easy questions is above chance, that the High accuracy advisor would have a higher probability of agreement on those questions, just as the High agreement advisor had a higher probability of agreement in Experiment 2B§\@ref(ac-agr-dates).
+It is unlikely, but not impossible, that participants' accuracy even on subjectively easy questions was sufficiently bad as to render these effects undetectable.
+
+Another reason why advisor preferences are so varied is that there are reasons why participants might prefer to see advice from the disagreeing advisor.
+In both Dots and Dates tasks, it was harder to predict what the Low agreement advisor would say, potentially making the advice more interesting. 
+Furthermore, if participants thought they were unlikely to be correct, the Low agreement advisor's advice was more diagnostic of the correct answer because the Low agreement advisor was far less likely to endorse incorrect responses.
+It may be, therefore, that people evaluate advisors on the basis of agreement, but that what they do on the basis of that evaluation is a matter of personal preference.
+
+In the previous two studies we looked at the effects of advisor accuracy and agreement on the preference for picking those advisors when offered a choice.
+In order to isolate the effects, agreement was balanced in the accuracy experiments, and accuracy was balanced (as well as we were able) in the agreement experiments. 
+Next, we directly contrast these domains by providing participants with a pairing consisting of a High accuracy advisor and a High agreement advisor, introducing a clear performance cost of preferring to hear advice from the High agreement advisor.

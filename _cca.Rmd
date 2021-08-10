@@ -686,7 +686,7 @@ Pick rates did not differ (`r cat(md.ttest(tmp$High, tmp$Low, paired = T, labels
 
 ##### Follow-up tests
 
-##### Effect of initial agreement
+###### Effect of initial agreement
 
 This experiment was run in the lab, and was longer than the online experiments to help justify participants' travelling time.
 This meant that the experiment contained multiple blocks, and consequently that we could explore the effects of early experience of advice on subsequent advisor preferences.
@@ -750,7 +750,7 @@ ggplot(tmp, aes(x = agreeDiff_firstBlock, y = pPickBS_later)) +
 
 ```
 
-##### Subjective assessment and choice of advisors
+###### Subjective assessment and choice of advisors
 
 Participants were asked to complete short questionnaires at several points in the experiment.
 These questionnaires collected ratings on a 100 point scale for each advisor across four dimensions: three loosely inspired by @mayerIntegrativeModelOrganizational1995 accuracy, likeability, and influence; along with a general trustworthiness dimension. 

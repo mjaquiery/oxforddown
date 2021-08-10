@@ -17,8 +17,6 @@ params:
 ---
 
 ```{r setup 01-03, echo = F, include = F}
-source('scripts_and_filters/general_setup.R')
-
 library(BayesFactor)
 library(magrittr)
 library(see)
@@ -32,6 +30,8 @@ library(ez)
 
 # Psychology of source selection {#chapter-advisor-choice}
 \adjustmtc 
+
+\mccorrect{NICK: You're presenting in-line stats in some cases and in others only showing them on a figure. In-line stats are fine to me (and, as I mentioned earlier when we met, your examiners might be picky about requiring this). Anyway, be consistent about your formatting/presentation of stats.}
 
 <!-- 
 My research on advisor selection.
