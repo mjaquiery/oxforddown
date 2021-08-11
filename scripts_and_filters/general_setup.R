@@ -186,6 +186,88 @@ marginalBF <- function(x, comparisons) {
   out
 }
 
+#' Produce marginal means summaries for a 2x2 ANOVA on long data
+#' @param data tbl to process
+#' @param dv dependent variable
+#' @param wid identifier for cases
+#' @param interaction name for the interaction
+#'
+#' @details Within variables are collapsed first for the interaction, in order
+#'   of their listing, followed by between variables.
+#'   Will process all variables that aren't the DV or the WID.
+#'
+#' @note Will not work where the number of factors exceeds 2
+marginalMeans <- function(
+  data, 
+  dv = names(data)[2], 
+  wid = "pid",
+  interaction = "Difference"
+) {
+  tmp <- rename(
+    data,
+    pid = {{wid}},
+    dv = {{dv}}
+  )
+  vars <- select(tmp, c(-pid, -dv)) %>% names()
+  out <- list()
+  # factors
+  for (v in vars) {
+    out[[v]] <- tmp %>% group_by(pid, across(all_of(v))) %>%
+      summarise(dv = mean(dv), .groups = "drop") %>%
+      group_by(across(all_of(v))) %>%
+      summarise(
+        s = md.mean(dv, label = glue("M~{.data[[v]]}~")),
+        .groups = "drop"
+      ) %>%
+      unique()
+  }
+  # interaction
+  tmp <- tmp %>%
+    group_by(pid, across(all_of(vars))) %>%
+    summarise(dv = mean(dv), .groups = "drop") %>%
+    pivot_wider(names_from = vars[1], values_from = dv) 
+  
+  out$.interactionExpression <- glue("{names(tmp)[3]} - {names(tmp)[4]}")
+  
+  out$interaction <- tmp %>%
+    mutate(dv = .[[3]] - .[[4]]) %>%
+    group_by(across(all_of(vars[2]))) %>%
+    summarise(
+      s = md.mean(dv, label = glue("M~{interaction}|{.data[[vars[2]]]}~")),
+      .groups = "drop"
+    ) %>%
+    unique()
+  out
+}
+
+#' Produce a summary for an ANOVA and marginal means set
+#' @param ANOVA ANOVA object from an ezANOVA call
+#' @param mMeans marginal means list from a marginalMeans call
+summariseANOVA <- function(ANOVA, mMeans) {
+  mm <- mMeans[lapply(mMeans, is_tibble) == T]
+  mm <- lapply(1:length(mm), \(i) {
+    tibble(
+      Effect = names(mm)[i],
+      mm = mm[[i]] %>% pull(s) %>% paste(collapse = ", ")
+    )
+  }) %>% 
+    bind_rows()
+  ANOVA %>%
+    mutate(Effect = if_else(str_detect(Effect, ":"), "interaction", Effect)) %>%
+    nest(d = -Effect) %>%
+    mutate(
+      aov = map_chr(
+        d, 
+        ~ glue(
+          "F({.$DFn},{.$DFd})={num2str(.$F, 2)}, ", 
+          "p={prop2str(.$p, minPrefix = '<')}"
+        )
+      )
+    ) %>%
+    unnest(d) %>%
+    left_join(mm, by = "Effect") %>%
+    mutate(s = paste(aov, mm, sep = "; "))
+}
 
 # For esmData -------------------------------------------------------------
 

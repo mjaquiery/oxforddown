@@ -482,7 +482,7 @@ mmAdvisor <- trials %>%
   mutate(
     across(-Advisor, num2str),
     s = glue("M~{Advisor}~={inf_y} [95%CI {inf_ymin}, {inf_ymax}]"),
-    sCapped = glue("M~{Advisor}~={infCapped_y} [95%CI {infCapped_ymin}, {infCapped_ymax}]")
+    sCapped = glue("M~{Advisor}~={infCapped_y} [{infCapped_ymin}, {infCapped_ymax}]")
   )
 
 mmAgree <- trials %>%
@@ -504,7 +504,7 @@ mmAgree <- trials %>%
     agree = case_when(agree == 0 ~ "Disagree", agree == 1 ~ "Agree"),
     across(-agree, num2str),
     s = glue("M~{agree}~={inf_y} [95%CI {inf_ymin}, {inf_ymax}]"),
-    sCapped = glue("M~{agree}~={infCapped_y} [95%CI {infCapped_ymin}, {infCapped_ymax}]")
+    sCapped = glue("M~{agree}~={infCapped_y} [{infCapped_ymin}, {infCapped_ymax}]")
   )
 
 mmTrialType <- trials %>%
@@ -530,7 +530,7 @@ mmTrialType <- trials %>%
   unnest(cols = c(inf, infCapped), names_sep = "_") %>%
   mutate(
     across(-trialType, num2str),
-    s = glue("M~{trialType}~={inf_y} [95%CI {inf_ymin}, {inf_ymax}]"),
+    s = glue("M~{trialType}~={inf_y} [{inf_ymin}, {inf_ymax}]"),
     sCapped = glue("M~{trialType}~={infCapped_y} [95%CI {infCapped_ymin}, {infCapped_ymax}]")
   )
 
@@ -599,67 +599,36 @@ aov_inf_m <- tmp %>%
     within = c(Advisor, agree)
   )
 
-aov_inf_m <- aov_inf_m$ANOVA %>% 
+mm_inf <- tmp %>%
+  select(pid, inf, agree, Advisor) %>%
   mutate(
-    Effect = str_replace_all(Effect, "agree", "Advisor agreement"),
-    s = glue("F({DFn},{DFd})={num2str(F)}, p={prop2str(p)}")
-  ) 
+    agree = if_else(agree == 1, "Agree", "Disagree"),
+    agree = fct_rev(agree)
+  ) %>%
+  marginalMeans(inf, pid, "Disagree-Agree")
+
+message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
+
+s_inf_m <- summariseANOVA(aov_inf_m$ANOVA, mm_inf)
 
 aov_inf_cap_m <- tmp %>% 
   ezANOVA(
     dv = cappedInf,
     wid = pid, 
     within = c(Advisor, agree)
-  ) %>%
-  .$ANOVA %>% 
-  mutate(
-    Effect = str_replace_all(Effect, "agree", "Advisor agreement"),
-    s = glue("F({DFn},{DFd})={num2str(F)}, p={prop2str(p)}")
   )
 
-# Relevant marginal means
-mmmAdvisor <- trials %>%
-  filter(!is.na(Advisor), !practice) %>%
-  group_by(pid, Advisor) %>% 
-  summarise(
-    inf = mean(adviceInfluence),
-    infCapped = mean(adviceInfluenceCapped),
-    .groups = 'drop'
+mm_inf_cap <- tmp %>%
+  select(pid, cappedInf, agree, Advisor) %>%
+  mutate(
+    agree = if_else(agree == 1, "Agree", "Disagree"),
+    agree = fct_rev(agree)
   ) %>%
-  nest(d = -Advisor) %>%
-  mutate(
-    inf = map(d, ~ mean_cl_normal(.$inf)),
-    infCapped = map(d, ~ mean_cl_normal(.$infCapped))
-  ) %>% 
-  select(-d) %>%
-  unnest(cols = c(inf, infCapped), names_sep = "_") %>%
-  mutate(
-    across(-Advisor, num2str),
-    s = glue("M~{Advisor}~={inf_y} [95%CI {inf_ymin}, {inf_ymax}]"),
-    sCapped = glue("M~{Advisor}~={infCapped_y} [95%CI {infCapped_ymin}, {infCapped_ymax}]")
-  )
+  marginalMeans(cappedInf, pid, "Disagree-Agree")
 
-mmmAgree <- trials %>%
-  filter(!is.na(Advisor), !practice) %>%
-  group_by(pid, agree) %>% 
-  summarise(
-    inf = mean(adviceInfluence),
-    infCapped = mean(adviceInfluenceCapped),
-    .groups = 'drop'
-  ) %>%
-  nest(d = -agree) %>%
-  mutate(
-    inf = map(d, ~ mean_cl_normal(.$inf)),
-    infCapped = map(d, ~ mean_cl_normal(.$infCapped))
-  ) %>% 
-  select(-d) %>%
-  unnest(cols = c(inf, infCapped), names_sep = "_") %>%
-  mutate(
-    agree = case_when(agree == 0 ~ "Disagree", agree == 1 ~ "Agree"),
-    across(-agree, num2str),
-    s = glue("M~{agree}~={inf_y} [95%CI {inf_ymin}, {inf_ymax}]"),
-    sCapped = glue("M~{agree}~={infCapped_y} [95%CI {infCapped_ymin}, {infCapped_ymax}]")
-  )
+message(glue("Interaction calculation: {mm_inf_cap$.interactionExpression}"))
+
+s_inf_cap_m <- summariseANOVA(aov_inf_cap_m$ANOVA, mm_inf_cap)
 
 ```
 
@@ -667,7 +636,7 @@ The agree-in-confidence and agree-in-uncertainty advisers differed by design in 
 To control for the effects of initial confidence on influence, the above analysis was repeated using only those trials on which the initial estimate was correct and given with medium confidence.
 In a deviation from preregistration, this analysis was constrained to only forced trials because some participants had missing data for some advisor-trial type-agreement contingencies in the Medium confidence trials.
 
-The results were qualitatively identical to those for the trials at all confidence levels: a main effect of agreement (raw influence: `r aov_inf_m$s[2]`, `r mmmAgree %>% filter(agree == "Agree") %>% pull(s)`, `r mmmAgree %>% filter(agree == "Disagree") %>% pull(s)`; capped influence: `r aov_inf_cap_m$s[2]`, `r mmmAgree %>% filter(agree == "Agree") %>% pull(sCapped)`, `r mmmAgree %>% filter(agree == "Disagree") %>% pull(sCapped)`); and no signifcant effect of advisor (raw influence: `r aov_inf_m$s[1]`, `r mmmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(s)`, `r mmmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(s)`; capped influence: `r aov_inf_cap_m$s[1]`, `r mmmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(sCapped)`, `r mmmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(sCapped)`) or interaction (raw influence: `r aov_inf_m$s[3]`; capped influence: `r aov_inf_cap_m$s[3]`)
+The results were qualitatively identical to those for the trials at all confidence levels: a main effect of agreement (raw influence: `r aov_inf_m$s[2]`; capped influence: `r s_inf_cap_m$s[2]`); and no significant effect of advisor (raw influence: `r s_inf_m$s[1]`; capped influence: `r s_inf_cap_m$s[1]`) or interaction (raw influence: `r s_inf_m$s[3]`; capped influence: `r s_inf_cap_m$s[3]`).
 
 ##### \OpenScience{prereg} Sensitivity to the manipulation
 
@@ -1251,7 +1220,6 @@ gg$inf <- ggplot(tmp, aes(x = adviceTypeName, y = adviceInfluence,
 ```
 
 ```{r ac-cca-dots-r-performance-aov}
-out <- list()
 
 # Accuracy
 tmp <- familiarization %>% 
@@ -1272,59 +1240,24 @@ tmp <- familiarization %>%
     names_to = 'Decision', 
     values_to = 'accuracy'
   ) %>%
-  mutate(Decision = factor(Decision))
-  
+  mutate(
+    Decision = factor(str_to_sentence(Decision))
+  )
 
-aov_acc <- ez::ezANOVA(
+aov_acc <- ezANOVA(
   tmp, 
   dv = accuracy,
   wid = pid,
   within = c(Advisor, Decision)
 )
 
-out$acc_aov <- aov_acc$ANOVA %>%
-  nest(d = -Effect) %>%
-  mutate(s = map_chr(d, ~ glue(
-    "F({.$DFn},{.$DFd})={num2str(.$F, 2)}, p={prop2str(.$p, minPrefix = '<')}"
-  )))
+mm_acc <- tmp %>%
+  select(pid, accuracy, Decision, Advisor) %>%
+  marginalMeans(accuracy, pid, "Improvement")
 
-# Accuracy marginal means
+message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
 
-tmp <- familiarization %>% 
-  group_by(pid) %>%
-  summarise(
-    i = mean(initialAnswerCorrect),
-    f = mean(finalAnswerCorrect)
-  )
-
-bf <- ttestBF(tmp$i, tmp$f, paired = T)
-tt <- t.test(tmp$i, tmp$f, paired = T) %>% 
-  tidy() %>%
-  mutate(
-    p.value = prop2str(p.value),
-    across(where(is.numeric), num2str)
-  )
-
-out$acc_t <- glue(
-  "T({tt$parameter})={tt$statistic}, p={tt$p.value}"
-)
-
-out$acc_ta <- familiarization %>%
-  group_by(pid, Advisor) %>%
-  summarise(
-    diff = mean(finalAnswerCorrect) - mean(initialAnswerCorrect),
-    .groups = 'drop'
-  ) %>%
-  nest(d = -Advisor) %>%
-  mutate(
-    m = map(d, ~ mean_cl_normal(.$diff))
-  ) %>%
-  unnest(cols = m) %>%
-  select(-d) %>%
-  mutate(
-    across(-Advisor, prop2str),
-    s = glue("M~Difference|{Advisor}~={y} [95%CI {ymin}, {ymax}]")
-  )
+s_acc <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 
 # Confidence
 df <- familiarization %>% 
@@ -1332,7 +1265,6 @@ df <- familiarization %>%
     pid = factor(pid),
     initialConfidence,
     finalConfidence,
-    Advisor,
     initialAnswerCorrect,
     finalAnswerCorrect
   ) %>%
@@ -1348,68 +1280,32 @@ df <- familiarization %>%
       initialAnswerCorrect,
       finalAnswerCorrect
     ),
-    Correct = factor(Correct),
+    Correct = factor(
+      if_else(Correct, "Correct", "Incorrect")
+    ),
     Decision = factor(str_to_sentence(Decision))
   ) %>%
   select(-ends_with('AnswerCorrect')) %>%
-  group_by(pid, Advisor, Decision, Correct) %>%
+  group_by(pid, Decision, Correct) %>%
   summarise(
     Confidence = mean(Confidence), 
     .groups = 'drop'
   )
 
-aov_conf <- ez::ezANOVA(
+aov_conf <- ezANOVA(
   df, 
   dv = Confidence,
   wid = pid,
-  within = c(Advisor, Decision, Correct)
+  within = c(Decision, Correct)
 )
 
-out$conf_aov <- aov_conf$ANOVA %>%
-  nest(d = -Effect) %>%
-  mutate(s = map_chr(d, ~ glue(
-    "F({.$DFn},{.$DFd})={num2str(.$F, 2)}, p={prop2str(.$p, minPrefix = '<')}"
-  )))
+mm_conf <- df %>%
+  select(pid, Confidence, Decision, Correct) %>%
+  marginalMeans(Confidence, pid, "Increase")
 
-# Confidence marginal means
+message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
 
-out$conf_tc <- familiarization %>%
-  nest(d = -pid) %>%
-  mutate(
-    initial_cor = map_dbl(
-      d, 
-      ~ filter(., initialAnswerCorrect) %>% pull(initialConfidence) %>% mean()
-    ),
-    initial_incor = map_dbl(
-      d, 
-      ~ filter(., !initialAnswerCorrect) %>% pull(initialConfidence) %>% mean()
-    ),
-    final_cor = map_dbl(
-      d, 
-      ~ filter(., initialAnswerCorrect) %>% pull(finalConfidence) %>% mean()
-    ),
-    final_incor = map_dbl(
-      d, 
-      ~ filter(., !initialAnswerCorrect) %>% pull(finalConfidence) %>% mean()
-    )
-  ) %>%
-  mutate(
-    Initial = initial_cor - initial_incor,
-    Final = final_cor - final_incor
-  ) %>%
-  pivot_longer(
-    cols = c(Initial, Final), 
-    names_to = "Decision", 
-    values_to = "Difference"
-  ) %>%
-  select(pid, Decision, Difference) %>%
-  nest(d = -Decision) %>%
-  mutate(d = map(d, ~ mean_cl_normal(.$Difference))) %>%
-  unnest(cols = d) %>%
-  mutate(
-    across(-Decision, num2str),
-    s = glue("M~Difference|{Decision}~={y} [95%CI {ymin}, {ymax}]")
-  )
+s_conf <- summariseANOVA(aov_conf$ANOVA, mm_conf)
 
 r <- familiarization %>% 
   group_by(pid) %>% 
@@ -1420,19 +1316,20 @@ r <- familiarization %>%
     finalConfidence = mean(finalConfidence)
   )
 
-out$conf_r_i <- correlationBF(r$initialAccuracy, r$initialConfidence, paired = T)
-out$conf_r_f <- correlationBF(r$finalAccuracy, r$finalConfidence, paired = T)
+conf_r_i <- correlationBF(r$initialAccuracy, r$initialConfidence, paired = T)
+conf_r_f <- correlationBF(r$finalAccuracy, r$finalConfidence, paired = T)
 
 ```
 
 Basic behavioural performance was similar to that observed with the same Dots task in Experiments 1A§\@ref(ac-acc-dots-r-performance) and 2A§\@ref(ac-agr-dots-r-performance). 
-Initial decision accuracy converged on the target 71%, and, as shown in Figure \@ref(fig:ac-cca-dots-r-performance)A, participants benefited from advice in terms of their final decisions being more accurate than their initial decisions (ANOVA main effect of Time: `r out$acc_aov$s[2]`), predominantly driven by following advice from the Anti-bias advisor (interaction of Time and Advisor: `r out$acc_aov$s[3]`; `r out$acc_ta %>% filter(Advisor == "Bias-sharing") %>% pull(s)`, `r out$acc_ta %>% filter(Advisor == "Anti-bias") %>% pull(s)`).
+Initial decision accuracy converged on the target 71%, and, as shown in Figure \@ref(fig:ac-cca-dots-r-performance)A, participants benefited from advice in terms of their final decisions being more accurate than their initial decisions (ANOVA main effect of Time: `r s_acc$s[2]`), predominantly driven by following advice from the Anti-bias advisor (interaction of Time and Advisor: `r s_acc$s[3]`).
+There was no main effect of Advisor (`r s_acc$s[1]`).
 
-Figure \@ref(fig:ac-cca-dots-r-performance)B and ANOVA indicated that participants were more confident in their answers when their initial estimate was correct compared to incorrect (`r out$conf_aov$s[3]`), and that this difference was larger for final decisions than for initial estimates (`r out$conf_aov$s[6]`; `r out$conf_tc %>% filter(Decision == "Initial") %>% pull(s)`, `r out$conf_tc %>% filter(Decision == "Final") %>% pull(s)`).
-There was no main effect of time or advisor, and no other interactions.
-In accordance with the absence of a significant effect of advisor, Figure \@ref(fig:ac-cca-dots-r-performance)C shows that there was evidence of equivalence in the influence of the two advisors.
+Figure \@ref(fig:ac-cca-dots-r-performance)B and ANOVA indicated that participants were more confident in their answers when they were correct compared to incorrect (`r s_conf$s[2]`), and that this difference was larger for final decisions than for initial estimates (`r s_conf$s[3]`).
+There was no main effect of time independent of correctness (`r s_conf$s[1]`).
 
-There was no evidence of a correlation between initial estimate accuracy and confidence (`r bf2str(exp(out$conf_r_i@bayesFactor$bf))`), and no evidence for a correlation between final decision accuracy and confidence (`r bf2str(exp(out$conf_r_f@bayesFactor$bf))`).
+Figure \@ref(fig:ac-cca-dots-r-performance)C shows that there was evidence of equivalence in the influence of the two advisors.
+There was no evidence of a correlation between initial estimate accuracy and confidence (`r bf2str(exp(conf_r_i@bayesFactor$bf))`), and no evidence for a correlation between final decision accuracy and confidence (`r bf2str(exp(conf_r_f@bayesFactor$bf))`).
 
 ##### Advisor performance
 

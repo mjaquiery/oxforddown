@@ -541,28 +541,30 @@ tmp <- familiarization %>%
     names_to = 'Decision', 
     values_to = 'accuracy'
   ) %>%
-  mutate(Decision = factor(Decision))
+  mutate(
+    Decision = factor(str_to_sentence(Decision))
+  ) %>%
+  select(pid, accuracy, Decision, Advisor)
   
-
-aov_acc <- ez::ezANOVA(
+aov_acc <- ezANOVA(
   tmp, 
   dv = accuracy,
   wid = pid,
   within = c(Advisor, Decision)
 )
+mm_acc <- marginalMeans(tmp, accuracy, pid, "Improvement")
 
-tmp <- aov_acc$ANOVA %>%
-  nest(d = -Effect) %>%
-  mutate(s = map_chr(d, ~ glue(
-    "F({.$DFn},{.$DFd})={num2str(.$F, 2)}, p={prop2str(.$p, minPrefix = '<')}"
-  )))
+message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
+
+s <- summariseANOVA(aov_acc$ANOVA, mm_acc)
+
 ```
 
 Accuracy of initial decisions was controlled by a staircasing procedure which aimed to pin accuracy to 71%.
 The accuracy of final decisions was free to vary according to the ability of the participant to take advantage of the advice on offer.
 As Figure \@ref(fig:ac-acc-dots-r-performance)A shows, participants' accuracy scores for initial decisions were close to the target values (partly because participants whose accuracy scores diverged considerably were excluded).
 Participants tended to improve the accuracy of their responses following advice from High accuracy advisors, while the evidence was unclear as to whether there was any difference in response accuracy with Low accuracy advice.
-This is supported statistically by an ANOVA of response accuracy by Advisor and Time: there was no discernible effect of Advisor (`r tmp$s[[1]]`), but there was an interaction between Advisor and Time (`r tmp$s[[3]]`); and there was an effect of Time `r tmp$s[[2]]`. 
+This is supported statistically by an ANOVA of response accuracy by Advisor and Time: there was no discernible effect of Advisor (`r s$s[[1]]`), but there was an interaction between Advisor and Time (`r s$s[[3]]`); and there was an effect of Time `r s$s[[2]]`. 
 
 ###### Confidence
 
@@ -772,40 +774,31 @@ Although participants were primarily learning about the advisors at this time, w
 ```{r ac-acc-dots-r-influence}
 
 tmp <- familiarization %>% 
-  mutate(agree = adviceSide == initialAnswer) %>%
+  mutate(agree = if_else(adviceSide == initialAnswer, "Agree", "Disagree")) %>%
   group_by(pid, Advisor, agree) %>%
   summarise(influence = mean(adviceInfluenceCapped), .groups = "drop") %>%
-  mutate(across(-influence, factor))
+  mutate(across(-influence, factor)) %>%
+  select(pid, influence, agree, Advisor)
 
 aov_inf <- ezANOVA(
   tmp, 
   dv = influence,
   wid = pid, 
   within = c(Advisor, agree)
-) %>%
-  .$ANOVA %>%
-  nest(d = -Effect) %>%
-  mutate(s = map_chr(d, ~ glue(
-    "F({.$DFn},{.$DFd})={num2str(.$F, 2)}, p={prop2str(.$p, minPrefix = '<')}"
-  )))
+) 
 
-mmAgree <- familiarization %>%
-  mutate(agree = if_else(adviceSide == initialAnswer, "Agree", "Disagree")) %>%
-  group_by(pid, agree) %>%
-  summarise(influence = mean(adviceInfluenceCapped), .groups = "drop") %>%
-  group_by(agree) %>%
-  summarise(
-    s = md.mean(influence, label = glue("M~{agree}~")),
-    .groups = "drop"
-  ) %>%
-  unique()
+mm_inf <- marginalMeans(tmp, influence, pid, "Agree-Disagree")
+
+message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
+
+s <- summariseANOVA(aov_inf$ANOVA, mm_inf)
 
 ```
 
 As expected from participants who are paying attention to the task and attempting to maximize the calibration and accuracy of their final decisions, when participants receive agreeing advice they tend to increase their confidence in their initial response. 
 Likewise, where participants receive disagreeing advice, they tend to reduce their confidence in their answer.
-This influence of advice is stronger for disagreeing than agreeing trials (even when corrected to account for the scale assymetry; `r aov_inf$s[2]`; `r mmAgree %>% pull(s) %>% paste(collapse = ", ")`).
-This difference did not appear to be different between advisors (`r aov_inf$s[1]`), and as shown in Figure \@ref(fig:ac-acc-dots-r-performance)E, however, the level of influence was equivalent between advisors, with most participants being almost exactly equally influenced by both advisors (`r aov_inf$s[3]`).
+This influence of advice is stronger for disagreeing than agreeing trials (even when corrected to account for the scale asymmetry; `r s$s[2]`).
+This difference did not appear to be different between advisors (`r s$s[1]`), and as shown in Figure \@ref(fig:ac-acc-dots-r-performance)E, however, the level of influence was equivalent between advisors, with most participants being almost exactly equally influenced by both advisors (`r s$s[3]`).
 
 \mccorrect{NICK:Also, not to change now, but to flag for the viva: The figure brings out some of the questionable features of how you cap influence. It does not make sense to me that the maximum confidence change for disagreement with high initial confidence is small. I realise why you do it mathematically, but it is very odd conceptually when these are arguably the most influential changes -- when a person shifts their view initially held with near certainty. MATT: Should we keep the off-diagonal figure thing to illustrate this?}
 
@@ -1602,53 +1595,23 @@ aov_acc <- acc %>%
     within = c(Advisor, Response)
   )
 
-aov_acc <- aov_acc$ANOVA %>%
-  nest(d = -Effect) %>%
-  mutate(s = map_chr(d, ~ glue(
-    "F({.$DFn},{.$DFd})={num2str(.$F, 2)}, p={prop2str(.$p, minPrefix = '<')}"
-  )))
+mm_acc <- acc %>%
+  select(pid, Accuracy, Response, Advisor) %>%
+  mutate(Advisor = str_extract(Advisor, ".+")) %>%
+  marginalMeans(Accuracy, pid, "Improvement")
 
-# Marginal means
+message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
 
-mmTime <- Familiarization %>% 
-  rename(
-    Initial = responseAnswerSideCorrect, 
-    Final = responseAnswerSideCorrectFinal
-  ) %>%
-  pivot_longer(c(Initial, Final)) %>%
-  group_by(name, pid) %>%
-  summarise(Accuracy = mean(value), .groups = "drop") %>% 
-  group_by(name) %>%
-  summarise(
-    s = md.mean(Accuracy, label = glue("M~{name}~"), isProportion = T), 
-    .groups = "drop"
-  ) %>%
-  unique()
-
-mmInt <- Familiarization %>% 
-  group_by(pid, Advisor) %>%
-  summarise(
-    across(starts_with("responseAnswerSideCorrect"), mean),
-    .groups = "drop"
-  ) %>%
-  mutate(
-    improvement = responseAnswerSideCorrectFinal - responseAnswerSideCorrect
-  ) %>%
-  group_by(Advisor) %>%
-  summarise(
-    s = md.mean(improvement, label = glue("M~Improvement|{Advisor}~"), isProportion = T),
-    .groups = "drop"
-  ) %>%
-  unique()
+s <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 
 ```
 
 Unlike in the Dots version of the task, participant accuracy is not controlled because it depends on participants' existing knowledge (and guesses) across a relatively small and varied set of questions. 
 Correspondingly, accuracy varied substantially across participants (Figure \@ref(fig:ac-acc-dates-r-performance)A). 
-Figure \@ref(fig:ac-acc-dates-r-performance)A also shows that participants managed to improve their performance from their initial estimates to their final decisions with both advisors (`r aov_acc$s[2]`; `r mmTime %>% pull(s) %>% paste(collapse = ", ")`). 
+Figure \@ref(fig:ac-acc-dates-r-performance)A also shows that participants managed to improve their performance from their initial estimates to their final decisions with both advisors (`r s$s[2]`). 
 This is likely because the advisors themselves were more accurate than the participants, so following their advice was generally a good strategy, and the difficulty of the task meant that participants were very willing to be influenced by advice.
 
-As would be expected from participants following advice, the improvement in accuracy from initial estimates to final decisions was greater for the High accuracy advisor than the Low accuracy advisor (`r aov_acc$s[3]`; `r mmInt %>% pull(s) %>% paste(collapse = ", ")`).
+As would be expected from participants following advice, the improvement in accuracy from initial estimates to final decisions was greater for the High accuracy advisor than the Low accuracy advisor (`r s$s[3]`).
 
 ###### Confidence
 
@@ -1663,67 +1626,19 @@ aov_conf <- conf %>%
     within = c(initialCor, Response)
   )
 
-aov_conf <- aov_conf$ANOVA %>%
-  nest(d = -Effect) %>%
-  mutate(s = map_chr(d, ~ glue(
-    "F({.$DFn},{.$DFd})={num2str(.$F, 2)}, p={prop2str(.$p, minPrefix = '<')}"
-  )))
+mm_conf <- conf %>%
+  select(pid, Confidence, Response, initialCor = `Initial estimate accuracy`) %>%
+  marginalMeans(Confidence, pid, "Increase")
 
-# Marginal means
+message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
 
-mmTime <- Familiarization %>% 
-  rename(
-    Initial = responseConfidence, 
-    Final = responseConfidenceFinal
-  ) %>%
-  pivot_longer(c(Initial, Final)) %>%
-  group_by(name, pid) %>%
-  summarise(Confidence = mean(value), .groups = "drop") %>% 
-  group_by(name) %>%
-  summarise(
-    s = md.mean(Confidence, label = glue("M~{name}~"), decimals = 1), 
-    .groups = "drop"
-  ) %>%
-  unique()
-
-mmInitialCor <- Familiarization %>%
-  pivot_longer(c(responseConfidence, responseConfidenceFinal)) %>%
-  mutate(
-    initialCor = if_else(responseAnswerSideCorrect, "Correct", "Incorrect")
-  ) %>%
-  group_by(pid, initialCor) %>%
-  summarise(value = mean(value), .groups = "drop") %>%
-  group_by(initialCor) %>% 
-  summarise(
-    s = md.mean(value, label = glue("M~{initialCor}~"), decimals = 1),
-    .groups = "drop"
-  ) %>%
-  unique()
-  
-mmInt <- Familiarization %>% 
-  mutate(
-    initialCor = if_else(responseAnswerSideCorrect, "Correct", "Incorrect")
-  ) %>%
-  group_by(pid, initialCor) %>%
-  summarise(
-    across(starts_with("responseConfidence"), mean),
-    .groups = "drop"
-  ) %>%
-  mutate(
-    increase = responseConfidenceFinal - responseConfidence
-  ) %>%
-  group_by(initialCor) %>%
-  summarise(
-    s = md.mean(increase, label = glue("M~Increase|{initialCor}~"), decimals = 1),
-    .groups = "drop"
-  ) %>%
-  unique()
+s <- summariseANOVA(aov_conf$ANOVA, mm_conf)
 
 ```
 
 Generally, we expect participants to be more confident on trials on which they are correct compared to trials on which they are incorrect (Figure \@ref(fig:ac-acc-dates-r-performance)B).
-Participants' initial estimates and final decisions were both systematically more confident when the initial estimate was correct as compared to incorrect (`r aov_conf$s[1]`; `r mmInitialCor %>% pull(s) %>% paste(collapse = ", ")`).
-Participants were also more confident on final decisions than on initial estimates (`r aov_conf$s[2]`; `r mmTime %>% pull(s) %>% paste(collapse = ", ")`), and the increase over time only appeared for the trials where the initial estimate was correct (`r aov_conf$s[3]`; `r mmInt %>% pull(s) %>% paste(collapse = ", ")`).
+Participants' initial estimates and final decisions were both systematically more confident when the initial estimate was correct as compared to incorrect (`r aov_conf$s[1]`).
+Participants were also more confident on final decisions than on initial estimates (`r aov_conf$s[2]`), and the increase over time only appeared for the trials where the initial estimate was correct (`r aov_conf$s[3]`).
 
 ###### Metacognitive ability
 
@@ -1921,44 +1836,23 @@ inf_aov <- suppressWarnings(
   )
 ) 
 
-inf_aov <- inf_aov$ANOVA %>%
-  nest(d = -Effect) %>%
-  mutate(s = map_chr(d, ~ glue(
-    "F({.$DFn},{.$DFd})={num2str(.$F, 2)}, p={prop2str(.$p, minPrefix = '<')}"
-  )))
-
-mmAdv <- Familiarization %>% 
-  group_by(pid, Advisor) %>%
-  summarise(inf = mean(advisor0Influence), .groups = "drop") %>%
-  group_by(Advisor) %>%
-  summarise(
-    s = md.mean(inf, label = glue("M~Influence|{Advisor}~"), decimals = 2),
-    .groups = "drop"
-  ) %>%
-  unique()
-
-mmInt <- Familiarization %>% 
+mm_inf <- adv_inf %>%
   transmute(
-    pid, Advisor, advisor0Influence, 
-    feedback = if_else(feedback, "Feedback", "No feedback")
+    pid, 
+    advisor0Influence, 
+    Advisor = fct_rev(Advisor), 
+    `Feedback condition`
   ) %>%
-  group_by(pid, Advisor, feedback) %>%
-  summarise(influence = mean(advisor0Influence), .groups = "drop") %>%
-  pivot_wider(names_from = Advisor, values_from = influence) %>%
-  mutate(difference = `High accuracy` - `Low accuracy`) %>%
-  group_by(pid, feedback) %>%
-  summarise(difference = mean(difference), .groups = "drop") %>%
-  group_by(feedback) %>%
-  summarise(
-    s = md.mean(difference, label = glue("M~Difference|{feedback}~"), decimals = 2),
-    .groups = "drop"
-  ) %>%
-  unique()
+  marginalMeans(advisor0Influence, pid, "High-Low accuracy")
+
+message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
+
+s <- summariseANOVA(inf_aov$ANOVA, mm_inf)
 
 ```
 
-The High accuracy advisor was substantially more influential than the other Low accuracy advisor (`r inf_aov$s[1]`, `r paste0(mmAdv$s, collapse = ", ")`).
-This tendency did not differ significantly between the groups (`r inf_aov$s[3]`, `r paste0(mmInt$s, collapse = ", ")`), and nor did the participants in the feedback and no feedback conditions appear to differ in the extent to which they took advice (`r inf_aov$s[1]`).
+The High accuracy advisor was substantially more influential than the other Low accuracy advisor (`r inf_aov$s[2]`).
+This tendency did not differ significantly between the groups (`r inf_aov$s[3]`), and nor did the participants in the feedback and no feedback conditions appear to differ in the extent to which they took advice (`r inf_aov$s[1]`).
 
 These influence measurements are calculated on the Familiarization phase trials in which participants are not offered a choice of advisor.
 It is during this phase that participants are learning about the value of the advice (especially in the Feedback condition), and thus any influence on later trials may be diluted by low influence on trials which occur before an advisor has had time to develop a reputation as reliable.

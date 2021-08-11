@@ -363,7 +363,6 @@ gg$inf <- ggplot(tmp, aes(x = adviceTypeName, y = adviceInfluence,
 ```
 
 ```{r ac-ava-dots-r-performance-aov}
-out <- list()
 
 # Accuracy
 tmp <- familiarization %>% 
@@ -384,40 +383,24 @@ tmp <- familiarization %>%
     names_to = 'Decision', 
     values_to = 'accuracy'
   ) %>%
-  mutate(Decision = factor(Decision))
-  
+  mutate(
+    Decision = factor(str_to_sentence(Decision))
+  )
 
-aov_acc <- ez::ezANOVA(
+aov_acc <- ezANOVA(
   tmp, 
   dv = accuracy,
   wid = pid,
   within = c(Advisor, Decision)
 )
 
-out$acc_aov <- aov_acc$ANOVA %>%
-  nest(d = -Effect) %>%
-  mutate(s = map_chr(d, ~ glue(
-    "F({.$DFn},{.$DFd})={num2str(.$F, 2)}, p={prop2str(.$p, minPrefix = '<')}"
-  )))
+mm_acc <- tmp %>%
+  select(pid, accuracy, Decision, Advisor) %>%
+  marginalMeans(accuracy, pid, "Improvement")
 
-tmp <- familiarization %>% 
-  group_by(pid) %>%
-  summarise(
-    i = mean(initialAnswerCorrect),
-    f = mean(finalAnswerCorrect)
-  )
+message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
 
-bf <- ttestBF(tmp$i, tmp$f, paired = T)
-tt <- t.test(tmp$i, tmp$f, paired = T) %>% 
-  tidy() %>%
-  mutate(
-    p.value = prop2str(p.value),
-    across(where(is.numeric), num2str)
-  )
-
-out$acc_t <- glue(
-  "T({tt$parameter})={tt$statistic}, p={tt$p.value}"
-)
+s_acc <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 
 # Confidence
 df <- familiarization %>% 
@@ -425,7 +408,6 @@ df <- familiarization %>%
     pid = factor(pid),
     initialConfidence,
     finalConfidence,
-    Advisor,
     initialAnswerCorrect,
     finalAnswerCorrect
   ) %>%
@@ -441,35 +423,32 @@ df <- familiarization %>%
       initialAnswerCorrect,
       finalAnswerCorrect
     ),
-    Correct = factor(Correct),
+    Correct = factor(
+      if_else(Correct, "Correct", "Incorrect")
+    ),
     Decision = factor(str_to_sentence(Decision))
   ) %>%
   select(-ends_with('AnswerCorrect')) %>%
-  group_by(pid, Advisor, Decision, Correct) %>%
+  group_by(pid, Decision, Correct) %>%
   summarise(
     Confidence = mean(Confidence), 
     .groups = 'drop'
   )
 
-aov_conf <- ez::ezANOVA(
+aov_conf <- ezANOVA(
   df, 
   dv = Confidence,
   wid = pid,
-  within = c(Advisor, Decision, Correct)
+  within = c(Decision, Correct)
 )
 
-out$conf_aov <- aov_conf$ANOVA %>%
-  nest(d = -Effect) %>%
-  mutate(s = map_chr(d, ~ glue(
-    "F({.$DFn},{.$DFd})={num2str(.$F, 2)}, p={prop2str(.$p, minPrefix = '<')}"
-  )))
+mm_conf <- df %>%
+  select(pid, Confidence, Decision, Correct) %>%
+  marginalMeans(Confidence, pid, "Increase")
 
-# 3-way interaction
-m <- df %>% 
-  group_by(Advisor, Correct, Decision) %>% 
-  summarise(conf = mean(Confidence), .groups = 'drop') %>%
-  pivot_wider(names_from = Decision, values_from = conf) %>%
-  mutate(Difference = Final - Initial)
+message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
+
+s_conf <- summariseANOVA(aov_conf$ANOVA, mm_conf)
 
 r <- familiarization %>% 
   group_by(pid) %>% 
@@ -480,20 +459,21 @@ r <- familiarization %>%
     finalConfidence = mean(finalConfidence)
   )
 
-out$conf_r_i <- correlationBF(r$initialAccuracy, r$initialConfidence, paired = T)
-out$conf_r_f <- correlationBF(r$finalAccuracy, r$finalConfidence, paired = T)
+conf_r_i <- correlationBF(r$initialAccuracy, r$initialConfidence, paired = T)
+conf_r_f <- correlationBF(r$finalAccuracy, r$finalConfidence, paired = T)
 
 ```
 
 Basic behavioural performance was similar to that observed with the same Dots task in Experiments 1A§\@ref(ac-acc-dots-r-performance) and 2A§\@ref(ac-agr-dots-r-performance). 
-Initial decision accuracy converged on the target 71%, and, as shown in Figure \@ref(fig:ac-ava-dots-r-performance)A, participants benefited from advice in terms of their final decisions being more accurate than their initial decisions (ANOVA main effect of Time: `r out$acc_aov$s[2]`), especially following advice from the High accuracy advisor (interaction of Time and Advisor: `r out$acc_aov$s[3]`).
+Initial decision accuracy converged on the target 71%, and, as shown in Figure \@ref(fig:ac-ava-dots-r-performance)A, participants benefited from advice in terms of their final decisions being more accurate than their initial decisions (ANOVA main effect of Time: `r s_acc$s[2]`), especially following advice from the High accuracy advisor (interaction of Time and Advisor: `r s_acc$s[3]`).
+There was no main effect of Advisor (`r s_acc$s[1]`).
 
-Figure \@ref(fig:ac-ava-dots-r-performance)B and ANOVA indicated that participants were more confident in their correct answers than their incorrect ones (`r out$conf_aov$s[3]`), and more confident in their final decisions than their initial estimates (`r out$conf_aov$s[2]`), and that these two factors interacted (`r out$conf_aov$s[6]`).
-The advisor also mattered, with a main effect (`r out$conf_aov$s[1]`) and interaction with Time (`r out$conf_aov$s[4]`).
-There was also a three-way interaction (`r out$conf_aov$s[7]`) caused by confidence decreasing for incorrect answers and increasing for correct answers with the High accuracy advisor, and increasing regardless of correctness following advice from the High agreement advisor.
+Figure \@ref(fig:ac-ava-dots-r-performance)B and ANOVA indicated that participants were more confident in their correct answers than their incorrect ones (`r s_conf$s[2]`), and more confident in their final decisions than their initial estimates (`r s_conf$s[1]`), and that these two factors interacted (`r s_conf$s[3]`).
+
+The advisor also mattered; confidence decreased for incorrect answers and increased for correct answers with the High accuracy advisor, and increased regardless of correctness following advice from the High agreement advisor.
 This indicates that in general the confidence changed in the direction of the advice (because only the High accuracy advisor disagreed frequently, and then only on trials where the participant's initial estimate was incorrect), meaning the High accuracy advisor was more influential (Figure \@ref(fig:ac-agr-dots-r-performance)C).
 
-There was no evidence of a correlation between initial estimate accuracy and confidence (`r bf2str(exp(out$conf_r_i@bayesFactor$bf))`), and no evidence for a correlation between final decision accuracy and confidence (`r bf2str(exp(out$conf_r_f@bayesFactor$bf))`).
+There was no evidence of a correlation between initial estimate accuracy and confidence (`r bf2str(exp(conf_r_i@bayesFactor$bf))`), and no evidence for a correlation between final decision accuracy and confidence (`r bf2str(exp(conf_r_f@bayesFactor$bf))`).
 
 ##### Advisor performance
 
@@ -796,6 +776,9 @@ Both advisors used markers that spanned 7 years, and both placed the markers in 
 The target point for the High accuracy advisor was the correct answer, and the target point for the High agreement advisor was the participant's initial estimate.
 Neither advisor ever placed their marker exactly on the midpoint of the participant's marker (because doing so means the weight on advice statistic is undefined). 
 
+Note that just as the task is continuous rather than binary, so agreement is continuous rather than binary. 
+There is no objective threshold at which to classify advice as 'agreement', although we can classify accuracy in a binary way as whether or not a marker includes the correct answer.
+
 On off-brand advice trials, of which there were between `r paste(range(at$nOffBrand) / 2, collapse = " and ")` per Familiarization block, advisors neither indicated the correct answer nor agreed with the participant. 
 This was achieved by picking a target point of the participant's answer reflected around the correct answer. 
 Thus, if the centre of the participant's initial estimate was 1955, and the correct answer was 1945, the target point would be 1935.
@@ -1030,64 +1013,36 @@ In this section, task performance is explored during the Familiarization phase o
 There were an equal number of these trials for each participant for each advisor.
 
 ```{r ac-ava-dates-r-aov}
+
 # Accuracy
 tmp <- Familiarization %>%
-  mutate(Reduction = responseError - responseErrorFinal)
+  mutate(Initial = responseError, Final = responseErrorFinal) %>%
+  pivot_longer(c(Initial, Final), names_to = "Decision", values_to = "Error") %>%
+  select(pid, Error, Decision, Advisor) %>%
+  mutate(across(-Error, factor)) %>%
+  group_by(pid, Decision, Advisor) %>%
+  summarise(Error = mean(Error), .groups = "drop")
 
 aov_acc <- tmp %>%
-  select(pid, Advisor, Feedback, Reduction) %>%
-  mutate(across(-Reduction, factor)) %>%
-  group_by(pid, Advisor, Feedback) %>%
-  summarise(Reduction = mean(Reduction), .groups = "drop") %>%
   ezANOVA(
-    dv = Reduction, 
+    dv = Error, 
     wid = pid,
-    within = Advisor,
-    between = Feedback
-  ) %>%
-  .$ANOVA %>%
-  nest(d = -Effect) %>%
-  mutate(s = map_chr(d, ~ glue(
-    "F({.$DFn},{.$DFd})={num2str(.$F, 2)}, p={prop2str(.$p, minPrefix = '<')}"
-  )))
+    within = c(Decision, Advisor)
+  )
 
-# Marginal means
-acc_mmAdvisor <- tmp %>%
-  group_by(Advisor, pid) %>%
-  summarise(Reduction = mean(Reduction), .groups = "drop") %>% 
-  group_by(Advisor) %>%
-  summarise(
-    s = md.mean(Reduction, label = glue("M~{Advisor}~")), 
-    .groups = "drop"
-  ) %>%
-  unique()
-acc_mmFeedback <- tmp %>%
-  group_by(Feedback, pid) %>%
-  summarise(Reduction = mean(Reduction), .groups = "drop") %>% 
-  group_by(Feedback) %>%
-  summarise(
-    s = md.mean(Reduction, label = glue("M~{Feedback}~")), 
-    .groups = "drop"
-  ) %>%
-  unique()
+mm_acc <- tmp %>% 
+  mutate(Decision = fct_rev(Decision)) %>%
+  marginalMeans(Error, pid, "Reduction")
 
-acc_mmInt <- tmp %>%
-  group_by(Advisor, Feedback, pid) %>%
-  summarise(Reduction = mean(Reduction), .groups = "drop") %>%
-  pivot_wider(names_from = Advisor, values_from = Reduction) %>%
-  group_by(Feedback, pid) %>%
-  summarise(Difference = `High accuracy` - `High agreement`, .groups = "drop") %>%
-  group_by(Feedback) %>%
-  summarise(
-    s = md.mean(Difference, label = glue("M~Difference|{Feedback}~")), 
-    .groups = "drop"
-  ) %>%
-  unique()
+message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
+
+s_acc <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 
 ```
 
-In both the original and replication, participants seemed to reduce their error (i.e. improve their response accuracy) much more following advice from the High accuracy advisor (`r aov_acc$s[2]`; `r acc_mmAdvisor %>% pull(s) %>% paste(collapse = ", ")`; Figure \@ref(fig:ac-ava-dates-r-performance)). 
-There was no evidence of an overall difference between feedback conditions (`r aov_acc$s[1]`), or of an interaction between feedback condition and advisor (`r aov_acc$s[3]`).
+Participants generally improve their response accuracy following advice; they had lower error on final decisions than on their initial estimates (`r s_acc$s[1]`).
+They also had lower error on their answers with the High accuracy advisor (`r s_acc$s[2]`).
+As expected, there was an interaction: participants reduced their error much more following advice from the High accuracy advisor (`r s_acc$s[3]`; Figure \@ref(fig:ac-ava-dates-r-performance)). 
 
 Generally, we expect participants to be more confident on trials on which they are correct compared to trials on which they are incorrect.
 Confidence can be measured by the width of the marker selected by the participant.
@@ -1299,36 +1254,21 @@ aov_inf <- tmp %>%
     dv = WOA, wid = pid, within = Advisor, between = Feedback
   )
 
-mmAdvisor <- OffBrand %>%
-  filter(!(pid %in% lost)) %>%
-  group_by(pid, Advisor) %>%
-  summarise(WOA = mean(advisor0WOA), .groups = "drop") %>%
-  group_by(Advisor) %>%
-  summarise(
-    s = md.mean(WOA, label = glue("M~{Advisor}~")), 
-    .groups = "drop"
-  ) %>%
-  unique()
-mmInt <- OffBrand %>%
-  filter(!(pid %in% lost)) %>%
-  group_by(pid, Advisor, Feedback) %>%
-  summarise(WOA = mean(advisor0WOA), .groups = "drop") %>%
-  pivot_wider(names_from = Advisor, values_from = WOA) %>%
-  mutate(Difference = `High accuracy` - `High agreement`) %>%
-  group_by(Feedback) %>%
-  summarise(
-    s = md.mean(Difference, label = glue("M~Difference|{Feedback}~")), 
-    .groups = "drop"
-  ) %>%
-  unique()
+mm_inf <- tmp %>% 
+  select(pid, WOA, Advisor, Feedback) %>%
+  marginalMeans(WOA, pid, "Accuracy-Agreement")
+
+message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
+
+s_inf <- summariseANOVA(aov_inf$ANOVA, mm_inf)
 
 ```
 
-We included in our design a subset of trials on which advisors offered the same kind of advice. 
+We included in our design a subset of trials on which advisors offered the same kind of advice.^[`r length(lost)` participant was dropped from this analysis because their data did not have any remaining off-brand trials for one advisor.] 
 This meant that we could investigate the influence of the advisors while controlling for differences in their advice.
-Examining the influence of these off-brand trials indicated that the High accuracy advisor was more influential than the High agreement advisor (`r aov_inf$s[2]`; `r mmAdvisor %>% pull(s) %>% paste(collapse = ", ")`).
-This difference was more pronounced in the Feedback condition (`r aov_inf$s[3]`; `r mmInt %>% pull(s) %>% paste(collapse = ", ")`). 
-There was no evidence of a main effect of condition, however (`r aov_inf$s[1]`).
+Examining the influence of these off-brand trials indicated that the High accuracy advisor was more influential than the High agreement advisor (`r s_inf$s[2]`).
+This difference was more pronounced in the Feedback condition (`r s_inf$s[3]`). 
+There was no evidence of a main effect of condition, however (`r s_inf$s[1]`).
 
 ### Discussion {#ac-ava-d}
 
