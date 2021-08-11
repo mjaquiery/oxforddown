@@ -769,12 +769,43 @@ The advisors' actual accuracies matched the target accuracies (Table \@ref(tab:a
 During the Familiarization stage of the experiment, participants were assigned advisors by fiat. 
 Although participants were primarily learning about the advisors at this time, we can nonetheless look at differences in the influence of the advisors without the confound of advisor choice.
 
-\mccorrect{TODO: ANOVA stats for the Advisor/Correct factors on Increased confidence}
+```{r ac-acc-dots-r-influence}
+
+tmp <- familiarization %>% 
+  mutate(agree = adviceSide == initialAnswer) %>%
+  group_by(pid, Advisor, agree) %>%
+  summarise(influence = mean(adviceInfluenceCapped), .groups = "drop") %>%
+  mutate(across(-influence, factor))
+
+aov_inf <- ezANOVA(
+  tmp, 
+  dv = influence,
+  wid = pid, 
+  within = c(Advisor, agree)
+) %>%
+  .$ANOVA %>%
+  nest(d = -Effect) %>%
+  mutate(s = map_chr(d, ~ glue(
+    "F({.$DFn},{.$DFd})={num2str(.$F, 2)}, p={prop2str(.$p, minPrefix = '<')}"
+  )))
+
+mmAgree <- familiarization %>%
+  mutate(agree = if_else(adviceSide == initialAnswer, "Agree", "Disagree")) %>%
+  group_by(pid, agree) %>%
+  summarise(influence = mean(adviceInfluenceCapped), .groups = "drop") %>%
+  group_by(agree) %>%
+  summarise(
+    s = md.mean(influence, label = glue("M~{agree}~")),
+    .groups = "drop"
+  ) %>%
+  unique()
+
+```
 
 As expected from participants who are paying attention to the task and attempting to maximize the calibration and accuracy of their final decisions, when participants receive agreeing advice they tend to increase their confidence in their initial response. 
-Likewise, where participants receive disagreeing advice, they tend to reduce their confidence in their answer. 
-Participants receiving disagreeing advice occasionally change their mind (much less than they would if they were to average their initial opinion and advice, see the chapter on Context of Advice§\@ref(chapter-context)).
-As shown in Figure \@ref(fig:ac-acc-dots-r-performance)E, however, the level of influence was equivalent between advisors, with most participants being almost exactly equally influenced by both advisors.
+Likewise, where participants receive disagreeing advice, they tend to reduce their confidence in their answer.
+This influence of advice is stronger for disagreeing than agreeing trials (even when corrected to account for the scale assymetry; `r aov_inf$s[2]`; `r mmAgree %>% pull(s) %>% paste(collapse = ", ")`).
+This difference did not appear to be different between advisors (`r aov_inf$s[1]`), and as shown in Figure \@ref(fig:ac-acc-dots-r-performance)E, however, the level of influence was equivalent between advisors, with most participants being almost exactly equally influenced by both advisors (`r aov_inf$s[3]`).
 
 \mccorrect{NICK:Also, not to change now, but to flag for the viva: The figure brings out some of the questionable features of how you cap influence. It does not make sense to me that the maximum confidence change for disagreement with high initial confidence is small. I realise why you do it mathematically, but it is very odd conceptually when these are arguably the most influential changes -- when a person shifts their view initially held with near certainty. MATT: Should we keep the off-diagonal figure thing to illustrate this?}
 

@@ -1,19 +1,14 @@
 
 ## Effects of Advisor Agreement on Advisor Selection {#ac-agr}
 
-The next pair of experiments investigated how advice preferences are shaped by advisors’ likelihood of giving advice that agrees vs. disagrees with participants’ own initial estimates. 
-Pescetelli and Yeung \mccorrect{NICK: Niccolo Exp 2 in the JEP:G paper. He found (in terms of influence) a big effect of agreement and a much smaller effect of accuracy when there was no feedback. When feedback was provided, accuracy had maybe a bit bigger effect than agreement, but both effects were clear.} demonstrated that advisors who agree  more frequently are more influential (regardless of the presence of feedback) in a lab-based perceptual decision-making task.
-
-\mccorrect{NICK: Here we explored the impact of agreement on choice of advisor. Experiment X looks at this effect in the Dots task, while Experiment Y does the same for the Dates task.}
-
-\mccorrect{NICK: somewhere we need to talk about what we mean by agreement, how Niccolo defined it, how we define it (varies between binary/continuous tasks), etc. Remind the reader what we mean by agreement in Method}
-
 Experiments 1A§\@ref(ac-acc-dots) and 1B§\@ref(ac-acc-dates) revealed differences in how participants selected the advisors between the Dots task (which has no feedback) and the No feedback condition of the Dates task for High versus Low accuracy advisors. 
 We may expect more pronounced effects in the absence of feedback when contrasting High versus Low agreement advisors, because we expect that agreement is the driving force behind the accuracy differences where feedback is not provided.
+@pescetelliRoleDecisionConfidence2021 demonstrated that advisors who agree more frequently are more influential (regardless of the presence of feedback, but especially without it) in a lab-based perceptual decision-making task.
+Here we explored the impact of agreement on choice of advisor. Experiment 2A§\@ref(ac-agr-dots) looks at this effect in the Dots task, while Experiment 2B§\@ref(ac-agr-dates) does the same for the Dates task.
+
+\mccorrect{TODO: How did Niccolo define agreement? We should check it's to do with the same side stuff.}
 
 ### Experiment 2A: Advisor agreement effects in the Dots Task {#ac-agr-dots}
-
-\mccorrect{NICK: In this experiment, the advice provided was no longer independent of initial decisions. Instead, advice was provided contingent on those decisions, such that the two advisors varied in their likelihood etc. I think it's worth making the point explicit, to begin to suggest how we can dissociate agreement and accuracy.}
 
 ```{r ac-agr-dots-load, include = F}
 

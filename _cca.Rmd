@@ -1574,7 +1574,6 @@ ggplot(tmp, aes(x = '', y = pPickBS)) +
   pull(pPickBS) %>%
   md.ttest(y = .5)
   
-
 ```
 
 There was a strong tendency for participants to express no, or slight preferences between advisors (`r .T`).

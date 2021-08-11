@@ -857,13 +857,11 @@ Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded,
 
 ##### Task performance
 
-\mccorrect{NICK: The usual scope to edit down here in this section. Just focus on the results as a function of advisor (e.g. better judgements with the accurate advisor). Be sure to spell out the you've got a different DV here -- error in years (so that lower numbers on the graphs indicate better performance, in contrast with previous graphs).}
-
 ```{r ac-ava-dates-r-split}
 
 for (E in c(.GlobalEnv, .prevStudy)) {
   
-  fb <- AdvisedTrial %>% 
+  fb <- E$AdvisedTrial %>% 
     group_by(pid) %>%
     summarise(Feedback = max(feedback)) %>%
     mutate(Feedback = if_else(Feedback == 1, "Feedback", "No feedback"))
@@ -1224,34 +1222,23 @@ This qualitative difference from the No feedback condition also translated into 
 ```{r ac-ava-dates-r-influence-graph, fig.caption="Date task advisor WoA for high accuracy/agreement advisors.  Participants' weight on the advice for advisors in the Familiarization phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The dotted outline indicates the distribution of participant means in the original experiment of which this experiment is a replication."}
 
 for (E in c(.GlobalEnv, .prevStudy)) {
-  E$Familiarization <- E$Familiarization %>% 
-    mutate(Advisor = advisor_description_name(advisor0idDescription))
-  
-  E$tmp <- E$Familiarization %>% 
-    group_by(pid, Advisor, feedback) %>%
+  E$tmp <- E$OffBrand %>% 
+    group_by(pid, Advisor, Feedback) %>%
     select(c(matches('(influence|WOA)'), group_vars(.))) %>%
-    summarise_all(mean) 
+    summarise_all(mean, .groups = "drop") 
   
-  # Add in feedback condition
-  E$tmp <- left_join(
-    E$tmp,
-    E$Familiarization %>% 
-      group_by(pid) %>% 
-      summarise(feedbackCondition = case_when(any(feedback == 1) ~ 'Feedback', 
-                                              T ~ 'No feedback'),
-                .groups = 'drop'),
-    by = 'pid'
-  ) %>% 
-    ungroup() %>%
-    mutate_if(is.character, factor) %>%
-    mutate(`Feedback condition` = paste0(feedbackCondition, '\n'),
-           `Feedback condition` = factor(`Feedback condition`)) %>%
+  E$tmp <- E$tmp %>% 
+    mutate(
+      across(where(is.character), factor),
+      Feedback = paste0(Feedback, '\n'),
+      Feedback = factor(Feedback)
+    ) %>%
     filter(!is.na(advisor0WOA)) %>%
     order_factors()
 }
 
 bf <- tmp %>% 
-  nest(d = -c(feedbackCondition, `Feedback condition`)) %>%
+  nest(d = -Feedback) %>%
   mutate(
     bf = map(d, ~ select(., pid, Advisor, advisor0WOA) %>%
                pivot_wider(names_from = Advisor, 
@@ -1266,7 +1253,7 @@ bf$BF <- sapply(1:nrow(bf), function(i) bf2str(exp(bf$bf[[i]]@bayesFactor$bf)))
 dw <- .1
 
 ggplot(tmp, aes(x = Advisor, y = advisor0WOA, 
-                colour = `Feedback condition`, fill = `Feedback condition`)) +
+                colour = Feedback, fill = Feedback)) +
   geom_hline(yintercept = 0, colour = 'lightgrey', size = 1) +
   geom_line(aes(group = pid), alpha = .25) +
   geom_split_violin(aes(x = nudge(Advisor, dw),
@@ -1274,7 +1261,7 @@ ggplot(tmp, aes(x = Advisor, y = advisor0WOA,
                     colour = NA) +
   geom_split_violin(aes(x = nudge(Advisor, dw),
                         group = Advisor,
-                        fill = `Feedback condition`), 
+                        fill = Feedback), 
                     colour = 'black', alpha = 0, width = .9, 
                     linetype = 'dashed', size = 1,
                     data = .prevStudy$tmp) +
@@ -1286,9 +1273,9 @@ ggplot(tmp, aes(x = Advisor, y = advisor0WOA,
   geom_label(y = 1, x = 1.5, colour = 'black', fill = 'white', 
              aes(label = paste0('BF = ', BF)), data = bf) +
   scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
+  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour'), guide = "none") +
   coord_cartesian(clip = F) +
-  facet_grid(~`Feedback condition`) +
+  facet_grid(~Feedback) +
   labs(x = 'Advisor advice profile', y = 'Weight on Advice')
 
 
@@ -1345,21 +1332,37 @@ There was no evidence of a main effect of condition, however (`r aov_inf$s[1]`).
 
 ### Discussion {#ac-ava-d}
 
-\mccorrect{NICK: Focus first on pick rates without feedback, then pick rates with feedback (effect lost; wide overall preferences)}
-
-Whereas \mccorrect{NICK: Experiments XX-XX} assessed the separate effects of advisor accuracy and agreement, in these two experiments these factors were set in opposition. 
-The influence results and the choice results were both clear when feedback was provided (in the Dates task), indicating that people are capable of attending to challenging but useful information provided they have a chance to learn that the information is actually useful.
-In contrast, when people are not given objective feedback against which to evaluate the advice they receive \mccorrect{NICK: I think this is the right way to phrase it, since elsewhere you've argued (and shown) that  people can learn some useful stuff even in the absence of feedback.}, there does not seem to be a systematic response: some people seek agreement while others seek alternate perspectives, and the extent to which each strategy is pursued to the exclusion of the other is also highly variable. 
+Whereas previous experiments assessed the separate effects of advisor accuracy (1A§\@ref(ac-acc-dots) and 1B§\@ref(ac-acc-dates)) and agreement (2A§\@ref(ac-agr-dots) and 2B§\@ref(ac-agr-dates)), in these two experiments these factors were set in opposition. 
+The results were clear when feedback was provided (in the Dates task), indicating that people are capable of attending to challenging but useful information provided they have a chance to learn that the information is actually useful.
+In contrast, when people are not given objective feedback against which to evaluate the advice they receive, there does not seem to be a systematic response: some people seek agreement while others seek alternate perspectives, and the extent to which each strategy is pursued to the exclusion of the other is also highly variable. 
 It is an open question whether a person's strategy choice in the absence of useful cues as to the utility of the information they receive is due to random selection or related in a meaningful way to their personality or cognitive style.
 
-The results of the source selection behaviour in this experiment conceptually replicate the advisor influence results in the previous study (§\@ref(chapter-advice-taking)). 
-While this study was not set up to examine influence rigorously, the influence results in this study are nonetheless compatible with the influence results in that previous study.
+The distributions of preferences were compatible with but slightly different to those seen in the previous experiments. 
+In neither Experiment 1A§\@ref(ac-acc-dots) nor 2A§\@ref(ac-agr-dots) did we see a null effect of choice, so it is not clear whether that would look like random picking or, as it does here, a similar range of preference directions and strengths to those seen in the Dates task.
+The Dots task distribution seen here might be expected, given no systematic preferences, to cluster around the middle, representing the drives for fairness, novelty, etc. as discussed in previous chapters.
+The Dates task distribution is more in keeping with previous experiments: the expected range of preference directions and strengths is there in the absence of a systematic preference.
+In the Feedback condition where systematic differences are seen, we still see the entire range of preference directions and strengths, as we did before, although the clustering towards the High accuracy advisor is much more pronounced than in previous experiments. 
+This clustering of the distribution suggests that the manipulation worked more effectively in this experiment, perhaps because of the use of the continuous Dates task: participants may have experienced the visual depiction of a distance between their estimate and the advice as a stronger signal than binary agreement or disagreement.
 
-\mccorrect{Offbrand advice from agreeing advisor was more surprising than offbrand advice from accurate advisor. Influence analysis has to be tentative.}
+The results of the source selection behaviour in this experiment conceptually replicate the advisor influence results in the previous study (§\@ref(chapter-advice-taking)), and the influence results in the Dates task similarly replicate those findings. 
+While this study was not set up to examine influence rigorously, the inclusion of trials where the advisors offered equivalent advice allowed us to explore advisor influence without the confound of the advice itself. 
+We found, in two preregistered studies, that participants in the Feedback condition discriminated between their advisors, being more influenced by the accurate rather than agreeing advice. 
+Contrary to our hypothesis, however, we found that participants in the No feedback condition either did not discriminate (original) or did not provide evidence of discrimination (replication). 
 
-\mccorrect{During the Familiarization phase, participants are learning about the advisors, so this design is not optimal for studying influence. 
-Nevertheless, participants in the Feedback condition appear to have learned rapidly that the advice of the High accuracy advisor is worth following, and the advice of the High agreement advisor is not informative. 
-There is a slight suggestion from the individual participant data that many of the participants in the No feedback condition may have been creeping towards this conclusion, but the statistics are uninformative on the question.}
+The similarity of these results to those of the previous study is encouraging, although once again the methodology does not entirely equate the advice between the advisors.
+Although advice on the off-brand trials is constructed using the same rules for each advisor, off-brand advice from the High agreement advisor will be much more surprising than off-brand advice from the High accuracy advisor, because participants will usually have experienced the High accuracy advisor offering advice that deviates dramatically from their initial estimates whereas they will not have experienced this from the High agreement advisor.
+Assuming that participants in the No feedback condition have no better insight into the correct answer than they offer with their estimate, advice from the High agreement advisor may be discounted simply because it deviates more from the perceived correct answer than usual.
+Participants in the No feedback condition may also feel reassured by the High agreement advisor that they are good at the task, and thus reduce their reliance on advice.
+It is possible, in sum, for participants in the No feedback condition to suffer suppression of influence on off-brand trials specifically for the High agreement advisor, which would lead to genuine influence effects being difficult to detect.
 
-\mccorrect{NICK: Scope to expand here: Isn't it interesting potentially that agreement doesn't have an effect here, given that you showed that it did in previous experiments?
-It might be taken to indicate that participants were sensitive to the objective accuracy of the advice as well here (even with feedback absent) -- which Niccolo's experiments suggest they are.}
+Another consideration is that the off-brand advice trials that the influence analysis is based on occur during the Familiarization phase when participants are learning about the advisors. 
+Participants in the Feedback condition appear to have learned rapidly that the advice of the High accuracy advisor is worth following, and the advice of the High agreement advisor is not informative. 
+There is a slight suggestion from the individual participant data that many of the participants in the No feedback condition may have been creeping towards this conclusion, but the statistics are uninformative on the question.
+It is highly plausible that learning with feedback is far more rapid than learning without feedback, especially in noisy and heterogeneous tasks.
+
+Whereas the previous experiments demonstrated that participants denied feedback would prefer to pick the High agreement advisor, that did not happen in this experiment.
+Together with the above, this might indicate that even without feedback participants were sensitive to the accuracy of advice over and above agreement. 
+The @pescetelliRoleDecisionConfidence2021 theory of metacognitive advice evaluation supports this because confidence is used to assess advice plausibility. 
+Where people receive agreeing advice on questions that they feel confident about, they will consider the advice as highly likely to be accurate, whereas when they themselves are very unsure of the answer they will not learn very much about the advisor from the advice whether it agrees or not.
+
+It is this confidence-based assessment of advice that we attempted to test in the next experiments using advisors whose advice was generated depending on the participant's confidence in their initial estimate.
