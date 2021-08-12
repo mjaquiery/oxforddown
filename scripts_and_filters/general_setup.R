@@ -203,6 +203,7 @@ marginalMeans <- function(
   wid = "pid",
   interaction = "Difference"
 ) {
+  fx <- function(x) str_to_title(x) %>% str_replace_all(" ", "")
   tmp <- rename(
     data,
     pid = {{wid}},
@@ -216,7 +217,7 @@ marginalMeans <- function(
       summarise(dv = mean(dv), .groups = "drop") %>%
       group_by(across(all_of(v))) %>%
       summarise(
-        s = md.mean(dv, label = glue("M~{.data[[v]]}~")),
+        s = md.mean(dv, label = glue("M~{fx(.data[[v]])}~")),
         .groups = "drop"
       ) %>%
       unique()
@@ -233,7 +234,10 @@ marginalMeans <- function(
     mutate(dv = .[[3]] - .[[4]]) %>%
     group_by(across(all_of(vars[2]))) %>%
     summarise(
-      s = md.mean(dv, label = glue("M~{interaction}|{.data[[vars[2]]]}~")),
+      s = md.mean(
+        dv, 
+        label = glue("M~{fx(interaction)}|{fx(.data[[vars[2]]])}~")
+      ),
       .groups = "drop"
     ) %>%
     unique()
@@ -259,8 +263,8 @@ summariseANOVA <- function(ANOVA, mMeans) {
       aov = map_chr(
         d, 
         ~ glue(
-          "F({.$DFn},{.$DFd})={num2str(.$F, 2)}, ", 
-          "p={prop2str(.$p, minPrefix = '<')}"
+          "F({.$DFn},{.$DFd}) = {num2str(.$F, 2)}, ", 
+          "p = {prop2str(.$p, minPrefix = '<')}"
         )
       )
     ) %>%

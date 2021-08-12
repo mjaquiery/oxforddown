@@ -79,7 +79,7 @@ In this chapter, we partially replicate the findings of @pescetelliRoleDecisionC
 ### Overview of Experiments
 
 We conducted a series of experiments to explore whether the advice-taking behaviour observed previously [@pescetelliRoleDecisionConfidence2021] would translate into preferential source selection behaviour.
-In these experiments participants were familiarised with different pairs of advisors, and then given the opportunity to select which advisor they would like to get advice from (General Method§\@ref(general-method)).
+In these experiments participants were familiarised with different pairs of advisors, and then given the opportunity to select which advisor they would like to get advice from (General Method§\@ref(gm)).
 
 Each experiment was repeated using two different tasks: a perceptual decision-making "Dots task", extended from @pescetelliRoleDecisionConfidence2021; and a historical date estimation "Dates task" newly built for this project.
 To reduce expenditure, all participants in the Dots task experiments received no feedback on their answers while learning about advisors, because contrasting the presence and absence of feedback was done by @pescetelliRoleDecisionConfidence2021.

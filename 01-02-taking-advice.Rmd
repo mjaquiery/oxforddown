@@ -98,7 +98,7 @@ Data, analysis script, and analysis for the pilot study are also available at \m
 
 #### Method {#ai-ava-m}
 
-This study used the continuous version of the Dates Task ([§Estimation (Dates Task) - Continuous](#m-p-dates-c)).
+This study used the continuous version of the Dates task§\@ref(m-p-dates-c).
 
 #### Results {#ai-ava-r}
 

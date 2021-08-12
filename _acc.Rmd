@@ -2,7 +2,7 @@
 ## Effects of Advice Accuracy on Advisor Selection {#ac-acc}
 
 @pescetelliRoleDecisionConfidence2021 demonstrated that more accurate advisors are more trusted and more influential (regardless of the presence of feedback) in a lab-based perceptual decision-making task.
-We attempted to extend this finding to the domain of advisor selection in two online tasks: a 'Dots Task' requiring similar perceptual decision-making, and an estimation-based 'Dates Task'.
+We attempted to extend this finding to the domain of advisor selection in two online tasks: a 'Dots task' requiring similar perceptual decision-making, and an estimation-based 'Dates task'.
 We predicted that participants would choose a more accurate advisor over a less accurate one, and would do so even in the absence of objective feedback (based on the hypothesis that they can infer accuracy from differing agreement rates).
 
 The ability to distinguish between accurate advisors in these experiments is important because discrimination based on accuracy is crucial to the phenomenon we are attempting to explain: rational advice-seeking behaviour in the absence of feedback.
@@ -172,7 +172,7 @@ familiarization <- trials %>%
   order_factors()
 ```
 
-In line with the preregistration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, do not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), have fewer than `r minTrialsPerCategory` trials in each confidence category, or have completed the experiment after the preregistered amount of data has already been collected. 
+In line with the preregistration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or had completed the experiment after the preregistered amount of data has already been collected. 
 Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-acc-dots-exclusions).
 
 ##### Task performance
@@ -1017,7 +1017,7 @@ tmp <- bind_rows(
 
 ```
 
-`r length(unique(AdvisedTrial$pid))` participants each completed `r round(sum(tmp$n))` trials over `r max(tmp$block)` blocks of the binary version of the Dates Task (§\@ref(m-p-dates-b)).
+`r length(unique(AdvisedTrial$pid))` participants each completed `r round(sum(tmp$n))` trials over `r max(tmp$block)` blocks of the binary version of the Dates task§\@ref(m-p-dates-b).
 On each trial, participants were presented with an historical event that occurred on a specific year between 1900 and 2000.
 They were given a date and asked whether the event occurred before or after that date, indicating their confidence in their decision by selecting an appropriate point on the relevant answer bar.
 Participants then received advice indicating which of the two bars (before or after) was supposedly the correct answer.
@@ -1851,8 +1851,8 @@ s <- summariseANOVA(inf_aov$ANOVA, mm_inf)
 
 ```
 
-The High accuracy advisor was substantially more influential than the other Low accuracy advisor (`r inf_aov$s[2]`).
-This tendency did not differ significantly between the groups (`r inf_aov$s[3]`), and nor did the participants in the feedback and no feedback conditions appear to differ in the extent to which they took advice (`r inf_aov$s[1]`).
+The High accuracy advisor was substantially more influential than the other Low accuracy advisor (`r s$s[2]`).
+This tendency did not differ significantly between the groups (`r s$s[3]`), and nor did the participants in the feedback and no feedback conditions appear to differ in the extent to which they took advice (`r s$s[1]`).
 
 These influence measurements are calculated on the Familiarization phase trials in which participants are not offered a choice of advisor.
 It is during this phase that participants are learning about the value of the advice (especially in the Feedback condition), and thus any influence on later trials may be diluted by low influence on trials which occur before an advisor has had time to develop a reputation as reliable.
@@ -2050,7 +2050,10 @@ kableLM(
 ```
 
 ```{r ac-acc-dates-r-cors-agr}
-kableLM(
+kableLM(,
+  escape = F
+,
+  escape = F
   lm_agr,
   caption = "\\label{tab:ac-acc-dates-r-cors-agr-t}Experienced agreement difference effects in the Dates task with in/accurate advisors"
 )
