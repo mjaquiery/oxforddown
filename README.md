@@ -107,7 +107,7 @@ See also the general, official resources [*R Markdown: The Definitive Guide*](ht
 
 ### Video tutorials
 
-I am in the process of updating the tutorial videos to v3 - I've marked below which ones are yet to be updated (they are still informative), and crossed out the ones that are now longer useful:
+I am in the process of updating the tutorial videos to v3 - I've noted below which have yet to be updated, but are still informative, and struck out those that no longer apply:
 
 - [Part 1: Building the entire thesis](https://youtu.be/LBHxcuCMjnk)
 - [Part 2: Building a single chapter](https://youtu.be/8vcO252Us6g)
@@ -203,6 +203,8 @@ bibliography: references.bib
 ```
 
 The file **templates/brief_template.tex** formats the chapter in the OxThesis style but without including the front matter (table of contents, abstract, etc).
+
+**NOTE:** The bibliography path in your individual chapters' YAML headers needs to be identical to the one in **index.Rmd** - otherwise your individual chapters' bibliography path may override the path in **index.Rmd** and cause trouble when you knit the entire thesis.
 
 ## Customisations and extensions
 
