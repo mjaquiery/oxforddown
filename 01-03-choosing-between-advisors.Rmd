@@ -31,14 +31,6 @@ library(ez)
 # Psychology of source selection {#chapter-advisor-choice}
 \adjustmtc 
 
-\mccorrect{NICK: You're presenting in-line stats in some cases and in others only showing them on a figure. In-line stats are fine to me (and, as I mentioned earlier when we met, your examiners might be picky about requiring this). Anyway, be consistent about your formatting/presentation of stats.}
-
-<!-- 
-My research on advisor selection.
--->
-
-## Introduction
-
 Advice is relied upon to a different extent depending upon a variety of markers for its trustworthiness, including its plausibility and the reputation of its source.
 The question at the core of this chapter is whether people preferentially seek out advice from advisors they believe to be more trustworthy.
 At first glance, it may seem a foregone conclusion that people will seek out advice from more trustworthy advisors: who after all wants to be advised by fools or liars?

@@ -2050,10 +2050,7 @@ kableLM(
 ```
 
 ```{r ac-acc-dates-r-cors-agr}
-kableLM(,
-  escape = F
-,
-  escape = F
+kableLM(
   lm_agr,
   caption = "\\label{tab:ac-acc-dates-r-cors-agr-t}Experienced agreement difference effects in the Dates task with in/accurate advisors"
 )
