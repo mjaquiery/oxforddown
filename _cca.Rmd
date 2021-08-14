@@ -935,11 +935,12 @@ The advisors are balanced for their overall accuracy and agreement rates, but th
 The Anti-bias advisor agrees more frequently with participants when their initial estimate is correct and made with relatively low confidence (Table \@ref(tab:ac-cca-dots-profiles)).
 
 ```{r ac-cca-dots-profiles-r} 
+pCor <- .71
 
 cca.table <- tribble(
   ~ Advisor, ~ Low, ~ Medium, ~ High, ~ `Correct`, ~ `Incorrect`, ~ Overall, ~ Accuracy,
-  "Bias-sharing", 50, 70, 90, 70, 30, 70 * .71 + 30 * .29, 70 * .71 + 70 * .29,
-  "Anti-bias", 90, 70, 50, 70, 30, 70 * .71 + 30 * .29, 70 * .71 + 70 * .29
+  "Bias-sharing", 50, 70, 90, 70, 30, 70 * pCor + 30 * (1 - pCor), 70 * pCor + 70 * (1 - pCor),
+  "Anti-bias", 90, 70, 50, 70, 30, 70 * pCor + 30 * (1 - pCor), 70 * pCor + 70 * (1 - pCor)
 ) %>%
   rename_with(~ paste0(., footnote_marker_alphabet(2)), .cols = c(Low, High)) %>% 
   rename_with(~ paste0(., footnote_marker_alphabet(3)), .cols = Medium) %>%

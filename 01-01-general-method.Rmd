@@ -102,6 +102,9 @@ knitr::include_graphics("figures/methods/dots-structure.jpg")
 
 Stimuli in the Dots Task consisted of two boxes arranged to the left and right of a fixation cross (Figure \@ref(fig:m-dots)).
 These boxes were briefly (300ms) and simultaneously filled with an array of non-overlapping dots, and the participant was instructed to identify the box with the most dots.
+The participant submitted their response by selecting a point on a horizontal bar: points to the left of the midpoint indicated the participant thought the lefthand box had more dots, and points to the right that they thought the righthand box had more dots. 
+The further away from the midpoint the participant selected on the bar, the more confidence they indicated in their response.
+
 The number of dots was exactly determined by the difficulty of the trial: the box with the \mccorrect{!TODO[check this description]} least dots had 200 - the difficulty, while the box with the most had 200 + the difficulty.
 The dots did not move during the presentation of the stimulus.
 There was thus an objectively correct answer to the question which, given enough time, could be precisely determined from the stimulus.
@@ -116,6 +119,14 @@ Stimuli were continually adjusted throughout the experiment to maintain an initi
 There were a substantial number of trials in the practice block so that participants could eliminate practice effects and thus experience a more stable objective difficulty during the core trial blocks.
 The specific number of practice trials differed between experiments as we sought to balance minimising the participant time requirement with minimising practice effects.
 
+After the practice there were blocks where participants received advice on their initial estimates and made a final decision using the same response process as their initial estimate.
+Advice was presented with a representation of an advisor with a text bubble stretching out to the side the advisor endorsed, containing the text "I think it was on the RIGHT" or LEFT as appropriate.
+The advisors were represented in various manners in various versions of the task, but predominantly in a format with a central box containing a generic blank portrait icon and text at the bottom with "Advisor ##" where ## was a number between 10 and 99.
+
+On some trials participants could choose between potential advisors.
+In these cases, the potential advisors were positioned vertically in the centre of the screen and the participant clicked on the advisor from whom they wished to receive advice.
+There was never a time limit for selecting an advisor.
+
 Throughout the experiment a progress bar provided a graphical indication of the number of trials remaining in the experiment.
 After each block participants were told what percentage of the final decisions they had provided were correct and allowed to take a short, self-paced break.
 
@@ -123,7 +134,7 @@ At the end of the experiment participants were presented with a questionnaire as
 These questionnaire responses are not analysed because they were generally uninformative.
 Some free text responses may be redacted in the open data to prevent participants being identifiable.
 
-##### Specific limitations
+##### Specific limitations of the Dots task
 
 The Dots task uses a perceptual decision with a high number of trials.
 This structure makes it plausible that participants respond to the advice primarily through simple reinforcement learning rather than through specific social processes thought to be at work in advice-taking and advisor evaluation.
@@ -196,6 +207,7 @@ Advisors in these experiments typically placed their advice markers by identifyi
 On occasion, advisors would offer 'off-brand' advice, designed to neither be close to the participant's initial estimate nor the correct year. 
 
 When a choice of advisors was offered, the two advisors were shown next to one another vertically on the lefthand side of the screen, and the participant clicked on the advisor from whom they wished to receive advice.
+There was never a time limit for making this choice.
 
 On trials that contained feedback, the correct year was identified by the placement of a gold star placed over the timeline with a line pointing to the correct point on the timeline. 
 The correct year was also displayed in text. 
@@ -233,6 +245,7 @@ They then determined their answer and their confidence by comparing their belief
 This method is a somewhat rationalist version of how participants themselves may generate confidence judgements in this task.
 
 When a choice of advisors was offered, advisor avatars were placed vertically in the centre of the screen, between the two bars, and participants clicked on the avatar of the advisor from whom they wished to hear advice.
+There was never a time limit for this choice.
 
 Attention check trials in the binary Dates task prompted the participant to enter a specific response with a specific confidence. 
 For example, the prompt that usually contained an event might instruct the participant to "enter 'Before' with high confidence".
@@ -258,17 +271,26 @@ Questions where respondents' answers were particularly accurate or inaccurate we
 
 \mccorrect{QUESTION: I'm pretty sure I can put my hands on the experimental code, screenshots of the estimation task, and the brief write-ups or analysis of the responses. Likely I have the raw data for the responses, too. Is it worth including that stuff, either here in brief or in an Appendix?}
 
-##### Specific limitations
+##### Specific limitations of the Dates task
 
-\mccorrect{!TODO[Some discussion of limitations of this method: no control over participant error rates, difficult task, inconsistent presentation for an individual (e.g. solid knowledge of an obscure date)]}
+There are several specific limitations of the Dates task.
+Firstly, and most importantly, we were unable to control participants' accuracy in the way we were able to control their accuracy in the Dots task.
+The advisor advice profiles' advice was determined through varying the probability of agreement contingent on the accuracy of the participant's initial estimate.
+Being unable to fix the overall accuracy of participants' initial estimates meant that the overall accuracy and agreement rates of the advisor advice profiles could differ quite substantially across participants and also between advisors for the same participant.
+
+The inability to control overall accuracy rates is in part a consequence of the second limitation: the difficulty of any given question was idiosyncratic. 
+The questions concerned dates of real historical events, and some of these may have had particular relevance to individual participants, or were perhaps encountered by those participants recently or memorably, allowing precise, accurate, and high-confidence responses to what would be for the average participant very difficult questions.
+The average performance of all participants on any given question is not necessarily a good guide to the individual experience of any given participant.
+
+Lastly, participants found the task difficult overall. 
+People tend to be more willing to take advice concerning difficult tasks [@ginoEffectsTaskDifficulty2007], perhaps as a way of diluting responsibility for the decision [@harveyTakingAdviceAccepting1997].
+This meant that there was potential for some ceiling effects whereby advisors were not differentiated because all advisors were seen as useful, even if this was because of their potential for sharing blame rather than the informational content of their advice.
 
 #### General limitations
 
 There are several limitations common to both task designs.
 The most obvious limitation is that the advisors are not organically-interacting humans.
-There are other ecological validity limitations in the presentation of advice, the structure of the experiment, and the absence of other cues.
-
-\mccorrect{!TODO[Other limitations that aren't wider ecological validity ones?]}
+There are other ecological validity limitations in the presentation of advice, the structure of the experiment, the absence of other cues, and the types of tasks used.
 
 The use of artificial advisors means that advice can be carefully specified, and the experiments can be run easily, cheaply, and quickly.
 Transparently artificial advisors may, however, limit the generalisability of the experimental results in two ways.
@@ -285,42 +307,13 @@ The task presents a series of trials sequentially, with a rapid procession throu
 This structure is intended to condense a real-world relationship with an advisor, built up over repeated interactions over time, into as narrow a time window as possible. 
 It is likely that this temporal compression does not fundamentally alter the processes of advisor evaluation and trust formation, but we have little positive evidence to support this supposition.
 
-The final major difference between real-life advice and the advice offered in these experiments is in the richness of the relationship between advisor and judge.
+Another major difference between real-life advice and the advice offered in these experiments is in the richness of the relationship between advisor and judge.
 In a real-life relationship there would be numerous other factors at play which may alter or overwhelm any advice-taking and advisor evaluation processes revealed by these experiments. 
 How well a person gets along with another could matter beyond simply increasing the perceived benevolence of the other, for example.
 
-### Advisor advice profiles {#m-profiles}
-
-\mccorrect{!TODO[Adjust this to talk more precisely about what agreement means in different contexts, and be a more general introduction to the idea of agreement, accuracy, and their relationship.]}
-
-The advisers are virtual agents whose probability of agreeing with the participant’s decision varies as a function of the participant’s confidence and correctness in the initial decision phase.
-Table \@ref(tab:m-advisor-profiles) illustrates how this relationship functions, and shows that the overall correctness and agreement rates of the advisers is equivalent overall.
-Importantly, on largest minority of trials, the middle 40%, the advisers are exactly equivalent, meaning these trials can be compared directly without confounds arising from agreement rate and initial confidence.
-
-```{r m-advisor-profiles-r} 
-library(tidyverse)
-library(kableExtra)
-tmp <- tribble(
-  ~` `, ~`  `, ~`Bias Sharing`, ~`Anti Bias`,
-  "Participant correct", "High (top 30%)", 80, 60,
-  "Participant correct", "Medium (middle 40%)", 70, 70,
-  "Participant correct", "Low (bottom 30%)", 60, 80,
-  "Participant incorrect", "Any", 30, 30,
-  "Total agreement", "Participant correct", 70, 70,
-  "Total agreement", "Participant incorrect", 30, 30
-)
-
-kable(tmp, caption = "\\label{tab:m-advisor-profiles}Confidence contingent agreement advisor advice profiles") %>%
-  kable_styling() %>%
-  column_spec(1, bold = T) %>%
-  row_spec(0, bold = F) %>%
-  collapse_rows(columns = 1, valign = "top") %>%
-  add_header_above(c(" ", 
-                     "Initial decision confidence", 
-                     "Probability of agreement (%)" = 2))
-
-```
-
+Lastly, both the Dots task and the Dates task had an objectively correct answer on every question.
+A substantial portion of everyday real-world advice-seeking behaviour concerns questions on which there is no readily-determinable objectively correct answer, such as where might be a good holiday destination, or whether one should pursue postgraduate education.
+These more subjective questions have received some attention by @vanswolForecastingAnotherEnjoyment2011, but are seldom studied in the advice-taking cognitive psychology literature.
 
 ### Analysis {#m-analysis}
 
@@ -336,7 +329,7 @@ Pick rate is the proportion of choice trials in which a specified advisor was ch
 
 A participant's pick rate is an aggregate over a number of trials, and expresses the observed probability of picking the specified advisor.
 The mentally represented preference for that advisor is not measured directly (if such a thing even exists), and cannot be determined from the observed pick rate without knowing the mapping function for each individual participant.
-Mapping functions (such as softmax \mccorrect{!TODO[cite something on this]}) produce stochastic choice behaviour from a preference marked on a continuous scale, and are typically sigmoid.
+Mapping functions (such as the logistic sigmoid function) produce stochastic choice behaviour from a preference marked on a continuous scale.
 The relationship between preference and pick rate is non-linear and idiosyncratic, but it is likely monotonic for all participants: the stronger the preference the higher the pick rate.
 Despite this monotonic relationship, it is important not to infer that one participant's preference for an advisor is stronger than another's on the basis of the former picking that advisor more frequently: it may be instead that, for the former participant, smaller differences in preference lead to more consistent picking behaviour.
 
@@ -389,17 +382,25 @@ knitr::include_graphics("figures/experiment_01_MATLAB/capping.jpg")
 The capped influence measure $I_\text{capped}$ is obtained by:
 
 \begin{align}
-I_\text{capped} = f(C_1) 
-\begin{cases}
-  \text{min}(I, 2C_1 - S_\text{max}) & C_1 > 0 \\
-  \text{max}(I, 2C_1 + S_\text{max}) & C_1 < 0
-\end{cases}
+I_\text{capped} = \text{min}(I, |S_\text{max} - C_1|)
 (\#eq:ex1-influence-capping)
 \end{align}
 
-\mccorrect{!TODO[Check this equation and explain its terms]}
+Where $C_1$ and $C_2$ are the initial estimate and final decision, respectively, $I$ stands for influence, and $S_\text{max}$ indicates the maximum value of the scale.
+Thus, to follow the example in Figure \@ref(fig:m-capping), the initial estimate was 42, and if disagreeing advice led to a final decision of 2 the raw influence measure would be 40.
+This would then be compared to the absolute value of the scale width minus the initial estimate (55 - 42 = 13) and the minimum of the two would be the capped influence value, in this case 13.
 
-#### Statistics
+There are benefits to and limitations of this approach.
+A benefit is that it places agreement and disagreement on the same potential scale.
+A limitation is that the truncation happens most extremely where initial estimates are made with very high confidence (because there is almost no increase that could have happened following agreement, so the cap is very low on the influence of disagreeing advice).
+Conceptually, these changes where a participant adjusts a view previously held with near certainty may in fact be the most interesting of all.
+
+An alternative approach to capping, not used here, is to scale the observed adjustment by the potential space for adjustment. 
+This approach often has the effect of overinflating influence of agreement, and can make very subtle differences in the use of the top end of the scale highly important.
+If, for example, a participant using a 50-point rating scale selected 48 for their initial estimate and received agreeing advice, a final decision of 49 would constitute an influence rating of 50% and a final decision of 50 an influence rating of 100%. 
+It is not at all clear that participants differentiate the positions on the scales with this decree of precision, and so we considered this approach to capping influence inappropriate.
+
+#### Inferential statistics
 
 Statistical analyses are conducted using a both Frequentist and Bayesian statistics.
 
@@ -560,9 +561,10 @@ Sharing data directly allows other scientists to check and extend the data analy
 This increases the robustness of the results, and increases the efficiency of science as a whole.
 The links accompanying the open data badge point to online storage where the data can be obtained for a study, along with appropriate metadata.
 
-\mccorrect{!TODO[Explain something about unanalysed data etc. because we're cutting out the unanalyzed stuff from the main chapters.]}
-
 ### Thesis workflow
 
-This thesis is written in RMarkdown, with the data fetched and analysed at the time the document is produced using the publically available pipeline - the entire document can be reproduced locally using the source code in an appropriate environment.
+This thesis is written in RMarkdown, with the data fetched and analysed at the time the document is produced using the publicly available pipeline - the entire document can be reproduced locally using the source code in an appropriate environment.
+Some parts of the thesis use computational modelling or model fitting. 
+These parts use cached datasets, also available online, in order to reduce the time required to create the thesis from its source files from hours to minutes using a high-end desktop personal computer.
+The caching behaviour can be prevented for those wishing to evaluate the validity of the modelling components by setting the value of the R option `ESM.recalculate` to higher values (documented in the `index.Rmd` file).
 A Docker environment copying the environment used to produce this document is available at \mccorrect{!TODO[the containerisation thing]}
