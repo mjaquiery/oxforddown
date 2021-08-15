@@ -35,6 +35,7 @@ The [first scenario](#models-scenario-1) is one in which agents occasionally giv
 In the [second scenario](#models-scenario-2), advice is simply noisier than the judge’s own initial estimate, either because the judge is less competent at the task, less willing to exert the required effort for the task, or because the advice is communicated imperfectly.
 In the [third scenario](#models-scenario-3), agents belong to either a ‘cautious’ or a ‘confident’ group in how they express and interpret advice, which is a simple analogue of the observation that people’s expressions of confidence are idiosyncratic [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017].
 In each of these three scenarios, it is hypothesised that some level of egocentric discounting will emerge as the dominant strategy, i.e., the mean population weighting for initial estimates versus advice will be greater than .50.
+
 ## General method
 
 Agent-based computational models of an evolutionary process were programmed in R [@rcoreteamLanguageEnvironmentStatistical2018] and run variously on a home computer and the Oxford Advanced Research Computing cluster [@richardsUniversityOxfordAdvanced2015].
@@ -81,15 +82,19 @@ The final decisions in [Scenario 3](#models-scenario-3) are more complex, but fo
 
 Roulette wheel selection is used to bias reproduction in favour of agents performing best on the decisions.
 Performance is determined by a fitness function which differs slightly between categorical and continuous decisions.
-For scenarios [1](#models-scenario-1) and [2](#models-scenario-2), which use continuous decisions, this fitness is obtained by subtracting the absolute difference between the final decision and the true value for each decision:
+For scenarios [1](#models-scenario-1) and [2](#models-scenario-2), which use continuous decisions, this fitness is obtained by subtracting the absolute difference between the final decision and the true value for each decision (mean absolute deviance):
 
 \begin{align}
 u^i = - \sum^{30}_{t=1} |v_t - d_t^i|
 (\#eq:models-fitness-continous)
 \end{align}
 
+[Scenario 3](#models-scenario-3) uses categorical decisions. 
+These are processed using a fitness function that \mccorrect{TODO: Categorical fitness function description}
+
 The selection algorithm proceeds as follows: The worst performance is subtracted from each agent’s fitness and 1 added to put fitness scores in a positive range.
 These scores are then continually multiplied by 10 until the lowest score is at least 10 to improve resolution.
+\mccorrect{QUESTION: Wouldn't the lowest score be 1 so the multiplication by 10 would only need to happen once?}
 Each agent is then given a probability to reproduce equal to their share of the sum of all fitness scores:
 
 \begin{align}
@@ -129,7 +134,7 @@ Egocentric discounting may be a viable strategy, even if there is no difference 
 
 ## Scenario 2: noisy advice {#models-scenario-2}
 
-In this scenario, agents offer advice which is of slightly lower quality on average than their own intial decisions.
+In this scenario, agents offer advice which is of slightly lower quality on average than their own initial decisions.
 This could reflect a difference in effort or in expertise.
 
 ### Method
@@ -182,7 +187,7 @@ v_t = N(50,1)
 
 This allowed categorical answers which identified whether or not $v_t$ was greater than 50.
 Agents were equiprobably assigned a personal confidence factor ($c$) of 1 or 10.
-This was used to scale the difference between the advising agent's intial estimate and the category boundary to produce the advice:
+This was used to scale the difference between the advising agent's initial estimate and the category boundary to produce the advice:
 
 \begin{align}
 a^i_t = (e^j_t - 50\cdot c^j) + 50
@@ -221,5 +226,5 @@ More generally, the results indicate that properties of the advice-giving milieu
 
 These models establish that it is plausible that people have deeply ingrained hyperpriors towards discounting advice.
 It is also possible, however, that people can flexibly respond to contexts, modulating their advice-taking appropriately.
-The voluminous experiments in advice taking discussed in the [introduction to this section](#context-of-advice) \mccorrect{!TODO[that discussion?]} can be seen as eliciting exactly this behaviour.
+The voluminous experiments in advice taking discussed in the [introduction to this section](#context-of-advice) can be seen as eliciting exactly this behaviour.
 In the next chapter I present new behavioural experiments which suggest that people do indeed modulate their advice-taking to the specifics of the context in which they are in.

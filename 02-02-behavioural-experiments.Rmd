@@ -25,9 +25,7 @@ Present behavioural experiments in which we show sensitivity to both the advisor
 The evolutionary models discussed [in the last chapter](#chapter-advice-taking-context) demonstrated that optimal advice-taking strategies depend in part upon the advice one receives being a genuine effort to help.
 Difference in benevolence, or the extent to which the interests of the advisor and the judge overlap, have been shown to affect levels of advice-taking.
 \mccorrect{!TODO[CITE]} showed that, where advisors were paid contingent upon the quality of the final decision, advice-taking was higher than where advisors were paid a flat fee for providing advice.
-\mccorrect{!TODO[lit review stuff - inc.
-Behrens/Hunt?
-social decision making]}
+\mccorrect{!TODO[lit review stuff - inc. Behrens/Hunt? social decision making]}
 
 Advice-taking can be contingent on the properties of the advice, or on the properties of the advisor.
 In order to maximise the value of advice while minimising the potential exposure to exploitation, advice-taking should be contingent on a combination of these factors.
@@ -39,7 +37,7 @@ Results indicated that participants' advice-taking depended upon both the plausi
 
 #### Procedure
 
-The procedure for these experiments follows the dates estimation task, described [previously](\mccorrect{!TODO[link properly]}).
+The procedure for these experiments follows the Dates task, described [previously](\mccorrect{!TODO[link properly]}).
 Additionally, in this version, participants had to provide an assessment of the honesty of each advisory estimate they received before they could integrate it into their final decision.
 
 ```{r be-performance, fig.align='center', fig.caption="Advice honesty rating.  Participants rated advice on a three-point scale according to whether they thought the advice was deceptive or honest.", out.width="80%", echo=F}
