@@ -1,0 +1,164 @@
+---
+output:
+  bookdown::pdf_document2:
+    template: templates/brief_template.tex
+    keep_tex: false
+  bookdown::word_document2: default
+  bookdown::html_document2: default
+documentclass: book
+editor_options: 
+  chunk_output_type: inline
+  
+bibliography: 
+  - bibliography/references.bib
+bibliography-heading-in-pdf: Works Cited
+params:
+  corrections: true 
+---
+
+```{r setup 01-03, echo = F, include = F}
+```
+
+# Psychology of source selection {#chapter-advisor-choice}
+\adjustmtc 
+
+Advice is relied upon to a different extent depending upon a variety of markers for its trustworthiness, including its plausibility and the reputation of its source.
+The question at the core of this chapter is whether people preferentially seek out advice from advisors they believe to be more trustworthy.
+At first glance, it may seem a foregone conclusion that people will seek out advice from more trustworthy advisors: who after all wants to be advised by fools or liars?
+Nevertheless, empirical evidence for this kind of source selection behaviour has been somewhat mixed.
+The evidence that people do tend to seek out information from sources likely to agree with them is moderate ['selective exposure', @hartFeelingValidatedBeing2009]. 
+The evidence that people avoid information likely to disagree is poor ['selective avoidance', @jangChallengesSelectiveExposure2014a; @weeksPartisanEnclavesShared2016], with evidence becoming less persuasive as tasks become more ecologically valid [@searsSelectiveExposureInformation1967; @nelsonMythPartisanSelective2017]. 
+
+There are also intuitive arguments for a range of potential findings.
+It would make sense that people seek out information they are more likely to use, because all information acquisition comes with some kind of cost, even if only attentional and opportunity costs, and rational actors should maximise their benefit-cost trade-off.
+It may make sense for people to seek out information they are likely to agree with, regardless of usefulness, because they may be exercising critical vigilance over their own side in a debate, ensuring that bad arguments are not used to support their ideological position.
+It would also make sense, however, for people to seek out information from sources they disagree with: perhaps those we disagree with have access to evidence or reasons we had not considered; or perhaps learning about others' views will allow us to better counter them and convert their adherents [@freedmanConfidenceUtilitySelective1965].
+People may even prefer a balanced or random diet of information because they feel unable to judge relative quality, or because all the reasons above are pulling them in different directions. 
+
+The vast majority of the source selection literature uses surveys or browsing tasks with stimuli being realistic politically-charged media items.
+Measurements are either active interest ratings or passive activity monitoring [usually on links clicked or reading time, but eye tracking is a recent innovation: @marquartSelectiveExposureContext2016; @schmuckAvoidingOtherSide2020].
+The experiments here are more traditional cognitive psychology experiments: the complex contextual factors suspected of driving selectivity are removed [@festingerTheoryCognitiveDissonance1957; @knobloch-westerwickSelectiveExposureSelf2015] and only the informational motive remains.
+While it is not impossible that a preference for agreement which makes sense from a self-image preservation perspective bleeds into a context where accuracy is key, the experiments here at least provide a context where a correct answer exists.^[It is arguable that people may seek out politically-concordant information because they believe it to be more accurate rather than because they do not want their self-image to be challenged.]
+
+### Similar work
+
+The source selection literature is largely from the domains of social and personality, in which the constructs that produce the phenomena are attitudes and self-concepts. 
+This work is grounded in the cognitive psychology domain, and consequently uses a model of advisor evaluation (Advisor Evaluation without Feedback§\@ref(advisor-evaluation-without-feedback)) that posits measurable variables and mathematically-describable processes.
+This model is based on a similar model from @pescetelliRoleDecisionConfidence2021.
+It takes as a starting point the observation that, given objective feedback, people can use that feedback to learn about the trustworthiness of advisors [@yanivAdviceTakingDecision2000; @pescetelliRoleDecisionConfidence2021; @behrensAssociativeLearningSocial2008].
+The extent to which advice is taken (§\@ref(m-analysis-dv-woa)) is commonly used as a measure of a participant's trust in an advisor, on the argument that the participant seeks to maximise task performance and task performance is maximised by taking more advice from more trustworthy advisors.
+As expected, people make greater use of advice they believe will be more accurate compared to less accurate [@ginoAnxietyAdviceAbility2012; @rakoczyYoungChildrenHeed2015; @sniezekImprovingJudgementPrepaid2004; @sollStrategiesRevisingJudgment2009; @tostPowerCompetitivenessAdvice2012; @schultzeInabilityIgnoreUseless2017; @wangWhyDoesAdvice2018; @onkalEvaluatingExpertAdvice2017].
+
+When objective feedback is unavailable, it is still possible for people to demonstrate a greater dependence upon advice from more as opposed to less accurate advisors.
+This is a consequence of agreement: where the base probability of being correct is greater than chance, the independent estimates of people who are more accurate will agree more often (leading to 100% agreement on the correct answer for two independent decision-makers of perfect accuracy).
+In the absence of feedback, therefore, agreement can be used as a proxy for accuracy, as formalised in the model.
+
+@pescetelliRoleDecisionConfidence2021 demonstrated that advice is more influential from (equally accurate) advisors who tend to agree with a participant more frequently when objective feedback is not provided.
+This is despite the fact that advice is generally more influential when it disagrees with the participant's initial estimate.
+^[This is partly due to the nature of the judge-advisor system: there is always room for disagreement to be more extreme than agreement, because agreement is lower-bounded by the participant's initial estimate.] 
+Their data suggest that people may be using agreement as a proxy for accuracy, although they may also simply prefer agreement over disagreement when there is no accuracy cost to be paid.
+In this chapter, we partially replicate the findings of @pescetelliRoleDecisionConfidence2021, and explore the consequences of pitting accurate advisors against agreeing advisors.
+
+### Overview of Experiments
+
+We conducted a series of experiments to explore whether the advice-taking behaviour observed previously [@pescetelliRoleDecisionConfidence2021] would translate into preferential source selection behaviour.
+In these experiments participants were familiarised with different pairs of advisors, and then given the opportunity to select which advisor they would like to get advice from (General Method§\@ref(gm)).
+
+Each experiment was repeated using two different tasks: a perceptual decision-making "Dots task", extended from @pescetelliRoleDecisionConfidence2021; and a historical date estimation "Dates task" newly built for this project.
+To reduce expenditure, all participants in the Dots task experiments received no feedback on their answers while learning about advisors, because contrasting the presence and absence of feedback was done by @pescetelliRoleDecisionConfidence2021.
+In the Dates task, due to its novelty, participants were split into conditions based on whether or not they received feedback while learning about the advisors.
+
+The first of the advisor pairs was a high accuracy advisor and a low accuracy advisor (Experiment 1A§\@ref(ac-acc-dots) and Experiment 1B§\@ref(ac-acc-dates)). 
+We predicted that the high accuracy advisor would be selected more often, even where feedback was not available. 
+This experiment would demonstrate the minimum phenomenon of interest -- sensitivity to advisor accuracy in the absence of feedback translating into preferential advisor selection.
+
+The second advisor pair was a high agreement and a low agreement advisor (Experiment 2A§\@ref(ac-agr-dots) and Experiment 2B§\@ref(ac-agr-dates)). 
+We predicted that the high agreement advisor would be selected more frequently, because we expect agreement to be the method by which the accurate advisors were detected in the previous task.
+This experiment would constitute a test of the purported mechanism.
+
+The third advisor pair was a high agreement advisor and a high accuracy advisor (Experiment 3A§\@ref(ac-ava-dots) and Experiment 3B§\@ref(ac-ava-dates)).
+We predicted that the high agreement advisor would be selected more frequently than the high accuracy advisor, but only where feedback was withheld.
+Where feedback was provided, we expected the high accuracy advisor to be picked more often.
+This experiment would test whether the absence of feedback invites using agreement as a substitute for accuracy.
+
+The final advisor pair were confident contingent advisors like those used in @pescetelliRoleDecisionConfidence2021 (Experiment 4A§\@ref(ac-cca-dots) and the Lab Study§\@ref(ac-cca-lab)). 
+These advisors agree at the same rate and are similarly accurate, but one agrees more when the participant expresses high initial confidence and less when the participant expresses low initial confidence, and the other vice-versa. 
+We predicted that the former 'bias-sharing' advisor would be selected more often because participants would use their own sense of confidence to weight the value of agreement. 
+This experiment would explore whether metacognitive processes are able to finesse the basic agreement-for-accuracy substitution.
+
+
+<!-- Presentation of the experiments (may want different subsections for each experiment and an extra one for the general discussion).
+-->
+
+<!-- The results for each experiment are included in their own files because they're just too damn long for hackMD.io to handle -->
+```{r, child=c('_acc.Rmd', '_agr.Rmd',  '_ava.Rmd', '_cca.Rmd'), results='asis'}
+```
+
+## General discussion
+
+\mccorrect{!NICK[I guess this needs updating in light of the modelling work you've done now. General structure suggestion:
+Worth starting with a reminder of the original aims, because this is a long chapter! Previous work has looked at how advisor trust is learnt, with a particular interest in how trust is learnt when feedback is sparse/absent. Here we extended this to ask how these patterns of trust might affect advisor selection. Then give a brief integrative summary of the results: Experiments 1 and 2 showed such and such; Experiments 3 and 4 showed such and such. etc. 
+
+Next highlight key themes as they relate to your results specifically, and then to the modelling to come. Regarding the former, the themes seem to be: preference for accurate advice when this can be inferred from feedback, but not otherwise. Preference for agreeing advice when feedback is absent, but not when it's present. Relate back to previous literature -> mixed evidence on how people seek info. May depend on domain? (Cf. our conversation all those years ago with Jonathan Bright about different knowledge/info domains.) + the more detailed points you make below (e.g., about similarities and differences between the tasks)
+
+With regard to the modelling: preference for agreeing advice when feedback is absent, but also wide variation in this preference. When preferences are not strong at the population level, we see almost all selection behaviours from always choosing A to always choosing B.]}
+
+The patterns observed for advice taking are also evident in advisor selection.
+Modelling work \mccorrect{!TODO[lots of citations for this]} indicates that biased source selection can dramatically reshape communication networks and create echo chamber effects where accurate but unpalatable information is ignored.
+Empirical research on source selection behaviour has found relatively little indication that people behave this way in the real world \mccorrect{!TODO[source selection experiments citations]}, but here we are at least able to demonstrate in principle a psychological mechanism which could drive biased source selection.
+Furthermore, the mechanisms which produce biased source selection are rational and appropriate given the information available to participants.
+
+\mccorrect{!TODO[Note that most selective exposure stuff is grounded in cognitive dissonance @festingerTheoryCognitiveDissonance1957 or SESAM @knobloch-westerwickSelectiveExposureSelf2015 models and we're more concerned with an accuracy task and cognitive models.]}
+
+### Advisor choice results
+
+The preferences for advisors were broadly consistent with the pattern expected from previous work on advisor influence.
+Where objective feedback could be used to calculate advisor performance, participants showed a systematic preference for picking the advisor who would provide the most accurate advice.
+Where objective feedback was unavailable, participants only showed a clear preference for High agreement advisors over Low agreement advisors (although in the Dates task there was also a preference for High accuracy over Low accuracy advisors).
+These results are consistent with an account of advisor trust updating which uses agreement as a proxy for advisor accuracy when more reliable information is not available.
+
+### Differences between tasks
+
+The studies here explore the different manipulations of advice profile using two different tasks: a Dots task with a perceptual decision and a Dates task using an estimation decision.
+These two tasks have consistent results, but there are nevertheless identifiable differences between the tasks.
+Most notably, although advisor choice distributions in both tasks are roughly normally distributed, those in the Dots task results are sharper.
+This sharpness may be a result of many participants selecting advisors at approximately equal rates.
+If participants become bored or fatigued by the experiment they may disengage and select advisors in a random manner.
+\mccorrect{!TODO[Did we restore advisor agreement/accuracy/etc to a baseline during Test phase? If so participants might detect a return to baseline from their favourite advisor and explore away.]}
+
+Where manipulations are effective in the Dots task (§\@ref(ac-ava-dots)) they change the direction of preferences: a good many participants continue to pick advisors at approximately equal rates, but preferences in those who do express a preference systematically favour one particular advisor.
+Systematic differences in the Dates task are signified by distributions in which the modal preference moves to an extreme preference for the relevant advisor while the tails of the distribution continue to cover the whole range.
+These differences are likely a consequence of the difference in the number of Choice trials in each Task: because the Dates task only has around 10 Choice trials it is relatively common for participants to select a single preferred advisor repeatedly, while participants in the Dots task may become tired of seeing advice from the same advisor over the \mccorrect{!TODO[how many Choice trials in Dots?]} Choice trials in the Dots task, increasing the novelty value of advice from the non-preferred advisor and thus reducing the apparent strength of preference.
+\mccorrect{Long sentence: revise}
+
+The only case in which results between the No feedback condition of the Dates task and the Dots task were in conflict was High vs Low accuracy advisors. 
+Participants in the Dots task had a systematic preference for the High accuracy advisor (§\@ref(ac-acc-dates)).
+These differences are likely caused by the greater accuracy participants display in the Dots task making the experienced agreement profiles of the advisors more distinct.
+This explanation is wholly consistent with an account of advisor trust which uses agreement as a proxy for accuracy when better information is unavailable.
+This explanation entails a prediction that longer-term experience with the High accuracy advisor should eventually engender a systematic preference for that advisor, provided participants' guesses are more accurate than chance.
+
+### Variability between participants
+
+As noted above, participants displayed a range of preferences. 
+Most participants in most conditions in most studies demonstrated fairly balanced picking behaviour; perhaps motivated by a sense of fairness or novelty, or perhaps as a result of random selection. \mccorrect{!TODO[We could take a quick look at whether participants tend to always pick the advisor in the first/second position, and how that correlates with preference strength. Could relate to choice-induced bias for advisor position: zajkowskiCrossDomainEffectsChoiceInduced2021]}
+Where effects appear in the data, they show up as a fat tail on a skewed distribution: a sizeable minority select a given advisor on most trials, and almost no one selects the other advisor on most of the trials.
+
+This heterogeneity is seldom measured in population models of influence dynamics. 
+In the [following chapter](#chapter-network-effects), we explore the effects of including this kind of heterogeneity in agent-based models of advice giving.
+
+### Social and Personality perspectives
+
+Source selection, most robustly selective exposure, is argued in the Social and Personality Psychology domains to be a product of a drive for cognitive consonance [@festingerTheoryCognitiveDissonance1957] or protecting a positive self-concept [@knobloch-westerwickSelectiveExposureSelf2015] rather than an heuristic which is expected to improve the accuracy of decision-making under common real-world conditions.
+While these experiments do not directly contradict that literature, they do indicate that source selection can occur in the absence of any clear implications of the choice for a person's view of themselves.
+It may be argued that the effects in the absence of meaningful moral or political contexts reflects a bleed over from processes that perform useful work in vigilantly guarding a person's self-image, and that are always active when choices over information sources are made.
+Conversely, however, it could be argued that much of the selective exposure evidence represents a drive for accurate information: if I strongly believe in a liberal world-view I may judge the reporting of a liberal media outlet to be more objectively accurate, and be more willing to view the contents on that basis.
+
+### Strengths
+
+\mccorrect{!NICK:[I'd suggest integrating this into the preceding discussion: e.g., an important strength is comparing across two tasks. Also having careful control over advice properties.]}
+
+### Limitations
+
+\mccorrect{!NICK:[Refer back to your Intro theme of social learning via RL: we've looked at this situation in terms of learning from repeated interaction, but maybe this is rare IRL? Pick rates may not reveal underlying preferences: could get very consistent picks in the absence of true preference, because it's just easier for participants to do the same thing all the time rather than make an active choice.]}
+
+### Conclusion

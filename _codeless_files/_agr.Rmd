@@ -1,0 +1,332 @@
+
+## Effects of Advisor Agreement on Advisor Selection {#ac-agr}
+
+Experiments 1A§\@ref(ac-acc-dots) and 1B§\@ref(ac-acc-dates) revealed differences in how participants selected the advisors between the Dots task (which has no feedback) and the No feedback condition of the Dates task for High versus Low accuracy advisors. 
+We may expect more pronounced effects in the absence of feedback when contrasting High versus Low agreement advisors, because we expect that agreement is the driving force behind the accuracy differences where feedback is not provided.
+@pescetelliRoleDecisionConfidence2021 demonstrated that advisors who agree more frequently are more influential (regardless of the presence of feedback, but especially without it) in a lab-based perceptual decision-making task.
+Here we explored the impact of agreement on choice of advisor. Experiment 2A§\@ref(ac-agr-dots) looks at this effect in the Dots task, while Experiment 2B§\@ref(ac-agr-dates) does the same for the Dates task.
+
+### Experiment 2A: Advisor agreement effects in the Dots Task {#ac-agr-dots}
+
+```{r ac-agr-dots-load, include = F}
+```
+
+#### Open scholarship practices
+
+This experiment was preregistered at `r unique(dotstask$preregistration)`.
+The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from https://osf.io/8cnpq/.
+A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/9932543c62b00bd96ef7ddb3439e6c2d5bdb99ce/AdvisorChoice/index.html.
+
+#### Method {#ac-agr-dots-m}
+
+```{r ac-agr-dots-m-structure}
+```
+
+`r length(unique(trials$pid))` participants each completed `r sum(tmp$n)` trials over `r nrow(tmp)` blocks of a perceptual decision-making task.
+Each trial consisted of three phases: participants gave an initial estimate (with confidence) of which of two briefly presented boxes contained more dots; received advice on their decision from an advisor; and made a final decision (again, with confidence).
+
+Participants started with `r sum(tmp$typeName == "catch")` blocks of `r tmp %>% filter(typeName == "catch") %>% mutate(n = n - (n %% 4)) %>% .$n %>% unique()` trials that contained no advice to allow them to familiarise themselves with the task; to allow the staircasing process to titrate the difficulty to their ability in order to maintain approximately 71% initial estimate accuracy; and to allow estimating of participants' idiosyncratic confidence reporting style.
+The first three trials were introductory trials that explained the task.
+All trials in this section included feedback indicating whether or not the participant's response was correct.
+
+Participants then did `r tmp %>% filter(typeName == "force" & practice) %>% .$n %>% sum()` trials with a practice advisor to get used to receiving advice.
+They were informed that they would "get **advice** from an advisor to help you make your decision", and that "advice is not always correct, but it is there to help you: if you use the advice you will perform better on the task."
+
+```{r ac-agr-dots-m-structure-main}
+```
+
+Participants then performed `r sum(tmp$typeName == "choice")` sets of `r nrow(tmp) / sum(tmp$typeName == "choice")` blocks each.
+These sets consisted of `r sum(tmp$typeName == "force") / sum(tmp$typeName == "choice")` familiarisation block of `r tmp %>% filter(typeName == "force") %>% .$n %>% unique()` trials in which participants were assigned one of two advisors.
+The familiarisation block was followed with a test block of `r tmp %>% filter(typeName == "choice") %>% .$n %>% unique()` trials in which participants could choose between the advisors they encountered in the familiarisation block.
+The participants saw different pairs of advisors in each set, with each pair consisting of one advisor with each of the advice profiles.
+
+##### Advice profiles
+
+```{r ac-agr-dots-m-profiles-setup}
+```
+
+The two advisor profiles (Table \@ref(tab:ac-agr-dots-m-profiles)) used in the experiment were High agreement and Low agreement.
+These advisors were defined in terms of their likelihood of agreement with participants' correct and incorrect initial estimates, while being matched for objective accuracy. 
+The High agreement advisor gave advice that endorsed the same answer side as the participant's initial estimate `r round(tmp[1] * 100, 1)`% of the time while the Low agreement advisor agreed with the participant `r round(tmp[2] * 100, 1)`% of the time.
+These overall agreement rates were split based on on the participants' initial estimate accuracy to achieve balanced overall accuracy rates between advisors.
+
+```{r ac-agr-dots-m-profiles-r}
+```
+
+#### Results {#ac-agr-dots-r}
+
+##### Exclusions
+
+```{r ac-agr-dots-r-clean}
+```
+
+In line with the pre-registration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or finish the experiment after `r preRegParticipants` participants have already submitted data which passed the other exclusion tests. 
+Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-agr-dots-exclusions).
+
+##### Task performance
+
+```{r ac-agr-dots-r-performance, fig.caption="Task performance for the Dots task with dis/agreeing advisors.  A: Response accuracy. Faint lines show individual participant means, for which the violin and box plots show the distributions. The half-width horizontal dashed lines show the level of accuracy which the staircasing procedure targeted, while the full width dashed line indicates chance performance. Dotted violin outlines show the distribution of actual advisor accuracy.  B: Confidence. Faint lines show individual participant means, for which the violin and box plots show the distributions.  C: Influence. Participants' weight on the advice for advisors in the Familiarization stage of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2]."}
+```
+
+```{r ac-agr-dots-r-performance-aov}
+```
+
+Basic behavioural performance was similar to that observed with the same Dots task in Experiment 1A§\@ref(ac-acc-dots-r-performance). 
+Initial decision accuracy converged on the target 71%, and participants may have benefited from advice in terms of their final decisions being more accurate than their initial decisions (`r s_acc$s[2]`; Figure \@ref(fig:ac-agr-dots-r-performance)A).
+There was no evidence of a general difference in participants' overall accuracy between advisors (`r s_acc$s[1]`), nor was there evidence of a difference in participants' improvement in accuracy between advisors (`r s_acc$s[3]`).
+
+Figure \@ref(fig:ac-agr-dots-r-performance)B and ANOVA indicated that participants were more confident in their correct answers than their incorrect ones (`r s_conf$s[2]`), and less confident in their final decisions than their initial estimates (`r s_conf$s[1]`).
+These two factors interacted (`r s_conf$s[3]`).
+
+Perhaps surprisingly, there was no correlation between initial estimate accuracy and confidence (`r bf2str(exp(conf_r_i@bayesFactor$bf))`), and no evidence for a correlation between final decision accuracy and confidence (`r bf2str(exp(conf_r_f@bayesFactor$bf))`).
+
+Neither advisor appeared to be more influential than the other (Figure \@ref(fig:ac-agr-dots-r-performance)C).
+
+##### Advisor performance
+
+The advice is generated probabilistically from the rules described previously in Table \@ref(tab:ac-agr-dots-m-profiles).
+It is thus important to get a sense of the actual advice experienced by the participants.
+
+```{r ac-agr-dots-r-advice-agr}
+```
+
+```{r ac-agr-dots-r-advice-acc}
+```
+
+The advisors agreed with the participants' initial estimates at close to target rates (Table \@ref(tab:ac-agr-dots-r-advice-agr-t)), and were as accurate on average as expected (Table \@ref(tab:ac-agr-dots-r-advice-acc-t)). 
+Nevertheless, some participants experienced in practice 10-20% differences in advisor accuracy (although neither advisor was systematically more accurate across participants). 
+All participants experienced the intended relationship wherein the High agreement advisor agreed with them more than the Low agreement advisor.
+
+##### \OpenScience{prereg} Hypothesis test {#ac-agr-r-h}
+
+```{r ac-agr-dots-r-graph, fig.caption="Dot task advisor choice for high/low agreement advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line.", fig.height=6, fig.width=5}
+```
+
+Our key analysis concerned whether participants would have a systematic preference for choosing the High agreement advisor when they were given a choice of advisor. 
+Consistent with the key prediction of this experiment, advisor choice varied significantly as a function of advisor agreement rate (Figure \@ref(fig:ac-agr-dots-r-graph)): The High agreement advisor was preferred at a rate greater than that expected by chance (`r .T`).
+The modal preference remained at chance, but almost all participants who manifested a preference preferred the High agreement advisor. 
+
+##### Follow-up tests
+
+```{r ac-agr-dots-r-choice-by-exp, fig.caption="Advisor choice by experience in the Dots task with dis/agreeing advisors.  Each dot is a participant's proportions. The difference in accuracy rates is calculated as the proportion of correct answers seen from the High accuracy advisor minus the proportion of correct answers seen from the Low accuracy advisor, and the difference in agreement rates similarly for agreement. The participants did not receive feedback on the correct answers"}
+```
+As noted above, the stochastic nature of the advisors' advice meant that there was some variation in the participants' experience of the advisors.
+This allowed us to investigate whether either objective accuracy or agreement rate differences were predictive of pick rates.
+This did not appear to be the case: there was no evidence of a relationship between participants' advisor preference and their experience of either advisor accuracy ($BF_{10}=$ `r bf2str(exp(r_acc@bayesFactor$bf))`) or advisor agreement ($BF_{10}=$ `r bf2str(exp(r_agr@bayesFactor$bf))`). 
+
+We would not expect a relationship to accuracy here, because we hypothesise that the work done by accuracy differences in the previous experiment was actually driven by agreement, which we manipulated in this experiment.
+We might have expected a correlation between experienced agreement rates and preference strength, but these are between-participant differences and we suspect there is a great deal of noise in participant preferences that would mask any differences over the rather limited agreement rate difference range.
+
+```{r}
+tmp <- test %>%
+  select(pid, initialConfidence, Advisor) %>%
+  nest(d = -pid) %>%
+  mutate(
+    d = map(
+      d, 
+      ~ mutate(
+        ., 
+        initialConfidence = initialConfidence >= median(.$initialConfidence)
+      )
+    )
+  ) %>%
+  unnest(cols = d) %>%
+  group_by(pid, initialConfidence) %>%
+  summarise(pickRate = mean(Advisor == "High agreement"), .groups = 'drop') %>%
+  pivot_wider(names_from = initialConfidence, values_from = pickRate) %>%
+  rename(lowConf = `FALSE`, highConf = `TRUE`)
+  
+bf <- ttestBF(tmp$lowConf, tmp$highConf, paired = T)
+tmp <- tmp %>%
+  summarise(across(-pid, mean))
+
+```
+
+We might also expect advisor preference to vary as a function of initial confidence.
+Following the logic in the previous experiment (Experiment 1A§\@ref(ac-acc-dots-r-follow-up)), participants may have a strong preference for the High agreement advisor but only exercise that preference where they are unsure about the answer themselves (i.e. where advice is most valuable to them).
+This appeared not to be the case: we split participants' trials into high and low confidence based on their idiosyncratic median confidence, and conducted a paired t-test of the pick rates for the High accuracy advisor in each confidence category.
+The Bayes factor for this t-test indicated good evidence of no difference in pick rates ($\text{BF}_{10}=$ `r bf2str(exp(bf@bayesFactor$bf))`).
+
+##### Summary/Discussion
+
+Participants who had a preference for one of the two advisors almost universally preferred the High agreement advisor. 
+These results are in line with the effects of advisor accuracy in the same task as found in Experiment 1A§\@ref(ac-acc-dots). 
+They are also consistent with our hypothesis that agreement is used as a proxy for feedback when objective feedback is unavailable.
+We next explored whether this pattern would also be apparent in the Dates task.
+
+### Experiment 2B: Advisor agreement effects in the Dates Task {#ac-agr-dates}
+
+As with Experiment 1B§\@ref(ac-acc-dates), we attempted to replicate the result using the Dates task.
+Participants in this task were split into conditions depending upon whether or not they received feedback, allowing a direct exploration of the effect of feedback on advisor preference.
+
+```{r ac-agr-dates-load, include = F}
+```
+
+#### Open scholarship practices
+
+This experiment was preregistered at `r unique(datequiz$preregistration)`.
+The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from \mccorrect{!TODO[OSFify Dates task data]}.
+A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/master/ACBin/acc.html.
+
+#### Method {#ac-agr-dates-m}
+
+```{r ac-agr-dates-m-structure}
+```
+
+`r length(unique(AdvisedTrial$pid))` participants each completed `r round(sum(tmp$n))` trials over `r max(tmp$block)` blocks of the binary version of the Dates task§\@ref(m-p-dates-b).
+On each trial, participants were presented with an historical event that occurred on a specific year between 1900 and 2000.
+They were given a date and asked whether the event occurred before or after that date, indicating their confidence in their decision by selecting an appropriate point on the relevant answer bar.
+Participants then received advice indicating which of the two bars (before or after) was supposedly the correct answer.
+Participants could then mark a final response in the same manner as their original response.
+
+Participants started with `r sum(tmp$type == "practice")` block of `r tmp %>% filter(type == "practice") %>% pull(n) %>% round()` trials that contained no advice to allow them to familiarise themselves with the task.
+All trials in this section included feedback for all participants indicating whether or not the participant's response was correct.
+
+Participants then did `r tmp %>% filter(type == "advice_practice") %>% pull(n) %>% round()` trials with a practice advisor to get used to receiving advice.
+They also received feedback on these trials.
+They were informed that they would "receive advice from advisors" to "help you complete the task".
+They were told that the "advisors aren't always correct, but they are quite good at the task", and informed that they should "identify which advisors are best and to weigh their advice accordingly".
+
+Participants then performed `r sum(tmp$type == "core")` blocks of trials that constituted the main experiment.
+The first two of these were familiarization blocks where participants had a single advisor in each block for `r tmp %>% filter(block == 2, type == "core") %>% pull(n) %>% round()` trials, plus `r tmp %>% filter(block == 2, type == "atn_check") %>% pull(n) %>% round()` attention check.
+
+Participants were split into four conditions that produced differences in their experience of these familiarization blocks.
+These conditions were whether or not they received feedback, and which of the two advisors they were familiarized with first.
+
+Finally, participants performed a test block of `r tmp %>% filter(block == 4) %>% pull(n) %>% round()` trials that offered them a choice on each trial of which of the two advisors they had encountered over the last two blocks would give them advice.
+No participants received feedback during the test phase.
+
+##### Advice profiles
+
+The High agreement and Low agreement advisor profiles issued binary advice (endorsing either the 'before' or 'after' column) probabilistically based on which column the participant had selected in their initial estimate and whether that was the correct answer. 
+Unlike in the Dots task above (Experiment 2A§\@ref(ac-agr-dots)), the accuracy of the advisors was not controlled because we were unable to control the participants' accuracy, and advisor accuracy depends upon participant accuracy when agreement rates are fixed.
+
+```{r ac-agr-dates-m-profiles-r}
+```
+
+#### Results {#ac-agr-dates-r}
+
+##### Exclusions
+
+```{r ac-agr-dates-r-clean}
+```
+
+Individual trials were screened to remove those that took longer than `r maxTrialRT/1000`s to complete.
+`r nrow(tmp)` participants had a total of `r sum(tmp$n)` trials removed in this way, representing `r num2str(pc * 100)`% of all trials.
+Participants were then excluded for having fewer than `r minTrials` trials remaining, fewer than `r minKeyTrials` trials on which they had a choice of advisor, or for giving the same initial and final response on more than `r (1 - minChangeRate) * 100`% of trials. 
+These criteria led to no participants being excluded from this experiment.
+
+##### Task performance
+
+```{r ac-agr-dates-r-split}
+```
+
+Before exploring the interaction between the participants' responses and the advisors' advice, and the participants' advisor selection behaviour, it is useful to verify that participants interacted with the task in a sensible way, and that the task manipulations worked as expected.
+In this section, task performance is explored during the Familiarization phase of the experiment where participants received advice from a pre-specified advisor on each trial. 
+There were an equal number of these trials for each participant for each advisor.
+As before (Experiment 1B§\@ref(ac-acc-dates)), the conditions are pooled together while exploring participants' performance on the task. 
+
+```{r ac-agr-dates-r-performance, fig.caption="Task performance for the Dates task with dis/agreeing advisors.  A: Response accuracy. Faint lines show individual participant means, for which the violin and box plots show the distributions. The dashed line indicates chance performance. Dotted violin outlines show the distribution of actual advisor accuracy.  Because there were relatively few trials, the proportion of correct trials for a participant generally falls on one of a few specific values. This produces the lattice-like effect seen in the graph. Some participants had individual trials excluded for over-long response times, meaning that the denominator in the accuracy calculations is different, and thus producing accuracy values which are slightly offset from others'.  B: Confidence. Faint lines show individual participant means, for which the violin and box plots show the distributions.  C: Influence. Participants' weight on the advice for advisors in the Familiarization stage of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2]."}
+```
+
+```{r ac-agr-dates-r-performance-aov}
+```
+
+There were some similarities to and some differences from the basic behavioural performances compared to the same Dates task in Experiment 1B§\@ref(ac-acc-dates-r-performance). 
+
+Participants' accuracy (Figure \@ref(fig:ac-agr-dates-r-performance)A), which was uncontrolled in this task, was greater on final decisions than on initial estimates (`r s_acc$s[2]`).
+There was no significant difference between advisors (`r s_acc$s[1]`), but the increase in final decision accuracy was greater for the Low agreement advisor than the High agreement advisor (`r s_acc$s[3]`).
+
+As expected, and as shown in Figure \@ref(fig:ac-agr-dates-r-performance)B participants were systematically more confident when their initial estimate was correct as compared to incorrect (`r s_conf$s[1]`).
+Participants were also more confident on final decisions than on initial estimates (`r s_conf$s[2]`). 
+This increase in confidence was greater when the initial estimate was correct as compared to incorrect (`r s_conf$s[3]`).
+
+The High agreement advisor was more influential (Figure \@ref(fig:ac-agr-dates-r-performance)C) than the Low agreement advisor overall (`r s_inf$s[2]`), and participants in the No feedback condition were more influenced than participants in the Feedback condition (`r s_inf$s[1]`).
+There was no evidence of an interaction between these differences, however (`r s_inf$s[3]`).
+
+##### Advisor performance
+
+```{r ac-agr-dates-r-advice-agr}
+```
+
+```{r ac-agr-dates-r-advice-acc}
+```
+
+The advice is generated probabilistically from the rules described previously (Advice profiles§\@ref(ac-acc-dates-m-advice-profiles)).
+This advisors agreed with participants contingent on the accuracy of the participants' initial estimates at close to the target rates (Table \@ref(tab:ac-agr-dates-r-advice-agr-t)).
+This meant that advisors were distinguished by their overall agreement rates as they were intended to be in the familiarization phase. 
+The accuracy of participants' initial estimates was not much above 50%, meaning that the overall accuracy rates of the advisors were similar to those projected (Table \@ref(tab:ac-agr-dates-r-advice-acc-t)).
+Most (`r n_ap`/`r length(unique(Familiarization$pid))`, `r num2str(n_ap / length(unique(Familiarization$pid)) * 100)`%) participants experienced the High accuracy advisor as providing more accurate advice than the Low accuracy advisor.
+
+##### \OpenScience{prereg} Hypothesis test
+
+```{r ac-agr-dates-r-graph, fig.caption="Dates task advisor choice for High/Low agreement advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line. Participants in the Feedback condition received feedback during the Familiarization phase, but not during the Choice phase.", fig.height=6, fig.width=6}
+```
+
+Consistent with the result from the Dots task, the key analysis demonstrated that in the No feedback condition participants' preferences for receiving advice from the High agreement advisor were greater than chance (`r .T.Nfb`).
+The modal preference was to select the High agreement advisor on every Choice trial, and although some participants still showed a preference for hearing advice from the Low agreement advisor, preferences for the High agreement advisor were generally stronger and more frequent (Figure \@ref(fig:ac-agr-dates-r-graph)).
+
+In the Feedback condition, the mean of the participants' selection rates was equivalent to random picking (`r .T.fb`).
+This is consistent with a strategy which attempts to maximise the accuracy of final decisions, because neither advisor would help with this task systematically. 
+The null result here does indicate, however, that there is no strong and clear preference for agreement over and above its accuracy benefits.
+
+Interestingly, despite different patterns of preferences when compared to chance, there was not enough evidence to demonstrate whether the preference patterns for the two conditions were or were not different from one another.
+This may be a consequence of the variability of preferences: as with the Dates task using High accuracy and Low accuracy advisors (Experiment 1B§\@ref(ac-acc-dates)), the participants in both Feedback and No feedback conditions spanned the entire gamut of preference strengths and directions. 
+One participant in the No feedback group here, for example, never chose the High agreement advisor. 
+Even where there were no systematic effects (No feedback condition in Experiment 1B, Feedback condition here), participants still had a range of preferences with some picking one or the other advisor exclusively.
+A substantial minority (`r num2str((bn$p.value < .05) * 100, 1)`%) of participants had preference strengths beyond those expected by chance when picking randomly.^[5% would be expected to have had strengths of these magnitudes if picking randomly.]
+As noted previously (Experiment 1: Discussion§\@ref(ac-acc-d)), this is in contrast to the behaviour in the Dots task, where preferences tend to mass towards even pick rates with a long tail differentiating the population preferences from chance.
+
+##### Follow-up tests
+
+```{r ac-agr-dates-r-follow-up, fig.caption="Preference predictors in the Dates task with dis/agreeing advisors.  Scatter plots of participants' experience with advisors in terms of agreement or accuracy rates. Differences are expressed as the experienced rate for the High agreement advisor minus the experienced rate for the Low agreement advisor during the Familiarization phase. Numbers in bold in the regression equations are significant at p < .05."}
+```
+
+```{r ac-agr-dates-r-cors-acc}
+```
+
+```{r ac-agr-dates-r-cors-agr}
+```
+
+There was variation in the relative agreement and accuracy rates of the advisors as experienced by each participant during the Familiarization phase. 
+This experienced difference could have led to detectable variation in picking behaviour because relative agreement rate is the mechanism we suspect to be driving picking behaviour differences.
+
+This did not appear to be the case either for accuracy (Table \@ref(tab:ac-agr-dates-r-cors-acc-t)) or agreement (Table \@ref(tab:ac-agr-dates-r-cors-agr-t)).
+As shown in Figure \@ref(fig:ac-agr-dates-r-follow-up), experienced accuracy difference was a significant predictor of picking preference for participants in the Feedback condition.
+This effect did not show up in the linear regression with agreement rate difference and feedback condition as predictors (Table \@ref(tab:ac-agr-dates-r-cors-acc-t)), and the evidence in the Bayesian equivalent was sub-threshold (BF=`r bf2str(lm_acc_bf$bf[3])`).
+Despite the possibility that this result is a false positive (running many individual regressions without familywise error correction will tend to indicate some significant relationships by chance alone), it does make sense because this relationship was argued to lie behind the result in Experiment 1B§\@ref(ac-acc-dates).
+Experiment 1B showed a preference for the High accuracy advisor in the picking behaviour, but not a relationship between that picking preference strength and experienced accuracy difference. 
+Experienced accuracy differences were tightly controlled in Experiment 1B, however, whereas here they have more room to vary and thus may be more likely to reveal relationships.
+
+Comparing the overall model fits to Experiment 1B, it is notable that the adjusted $R^2$, or the amount of variance in the dependent variable explained by the predictors, is much lower here. 
+Whatever is driving picking preference variation, it does not seem to be well captured by the variation in experienced agreement or accuracy rates, or by the difference between the experimental conditions.
+
+### Discussion {#ac-agr-d}
+
+These two experiments investigated the impact of advisor agreement on choice of advice. 
+In both Dots and Dates tasks, where the absence of feedback means advisors' performances cannot be evaluated objectively, participants preferred high agreement advisors to low agreement advisors.
+This is consistent with our underlying theory that agreement is used as a mechanism for evaluating advisors in the absence of objective feedback.
+
+When feedback was provided in the Dates task, advisors were selected at rates equivalent to chance overall.
+Despite this overall chance level of preference in the sample, individual participants had a wide range of preference strengths and directions, and this was true for both the experimental conditions.
+This contrasts with what we see in the Dots task data, for both Experiment 1A§\@ref(ac-acc-dots) and 2A§\@ref(ac-agr-dots), where the majority of participants' preferences are moderate, with a minority of participants' more marked preferences producing the systematic effects.
+
+In the Dates task, as we saw in Experiment 1B§\@ref(ac-acc-dates), systematic effects show up as a general nudging of preferences in one direction rather than as every participant developing similar preferences.
+This wide variability with some systematic nudging is explicable in terms of the heterogeneity of the Dates task. 
+Participants will have a different level of knowledge on different questions, and we might expect advisors to occasionally offer implausible advice to questions participants consider easy.
+If this were to happen, participants might weight these occurrences highly, in line with the @pescetelliRoleDecisionConfidence2021 theory of metacognitive evaluation of advice.
+More frequently disagreeing advisors will be more likely to disagree on these subjectively easy questions and suffer the reputational consequences.
+This greater likelihood could mean that the wide spread of behaviour from participants is due to the greater frequency of these important events for the Low accuracy advisor, rather than a consistent effect of agreement alone.
+
+A challenge for this explanation is that in Experiment 1B§\@ref(ac-acc-dates) we observed participants in the No feedback condition demonstrating a range of preferences that were not systematically different from chance. 
+We would expect, provided participants' performance on subjectively easy questions is above chance, that the High accuracy advisor would have a higher probability of agreement on those questions, just as the High agreement advisor had a higher probability of agreement in Experiment 2B§\@ref(ac-agr-dates).
+It is unlikely, but not impossible, that participants' accuracy even on subjectively easy questions was sufficiently bad as to render these effects undetectable.
+
+Another reason why advisor preferences are so varied is that there are reasons why participants might prefer to see advice from the disagreeing advisor.
+In both Dots and Dates tasks, it was harder to predict what the Low agreement advisor would say, potentially making the advice more interesting. 
+Furthermore, if participants thought they were unlikely to be correct, the Low agreement advisor's advice was more diagnostic of the correct answer because the Low agreement advisor was far less likely to endorse incorrect responses.
+It may be, therefore, that people evaluate advisors on the basis of agreement, but that what they do on the basis of that evaluation is a matter of personal preference.
+
+In the previous two studies we looked at the effects of advisor accuracy and agreement on the preference for picking those advisors when offered a choice.
+In order to isolate the effects, agreement was balanced in the accuracy experiments, and accuracy was balanced (as well as we were able) in the agreement experiments. 
+Next, we directly contrast these domains by providing participants with a pairing consisting of a High accuracy advisor and a High agreement advisor, introducing a clear performance cost of preferring to hear advice from the High agreement advisor.

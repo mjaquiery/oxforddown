@@ -1,0 +1,192 @@
+---
+output:
+  bookdown::pdf_document2:
+    template: templates/brief_template.tex
+  bookdown::word_document2: default
+  bookdown::html_document2: default
+documentclass: book
+
+bibliography: 
+  - bibliography/references.bib
+bibliography-heading-in-pdf: Works Cited
+params:
+  corrections: true 
+---
+
+```{r setup 01-02, echo = F, include = F}
+```
+
+# Psychology of advice-taking {#chapter-advice-taking}
+\adjustmtc 
+
+The model of advice-taking presented earlier§\@ref(chapter-advisor-evaluation) has some empirical support from previous work in our lab [@pescetelliRoleDecisionConfidence2021].
+In those experiments, participants completed a perceptual decision-making task within a judge-advisor system.
+Participants provided a judgement (including a confidence rating) concerning which of two briefly presented boxes of dots contained more dots. 
+They then received advice on the answer from an advisor and provided a final decision, again including a confidence judgement.
+
+@pescetelliRoleDecisionConfidence2021 showed that participants who received feedback on their decisions, which could in turn be used to evaluate the advisors, showed larger shifts in their confidence in the direction of advice from more accurate advisors.
+Participants who did not receive feedback showed similarly higher influence from advisors who tended to agree more often (i.e. to suggest as advice the same side participants chose in their initial estimate). 
+Both effects, accuracy and agreement, were present regardless of feedback, although the agreement effect was far more pronounced in the no feedback group than the feedback group, and the accuracy effect was more pronounced in the feedback than the no feedback group.
+Participants' subjective assessments of the trustworthiness of the advisors roughly^[In some cases the results were only numerically compatible, and not statistically significant.] followed their behaviour: advisors who were more influential were rated as more trustworthy.
+
+We aimed to replicate these results in a new paradigm.
+This new paradigm, the Dates task, was newly-implemented for this project.
+The Dates task was designed with several appealing features in mind: it was to be more similar to the tasks performed by participants in previous advice-taking experiments; it was to be shorter for participants to complete, and suitable for online delivery; and it was supposed to be more engaging for participants.
+
+For this replication, we chose to directly contrast the tendency to prefer agreeing advisors over accurate ones where feedback was withheld with the tendency to prefer accurate advisors over agreeing ones where feedback was available. 
+
+## Experiment 0: Extending results to the Dates task {#ai-ava}
+
+```{r ai-ava-load, include = F}
+```
+
+#### Open scholarship practices
+
+This experiment was preregistered at `r unique(datequiz$preregistration)`.
+The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from \mccorrect{!TODO[OSFify Dates task data]}.
+A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/f90b6f9266a901211a4ddb7b5ee1de1c74e8df57/ACv2/index.html.
+
+This is a replication of a study of identical design that produced the same results. 
+The data for the original study can be obtained from the `esmData::` R package or from \mccorrect{!TODO[OSFify]}.
+
+#### Method {#ai-ava-m}
+
+```{r ai-ava-m-structure}
+```
+
+`r length(unique(AdvisedTrial$pid))` participants each completed `r round(sum(ceiling(tmp$n)))` trials over `r max(tmp$block)` blocks of the continuous version of the Dates task§\@ref(m-p-dates-c).
+On each trial, participants were presented with an historical event that occurred on a specific year between 1900 and 2000.
+They were asked to drag one of three markers onto a timeline to indicate the date range within which they thought the event occurred.
+The three markers each had different widths, and each marker had point value associated with it, with wider markers worth fewer points.
+The markers were 1, 3, and 9 years wide, being worth 27, 9, and 3 points respectively.
+Participants then received advice indicating a region of the timeline in which the advisor suggested the event occurred.
+Participants could then mark a final response in the same manner as their original response, and could choose a different marker width if they wished.
+
+Participants started with `r sum(tmp$type == "practice")` block of `r tmp %>% filter(type == "practice") %>% pull(n) %>% ceiling()` trials that contained no advice to allow them to familiarise themselves with the task.
+All trials in this section included feedback for all participants indicating whether or not the participant's response was correct.
+
+Participants then did `r tmp %>% filter(type == "advice_practice") %>% pull(n) %>% round()` trials with a practice advisor to get used to receiving advice.
+They also received feedback on these trials.
+They were informed that they would "get advice on the answers you give" and that the feedback they received would "tell you about how well the advisor does, as well as how well you do".
+Before starting the main experiment they were told that they would receive advice from multiple advisors and that "advisors might behave in different ways, and it's up to you to decide how useful you think each advisor is, and to use their advice accordingly".
+
+Participants then performed `r sum(tmp$type == "core")` blocks of trials that constituted the main experiment.
+In each of these blocks participants had a single advisor for `r tmp %>% filter(block == 2, type == "core") %>% pull(n) %>% round()` trials, plus `r tmp %>% filter(block == 2, type == "atn_check") %>% pull(n) %>% round()` attention check.
+
+Participants were split into four conditions that produced differences in their experience of these blocks.
+These conditions were whether or not they received feedback, and which of the two advisors they encountered first.
+For each advisor, participants saw the advisor's advice on `r max(at$all/2)` trials. 
+On each trial there was an 80% chance the advisor gave advice according to the advice profile (detailed below). 
+Otherwise, the advisors issued the same kind of advice as one another, chosen to neither agree with the participant's answer nor indicate the correct answer. 
+This "off-brand" advice was used to control for the effects of advice when the influence of advice was the dependent variable.
+
+##### Advice profiles {#ai-ava-m-advisors}
+
+The High accuracy and High agreement advisor profiles defined marker placements based on the timeline based on the correct answer and the participant's initial estimate respectively. 
+Both advisors used markers that spanned 7 years, and both placed the markers in a normal distribution around the target point with a standard deviation of 5 years.
+The target point for the High accuracy advisor was the correct answer, and the target point for the High agreement advisor was the participant's initial estimate.
+Neither advisor ever placed their marker exactly on the midpoint of the participant's marker (because doing so means the weight on advice statistic is undefined). 
+
+Each advice trial had a 20% chance of being designated "off-brand".
+On these trials advisors neither indicated the correct answer nor agreed with the participant. 
+This was achieved by picking a target point of the participant's answer reflected around the correct answer. 
+Thus, if the centre of the participant's initial estimate was 1955, and the correct answer was 1945, the target point would be 1935.
+In some cases there was not enough of the scale left once this reflection had taken place.
+If the centre of a participant's initial estimate was 1960, and the correct answer was 1990, the target point could not be 2020, because the scale only went up to 2010. 
+Where this occurred, advisors issued answers that were twice as wrong as the participant's answer, in the same direction. 
+In this case, that would mean the new target point was 1930.
+
+#### Results {#ai-ava-r}
+
+##### Exclusions
+
+```{r ai-ava-r-exclusions}
+```
+
+In line with the preregistration, participants' data were excluded from analysis where they failed attention checks, fail to complete the entire experiment, or had more than `r nMaxOutliers` outlying trials. Outlying trials were calculated after excluding participants who failed to complete the experiment, and were defined as trials for which the total trial time was greater than `r zThresh` standard deviations away from the mean of all trials from all participants.
+
+A browser compatibility issue in this study meant that any participants completing the study using the Safari family of browsers had to be excluded because the advice was not presented appropriately. 
+
+```{r ai-ava-r-exclusion-table}
+```
+
+##### Task performance
+
+```{r ai-ava-r-split}
+```
+
+```{r ai-ava-r-performance, fig.caption="Task performance for Experiment 0.  A: Response error.  Faint lines show individual participant mean error (the absolute difference between the participant's response and the correct answer), for which the violin and box plots show the distributions. The dashed line indicates chance performance. Dotted violin outlines show the distribution of participant means on the original study which this is a replication. The dependent variable here is error, the distance between the correct answer and the participant's answer, and consequently lower values represent better performance. The theoretical limit for error is around 100.  B: Error by marker width.  Faint lines show individual participant mean error (distance from the centre of the participant's marker to the correct answer) for each width of marker used, and box plots show the distributions. Some participants did not use all markers, and thus not all lines connect to each point on the horizontal axis. The dashed box plots show the distributions of participant means in the original experiment of which this is a replication. The faint black points indicate outliers.  Grey bars show half of the marker width: mean error scores within this range mean the marker covers the correct answer."}
+```
+
+```{r ai-ava-r-aov}
+```
+
+Participants had lower error on final decisions than on their initial estimates (`r s_acc$s[1]`), indicating improved performance after seeing advice.
+They also had lower error on their answers with the High accuracy advisor (`r s_acc$s[2]`).
+As expected, there was an interaction: participants reduced their error much more following advice from the High accuracy advisor (`r s_acc$s[3]`; Figure \@ref(fig:ai-ava-r-performance)). 
+
+Generally, we expect participants to be more confident on trials on which they are correct compared to trials on which they are incorrect.
+Confidence can be measured by the width of the marker selected by the participant.
+Where participants are more confident in their response, they can maximise the points they receive by selecting a thinner marker. 
+Where participants are unsure, they can maximise their chance of getting the answer correct by selecting a wider marker.
+Participants' error was lower for each marker width in final decisions than initial estimates (Figure \@ref(fig:ai-ava-r-confidence)). 
+For both initial estimates and final decisions, error was higher for wider markers than for narrower ones.
+
+##### Advisor performance
+
+```{r ai-ava-r-advice}
+```
+
+The advice is generated probabilistically so it is important to check that the advice experienced by the participants matched the experience we designed.
+On average, the High accuracy advisor had lower error than the High agreement advisor (`r tt %>% filter(Dimension == "Error") %>% pull(s)`), and their advice was further away from the participants' initial estimates than the High accuracy advisor's (`r tt %>% filter(Dimension == "Distance") %>% pull(s)`).
+`r sum(ap$ErrorAP)`/`r nrow(ap)` (`r num2str(sum(ap$ErrorAP) / nrow(ap) * 100)`%) participants experienced the High accuracy advisor as having lower average error than the High agreement advisor, and `r sum(ap$DistAP)`/`r nrow(ap)` (`r num2str(sum(ap$DistAP) / nrow(ap) * 100)`%) participants experienced the High agreement advisor as offering advice closer to their initial estimates than the High accuracy advisor.
+Overall, this indicates that the manipulation was implemented as planned.
+
+##### \OpenScience{prereg} Hypothesis test
+
+```{r ai-ava-r-graph, fig.caption="Dates task advisor influence for high accuracy/agreement advisors.  Shows the influence of the advice of the advisors. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The dashed outline shows the distribution of participant means in the original study of which this is a replication."}
+```
+
+There were systematic differences in the influence of advice on the key trials where the advice itself was balanced between advisors (Figure \@ref(fig:ai-ava-r-graph).
+The Accurate advisor was more influential than the Agreeing advisor (`r s_inf$s[2]`), and this was more extreme in the Feedback than the No feedback condition (`r s_inf$s[3]`).
+There was no significant difference between the Feedback and No feedback groups overall (`r s_inf$s[1]`).
+As shown in the Bayesian statistics on the graph (Figure \@ref(fig:ai-ava-r-graph)), there was good evidence that the advisors were differently influential in the Feedback condition (`r .T.fb`), and adequate evidence that they were not different in the No feedback condition (`r .T.Nfb`).
+
+### Discussion {#ai-ava-d}
+
+The experiments show that people can learn to disregard advice which provides support but no information, provided that feedback is available.
+Where feedback is unavailable, people do not appear to distinguish between useful and supportive advice.
+These results are not wholly consistent with an account of advice-taking in which people use agreement to evaluate advisors in the absence of feedback.
+Under such an account, we would expect participants in the No feedback condition to have shown a greater susceptibility to advice from the Agreeing advisor, but this did not happen.
+
+The equivalence of the influence of the advisors in the No feedback condition may be a consequence of relatively high levels of advice influence overall, producing a ceiling effect (the numerical advantage for the Agreeing advisor is as predicted by the theory).
+The relatively high levels of advice influence are a feature of the Dates task; the questions are difficult for most participants and consequently participants are likely to take more advice [@ginoEffectsTaskDifficulty2007].
+Another possible explanation for the equivalence of influence between the advisors is that participants may not have had enough exposure to the advisors to properly learn about the value of their advice. 
+The limitation on exposure is another feature of the Dates task: while the Dots task provides participants with many tens of trials in which to update their assessment of advisors, the Dates task provides a level of exposure more similar to normal social interaction (although not necessarily very similar).
+
+It is also arguable that the absence of differences in the No feedback condition is a consequence of the hypothesised mechanism itself.
+While the most plausible account of the equivalence between advisors in the No feedback condition must be that the participants were not able to distinguish between them, one might argue that the results are a consequence of averaging participants who came to different conclusions (as shown in Figure \@ref(fig:ai-ava-r-graph) where the individual participants' lines have steep slopes).
+If participants who did not receive feedback distinguished advice using two features, high-confidence agreement and variability of advice, participants whose Accurate advisors happened to agree where the participants were most confidence (i.e. the participants were well-calibrated) would be interpreted as better because they would agree when the participant had high confidence and provide visible correction where they did not.
+In a somewhat similar vein, the infrequent but necessary off-brand trials may have occurred at inopportune moments for some advisors, e.g. when the participant was particularly sure of an answer.
+It would be expected that these errors would seriously damage a participant's trust in the advisor who offered off-brand (neither agreeing nor correct) advice on those high-confidence trials.
+There is no reason to suspect that this happened systematically for one advisor over another, but by its unsystematic nature it could have overshadowed the effects we were looking for.
+
+The design of this experiment deliberately violated an assumption which may be generally true in real life, that the advice is sufficiently independent as to convey at least some information regarding the correct answer.
+Had we told participants that the agreeing advisor would agree with them no matter what they the participants said, the participants may have disregarded the advice.
+Nevertheless, the results show that, even where they would have performed objectively better by preferring accurate over agreeing advice, participants were not able to detect the more accurate advice without objective feedback.
+
+The results were only partially compatible with those of @pescetelliRoleDecisionConfidence2021.
+In the Feedback condition, we saw, as expected, a much greater influence of advice from the Accurate advisor.
+In the No feedback condition, however, the influence of the advisors appeared to be equivalent.
+We did demonstrate that this paradigm is capable of measuring influence differences.
+
+In the experiments that follow§(chapter-advisor-choice), both the Dots and Dates tasks are used to investigate differences in source selection behaviour.
+
+## Confidence-contingent advice {#ai-cca}
+
+We had hoped to investigate confidence-contingent advice, as used by @pescetelliRoleDecisionConfidence2021. 
+Confidence-contingent advice depends upon the participant's confidence in their initial estimate.
+A Bias-sharing advisor would be more likely to agree where the participant was confident in the initial estimate, and less likely to agree where the participant was less confident. 
+An Anti-bias advisor would do the opposite, and the advisors could be matched for overall agreement and accuracy behaviour.
+
+We designed and ran a prototype experiment along these lines, but were unable to get the manipulation to work, or to determine a way to appropriately balance overall agreement and accuracy behaviour of the advisors given the wide variability of participants' initial estimate performances.

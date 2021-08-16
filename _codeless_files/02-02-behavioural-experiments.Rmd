@@ -1,0 +1,265 @@
+---
+output:
+  bookdown::pdf_document2:
+    template: templates/brief_template.tex
+  bookdown::word_document2: default
+  bookdown::html_document2: default
+documentclass: book
+---
+
+```{r setup 02-02, echo = F, include = F}
+```
+
+# Behavioural responses to advice contexts {#chapter-context-benevolence}
+\adjustmtc 
+
+<!-- 
+Present behavioural experiments in which we show sensitivity to both the advisor and the advice, and discuss the relatively high levels of advice-taking (hard task!), and how the results support the impressions gleaned from the evolutionary models: context matters in advice-taking, and discounting may be a feature of vigilant conservatism (hyperprior for deceit).
+-->
+
+## Experiment 5: Benevolence of the advisor population {#be-db}
+
+```{r be-db-load, eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip')), include = F}
+```
+
+\mccorrect{!TODO[Make sure to report in brief/as post mortem the results for the in/out group studies and the early direct benevolence experiments, and point readers to the full details.]}
+
+The evolutionary models discussed [in the last chapter](#chapter-advice-taking-context) demonstrated that optimal advice-taking strategies depend in part upon the advice one receives being a genuine effort to help.
+Difference in benevolence, or the extent to which the interests of the advisor and the judge overlap, have been shown to affect levels of advice-taking.
+\mccorrect{!TODO[CITE]} showed that, where advisors were paid contingent upon the quality of the final decision, advice-taking was higher than where advisors were paid a flat fee for providing advice.
+\mccorrect{!TODO[lit review stuff - inc. Behrens/Hunt? social decision making]}
+
+Advice-taking can be contingent on the properties of the advice, or on the properties of the advisor.
+In order to maximise the value of advice while minimising the potential exposure to exploitation, advice-taking should be contingent on a combination of these factors.
+Where advice is plausible it should be weighted relatively equally, whether it comes from an advisor who is sometimes misleading or not, but where advice is more implausible it should only be trusted when it comes from an advisor who is never misleading.
+To explore whether people's behaviour matches this pattern, participants were recruited for a series of behavioural experiments in which they were given advice on a date estimation task from advisors who were described as either always helpful or occasionally misleading.
+
+We expected that advisor influence would be higher for advice that participants rated as 'honest' versus advice rated as 'deceptive'.
+Likewise, we expected that influence would be higher for advisors who were described as 'always honest', even for advice rated as 'honest'.
+In other words, we expect that participants' advice-taking depends upon both the plausibility of the advice and the benevolence of the advisor.
+
+#### Open scholarship practices
+
+This experiment was preregistered at `r unique(datequiz$preregistration)`.
+The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from \mccorrect{!TODO[OSFify Dates task data]}.
+A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/b4289fea196f71ccf0ba0b2ae8fde12139a16301/ACv2/db.html.
+
+This is a replication of a study of identical design that produced the same results. 
+The data for the original study can be obtained from the `esmData::` R package or from \mccorrect{!TODO[OSFify]}.
+
+There were a number of deviations from the preregistered analysis in this Experiment.
+Several participants used translation software to translate the experiment website. 
+We could not guarantee that the questions were accurately translated and so these participants were excluded.
+Some participants never rated the Sometimes deceptive advisor's advice as 'honest', and so they were excluded in the t-test comparing advisors.
+
+### Method {#be-db-m}
+
+```{r be-db-m-structure}
+```
+
+#### Procedure
+
+`r length(unique(AdvisedTrial$pid))` participants each completed `r round(sum(ceiling(tmp$n)))` trials over `r max(tmp$block)` blocks of the continuous version of the Dates task§\@ref(m-p-dates-c).
+On each trial, participants were presented with an historical event that occurred on a specific year between 1900 and 2000.
+They were asked to drag a marker onto a timeline to indicate the date range within which they thought the event occurred.
+The markers covered `r AdvisedTrial %>% filter(!is.na(responseMarkerWidth)) %>% pull(responseMarkerWidth) %>% unique()` years, meaning that it would cover an entire decade inclusively, e.g. 1965-1975.
+Participants then received advice indicating a region of the timeline in which the advisor suggested the event occurred, and rated the honesty of the advice on a three-point scale (Figure \@ref(fig:be-db-m-performance)).
+Participants could then mark a final response in the same manner as their original response, and could choose a different marker width if they wished.
+
+```{r be-db-m-performance, fig.align='center', fig.caption="Advice honesty rating.  Participants rated advice on a three-point scale according to whether they thought the advice was deceptive or honest.", out.width="80%", echo=F}
+```
+
+Participants started with `r sum(tmp$type == "practice")` block of `r tmp %>% filter(type == "practice") %>% pull(n) %>% ceiling()` trials that contained no advice to allow them to familiarise themselves with the task.
+All trials in this section included feedback for all participants indicating whether or not the participant's response was correct.
+
+Participants then did `r tmp %>% filter(type == "advice_practice") %>% pull(n) %>% round()` trials with a practice advisor to get used to receiving advice.
+They also received feedback on these trials.
+They were informed that they would "get advice on the answers you give" and that the feedback they received would "tell you about how well the advisor does, as well as how well you do".
+Before starting the main experiment they were told that they would receive advice from multiple advisors and that "advisors might behave in different ways, and it's up to you to decide how useful you think each advisor is, and to use their advice accordingly".
+
+Participants then performed `r sum(tmp$type == "core")` blocks of trials that constituted the main experiment.
+In each of these blocks participants had a single advisor for `r tmp %>% filter(block == 2, type == "core") %>% pull(n) %>% round()` trials, plus `r tmp %>% filter(block == 2, type == "atn_check") %>% pull(n) %>% round()` attention check.
+No feedback was given on answers in the main experiment blocks.
+
+The two advisors were identical in how they generated advice, but they were labelled differently.
+The advisors had different colours, and participants were told that the advisor who matched the participant's colour "will give you the **best advice that they can**", while the advisor who did not match the participant's colour "might sometimes try to direct you **away from the correct answer**".
+Colours and the order in which the advisors were encountered were counterbalanced.
+
+#### Advice profiles
+
+Despite differences in labelling, the advisors were identical in terms of how they actually produced advice.
+The advisors offered advice by placing an `r AdvisedTrial %>% filter(!is.na(advisor0confidence)) %>% pull(advisor0confidence) %>% unique()`-year wide marker on the timeline.
+The marker was placed with its centre on a point sampled from a roughly normal distribution around the correct answer with a standard deviation of `r AdvisedTrial %>% filter(!is.na(advisor0confidenceVariation)) %>% pull(advisor0confidenceVariation) %>% unique()` years.
+
+### Results
+
+##### Exclusions
+
+```{r be-db-exclusions}
+```
+
+Participants (total *n* = `r nrow(exclusions)`) could be excluded for a number of reasons: failing attention checks, having fewer than `r nMaxTrials - nMaxOutliers` trials which took less than `r maxTrialRT / 1000`s to complete, providing final decisions which were the same as the initial estimate on more than `r round((1 - minChangeRate) * 100)`% of trials, or using non-English labels for the honesty questionnaire.
+The latter exclusion was added after data were collected because it was not anticipated that participants would use translation software in the task.
+The numbers of participants who failed the various checks are detailed in Table \@ref(tab:be-db-exclusions).
+
+The final participant list consists of `r length(unique(AdvisedTrial$pid))` participants who completed an average of `r num2str(mean(aggregate(advisor0 ~ pid, AdvisedTrial, length)$advisor0))` trials each.
+
+```{r be-db-r-exclusion-table}
+```
+
+##### Task performance
+
+```{r be-db-r-split}
+```
+
+```{r be-db-r-performance, fig.caption="Task performance for Experiment 5.  A: Response error.  Faint lines show individual participant mean error (the absolute difference between the participant's response and the correct answer), for which the violin and box plots show the distributions. The dashed line indicates chance performance. Dotted violin outlines show the distribution of participant means on the original study which this is a replication. The dependent variable here is error, the distance between the correct answer and the participant's answer, and consequently lower values represent better performance. The theoretical limit for error is around 100."}
+```
+
+```{r be-db-r-aov}
+```
+
+Participants performed as expected, decreasing the error between the midpoint of their answer and the true answer from the initial estimate to the final decision (`r s_acc$s[1]`), which suggests that they incorporated the advice, which was indicative of the correct answer.
+The participants had less error on decisions made with the Always honest advisor than the Sometimes deceptive advisor (`r s_acc$s[2]`), although surprisingly there was no evidence that this was due to greater reduction in error scores over time for that advisor (`r s_acc$s[3]`).
+
+Participants only had one marker they could place, and separate confidence judgements were not asked for, so we cannot directly assess confidence in these data.
+
+##### Advisor performance
+
+```{r be-db-r-advisor-performance}
+```
+
+The advice given by the advisors was generated stochastically from the same distribution.
+Any differences will be random.
+This was demonstrably the case in the domain of advice error (absolute distance between the centre of the advice marker and the correct year; `r tt$s[1]`).
+The Bayes' Factor for the domain of agreement -- the absolute distance between the centre of the advice marker and the centre of the participant's initial estimate marker -- was essentially on the threshold (`r tt$s[2]`).
+
+##### Advice ratings
+
+```{r be-db-r-advice-ratings}
+```
+
+##### Effect of advice
+
+```{r be-db-r-advice, results='asis', eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))}
+```
+
+As expected, participants were substantially more influenced by advice they rated as 'honest' compared to advice they rated as 'deceptive' (`r "r"`).
+
+##### Effect of advisor
+
+```{r be-db-r-advisor, results='asis', eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))}
+```
+
+Participants were also more influenced by 'honest' advice from the advisor who was described as 'never misleading' (`r "r"`).
+
+\mccorrect{!TODO[plot of woa by advice rating and advisor]}
+
+##### Results plot
+
+The details of the data are best presented in a combined figure.
+
+```{r be-results-plot, fig.align='center', fig.caption="Influence of advice by advisor according to participants\' perception of advice honesty. Faint lines show means for individual participants (missing segments indicate the participant rated no advice from that advisor with the designated category). Violins, box plots, and heavy dashed lines aggregate means for all participants.", out.width="80%", echo=F}
+```
+
+The figure shows that there is a different pattern in the responses to advice across advice ratings depending upon the advisor supplying the advice.
+Advice perceived as not being honest is discounted relatively equally from the advisor described as 'always helpful', and is still fairly influential in the final decision.
+The advice perceived as 'honest' from this advisor is the most influential of all advice.
+Likewise, the 'honest' advice from the advisor described as 'sometimes-misleading' is more influential than the 'possibly deceptive' advice, which is in turn more influential than the 'deceptive' advice.
+The 'deceptive' advice from the 'sometimes-misleading' advisor is almost completely ignored.
+Within this broader pattern there is some variability between participants, including some participants whose responses violate the pattern quite dramatically - note the two participants with large decreases in influence for 'honest' advice from the 'sometimes-misleading' advisor as compared to the 'possibly deceptive' advice from the same.
+This may be a consequence of participants' values in each cell in the design being comprised of a low number of trials.
+#### Exploration
+
+\mccorrect{!TODO[below]}
+* were participants' criteria for judging advice as dishonest different between advisors?
+* Type 1 SDT might be able to do this if a sensible definition of objectively-deceptive advice can be produced
+    
+        * E.g.
+whether averaging with the advice would reduce error
+        
+        * There will be all sorts of problems with this, noteably it'll classify 'never deceptive' advisor as sometimes deceptive
+        
+    * May be able to investigate this with probabilities of classification for several distance bins - ROC type curve
+    
+        * what to do with 'possibly deceptive'?
+  
+### Discussion
+
+* Both the source and the plausibility of advice matter, and they seem to interact in a complex way.
+* Flexible adaptation to advice context, both in terms of categorisation and influence.
+
+* Support for the premise of the evolutionary simulations.
+
+    * Does not prove people actually do have these hyperpriors
+
+#### Limitations
+
+* N
+
+* No gender breakdown
+
+    * simplicity/privacy vs data gap
+    
+* Difficult task (high levels of advice-taking by default)
+
+## Noise in the advice
+
+The [second scenario](#models-scenario-2) explored in the evolutionary models added noise to the advice agents received and demonstrated that this provided an evolutionary pressure towards egocentric discounting.
+This scenario is not explored in behavioural experiments because its conclusions are well supported by existing literature.
+Specifically, the literature demonstrates that the normativity of discounting where the judge outperforms the advisor, that advice-taking is sensitive to advisor expertise, and that people are likely to consider themselves superior to the average advisor.
+
+The addition of noise in a point-value estimation task lowers the relative performance, and thus this scenario was essentially a manipulation of advisor expertise.
+Normative models support egocentric discounting where the judge is systematically more accurate than the advisor \mccorrect{!TODO[PAR model paper, early advice-taking theory papers]}.
+The decrease in advice-taking for novice as opposed to expert advisors is a robust result in the literature: \mccorrect{!TODO[expertise manipulation experiment lit review]}.
+The evidence above makes an empirical investigation on this point somewhat redundant, provided it can be shown that people have a naive assumption of superiority on a given task compared to the average other they are likely to encounter.
+This point is also well supported in the literature on self-serving biases \mccorrect{!TODO[describe driving self-assessment, naive realism?, etc.]}.
+It is expected that this is somewhat dependent upon the difficulty of the task presented; people faced with a difficult task will under- rather than overestimate their ability relative to others \mccorrect{!TODO[hard-easy effect of advice]}.
+Taken together, the above arguments demonstrate that, on average, people are likely to consider themselves more able on a given task than an arbitrary advisor, and consequently that they are likely to downweight advice relative to their own initial estimate.
+This behaviour is supported by normative mathematical models which show biasing towards the better estimator (in this case the judge) is the optimal strategy.
+As discussed in the scenario, the belief that one is better at a task than the average advisor may not be misguided: advisors may not dedicate the same amount of time, concentration, or thought to producing advice as judges do for initial estimates.
+Judges have to live with the consequences of their decisions, while advisors do not.
+## Confidence mapping
+
+The [third scenario](#models-scenario-3) explored in the evolutionary models assigned each agent a confidence mapping, and demonstrated that discounting emerged as an appropriate response where the advisor's confidence mapping was unknown.
+The key difficulty in conducting behavioural experiments to test the effects of known vs unknown confidence mapping is finding a manipulation of confidence mapping knowledge which is not confounded by familiarity with an advisor or the amount of information provided by an advisor.
+We train people in two contexts, in both of which they receive advice with confidence from one of two advisors and see feedback on their final answers.
+In the first context, all the advice is well calibrated, and both advisors use either high or low confidence distributions.
+In the second context, one advisor uses a high and the other a low confidence distribution.
+Participants are then tested with a brief exposure to an advisor whose confidence distribution is drawn from the middle of the scale.
+Where participants are unprepared for different confidence mappings (the first context), they will treat the new advisor like the old advisors - considering the advice as high- or low-confidence (and weighting it accordingly) depending on whether it is high or low for the advisors' distributions.
+Where participants are prepared for different confidence mappings (the second context), they will treat the new advice as medium confidence, and weight it accordingly.
+There will be a difference in the weight on advice in the probe trials between contexts: WoA will be highest where both training advisors have a low-confidence distribution, middling where they have different distributions, and lowest where they both have a high-confidence distribution.
+
+### Individuality as a cue to confidence
+
+#### Method
+
+#### Results
+
+### Identifiability of advice
+
+#### Method
+
+#### Results
+
+## General discussion
+
+The results of the direct benevolence experiments show that people are sensitive to the motivations of their advisors, and exercise appropriate caution where those motivations may mean the advice is misleading.
+They also demonstrate that, even where advice is considered trustworthy, it is discounted when coming from a less trusted advisor.
+Together with existing literature on the effects of advisor expertise, this supports the idea from the models that advice-taking can be fleixbly adjusted according to the context.
+The results of the confidence mapping experiments were less conclusive.
+We were unable to produce a manipulation which was sufficiently clear and strong to produce observable effects.
+It is plausible that people are sensitive to their knowledge of an advisor's confidence mapping, but it is also plausible that this degree of flexibility is beyond most people, and that simple heuristics (e.g.
+relying on cultural norms about the meanings of metacognitive terms \mccorrect{!TODO[cite Bang, Heyes, et al.
+on cultural metacognition]}) are used instead of complex calculations.
+The lack of flexibility on the timescale of a behavioural experiment does not, of course, negate the possibility of flexibility on the timescale of a human interpersonal relationship (perhaps there are a certain number of people whose confidence mappings we can track, a la Dunbar's number).
+Nor does it negate the possibility of an evolutionary or cultural-evolutionary mechanism baking in advice discounting as a protection against unknown confidence mapping, although it is questionable whether advice has been occuring in human societies for long enough to allow the former to take place.
+We have a plausbile explanation of egocentric which only relies on rational responses to environmental effects.
+These effects are ubiquitous, and thus a ubiquitous egocentric bias prior to engaging with the specifics of a situation makes sense.
+It is entirely plausible that experiments showing egocentric discounting behaviour fail to overcome the hyperpriors held by participants that taking advice is risky for various reasons.
+
+We saw in the previous section that people are sensitive to the quality of advice and advisors, and will curate their information environments based on that sensitivity.
+We have seen in this section how the properties of the information environment can change people's sensitivity to advice.
+\mccorrect{!TODO[If we have time, it'd be neat to see if we can get people's selection rates for advisors to recover after the advisors have been lying to them, showing that that how we curate information environment (source selection) also depends on the existing information environment properties.]}
+
+\mccorrect{!TODO[This theory really doesn't explain combining multiple estimates with one's own. How important is that failure? Do other theories explain that feature?]}
