@@ -84,6 +84,7 @@ The advisor profiles were not balanced for overall agreement rates.
 ```{r ac-acc-dots-m-profiles-r} 
 
 pCor <- .71
+
 agr <- matrix(c(.8, .2, .6, .4), 2, 2)
 
 agr.table <- tribble(

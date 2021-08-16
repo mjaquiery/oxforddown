@@ -121,7 +121,7 @@ The specific number of practice trials differed between experiments as we sought
 
 After the practice there were blocks where participants received advice on their initial estimates and made a final decision using the same response process as their initial estimate.
 Advice was presented with a representation of an advisor with a text bubble stretching out to the side the advisor endorsed, containing the text "I think it was on the RIGHT" or LEFT as appropriate.
-The advisors were represented in various manners in various versions of the task, but predominantly in a format with a central box containing a generic blank portrait icon and text at the bottom with "Advisor ##" where ## was a number between 10 and 99.
+The advisors were represented in various manners in various versions of the task, but predominantly in a format with a central box containing a generic blank portrait icon and text at the bottom with "Advisor ##" where ## was a number between 10 and 60.
 
 On some trials participants could choose between potential advisors.
 In these cases, the potential advisors were positioned vertically in the centre of the screen and the participant clicked on the advisor from whom they wished to receive advice.
@@ -519,7 +519,7 @@ These participants' data could be included in an analysis which used a participa
 
 _Nullius in verba_ ("take nobody's word for it") is written in stone above the entrance to the Royal Society's library.
 This fundamental principle of science, that it proceeds on evidence rather than assertion, has frequently been forgotten in practice.
-Concerns about sloppy, self-deluding, or outright fradulent science have existed since at least the time of Bacon.
+Concerns about sloppy, self-deluding, or outright fraudulent science have existed since at least the time of Bacon.
 The modern open science movement in psychology dates from the early 2010s.
 Simmons et al.
 demonstrated how easily false positive results could emerge from unconstrained researcher degrees of freedom in analysis [@simmonsFalsePositivePsychologyUndisclosed2011], Nosek and colleagues published a roadmap for improving the structure and function of academic research and publishing [@nosekScientificUtopiaOpening2012; @nosekScientificUtopiaII2012], and the Open Science Collaboration began [@collaborationEstimatingReproducibilityPsychological2015].

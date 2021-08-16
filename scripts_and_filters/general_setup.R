@@ -306,6 +306,7 @@ do_exclusions <- function(exclusions, envir = .GlobalEnv, backup = T) {
 
 #' Return the name of an advice type profile
 #' @param advisorType vector of advisor types
+#' @details Used for advisors in the Dots task data.
 #' @return vector of type names
 advisor_profile_name <- function(advisorType) {
   case_when(
@@ -323,6 +324,7 @@ advisor_profile_name <- function(advisorType) {
 
 #' Return the name of an advice type profile for the Dates task data
 #' @param advisor0idDescription vector of advisor descriptions
+#' @details Used for advisors in the Dates task data.
 #' @return vector of nice names
 advisor_description_name <- function(advisor0idDescription) {
   case_when(
@@ -332,6 +334,8 @@ advisor_description_name <- function(advisor0idDescription) {
     advisor0idDescription == 'lowAgreement' ~ 'Low agreement',
     advisor0idDescription == 'Accurate' ~ 'High accuracy',
     advisor0idDescription == 'Agreeing' ~ 'High agreement',
+    advisor0idDescription == 'inGroup' ~ 'Always honest',
+    advisor0idDescription == 'outGroup' ~ 'Sometimes deceptive',
     T ~ NA_character_
   )
 }

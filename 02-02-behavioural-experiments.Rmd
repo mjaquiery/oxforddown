@@ -9,6 +9,10 @@ documentclass: book
 
 ```{r setup 02-02, echo = F, include = F}
 source('scripts_and_filters/general_setup.R')
+library(BayesFactor)
+library(ez)
+library(magrittr) # for %$% exploding pipe operator
+library(patchwork)
 ```
 
 # Behavioural responses to advice contexts {#chapter-context-benevolence}
@@ -18,7 +22,29 @@ source('scripts_and_filters/general_setup.R')
 Present behavioural experiments in which we show sensitivity to both the advisor and the advice, and discuss the relatively high levels of advice-taking (hard task!), and how the results support the impressions gleaned from the evolutionary models: context matters in advice-taking, and discounting may be a feature of vigilant conservatism (hyperprior for deceit).
 -->
 
-## Benevolence of the advisor population
+## Experiment 5: Benevolence of the advisor population {#be-db}
+
+```{r be-db-load, eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip')), include = F}
+
+select_experiment(
+  project = 'datequiz',
+  function(x) filter(x, study == 'directBenevolence', version == 'v3-0-1')
+)
+
+# Version of which the analysed version is a replication
+.prevStudy <- new.env()
+select_experiment(
+  'datequiz', 
+  function(x) filter(x, study == 'directBenevolence', version == 'v3-0-0'), 
+  envir = .prevStudy
+)
+
+for (E in c(.GlobalEnv, .prevStudy)) {
+  E$AdvisedTrial <- annotate_responses(E$AdvisedTrial)
+  E$Trial <- annotate_responses(E$Trial)
+}
+
+```
 
 \mccorrect{!TODO[Make sure to report in brief/as post mortem the results for the in/out group studies and the early direct benevolence experiments, and point readers to the full details.]}
 
@@ -31,176 +57,468 @@ Advice-taking can be contingent on the properties of the advice, or on the prope
 In order to maximise the value of advice while minimising the potential exposure to exploitation, advice-taking should be contingent on a combination of these factors.
 Where advice is plausible it should be weighted relatively equally, whether it comes from an advisor who is sometimes misleading or not, but where advice is more implausible it should only be trusted when it comes from an advisor who is never misleading.
 To explore whether people's behaviour matches this pattern, participants were recruited for a series of behavioural experiments in which they were given advice on a date estimation task from advisors who were described as either always helpful or occasionally misleading.
-Results indicated that participants' advice-taking depended upon both the plausibility of the advice and the benevolence of the advisor, although the specific pattern differed from the one described above.
 
-### Method
+We expected that advisor influence would be higher for advice that participants rated as 'honest' versus advice rated as 'deceptive'.
+Likewise, we expected that influence would be higher for advisors who were described as 'always honest', even for advice rated as 'honest'.
+In other words, we expect that participants' advice-taking depends upon both the plausibility of the advice and the benevolence of the advisor.
+
+#### Open scholarship practices
+
+This experiment was preregistered at `r unique(datequiz$preregistration)`.
+The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from \mccorrect{!TODO[OSFify Dates task data]}.
+A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/b4289fea196f71ccf0ba0b2ae8fde12139a16301/ACv2/db.html.
+
+This is a replication of a study of identical design that produced the same results. 
+The data for the original study can be obtained from the `esmData::` R package or from \mccorrect{!TODO[OSFify]}.
+
+There were a number of deviations from the preregistered analysis in this Experiment.
+Several participants used translation software to translate the experiment website. 
+We could not guarantee that the questions were accurately translated and so these participants were excluded.
+Some participants never rated the Sometimes deceptive advisor's advice as 'honest', and so they were excluded in the t-test comparing advisors.
+
+### Method {#be-db-m}
+
+```{r be-db-m-structure}
+
+tmp <- bind_rows(
+  mutate(practiceTrial, type = "practice", block = 0),
+  mutate(practiceAdvisedTrial, type = "advice_practice", block = 1),
+  mutate(Trial, type = "atn_check") %>% filter(!is.na(block)),
+  mutate(AdvisedTrial, type = "core") %>% filter(!is.na(block))
+) %>%
+  group_by(pid, type, block) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(type, block) %>%
+  summarise(across(-pid, mean), .groups = "drop") %>%
+  arrange(block)
+
+```
 
 #### Procedure
 
-The procedure for these experiments follows the Dates task, described [previously](\mccorrect{!TODO[link properly]}).
-Additionally, in this version, participants had to provide an assessment of the honesty of each advisory estimate they received before they could integrate it into their final decision.
+`r length(unique(AdvisedTrial$pid))` participants each completed `r round(sum(ceiling(tmp$n)))` trials over `r max(tmp$block)` blocks of the continuous version of the Dates task§\@ref(m-p-dates-c).
+On each trial, participants were presented with an historical event that occurred on a specific year between 1900 and 2000.
+They were asked to drag a marker onto a timeline to indicate the date range within which they thought the event occurred.
+The markers covered `r AdvisedTrial %>% filter(!is.na(responseMarkerWidth)) %>% pull(responseMarkerWidth) %>% unique()` years, meaning that it would cover an entire decade inclusively, e.g. 1965-1975.
+Participants then received advice indicating a region of the timeline in which the advisor suggested the event occurred, and rated the honesty of the advice on a three-point scale (Figure \@ref(fig:be-db-m-performance)).
+Participants could then mark a final response in the same manner as their original response, and could choose a different marker width if they wished.
 
-```{r be-performance, fig.align='center', fig.caption="Advice honesty rating.  Participants rated advice on a three-point scale according to whether they thought the advice was deceptive or honest.", out.width="80%", echo=F}
+```{r be-db-m-performance, fig.align='center', fig.caption="Advice honesty rating.  Participants rated advice on a three-point scale according to whether they thought the advice was deceptive or honest.", out.width="80%", echo=F}
 knitr::include_graphics("figures/advice-honesty-rating.png")
 ```
 
-#### Manipulation
+Participants started with `r sum(tmp$type == "practice")` block of `r tmp %>% filter(type == "practice") %>% pull(n) %>% ceiling()` trials that contained no advice to allow them to familiarise themselves with the task.
+All trials in this section included feedback for all participants indicating whether or not the participant's response was correct.
 
-Participants performed two blocks of experimental trials.
-In one block, participants received advice from an advisor who they were told would 'always try to help', while in the other they received advice from an advisor who 'may sometimes try to mislead'.
-The order of advisors was counterbalanced between participants.
+Participants then did `r tmp %>% filter(type == "advice_practice") %>% pull(n) %>% round()` trials with a practice advisor to get used to receiving advice.
+They also received feedback on these trials.
+They were informed that they would "get advice on the answers you give" and that the feedback they received would "tell you about how well the advisor does, as well as how well you do".
+Before starting the main experiment they were told that they would receive advice from multiple advisors and that "advisors might behave in different ways, and it's up to you to decide how useful you think each advisor is, and to use their advice accordingly".
 
-The advice offered by the advisors was drawn from equivalent distributions for both advisors, meaning that there were no systematic differences in the quality of the advice.
-Both advisors offered advice sampled from a roughly normal distribution around the correct answer with a standard deviation of 11 years.
+Participants then performed `r sum(tmp$type == "core")` blocks of trials that constituted the main experiment.
+In each of these blocks participants had a single advisor for `r tmp %>% filter(block == 2, type == "core") %>% pull(n) %>% round()` trials, plus `r tmp %>% filter(block == 2, type == "atn_check") %>% pull(n) %>% round()` attention check.
+No feedback was given on answers in the main experiment blocks.
 
-#### Experiments
+The two advisors were identical in how they generated advice, but they were labelled differently.
+The advisors had different colours, and participants were told that the advisor who matched the participant's colour "will give you the **best advice that they can**", while the advisor who did not match the participant's colour "might sometimes try to direct you **away from the correct answer**".
+Colours and the order in which the advisors were encountered were counterbalanced.
 
-There were a series of experiments in this topic during which the experimental design was tweaked in order to find an effective manipulation and operationalisation of the key concepts.
-The experimental code for previous versions can be found on the commit history on GitHub for the [main experimental file](https://github.com/oxacclab/ExploringSocialMetacognition/commits/master/ACv2/db.html), as well as its [dependencies](https://github.com/oxacclab/ExploringSocialMetacognition/commits/master/src/modules).
-To give a brief overview of the major changes:
+#### Advice profiles
 
-* Version 2.0.0
-
-    * introduced a much clearer manipulation
-    
-        * reminded participants of advisor description in a message they had to acknowledge
-        
-        * kept participant's group visible throughout
-        
-        * included a single trial where the misleading advisor did actually mislead the participant
-        
-* Version 2.1.0
-
-    * removed actual differences in advice and adjusted advisor descriptions to match
-    
-* Version 3.0.0
-
-    * added a question probing the perceived honesty of the advice between receiving advice and providing a final decision
-* Version 3.0.1 
-
-    * [pre-registered](https://osf.io/tu3ev) replication of version 3.0.0
-    
-    * Deviations from pre-registration:
-    
-        * Added a new exclusion rule for those people who use translation software.
-* Added exclusions for participants with NA values in the in- vs out-group t-test (where e.g.
-no outgroup advice was rated as 'honest').
-        
-        * Included frequentist stats in the trustworthiness questionnaire item t-test.
-        
-        * Fixed some labels on graphs
-        
-        * Exploratory analyses expanded to include analysis of trials with WoA > .05
-  
-Below, only the results from **version 3.0.1** are reported, but the results of this version are compatible with findings of previous versions.
-Data for all versions are accessible \mccorrect{!TODO[archive data]}.
+Despite differences in labelling, the advisors were identical in terms of how they actually produced advice.
+The advisors offered advice by placing an `r AdvisedTrial %>% filter(!is.na(advisor0confidence)) %>% pull(advisor0confidence) %>% unique()`-year wide marker on the timeline.
+The marker was placed with its centre on a point sampled from a roughly normal distribution around the correct answer with a standard deviation of `r AdvisedTrial %>% filter(!is.na(advisor0confidenceVariation)) %>% pull(advisor0confidenceVariation) %>% unique()` years.
 
 ### Results
 
-\mccorrect{!TODO[Restructure this code to use the esmData package.
-Should be easy...]}  
-\mccorrect{!TODO[consistent advisor naming, including in figures]}
+##### Exclusions
 
-```{r load remote data, eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))}
-library(prettyMD)
-library(tidyverse)
+```{r be-db-exclusions}
 
-set.seed(20190723)
-studyVersion <- "3-0-1"
-studyName <- "directBenevolence"
+nMaxOutliers <- 1
+maxTrialRT <- 60000
+qqLabelWhitelist = c(  ## Advice questionnaire responses must be one of:
+  'Deceptive',
+  'Possibly Deceptive',
+  'Honest',
+  NA
+)
+minChangeRate = .1     ## some advice taken on 10%+ of trials
 
-overrideMarkerList <- c(11) ## Someone managed to get marker width 8 for one question, not sure how
+for (E in c(.GlobalEnv, .prevStudy)) {
+  E$exclusions <- E$AdvisedTrial %>% 
+    nest(d = -pid) %>%
+    mutate(
+      atn_check = map_lgl(
+        pid, 
+        ~ !all(E$Trial$responseCorrect[E$Trial$pid == .]) |
+          any(E$Trial$responseMarkerWidth[E$Trial$pid == .] != 11)
+      ),
+      `Attention check` = if_else(is.na(atn_check), T, atn_check),
+      `Multiple attempts` = map_lgl(
+        pid,
+        ~ {
+          h <- unique(E$AdvisedTrial$pidHash[E$AdvisedTrial$pid == .])
+          p <- unique(E$AdvisedTrial$pid[E$AdvisedTrial$pidHash == h])
+          length(p) > 1
+        }
+      ),
+      `Missing advice rating` = map_lgl(
+        d,
+        ~ any(is.na(.$advisor0questionnaireHonestyLabel))
+      ),
+      `Odd advice rating labels` = map_lgl(
+        d,
+        ~ !all(.$advisor0questionnaireHonestyLabel %in% qqLabelWhitelist)
+      ),
+      `Not enough changes` = map_lgl(
+        d,
+        ~ {
+          diff <- mutate(
+            .,
+            diff = responseEstimateLeft != responseEstimateLeftFinal,
+            diff = if_else(is.na(diff), F, diff)
+          ) %>%
+            pull(diff) %>% 
+            mean() 
+          diff < minChangeRate
+        }
+      )
+    ) %>% 
+  select(-atn_check, -d)
+  
+  do_exclusions(E$exclusions, envir = E)
+  
+  E$nMaxTrials <- E$AdvisedTrial %>% 
+    group_by(pid) %>% 
+    summarise(n = n(), .groups = 'drop') %>% 
+    pull(n) %>% 
+    max()
+  
+  E$AdvisedTrial <- E$AdvisedTrial %>% filter(timeEnd < maxTrialRT)
 
-exclude <- list(
-  maxAttnCheckFails = 0, ## pass all attn checks
-  maxTrialRT = 60000,    ## trials take < 1 minute
-  minTrials = 11,        ## at least 11 trials completed
-  minChangeRate = .1,    ## some advice taken on 10%+ of trials
-  qqLableWhitelist = c(  ## Advice questionnaire responses must be one of:
-    'Deceptive',
-    'Possibly Deceptive',
-    'Honest'
-  ),
-  multipleAttempts = T   ## exclude multiple attempts
-  ) 
+  E$exclusions <- E$exclusions %>% 
+    mutate(
+      `Too many outlying trials` = 
+        map_lgl(pid, ~ E$AdvisedTrial %>% 
+                  filter(pid == .x) %>%
+                  summarise(n = n(), .groups = 'drop') %>% 
+                  pull(n) < (E$nMaxTrials - nMaxOutliers)),
+      # if participants were already dropped don't mark them here
+      `Too many outlying trials` = if_else(!(pid %in% E$AdvisedTrial$pid),
+                                           F, `Too many outlying trials`)
+    )
 
-skipLoadData <- F
-httpPath <- "http://raw.githubusercontent.com/oxacclab/ExploringSocialMetacognition/master/analysis/ACv2/"
+  do_exclusions(E$exclusions, envir = E, backup = F)
+}
 
-source(paste0(httpPath, "src/02_Exclusions.R"))
-
-## Re-order factor levels for advice ratings
-## This helps the graphs present more neatly
-AdvisedTrial <- AdvisedTrial %>%
-  mutate(advisor0questionnaireHonestyLabel = 
-           factor(advisor0questionnaireHonestyLabel, 
-                  levels = 
-                    levels(advisor0questionnaireHonestyLabel)[c(1, 3, 2)]))
 ```
 
-#### Exclusions
-
-Participants (total *n* = `r "nrow(exclusions)"`) could be excluded for a number of reasons: failing attention checks, having fewer than 11 trials which took less than 1 minute to complete (one participant), providing final decisions which were the same as the initial estimate on more than 90% of trials, or using non-English labels for the honesty questionnaire (one participant).
+Participants (total *n* = `r nrow(exclusions)`) could be excluded for a number of reasons: failing attention checks, having fewer than `r nMaxTrials - nMaxOutliers` trials which took less than `r maxTrialRT / 1000`s to complete, providing final decisions which were the same as the initial estimate on more than `r round((1 - minChangeRate) * 100)`% of trials, or using non-English labels for the honesty questionnaire.
 The latter exclusion was added after data were collected because it was not anticipated that participants would use translation software in the task.
+The numbers of participants who failed the various checks are detailed in Table \@ref(tab:be-db-exclusions).
 
-The final participant list consists of `r "length(unique(AdvisedTrial$pid))"` participants who completed an average of `r "num2str(mean(aggregate(advisor0 ~ pid, AdvisedTrial, length)$advisor0))"` trials each.
+The final participant list consists of `r length(unique(AdvisedTrial$pid))` participants who completed an average of `r num2str(mean(aggregate(advisor0 ~ pid, AdvisedTrial, length)$advisor0))` trials each.
 
-#### Task performance
+```{r be-db-r-exclusion-table}
 
-Participants performed as expected, decreasing the error between the midpoint of their answer and the true answer from the initial estimate to the final decision, which suggests that they incorporated the advice, which was indicative of the correct answer.
-```{r be-task-performance, fig.align='center', fig.caption="Mean answer error for initial estimates and final decisions.  Faint lines show means for individual participants collapsed across trials, while boxplots, violins, and the heavy dashed line show aggregate participant means.", out.width="80%", echo=F, eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))}
-
-tmp <- decisions %>%
-  select(pid, decision, responseError) %>%
-  group_by(pid, decision) %>%
-  summarise(responseError = mean(responseError)) %>%
-  pivot_wider(names_from = decision, values_from = responseError) %>%
-  mutate(improved = last < first) %>%
-  pivot_longer(cols = c(first, last), 
-               names_to = "decision", 
-               values_to = "responseError")
-
-ggplot(tmp, aes(x = decision, y = responseError)) +
-  geom_violin(fill = NA, size = 2) +
-  stat_summary(geom = "line", fun.y = mean,
-               aes(group = 1, linetype = "mean"), size = 1) +
-  geom_line(alpha = .5, aes(group = pid, colour = improved)) + 
-  scale_linetype_manual(name = "", values = c("solid")) +
-  scale_color_discrete(name = "", labels = c("deteriorated", "improved")) +
-  labs(x = "decision", 
-       y = "|target - response marker centre| (years)")
+exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
+n <- ncol(exclusions)
+exclusions %>% 
+  summarise(across(where(is.logical), sum)) %>%
+  mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
+  pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
+  kable(caption = "\\label{tab:be-db-exclusions}Participant exclusions for Experiment 5") %>%
+  row_spec((n - 1):n, bold = T)
 
 ```
 
-The advice participants received was subject to variation, but there did not appear to be overall systematic differences between the advisors either in terms of error (distance between the centre of the advice estimate and the correct answer) or distance (distance between the centre of the advice estimate and the centre of the initial estimate).
-\mccorrect{!TODO[error and distance graphs]}
+##### Task performance
 
-#### Hypotheses
+```{r be-db-r-split}
 
-The hypotheses tested were that 
-* weight on advice would be higher for advice rated as 'honest' versus advice rated as 'deceptive'
-* weight on advice would be higher for advisors who were described as 'never misleading', even for advice rated as 'honest'
+for (E in c(.GlobalEnv, .prevStudy)) {
+  
+  fb <- E$AdvisedTrial %>% 
+    group_by(pid) %>%
+    summarise(Feedback = !all(is.na(timeFeedbackOn))) %>%
+    mutate(Feedback = if_else(Feedback == 1, "Feedback", "No feedback"))
+  
+  tmp <- E$AdvisedTrial %>%
+    left_join(fb, by = "pid") %>%
+    filter(!is.na(advisor0idDescription)) %>%
+    mutate(
+      Advisor = advisor_description_name(advisor0idDescription),
+      Advisor = factor(Advisor),
+      responseCentre = responseEstimateLeft + (responseMarkerWidth / 2),
+      advisor0questionnaireHonestyLabel = factor(
+        advisor0questionnaireHonestyLabel
+      ),
+      advisor0questionnaireHonestyLabel = fct_relevel(
+        advisor0questionnaireHonestyLabel, 
+        "Deceptive",
+        "Possibly Deceptive", 
+        "Honest"
+      )
+    ) %>%
+    order_factors()
+  
+  E$Familiarization <- tmp
+}
+
+```
+
+```{r be-db-r-performance, fig.caption="Task performance for Experiment 5.  A: Response error.  Faint lines show individual participant mean error (the absolute difference between the participant's response and the correct answer), for which the violin and box plots show the distributions. The dashed line indicates chance performance. Dotted violin outlines show the distribution of participant means on the original study which this is a replication. The dependent variable here is error, the distance between the correct answer and the participant's answer, and consequently lower values represent better performance. The theoretical limit for error is around 100."}
+
+gg <- list()
+
+# Task performance figure
+dw <- .2
+
+# Accuracy
+for (E in c(.GlobalEnv, .prevStudy))
+  E$tmp <- E$Familiarization %>% 
+  group_by(Advisor, pid) %>%
+  summarise(
+    `Initial estimate` = mean(responseError),
+    `Final decision` = mean(responseErrorFinal),
+    .groups = 'drop'
+  ) %>%
+  pivot_longer(cols = c(`Initial estimate`, `Final decision`), 
+               names_to = 'Response', values_to = 'Error') %>%
+  mutate(advisor = Advisor,
+         Advisor = factor(paste0(Advisor, '\n'))) %>%
+  mutate(Response = factor(Response)) %>%
+  order_factors()
+
+bf <- tmp %>% 
+  nest(d = -Advisor) %>%
+  mutate(d = map(d, as.data.frame),
+    bf = map(d, ~ ttestBF(x = .$Error[.$Response == 'Initial estimate'],
+                          y = .$Error[.$Response == 'Final decision'], 
+                          data = ., paired = T)),
+         bf = map_chr(bf, ~ .@bayesFactor %>% .$bf %>% exp() %>% bf2str())) %>%
+  select(-d)
+
+gg$acc <- tmp %>%
+  ggplot(aes(x = Response, y = Error, colour = advisor)) +
+  scale_y_continuous(limits = c(0, 50), expand = c(0, 0)) +
+  scale_x_discrete() +
+  scale_colour_discrete(name = 'Advisor', aesthetics = c('fill', 'colour')) +
+  coord_cartesian(clip = F) +
+  geom_line(aes(group = pid), alpha = .25) +
+  geom_split_violin(aes(x = nudge(Response, dw), 
+                        group = Response, fill = advisor), 
+                    width = .9, colour = NA) +
+  geom_split_violin(aes(x = nudge(Response, dw), group = Response), 
+                    fill = NA, width = .9, colour = 'black', linetype = 'dashed', 
+                    data = .prevStudy$tmp) +
+  geom_boxplot(aes(x = nudge(Response, dw), group = Response),
+               outlier.shape = NA, size = 1, width = dw/2, colour = 'black') +
+  geom_segment(x = 1 - dw, xend = 2 + dw, y = 50, yend = 50, 
+               colour = 'black') +
+  geom_label(aes(label = paste0('BF = ', bf)), 
+             x = 1.5, y = 50, colour = 'black', data = bf) +
+  facet_wrap(~Advisor) +
+  labs(y = 'Mean error') +
+  broken_axis_top
+
+# Confidence
+dw <- .4
+
+for (E in c(.GlobalEnv, .prevStudy)) 
+  E$tmp <- E$Familiarization %>% 
+  mutate(
+    `Initial error` = responseError,
+    `Initial width` = responseMarkerWidth,
+    `Final error` = responseErrorFinal,
+    `Final width` = responseMarkerWidthFinal
+  ) %>%
+  pivot_longer(cols = c(starts_with('Initial'), starts_with('Final')), 
+               names_to = c('Response', '.value'), 
+               names_pattern = '(\\w+) (\\w+)') %>%
+  group_by(pid, Response, width) %>%
+  summarise(Error = mean(error), .groups = 'drop') %>%
+  mutate(response = paste0(Response, '\n'),
+         response = factor(response),
+         Response = factor(Response),
+         `Marker width` = factor(width)) %>%
+  order_factors() 
+
+# Patchwork plots together
+gg$acc
+
+```
+
+```{r be-db-r-aov}
+
+# Accuracy
+tmp <- Familiarization %>%
+  mutate(Initial = responseError, Final = responseErrorFinal) %>%
+  pivot_longer(c(Initial, Final), names_to = "Decision", values_to = "Error") %>%
+  select(pid, Error, Decision, Advisor) %>%
+  mutate(across(-Error, factor)) %>%
+  group_by(pid, Decision, Advisor) %>%
+  summarise(Error = mean(Error), .groups = "drop")
+
+aov_acc <- tmp %>%
+  ezANOVA(
+    dv = Error, 
+    wid = pid,
+    within = c(Decision, Advisor)
+  )
+
+mm_acc <- tmp %>% 
+  mutate(Decision = fct_rev(Decision)) %>%
+  marginalMeans(Error, pid, "Reduction")
+
+message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
+
+s_acc <- summariseANOVA(aov_acc$ANOVA, mm_acc)
+
+```
+
+Participants performed as expected, decreasing the error between the midpoint of their answer and the true answer from the initial estimate to the final decision (`r s_acc$s[1]`), which suggests that they incorporated the advice, which was indicative of the correct answer.
+The participants had less error on decisions made with the Always honest advisor than the Sometimes deceptive advisor (`r s_acc$s[2]`), although surprisingly there was no evidence that this was due to greater reduction in error scores over time for that advisor (`r s_acc$s[3]`).
+
+Participants only had one marker they could place, and separate confidence judgements were not asked for, so we cannot directly assess confidence in these data.
+
+##### Advisor performance
+
+```{r be-db-r-advisor-performance}
+
+tmp <- Familiarization %>%
+  group_by(pid, Advisor) %>%
+  summarise(
+    Error = mean(advisor0Error),
+    Distance = mean(abs(advisor0adviceCentre - responseCentre)),
+    .groups = "drop"
+  )
+
+tt <- tmp %>%
+  pivot_longer(c(Error, Distance), names_to = "Dimension") %>%
+  pivot_wider(names_from = Advisor) %>%
+  nest(d = -Dimension) %>%
+  mutate(
+    s = map_chr(
+      d, 
+      ~ md.ttestBF(
+        .$`Always honest`, 
+        .$`Sometimes deceptive`,
+        labels = c("M~AlwaysHonest~", "M~SometimesDeceptive~"),
+        paired = T
+      )
+    )
+  )
+
+```
+
+The advice given by the advisors was generated stochastically from the same distribution.
+Any differences will be random.
+This was demonstrably the case in the domain of advice error (absolute distance between the centre of the advice marker and the correct year; `r tt$s[1]`).
+The Bayes' Factor for the domain of agreement -- the absolute distance between the centre of the advice marker and the centre of the participant's initial estimate marker -- was essentially on the threshold (`r tt$s[2]`).
+
+##### Advice ratings
+
+```{r be-db-r-advice-ratings}
+
+Familiarization %>%
+  mutate(rating = advisor0questionnaireHonestyLabel) %>%
+  group_by(pid, Advisor, rating) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  ggplot(aes(x = Advisor, y = n, fill = rating, colour = rating)) +
+  geom_boxplot(alpha = .25, outlier.color = NA) +
+  scale_y_continuous(limits = c(0, nMaxTrials / 2)) +
+  stat_summary(geom = "label", fun.data = ~ {
+    x <- enframe(., value = "y") %>%
+      group_by(y) %>%
+      summarise(label = n(), .groups = "drop")
+  }, colour = "black", fill = "white", label.size = 0, aes(group = rating), position = position_dodge(.75))
+
+```
 
 ##### Effect of advice
 
-```{r h2 woa by advice test, results='asis', eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))}
+```{r be-db-r-advice, results='asis', eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))}
 
-tmp <- AdvisedTrial %>%
-  dplyr::filter(advisor0questionnaireHonestyLabel %in% 
-                  c('Honest', 'Deceptive')) %>%
-  group_by(
-    pid,
-    advisor0questionnaireHonestyLabel
-  ) %>%
-  summarise(woa = mean(advisor0woa, na.rm = T)) %>%
-  ## strip missing cases
-  spread(advisor0questionnaireHonestyLabel, woa) %>%
-  dplyr::filter_all(all_vars(!is.na(.)))
+for (E in c(.GlobalEnv, .prevStudy)) {
+  E$tmp <- E$Familiarization %>%
+    mutate(
+      Rating = if_else(
+        advisor0questionnaireHonestyLabel == "Honest", 
+        "Honest", 
+        "Not honest"
+      ),
+      Rating = factor(Rating)
+    ) %>%
+    select(pid, Advisor, Rating, advisor0Influence) %>%
+    group_by(pid, Advisor, Rating) %>%
+    summarise(inf = mean(advisor0Influence), .groups = "drop") %>%
+    pivot_wider(names_from = c(Advisor, Rating), values_from = inf)
+  
+  E$lost <- E$tmp[!complete.cases(E$tmp), ]
+  
+  E$tmp <- E$tmp %>%
+    filter(complete.cases(.)) %>%
+    pivot_longer(
+      -pid, 
+      names_to = c("Advisor", "Rating"),
+      names_sep = "_",
+      values_to = "inf"
+    ) %>%
+    mutate(across(-inf, factor))
+}
 
-r <- "\\mccorrect{!TODO[fix ttest]}"
-# r <- md.ttest(tmp$Deceptive, tmp$Honest, 
-#               c('*M*|deceptive', '*M*|honest'),
-#               paired = T)
+
+aov_inf <- ezANOVA(tmp, inf, pid, c(Advisor, Rating))
+
+mm_inf <- tmp %>% 
+  select(pid, inf, Rating, Advisor) %>%
+  marginalMeans(inf, pid, "Honest-Dishonest")
+
+message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
+
+s_inf <- summariseANOVA(aov_inf$ANOVA, mm_inf)
+
+# Stats for graph
+bf <- tmp %>% 
+  nest(d = -Rating) %>%
+  mutate(
+    bf = map(d, ~ select(., pid, Advisor, inf) %>%
+               pivot_wider(names_from = Advisor, values_from = inf) %>%
+               filter_if(is.numeric, ~ !is.na(.)) %>%
+               as.data.frame() %$%
+               ttestBF(x = `Always honest`, y = `Sometimes deceptive`, data = ., paired = T))
+  ) 
+
+bf$BF <- sapply(1:nrow(bf), function(i) bf2str(exp(bf$bf[[i]]@bayesFactor$bf)))
+
+# Graph
+dw <- .1
+
+ggplot(tmp, aes(x = Advisor, y = inf, colour = Rating, fill = Rating)) +
+  geom_line(aes(group = pid), alpha = .3) +
+  geom_split_violin(aes(x = nudge(Advisor, dw),
+                        group = Advisor), width = .9,
+               colour = NA) +
+  geom_split_violin(aes(x = nudge(Advisor, dw),
+                        group = Advisor),
+                    fill = NA,
+                    colour = 'black', alpha = 0, width = .9,
+                    linetype = 'dashed', size = 1,
+                    data = .prevStudy$tmp) +
+  geom_boxplot(outlier.shape = NA, size = 1, width = dw/2,
+               aes(x = nudge(Advisor, dw), 
+                   group = Advisor),
+               colour = 'black') +
+  geom_segment(x = 1, xend = 2, y = 48, yend = 48, colour = 'black') +
+  geom_label(y = 48, x = 1.5, colour = 'black', fill = 'white', 
+             aes(label = paste0('BF = ', BF)), data = bf) +
+  scale_y_continuous(limits = c(NA, 50)) +
+  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
+  facet_grid(~Rating) +
+  labs(x = 'Advisor advice profile', y = 'Influence of advice') +
+  broken_axis_top
 
 ```
 
@@ -208,14 +526,14 @@ As expected, participants were substantially more influenced by advice they rate
 
 ##### Effect of advisor
 
-```{r h1, results='asis', eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))}
+```{r be-db-r-advisor, results='asis', eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))}
 
-tmp <- AdvisedTrial %>%
-  dplyr::filter(advisor0questionnaireHonestyLabel == 'Honest') %>%
-  group_by(pid, advisor0idDescription) %>%
-  summarise(woa = mean(advisor0woa)) %>%
-  spread(advisor0idDescription, woa) %>%
-  dplyr::filter_all(all_vars(!is.na(.)))
+# tmp <- AdvisedTrial %>%
+#   dplyr::filter(advisor0questionnaireHonestyLabel == 'Honest') %>%
+#   group_by(pid, advisor0idDescription) %>%
+#   summarise(woa = mean(advisor0woa)) %>%
+#   spread(advisor0idDescription, woa) %>%
+#   dplyr::filter_all(all_vars(!is.na(.)))
   
 
 r <- "\\mccorrect{!TODO[fix ttest]}"

@@ -44,8 +44,6 @@ For this replication, we chose to directly contrast the tendency to prefer agree
 
 ```{r ai-ava-load, include = F}
 
-rm(list = ls()); source('scripts_and_filters/general_setup.R')
-
 # Load the study data
 select_experiment(
   project = 'datequiz',
@@ -125,7 +123,7 @@ On each trial, participants were presented with an historical event that occurre
 They were asked to drag one of three markers onto a timeline to indicate the date range within which they thought the event occurred.
 The three markers each had different widths, and each marker had point value associated with it, with wider markers worth fewer points.
 The markers were 1, 3, and 9 years wide, being worth 27, 9, and 3 points respectively.
-Participants then received advice indicating a region of the timeline in which the advisor suggested the event occured.
+Participants then received advice indicating a region of the timeline in which the advisor suggested the event occurred.
 Participants could then mark a final response in the same manner as their original response, and could choose a different marker width if they wished.
 
 Participants started with `r sum(tmp$type == "practice")` block of `r tmp %>% filter(type == "practice") %>% pull(n) %>% ceiling()` trials that contained no advice to allow them to familiarise themselves with the task.
