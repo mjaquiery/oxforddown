@@ -222,25 +222,27 @@ marginalMeans <- function(
       ) %>%
       unique()
   }
-  # interaction
-  tmp <- tmp %>%
-    group_by(pid, across(all_of(vars))) %>%
-    summarise(dv = mean(dv), .groups = "drop") %>%
-    pivot_wider(names_from = vars[1], values_from = dv) 
-  
-  out$.interactionExpression <- glue("{names(tmp)[3]} - {names(tmp)[4]}")
-  
-  out$interaction <- tmp %>%
-    mutate(dv = .[[3]] - .[[4]]) %>%
-    group_by(across(all_of(vars[2]))) %>%
-    summarise(
-      s = md.mean(
-        dv, 
-        label = glue("M~{fx(interaction)}|{fx(.data[[vars[2]]])}~")
-      ),
-      .groups = "drop"
-    ) %>%
-    unique()
+  if (length(vars) == 2) {
+    # interaction
+    tmp <- tmp %>%
+      group_by(pid, across(all_of(vars))) %>%
+      summarise(dv = mean(dv), .groups = "drop") %>%
+      pivot_wider(names_from = vars[1], values_from = dv) 
+    
+    out$.interactionExpression <- glue("{names(tmp)[3]} - {names(tmp)[length(names(tmp))]}")
+    
+    out$interaction <- tmp %>%
+      mutate(dv = .[[3]] - .[[4]]) %>%
+      group_by(across(all_of(vars[2]))) %>%
+      summarise(
+        s = md.mean(
+          dv, 
+          label = glue("M~{fx(interaction)}|{fx(.data[[vars[2]]])}~")
+        ),
+        .groups = "drop"
+      ) %>%
+      unique()
+  }
   out
 }
 
@@ -248,6 +250,8 @@ marginalMeans <- function(
 #' @param ANOVA ANOVA object from an ezANOVA call
 #' @param mMeans marginal means list from a marginalMeans call
 summariseANOVA <- function(ANOVA, mMeans) {
+  if (class(ANOVA) == "list" && has_name(ANOVA, "ANOVA"))
+    ANOVA <- ANOVA$ANOVA
   mm <- mMeans[lapply(mMeans, is_tibble) == T]
   mm <- lapply(1:length(mm), \(i) {
     tibble(

@@ -251,11 +251,11 @@ for (E in c(.GlobalEnv, .prevStudy)) {
       Advisor = advisor_description_name(advisor0idDescription),
       Advisor = factor(Advisor),
       responseCentre = responseEstimateLeft + (responseMarkerWidth / 2),
-      advisor0questionnaireHonestyLabel = factor(
+      Rating = factor(
         advisor0questionnaireHonestyLabel
       ),
-      advisor0questionnaireHonestyLabel = fct_relevel(
-        advisor0questionnaireHonestyLabel, 
+      Rating = fct_relevel(
+        Rating, 
         "Deceptive",
         "Possibly Deceptive", 
         "Honest"
@@ -420,131 +420,177 @@ The Bayes' Factor for the domain of agreement -- the absolute distance between t
 
 ##### Advice ratings
 
-```{r be-db-r-advice-ratings}
+```{r be-db-r-advice-ratings, fig.caption="Advice rating in Experiment 5.  The polar plots show the number of times each participant gave the given rating to the advice of each advisor. The colour density illustrates the number of participants who gave at least that many ratings to the advice of an advisor."}
 
-Familiarization %>%
-  mutate(rating = advisor0questionnaireHonestyLabel) %>%
-  group_by(pid, Advisor, rating) %>%
-  summarise(n = n(), .groups = "drop") %>%
-  ggplot(aes(x = Advisor, y = n, fill = rating, colour = rating)) +
-  geom_boxplot(alpha = .25, outlier.color = NA) +
-  scale_y_continuous(limits = c(0, nMaxTrials / 2)) +
-  stat_summary(geom = "label", fun.data = ~ {
-    x <- enframe(., value = "y") %>%
-      group_by(y) %>%
-      summarise(label = n(), .groups = "drop")
-  }, colour = "black", fill = "white", label.size = 0, aes(group = rating), position = position_dodge(.75))
+axes <- crossing(
+  Advisor = c("Always honest", "Sometimes deceptive"),
+  x = c(1.5, 2.5, 3.5),
+  y = c(3, 6)
+)
+
+suppressWarnings(
+  Familiarization %>%
+    mutate(
+      Rating = Rating,
+      Rating = fct_rev(Rating)
+    ) %>%
+    ggplot(aes(x = Rating, fill = Advisor)) +
+    # data
+    geom_histogram(
+      aes(group = pid, colour = Advisor), 
+      stat = "count", 
+      position = "identity", 
+      alpha = .1
+    ) +
+    # axis
+    geom_vline(aes(xintercept = x), data = axes) +
+    geom_label(
+      aes(x = x, y = y, label = y), 
+      label.size = 0,
+      label.r = unit(.5, "lines"),
+      fill = "white",
+      data = axes
+    ) +
+    coord_polar() +
+    facet_wrap(~Advisor) +
+    theme(
+      axis.line = element_blank(),
+      axis.ticks = element_blank(),
+      axis.text.y.left = element_blank(),
+      axis.title = element_blank()
+    )
+)
+
+# Stats
+tmp <- table(Familiarization$Advisor, Familiarization$Rating) 
+
+chi <- chisq.test(tmp)
+bf <- contingencyTableBF(
+  tmp, 
+  sampleType = "indepMulti", 
+  fixedMargin = "rows"
+)
+r <- apply(tmp, 2, \(x) x[1]/x[2])
+
+s_r <- sapply(1:length(r), \(i) paste(names(r)[i], num2str(r[i]))) %>%
+  paste(collapse = ", ")
+s <- glue("$\\chi ^2({chi$parameter}) = ${num2str(chi$statistic)}, p={prop2str(chi$p.value)}, BF={bf2str(exp(bf@bayesFactor$bf))}; AlwaysHonest:SometimesDeceptive ratio: {s_r}")
 
 ```
 
-##### Effect of advice
+The advisors' advice was rated differently by the participants, as shown in Figure \@ref(fig:be-db-r-advice-ratings) (`r s`).
+This indicates that participants understood the task and that the manipulation worked as intended, with more suspicion applied to the advice from the Sometimes deceptive advisor.
+
+##### \OpenScience{prereg} Effect of advice
 
 ```{r be-db-r-advice, results='asis', eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))}
 
+# Actual test
+x <- Familiarization %>% 
+  select(
+    pid, 
+    advisor0WOA,
+    Rating = Rating
+  ) %>%
+  # filter(Rating %in% c("Deceptive", "Honest")) %>%
+  group_by(pid, Rating) %>%
+  summarise(advisor0WOA = mean(advisor0WOA), .groups = "drop") %>%
+  pivot_wider(names_from = Rating, values_from = advisor0WOA) %>%
+  drop_na(-pid) %>%
+  pivot_longer(-pid, names_to = "Rating", values_to = "WOA") %>%
+  mutate(across(-WOA, factor))
+
+aov_advice <- ezANOVA(x, WOA, pid, Rating)
+
+mm_advice <- marginalMeans(x, WOA, pid)
+
+s_advice <- summariseANOVA(aov_advice, mm_advice)
+
+```
+
+Participants chose their own ratings for the advice, and it was common for participants not to use all ratings for all advisors (e.g. many participants never rated advice from the Always honest advisor as Deceptive).
+This meant that the statistical tests preregistered for this hypothesis were broken down into separate contrasts of advice and advisor. 
+Using a more complete test, such as 2x3 ANOVA, would have suffered greatly from missing values.
+
+To explore the effect of advice, a 1x3 ANOVA was run on weight on advice across ratings. 
+In all, `r length(unique(x$pid))`/`r length(unique(Familiarization$pid))` (`r num2str(length(unique(x$pid)) / length(unique(Familiarization$pid)) * 100)`%) participants had at least one trial rated with each of the three ratings.
+The weight on advice differed according to the rating assigned the advice (`r `s_advice$s[1]`; Mauchly's test for Sphericity W=`r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][2][[1]])`, p=`r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][3][[1]])`).
+As expected, participants were more influenced by advice they rated as Honest compared to advice they rated as Deceptive.
+
+##### \OpenScience{prereg} Effect of advisor
+
+```{r be-db-r-advisor, fig.caption="Weight on Advice in Experiment 5.  Shows the weight of the advice of the advisors. Only trials where the participant rated the advice as Honest are included. The shaded area and boxplots indicate the distribution of the individual participants' mean weight on advice. Individual means for each participant are shown with lines in the centre of the graph. The dashed outline shows the distribution of participant means in the original study of which this is a replication."}
 for (E in c(.GlobalEnv, .prevStudy)) {
-  E$tmp <- E$Familiarization %>%
-    mutate(
-      Rating = if_else(
-        advisor0questionnaireHonestyLabel == "Honest", 
-        "Honest", 
-        "Not honest"
-      ),
-      Rating = factor(Rating)
-    ) %>%
-    select(pid, Advisor, Rating, advisor0Influence) %>%
-    group_by(pid, Advisor, Rating) %>%
-    summarise(inf = mean(advisor0Influence), .groups = "drop") %>%
-    pivot_wider(names_from = c(Advisor, Rating), values_from = inf)
+  E$tmp <- E$Familiarization %>% 
+    filter(Rating == "Honest") %>%
+    group_by(pid, Advisor) %>%
+    summarise(WOA = mean(advisor0WOA), .groups = "drop") %>%
+    pivot_wider(names_from = Advisor, values_from = WOA)
   
-  E$lost <- E$tmp[!complete.cases(E$tmp), ]
+  # Stats
+  E$.T <- E$tmp %>%
+    drop_na(-pid) %$%
+    md.ttest(
+      `Always honest`, 
+      `Sometimes deceptive`, 
+      paired = T,
+      labels = c("M~AlwaysHonest~", "M~SometimesDeceptive~")
+    )
   
-  E$tmp <- E$tmp %>%
-    filter(complete.cases(.)) %>%
-    pivot_longer(
-      -pid, 
-      names_to = c("Advisor", "Rating"),
-      names_sep = "_",
-      values_to = "inf"
-    ) %>%
-    mutate(across(-inf, factor))
+  # Graph stats
+  E$bf <- E$tmp %>%
+    drop_na(-pid) %$%
+    ttestBF(
+      `Always honest`, 
+      `Sometimes deceptive`, 
+      paired = T
+    )
+  
+  E$lost <- nrow(E$tmp) - nrow(drop_na(E$tmp, -pid))
+  
+  E$tmp <- E$tmp %>% 
+    pivot_longer(-pid, names_to = "Advisor", values_to = "WOA") %>%
+    mutate(Feedback = "No feedback")
 }
 
-
-aov_inf <- ezANOVA(tmp, inf, pid, c(Advisor, Rating))
-
-mm_inf <- tmp %>% 
-  select(pid, inf, Rating, Advisor) %>%
-  marginalMeans(inf, pid, "Honest-Dishonest")
-
-message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
-
-s_inf <- summariseANOVA(aov_inf$ANOVA, mm_inf)
-
-# Stats for graph
-bf <- tmp %>% 
-  nest(d = -Rating) %>%
-  mutate(
-    bf = map(d, ~ select(., pid, Advisor, inf) %>%
-               pivot_wider(names_from = Advisor, values_from = inf) %>%
-               filter_if(is.numeric, ~ !is.na(.)) %>%
-               as.data.frame() %$%
-               ttestBF(x = `Always honest`, y = `Sometimes deceptive`, data = ., paired = T))
-  ) 
-
-bf$BF <- sapply(1:nrow(bf), function(i) bf2str(exp(bf$bf[[i]]@bayesFactor$bf)))
+bf <- bf2str(exp(bf@bayesFactor$bf))
 
 # Graph
 dw <- .1
 
-ggplot(tmp, aes(x = Advisor, y = inf, colour = Rating, fill = Rating)) +
-  geom_line(aes(group = pid), alpha = .3) +
+tmp %>% 
+  drop_na(everything()) %>%
+  ggplot(aes(x = Advisor, y = WOA, fill = Feedback, colour = Feedback)) +
+  geom_line(aes(group = pid), alpha = .25) +
   geom_split_violin(aes(x = nudge(Advisor, dw),
                         group = Advisor), width = .9,
                colour = NA) +
   geom_split_violin(aes(x = nudge(Advisor, dw),
-                        group = Advisor),
-                    fill = NA,
-                    colour = 'black', alpha = 0, width = .9,
+                        group = Advisor,
+                        fill = Feedback), 
+                    colour = 'black', alpha = 0, width = .9, 
                     linetype = 'dashed', size = 1,
                     data = .prevStudy$tmp) +
   geom_boxplot(outlier.shape = NA, size = 1, width = dw/2,
                aes(x = nudge(Advisor, dw), 
                    group = Advisor),
                colour = 'black') +
-  geom_segment(x = 1, xend = 2, y = 48, yend = 48, colour = 'black') +
-  geom_label(y = 48, x = 1.5, colour = 'black', fill = 'white', 
-             aes(label = paste0('BF = ', BF)), data = bf) +
-  scale_y_continuous(limits = c(NA, 50)) +
+  geom_segment(x = 1, xend = 2, y = 1, yend = 1, colour = 'black') +
+  geom_label(y = 1, x = 1.5, colour = 'black', fill = 'white',
+             label = paste0('BF = ', bf)) +
+  scale_y_continuous(limits = c(0, 1),
+                     breaks = seq(0, 1, length.out = 6),
+                     expand = expansion(add = c(0, 0.1))) +
   scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
-  facet_grid(~Rating) +
-  labs(x = 'Advisor advice profile', y = 'Influence of advice') +
-  broken_axis_top
+  facet_grid(~Feedback) +
+  labs(x = 'Advisor advice profile', y = 'Weight of "Honest" advice') 
 
 ```
 
-As expected, participants were substantially more influenced by advice they rated as 'honest' compared to advice they rated as 'deceptive' (`r "r"`).
+To distinguish the effects of the advisor from the effects of the advice, we compared weight on advice for only those trials where the participant rated the advice as Honest. 
+This approach has the limitation that `r lost` (`r num2str(lost / length(unique(Familiarization$pid)) * 100)`%) participants had to be dropped due to never rating advice from the Sometimes deceptive advisor as Honest.
 
-##### Effect of advisor
-
-```{r be-db-r-advisor, results='asis', eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))}
-
-# tmp <- AdvisedTrial %>%
-#   dplyr::filter(advisor0questionnaireHonestyLabel == 'Honest') %>%
-#   group_by(pid, advisor0idDescription) %>%
-#   summarise(woa = mean(advisor0woa)) %>%
-#   spread(advisor0idDescription, woa) %>%
-#   dplyr::filter_all(all_vars(!is.na(.)))
-  
-
-r <- "\\mccorrect{!TODO[fix ttest]}"
-# r <- md.ttest(tmp$inGroup, tmp$outGroup, 
-#               c("*M*|inGroup", "*M*|outGroup"), paired = T)
-
-```
-
-Participants were also more influenced by 'honest' advice from the advisor who was described as 'never misleading' (`r "r"`).
-
-\mccorrect{!TODO[plot of woa by advice rating and advisor]}
+Comparing the two (Figure \@ref(fig:be-db-r-advisor)) showed that participants placed more weight on the Honest advice from the Always honest advisor (`r .T`).
 
 ##### Results plot
 
@@ -552,51 +598,74 @@ The details of the data are best presented in a combined figure.
 
 ```{r be-results-plot, fig.align='center', fig.caption="Influence of advice by advisor according to participants\' perception of advice honesty. Faint lines show means for individual participants (missing segments indicate the participant rated no advice from that advisor with the designated category). Violins, box plots, and heavy dashed lines aggregate means for all participants.", out.width="80%", echo=F}
 
-# AdvisedTrial %>%
-#   group_by(pid, advisor0idDescription, advisor0questionnaireHonestyLabel) %>%
-#   summarise(woa = mean(advisor0woa)) %>% 
-#   ggplot(aes(x = advisor0questionnaireHonestyLabel, y = woa)) +
-#   geom_violin(colour = NA, alpha = .25, 
-#               aes(fill = advisor0questionnaireHonestyLabel)) +
-#   geom_boxplot(outlier.colour = NA, fill = NA, 
-#                aes(group = advisor0questionnaireHonestyLabel)) +
-#   geom_line(alpha = .25, aes(group = pid)) + 
-#   stat_summary(geom = "line", fun.y = mean,
-#                aes(group = 1, linetype = "mean"), size = 1.5) +
-#   scale_y_continuous(limits = c(0, 1)) +
-#   scale_fill_discrete(name = "Advice rating") + 
-#   scale_linetype_manual(name = "", values = c("dashed")) + 
-#   facet_wrap(~advisor0idDescription) +
-#   labs(x = 'Advice Honesty Rating',
-#        y = 'Weight on Advice') +
-#   theme(
-#     legend.position = "top"
-#   )
+Familiarization %>%
+  group_by(pid, advisor0idDescription, Rating) %>%
+  summarise(woa = mean(advisor0WOA)) %>%
+  ggplot(aes(x = Rating, y = woa)) +
+  geom_violin(colour = NA, alpha = .25,
+              aes(fill = Rating)) +
+  geom_boxplot(outlier.colour = NA, fill = NA,
+               aes(group = Rating)) +
+  geom_line(alpha = .25, aes(group = pid)) +
+  stat_summary(geom = "line", fun.y = mean,
+               aes(group = 1, linetype = "mean"), size = 1.5) +
+  scale_y_continuous(limits = c(0, 1)) +
+  scale_fill_discrete(name = "Advice rating") +
+  scale_linetype_manual(name = "", values = c("dashed")) +
+  facet_wrap(~advisor0idDescription) +
+  labs(x = 'Advice Honesty Rating',
+       y = 'Weight on Advice') +
+  theme(
+    legend.position = "top"
+  )
 
 ```
 
-The figure shows that there is a different pattern in the responses to advice across advice ratings depending upon the advisor supplying the advice.
-Advice perceived as not being honest is discounted relatively equally from the advisor described as 'always helpful', and is still fairly influential in the final decision.
-The advice perceived as 'honest' from this advisor is the most influential of all advice.
-Likewise, the 'honest' advice from the advisor described as 'sometimes-misleading' is more influential than the 'possibly deceptive' advice, which is in turn more influential than the 'deceptive' advice.
-The 'deceptive' advice from the 'sometimes-misleading' advisor is almost completely ignored.
-Within this broader pattern there is some variability between participants, including some participants whose responses violate the pattern quite dramatically - note the two participants with large decreases in influence for 'honest' advice from the 'sometimes-misleading' advisor as compared to the 'possibly deceptive' advice from the same.
-This may be a consequence of participants' values in each cell in the design being comprised of a low number of trials.
 #### Exploration
 
-\mccorrect{!TODO[below]}
-* were participants' criteria for judging advice as dishonest different between advisors?
-* Type 1 SDT might be able to do this if a sensible definition of objectively-deceptive advice can be produced
-    
-        * E.g.
-whether averaging with the advice would reduce error
-        
-        * There will be all sorts of problems with this, noteably it'll classify 'never deceptive' advisor as sometimes deceptive
-        
-    * May be able to investigate this with probabilities of classification for several distance bins - ROC type curve
-    
-        * what to do with 'possibly deceptive'?
-  
+```{r be-db-r-criteria} 
+
+tmp <- Familiarization %>%
+  mutate(
+    Honest = Rating == "Honest",
+    Distance = abs(responseCentre - advisor0adviceCentre)
+  )
+
+x <- crossing(
+  pid = unique(tmp$pid),
+  distance = 1:100
+) %>%
+  mutate(
+    pHonest = map2_dbl(
+      pid, 
+      distance,
+      ~ tmp %>%
+        filter(pid == .x, Distance < .y) %>%
+        pull(Honest) %>%
+        mean()
+    )
+  )
+thresh <- x %>%
+  mutate(deviance = abs(2/3 - pHonest)) %>% 
+  group_by(pid) %>% 
+  filter(!is.nan(pHonest)) %>% 
+  filter(deviance == min(deviance)) %>% 
+  summarise(threshold = mean(distance))
+
+tmp %>% 
+  left_join(select(thresh, pid, threshold), by = "pid") %>%
+  mutate(pid = fct_reorder(pid, threshold)) %>%
+  ggplot(aes(y = pid, fill = Rating)) +
+  geom_density_ridges(aes(x = Distance), alpha = 1/3, colour = NA) +
+  facet_wrap(~Advisor) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  ) +
+  labs(y = "Participant")
+
+```
+
 ### Discussion
 
 * Both the source and the plausibility of advice matter, and they seem to interact in a complex way.
