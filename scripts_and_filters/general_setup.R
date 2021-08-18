@@ -91,9 +91,14 @@ theme_set(
     )
 )
 
-broken_axis <- theme(axis.line.y = element_line(arrow = arrow(ends = 'both', length = unit(6, 'points'), type = 'closed')))
+broken_axis_y <- theme(axis.line.y = element_line(arrow = arrow(ends = 'both', length = unit(6, 'points'), type = 'closed')))
 broken_axis_top <- theme(axis.line.y = element_line(arrow = arrow(ends = 'last', length = unit(6, 'points'), type = 'closed')))
 broken_axis_bottom <- theme(axis.line.y = element_line(arrow = arrow(ends = 'first', length = unit(6, 'points'), type = 'closed')))
+
+broken_axis_x <- theme(axis.line.x = element_line(arrow = arrow(ends = 'both', length = unit(6, 'points'), type = 'closed')))
+broken_axis_right <- theme(axis.line.x = element_line(arrow = arrow(ends = 'last', length = unit(6, 'points'), type = 'closed')))
+broken_axis_left <- theme(axis.line.x = element_line(arrow = arrow(ends = 'first', length = unit(6, 'points'), type = 'closed')))
+
 
 simulation <- theme(
   plot.background = element_rect(linetype = 'dashed', colour = 'black', size = 1),

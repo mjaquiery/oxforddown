@@ -500,7 +500,7 @@ gg$inf <- ggplot(tmp, aes(x = adviceTypeName, y = adviceInfluence,
   facet_grid(~paste0(`Feedback condition`, '\n')) +
   labs(x = "", y = 'Advice influence') +
   theme(legend.position = 'none') +
-  broken_axis
+  broken_axis_y
 
 gg$acc + gg$conf + gg$roc + gg$auroc + gg$inf +
   plot_layout(
@@ -1566,7 +1566,7 @@ gg$inf <- ggplot(adv_inf, aes(x = Advisor, y = advisor0Influence,
   scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
   facet_grid(~`Feedback condition`) +
   labs(x = 'Advisor advice profile', y = 'Influence of advice') +
-  broken_axis
+  broken_axis_y
 
 # Patchwork plots together
 gg$acc + gg$conf + gg$roc + gg$auroc + gg$inf +

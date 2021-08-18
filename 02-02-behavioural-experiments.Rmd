@@ -13,6 +13,7 @@ library(BayesFactor)
 library(ez)
 library(magrittr) # for %$% exploding pipe operator
 library(patchwork)
+library(lmerTest)
 ```
 
 # Behavioural responses to advice contexts {#chapter-context-benevolence}
@@ -474,11 +475,11 @@ r <- apply(tmp, 2, \(x) x[1]/x[2])
 
 s_r <- sapply(1:length(r), \(i) paste(names(r)[i], num2str(r[i]))) %>%
   paste(collapse = ", ")
-s <- glue("$\\chi ^2({chi$parameter}) = ${num2str(chi$statistic)}, p={prop2str(chi$p.value)}, BF={bf2str(exp(bf@bayesFactor$bf))}; AlwaysHonest:SometimesDeceptive ratio: {s_r}")
+s <- glue("({chi$parameter})={num2str(chi$statistic)}, p={prop2str(chi$p.value)}, BF={bf2str(exp(bf@bayesFactor$bf))}; AlwaysHonest:SometimesDeceptive ratio: {s_r}")
 
 ```
 
-The advisors' advice was rated differently by the participants, as shown in Figure \@ref(fig:be-db-r-advice-ratings) (`r s`).
+The advisors' advice was rated differently by the participants, as shown in Figure \@ref(fig:be-db-r-advice-ratings) ($\chi^2$`r s`).
 This indicates that participants understood the task and that the manipulation worked as intended, with more suspicion applied to the advice from the Sometimes deceptive advisor.
 
 ##### \OpenScience{prereg} Effect of advice
@@ -592,81 +593,87 @@ This approach has the limitation that `r lost` (`r num2str(lost / length(unique(
 
 Comparing the two (Figure \@ref(fig:be-db-r-advisor)) showed that participants placed more weight on the Honest advice from the Always honest advisor (`r .T`).
 
-##### Results plot
-
-The details of the data are best presented in a combined figure.
-
-```{r be-results-plot, fig.align='center', fig.caption="Influence of advice by advisor according to participants\' perception of advice honesty. Faint lines show means for individual participants (missing segments indicate the participant rated no advice from that advisor with the designated category). Violins, box plots, and heavy dashed lines aggregate means for all participants.", out.width="80%", echo=F}
-
-Familiarization %>%
-  group_by(pid, advisor0idDescription, Rating) %>%
-  summarise(woa = mean(advisor0WOA)) %>%
-  ggplot(aes(x = Rating, y = woa)) +
-  geom_violin(colour = NA, alpha = .25,
-              aes(fill = Rating)) +
-  geom_boxplot(outlier.colour = NA, fill = NA,
-               aes(group = Rating)) +
-  geom_line(alpha = .25, aes(group = pid)) +
-  stat_summary(geom = "line", fun.y = mean,
-               aes(group = 1, linetype = "mean"), size = 1.5) +
-  scale_y_continuous(limits = c(0, 1)) +
-  scale_fill_discrete(name = "Advice rating") +
-  scale_linetype_manual(name = "", values = c("dashed")) +
-  facet_wrap(~advisor0idDescription) +
-  labs(x = 'Advice Honesty Rating',
-       y = 'Weight on Advice') +
-  theme(
-    legend.position = "top"
-  )
-
-```
-
 #### Exploration
 
-```{r be-db-r-criteria} 
+```{r be-db-r-overall, fig.caption="Advice response in Experiment 5.  Scatter plot of advice distance and advice influence. The dashed line shows x = y. Colours represent different advice ratings. Dots represent individual trials, and lines show the pattern within each rating."} 
 
 tmp <- Familiarization %>%
   mutate(
-    Honest = Rating == "Honest",
     Distance = abs(responseCentre - advisor0adviceCentre)
   )
 
-x <- crossing(
-  pid = unique(tmp$pid),
-  distance = 1:100
-) %>%
+tmp %>% 
+  ggplot(aes(x = Distance, y = advisor0Influence, colour = Rating)) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+  geom_smooth(method = "lm", formula = y ~ x, se = F) +
+  geom_point(alpha = 1/3) +
+  coord_fixed() +
+  scale_x_continuous(limits = c(min(tmp$advisor0Influence), NA)) +
+  scale_y_continuous(limits = c(min(tmp$advisor0Influence), NA)) +
+  facet_wrap(~Advisor) +
+  labs(y = "Influence of advice") +
+  broken_axis_top +
+  broken_axis_right
+
+m <- tmp %>%
+  mutate(Rating = fct_rev(Rating)) %$%
+  lmer(advisor0Influence ~ Distance * Rating + (1|pid), data = .)
+
+x <- m %>% summary()
+coefs <- cbind(
+  x$coefficients,
+  suppressMessages(confint(m))[-(1:2),]
+) %>% 
+  as_tibble(rownames = "Effect") %>%
+  rowid_to_column("beta") %>%
   mutate(
-    pHonest = map2_dbl(
-      pid, 
-      distance,
-      ~ tmp %>%
-        filter(pid == .x, Distance < .y) %>%
-        pull(Honest) %>%
-        mean()
+    beta = beta - 1,
+    across(c(Estimate:last_col(), -`Pr(>|t|)`), num2str),
+    `Pr(>|t|)` = prop2str(`Pr(>|t|)`, minPrefix = "<"),
+    s = glue(
+      "{beta}={Estimate} [{`2.5 %`}, {`97.5 %`}], df={df}, p={`Pr(>|t|)`}"
     )
   )
-thresh <- x %>%
-  mutate(deviance = abs(2/3 - pHonest)) %>% 
-  group_by(pid) %>% 
-  filter(!is.nan(pHonest)) %>% 
-  filter(deviance == min(deviance)) %>% 
-  summarise(threshold = mean(distance))
 
-tmp %>% 
-  left_join(select(thresh, pid, threshold), by = "pid") %>%
-  mutate(pid = fct_reorder(pid, threshold)) %>%
-  ggplot(aes(y = pid, fill = Rating)) +
-  geom_density_ridges(aes(x = Distance), alpha = 1/3, colour = NA) +
-  facet_wrap(~Advisor) +
-  theme(
-    axis.text.y = element_blank(),
-    axis.ticks.y = element_blank()
-  ) +
-  labs(y = "Participant")
-
+s <- glue("")
 ```
 
+Figure \@ref(fig:be-db-r-overall) shows the overall pattern of advice-taking in the experiment. 
+The difference in the number of dots of each colour reflects the difference in participants' ratings of advice between advisors. 
+
+The lines illustrate the relationship between the distance of the advice from the participant's initial estimate and the amount the participant moved the marker towards the advisor's advice for their final decision.
+A linear mixed model was used to better understand the significance of the relationships in the figure, with the form:
+
+\begin{align}
+    \text{Influence}_t^a = \\
+    & \hspace{-4em} \beta 0 +  \\
+    & \hspace{-4em} \beta 1 *\text{Distance}_t^a + \\
+    & \hspace{-4em} \beta 2 *(\text{Rating}_t^a=\text{Possibly Deceptive}) + \\
+    & \hspace{-4em} \beta 3 *(\text{Rating}_t^a=\text{Deceptive}) + \\
+    & \hspace{-4em} \beta 4 *(\text{Rating}_t^a=\text{Possibly Deceptive}) * \text{Distance}_t^a + \\
+    & \hspace{-4em} \beta 5 *(\text{Rating}_t^a=\text{Deceptive}) * \text{Distance}_t^a \\
+    & \hspace{-4em} \epsilon_a + \\
+    & \hspace{-4em} \epsilon_t
+\end{align}
+
+The dashed line indicates complete acceptance of the advice, while the bottom triangle below the dashed line indicates incomplete acceptance.
+
+The relationship of advice rated Honest is similar between the advisors: as the advice gets further away it retains its level of influence and the participants are willing to go further to match it. 
+This pattern indicates that the participants see the difference between their own estimates and the advisor's as indicating that they themselves are mistaken.
+
+The relationship for the Possibly Deceptive advice is possibly the most intriguing. 
+Here, there are apparent differences in both intercept and slope. 
+We should not read too much into aggregated data on the basis of relatively few trials, but it seems that the advice is regarded as slightly less plausible from the Always honest advisor (to the tune of about 5 points; half the width of the markers) regardless of how distant it is from the participant's initial estimate, whereas it is regarded as progressively less plausible the further it is from the participant's initial estimate when coming from the Sometimes deceptive advisor.
+This suggests that as advice from the Sometimes deceptive advisor was less apparently plausible it was discounted progressively more.
+
+The pattern is most clearly different between the advisors in the Dishonest advice. 
+Where participants felt the Always honest advisor's advice was Dishonest they nevertheless continued to take it very seriously, even where it was quite far from their initial estimates. 
+There are some points where advice is entirely discounted, and some where advice is entirely accepted, so the summary line hides a huge amount of variation, and in any case there are very few of these trials.
+The pattern is clearly different for the Sometimes deceptive advisor, however: no matter how close or far away the advice from the initial estimate, the participants rarely adjusted their initial estimates at all.
+
 ### Discussion
+
+Both the source and the plausibility of the advice matter, and in this task they interacted such that discounting primarily occurred where advice was offered that differed substantially from the participant's initial estimate and came from the advisor the participants were told might mislead them.
 
 * Both the source and the plausibility of advice matter, and they seem to interact in a complex way.
 * Flexible adaptation to advice context, both in terms of categorisation and influence.
@@ -678,6 +685,7 @@ tmp %>%
 #### Limitations
 
 * N
+* N per trial
 
 * No gender breakdown
 
