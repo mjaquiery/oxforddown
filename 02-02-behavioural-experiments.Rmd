@@ -617,7 +617,7 @@ tmp %>%
 
 m <- tmp %>%
   mutate(Rating = fct_rev(Rating)) %$%
-  lmer(advisor0Influence ~ Distance * Rating + (1|pid), data = .)
+  lmer(advisor0Influence ~ Advisor * Distance * Rating + (1|pid), data = .)
 
 x <- m %>% summary()
 coefs <- cbind(
@@ -635,28 +635,48 @@ coefs <- cbind(
     )
   )
 
-s <- glue("")
+bf <- tmp %>%
+  mutate(
+    rpd = Rating == "Possibly Deceptive",
+    rd = Rating == "Deceptive",
+    A = Advisor == "Sometimes deceptive",
+    D = Distance,
+    I = advisor0Influence,
+    pid = factor(pid)
+  ) %>%
+  select(pid, rpd, rd, A, D, I) %$%
+  generalTestBF(
+    I ~ A + D + rpd + rd + A:D + A:rpd + A:rd + D:rpd + D:rd + A:D:rpd + A:D:rd + pid, 
+    data = .,
+    whichRandom = "pid", 
+    whichModels = "top",
+    progress = F
+  )
 ```
 
 Figure \@ref(fig:be-db-r-overall) shows the overall pattern of advice-taking in the experiment. 
 The difference in the number of dots of each colour reflects the difference in participants' ratings of advice between advisors. 
 
 The lines illustrate the relationship between the distance of the advice from the participant's initial estimate and the amount the participant moved the marker towards the advisor's advice for their final decision.
+The dashed line indicates complete acceptance of the advice, while the bottom triangle below the dashed line indicates incomplete acceptance.
+
 A linear mixed model was used to better understand the significance of the relationships in the figure, with the form:
 
-\begin{align}
-    \text{Influence}_t^a = \\
-    & \hspace{-4em} \beta 0 +  \\
-    & \hspace{-4em} \beta 1 *\text{Distance}_t^a + \\
-    & \hspace{-4em} \beta 2 *(\text{Rating}_t^a=\text{Possibly Deceptive}) + \\
-    & \hspace{-4em} \beta 3 *(\text{Rating}_t^a=\text{Deceptive}) + \\
-    & \hspace{-4em} \beta 4 *(\text{Rating}_t^a=\text{Possibly Deceptive}) * \text{Distance}_t^a + \\
-    & \hspace{-4em} \beta 5 *(\text{Rating}_t^a=\text{Deceptive}) * \text{Distance}_t^a \\
-    & \hspace{-4em} \epsilon_a + \\
-    & \hspace{-4em} \epsilon_t
-\end{align}
+$$
+I_t^a = 
+\beta 0 +
+\beta 1 * D_t^a + 
+\beta 2 * \text{rpd}_t^a + 
+\beta 3 * \text{rd}_t^a + 
+\beta 4 * \text{rpd}_t^a * D_t^a +
+\beta 5 * \text{rd}_t^a * D_t^a +
+\epsilon_a + 
+\epsilon_t
+$$
+where $I_t^a$ is the influence of trial $t$ for participant $a$, $D$ is the distance between the centre of the initial estimate and the advice for that participant on that trial, and $\text{rpd}$ and $\text{rd}$ are equal to 1 where that participant's rating of the advice on that trial was Possibly Dishonest or Dishonest, respectively. 
+$\epsilon_a$ is the participant's intercept (a random factor in the model), and $\epsilon_t$ is the error between the predicted value and the observed value of influence.
 
-The dashed line indicates complete acceptance of the advice, while the bottom triangle below the dashed line indicates incomplete acceptance.
+Overall, 
 
 The relationship of advice rated Honest is similar between the advisors: as the advice gets further away it retains its level of influence and the participants are willing to go further to match it. 
 This pattern indicates that the participants see the difference between their own estimates and the advisor's as indicating that they themselves are mistaken.
