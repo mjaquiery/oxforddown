@@ -599,7 +599,8 @@ Comparing the two (Figure \@ref(fig:be-db-r-advisor)) showed that participants p
 
 tmp <- Familiarization %>%
   mutate(
-    Distance = abs(responseCentre - advisor0adviceCentre)
+    Distance = abs(responseCentre - advisor0adviceCentre),
+    pid = factor(pid)
   )
 
 tmp %>% 
@@ -631,27 +632,58 @@ coefs <- cbind(
     across(c(Estimate:last_col(), -`Pr(>|t|)`), num2str),
     `Pr(>|t|)` = prop2str(`Pr(>|t|)`, minPrefix = "<"),
     s = glue(
-      "{beta}={Estimate} [{`2.5 %`}, {`97.5 %`}], df={df}, p={`Pr(>|t|)`}"
+      "{Estimate} [{`2.5 %`}, {`97.5 %`}], df={df}, p={`Pr(>|t|)`}"
     )
   )
 
 bf <- tmp %>%
   mutate(
-    rpd = Rating == "Possibly Deceptive",
-    rd = Rating == "Deceptive",
-    A = Advisor == "Sometimes deceptive",
+    rpd = factor(Rating == "Possibly Deceptive"),
+    rd = factor(Rating == "Deceptive"), 
+    A = factor(Advisor == "Sometimes deceptive"),
     D = Distance,
-    I = advisor0Influence,
     pid = factor(pid)
   ) %>%
-  select(pid, rpd, rd, A, D, I) %$%
+  as.data.frame %$%
   generalTestBF(
-    I ~ A + D + rpd + rd + A:D + A:rpd + A:rd + D:rpd + D:rd + A:D:rpd + A:D:rd + pid, 
+    advisor0Influence ~ A + D + rpd + rd + A:D + A:rpd + A:rd + D:rpd + D:rd + A:D:rpd + A:D:rd + pid,
     data = .,
-    whichRandom = "pid", 
+    whichRandom = "pid",
     whichModels = "top",
     progress = F
   )
+
+ef <- bf@denominator@shortName %>% str_split(" ?\\+ ") %>% .[[1]]
+ef <- bf@bayesFactor %>%
+  as_tibble(rownames = "Effect") %>%
+  mutate(
+    Effect = map_chr(
+      Effect,
+      ~ {
+        E <- str_split(.x, " ?\\+ ")
+        out <- ef[!(ef %in% E[[1]])]
+        if (nchar(out)) out else ""
+      }
+    ),
+    bf = 1/exp(bf)
+  ) %>%
+  mutate(
+    Effect = str_replace(Effect, "A", "AdvisorSometimes deceptive"),
+    Effect = str_replace(Effect, "D", "Distance"),
+    Effect = str_replace(Effect, "rd", "RatingDeceptive"),
+    Effect = str_replace(Effect, "rpd", "RatingPossibly Deceptive")
+  )
+
+left_join(
+  coefs, 
+  select(ef, Effect, bf, error),
+  by = "Effect"
+) %>% 
+  mutate(
+    bf = if_else(is.na(bf), Inf, bf),
+    s = glue("{s}, BF={bf2str(bf)}")
+  )
+
 ```
 
 Figure \@ref(fig:be-db-r-overall) shows the overall pattern of advice-taking in the experiment. 
@@ -660,25 +692,19 @@ The difference in the number of dots of each colour reflects the difference in p
 The lines illustrate the relationship between the distance of the advice from the participant's initial estimate and the amount the participant moved the marker towards the advisor's advice for their final decision.
 The dashed line indicates complete acceptance of the advice, while the bottom triangle below the dashed line indicates incomplete acceptance.
 
-A linear mixed model was used to better understand the significance of the relationships in the figure, with the form:
+A linear mixed model was used to better understand the significance of the relationships in the figure, predicting influence on a trial from the advisor, the distance of the advice, and rating (dummy-coded). 
+Random intercepts were included for participant.
 
-$$
-I_t^a = 
-\beta 0 +
-\beta 1 * D_t^a + 
-\beta 2 * \text{rpd}_t^a + 
-\beta 3 * \text{rd}_t^a + 
-\beta 4 * \text{rpd}_t^a * D_t^a +
-\beta 5 * \text{rd}_t^a * D_t^a +
-\epsilon_a + 
-\epsilon_t
-$$
-where $I_t^a$ is the influence of trial $t$ for participant $a$, $D$ is the distance between the centre of the initial estimate and the advice for that participant on that trial, and $\text{rpd}$ and $\text{rd}$ are equal to 1 where that participant's rating of the advice on that trial was Possibly Dishonest or Dishonest, respectively. 
-$\epsilon_a$ is the participant's intercept (a random factor in the model), and $\epsilon_t$ is the error between the predicted value and the observed value of influence.
+Overall, the distance between the initial estimate and the advice was hugely influential, with an increase in distance leading to an approximately equal increase in influence ($\beta = $`r coefs$s[3]`).
+This indicates that the advice rated Honest from the Always honest advisor was generally followed, as is shown clearly in Figure \@ref(fig:be-db-r-overall).
 
-Overall, 
+Advice rated as Deceptive from the Sometimes deceptive advisor was substantially less influential ($\beta = $`r coefs$s[8]`), and this was complemented by the relationship between distance and influence being substantially reduced in this case ($\beta = $`r coefs$[12]`).
 
-The relationship of advice rated Honest is similar between the advisors: as the advice gets further away it retains its level of influence and the participants are willing to go further to match it. 
+There are other patterns in Figure \@ref(fig:be-db-r-overall) that do not come out in the statistics, possibly due to the very low trial and participant numbers, but are suggestive of a pattern we might expect.
+The relationship of advice rated Honest is similar between the advisors: as the advice gets further away it retains its level of influence and the participants are willing to go further to match it.
+This is not tested directly in the stats, but there is no significant effect of advisor alone ($\beta = $`r coefs$s[2]`), the presence of which would indicate that Honest-rated advice differed between advisors.
+The Bayesian analogue of the test indicated that there was not enough evidence to decide whether Advisor alone was 
+
 This pattern indicates that the participants see the difference between their own estimates and the advisor's as indicating that they themselves are mistaken.
 
 The relationship for the Possibly Deceptive advice is possibly the most intriguing. 
@@ -729,6 +755,7 @@ Taken together, the above arguments demonstrate that, on average, people are lik
 This behaviour is supported by normative mathematical models which show biasing towards the better estimator (in this case the judge) is the optimal strategy.
 As discussed in the scenario, the belief that one is better at a task than the average advisor may not be misguided: advisors may not dedicate the same amount of time, concentration, or thought to producing advice as judges do for initial estimates.
 Judges have to live with the consequences of their decisions, while advisors do not.
+
 ## Confidence mapping
 
 The [third scenario](#models-scenario-3) explored in the evolutionary models assigned each agent a confidence mapping, and demonstrated that discounting emerged as an appropriate response where the advisor's confidence mapping was unknown.
