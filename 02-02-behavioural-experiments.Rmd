@@ -674,7 +674,7 @@ ef <- BF@bayesFactor %>%
     Effect = str_replace(Effect, "rpd", "RatingPossibly Deceptive")
   )
 
-left_join(
+coefs <- left_join(
   coefs, 
   select(ef, Effect, bf, error),
   by = "Effect"
@@ -694,18 +694,19 @@ The dashed line indicates complete acceptance of the advice, while the bottom tr
 
 A linear mixed model was used to better understand the significance of the relationships in the figure, predicting influence on a trial from the advisor, the distance of the advice, and rating (dummy-coded). 
 Random intercepts were included for participant.
+A similar Bayesian model was included to produce Bayes factors.
 
 Overall, the distance between the initial estimate and the advice was hugely influential, with an increase in distance leading to an approximately equal increase in influence ($\beta = $`r coefs$s[3]`).
 This indicates that the advice rated Honest from the Always honest advisor was generally followed, as is shown clearly in Figure \@ref(fig:be-db-r-overall).
+This pattern indicates that the participants see the difference between their own estimates and the advisor's as indicating that they themselves are mistaken.
 
 Advice rated as Deceptive from the Sometimes deceptive advisor was substantially less influential ($\beta = $`r coefs$s[8]`), and this was complemented by the relationship between distance and influence being substantially reduced in this case ($\beta = $`r coefs$[12]`).
 
 There are other patterns in Figure \@ref(fig:be-db-r-overall) that do not come out in the statistics, possibly due to the very low trial and participant numbers, but are suggestive of a pattern we might expect.
 The relationship of advice rated Honest is similar between the advisors: as the advice gets further away it retains its level of influence and the participants are willing to go further to match it.
 This is not tested directly in the stats, but there is no significant effect of advisor alone ($\beta = $`r coefs$s[2]`), the presence of which would indicate that Honest-rated advice differed between advisors.
-The Bayesian analogue of the test indicated that there was not enough evidence to decide whether Advisor alone was 
+The Bayesian analogue of the test indicated that there was not enough evidence to decide whether Advisor alone was an important factor.
 
-This pattern indicates that the participants see the difference between their own estimates and the advisor's as indicating that they themselves are mistaken.
 
 The relationship for the Possibly Deceptive advice is possibly the most intriguing. 
 Here, there are apparent differences in both intercept and slope. 
