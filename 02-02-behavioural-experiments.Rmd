@@ -636,7 +636,7 @@ coefs <- cbind(
     )
   )
 
-bf <- tmp %>%
+BF <- tmp %>%
   mutate(
     rpd = factor(Rating == "Possibly Deceptive"),
     rd = factor(Rating == "Deceptive"), 
@@ -653,13 +653,13 @@ bf <- tmp %>%
     progress = F
   )
 
-ef <- bf@denominator@shortName %>% str_split(" ?\\+ ") %>% .[[1]]
-ef <- bf@bayesFactor %>%
+ef <- BF@bayesFactor %>%
   as_tibble(rownames = "Effect") %>%
   mutate(
     Effect = map_chr(
       Effect,
       ~ {
+        ef <- BF@denominator@shortName %>% str_split(" ?\\+ ") %>% .[[1]]
         E <- str_split(.x, " ?\\+ ")
         out <- ef[!(ef %in% E[[1]])]
         if (nchar(out)) out else ""
@@ -680,7 +680,7 @@ left_join(
   by = "Effect"
 ) %>% 
   mutate(
-    bf = if_else(is.na(bf), Inf, bf),
+    bf = if_else(is.na(bf), 1, bf),
     s = glue("{s}, BF={bf2str(bf)}")
   )
 
