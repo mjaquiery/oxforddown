@@ -638,9 +638,9 @@ coefs <- cbind(
 
 BF <- tmp %>%
   mutate(
-    rpd = factor(Rating == "Possibly Deceptive"),
-    rd = factor(Rating == "Deceptive"), 
-    A = factor(Advisor == "Sometimes deceptive"),
+    rpd = Rating == "Possibly Deceptive",
+    rd = Rating == "Deceptive",
+    A = Advisor == "Sometimes deceptive",
     D = Distance,
     pid = factor(pid)
   ) %>%
@@ -707,27 +707,21 @@ The relationship of advice rated Honest is similar between the advisors: as the 
 This is not tested directly in the stats, but there is no significant effect of advisor alone ($\beta = $`r coefs$s[2]`), the presence of which would indicate that Honest-rated advice differed between advisors.
 The Bayesian analogue of the test indicated that there was not enough evidence to decide whether Advisor alone was an important factor.
 
-
-The relationship for the Possibly Deceptive advice is possibly the most intriguing. 
-Here, there are apparent differences in both intercept and slope. 
-We should not read too much into aggregated data on the basis of relatively few trials, but it seems that the advice is regarded as slightly less plausible from the Always honest advisor (to the tune of about 5 points; half the width of the markers) regardless of how distant it is from the participant's initial estimate, whereas it is regarded as progressively less plausible the further it is from the participant's initial estimate when coming from the Sometimes deceptive advisor.
-This suggests that as advice from the Sometimes deceptive advisor was less apparently plausible it was discounted progressively more.
-
-The pattern is most clearly different between the advisors in the Dishonest advice. 
-Where participants felt the Always honest advisor's advice was Dishonest they nevertheless continued to take it very seriously, even where it was quite far from their initial estimates. 
-There are some points where advice is entirely discounted, and some where advice is entirely accepted, so the summary line hides a huge amount of variation, and in any case there are very few of these trials.
-The pattern is clearly different for the Sometimes deceptive advisor, however: no matter how close or far away the advice from the initial estimate, the participants rarely adjusted their initial estimates at all.
+Similarly, there may be a difference in the way the Possibly Deceptive advice was received from the Sometimes deceptive advisor as compared to the Always honest advisor (`r coefs$s[7]`), or in how the influence of this advice related to the distance between the advice and initial estimate markers (`r coefs$s[11]`).
+The statistics did not support this, and the Bayesian statistics suggested that there was sufficient evidence against either effect being present.
 
 ### Discussion
 
 Both the source and the plausibility of the advice matter, and in this task they interacted such that discounting primarily occurred where advice was offered that differed substantially from the participant's initial estimate and came from the advisor the participants were told might mislead them.
+Participants adapted to the context of the advice, both in terms of how readily they were to categorise the advice as dishonest and in terms of how much they were influenced by the advice.
+As advice got more distant from the initial estimate, i.e. decreased on our measure of plausibility, participants had to decide whether the discrepancy was due to their own error or their advisor's.
+Where they were in a context that suggested the advisor was trustworthy, they were more likely to ascribe the error to themselves, rating the advice as honest and adopting it for their final decision. 
+Where they were in a context that suggested the advisor was not trustworthy, they were more likely to label the advice as misleading and to retain their initial estimate as their final decision.
 
-* Both the source and the plausibility of advice matter, and they seem to interact in a complex way.
-* Flexible adaptation to advice context, both in terms of categorisation and influence.
-
-* Support for the premise of the evolutionary simulations.
-
-    * Does not prove people actually do have these hyperpriors
+These observations complement the evolutionary simulations and the benevolence component of the three-factor model of trust described by \mccorrect{Cite Mayer et al 1995}.
+Nevertheless, we have demonstrated sensitivity to context, but not universal discounting due to hyperpriors.
+It remains a matter of speculation that people exercise epistemic hygiene by ensuring that information comes from trusted sources before integrating it, and that no source is as trusted as one's own mind.
+This result is in keeping with evidence from experiments where initial estimates are labelled as advice (and vice-versa), in which participants frequently show an unusual level of acceptance of the advice suggestive of their performing egocentric discounting of their own initial estimate because they have accepted the labels and adopted the advice as their own initial estimate. \mccorrect{Cite whoever did those neat label-swapping studies} 
 
 #### Limitations
 
