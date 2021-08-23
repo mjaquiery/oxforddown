@@ -725,14 +725,14 @@ This result is in keeping with evidence from experiments where initial estimates
 
 #### Limitations
 
-* N
-* N per trial
+Even compared to the other experiments in this thesis, these experiments had a low participant count. 
+As with other Dates task studies, data collection stopped when the Bayes Factor for the main experimental hypothesis reached one of the two thresholds (1/3 > BF > 3).
+This, combined with the low trial count for each participant, meant that there were interesting follow-up questions that the data were unable to address.
+In keeping with the open science approach, we suggest that future investigations exploring those questions take them as preregistered hypotheses.
 
-* No gender breakdown
-
-    * simplicity/privacy vs data gap
-    
-* Difficult task (high levels of advice-taking by default)
+The Dates task is one that participants find challenging, leading to generally high levels of advice taking in the absence of other effects [@ginoEffectsTaskDifficulty2007].
+This means that the Honest advisor seemed to be entirely trusted.
+As discussed in the introduction to this section§\@ref(chapter-context), however, even greatly trusted advisors' advice is usually subject to some egocentric discounting.
 
 ## Noise in the advice
 
@@ -779,15 +779,13 @@ There will be a difference in the weight on advice in the probe trials between c
 
 The results of the direct benevolence experiments show that people are sensitive to the motivations of their advisors, and exercise appropriate caution where those motivations may mean the advice is misleading.
 They also demonstrate that, even where advice is considered trustworthy, it is discounted when coming from a less trusted advisor.
-Together with existing literature on the effects of advisor expertise, this supports the idea from the models that advice-taking can be fleixbly adjusted according to the context.
+Together with existing literature on the effects of advisor expertise, this supports the idea from the models that advice-taking can be flexibly adjusted according to the context.
 The results of the confidence mapping experiments were less conclusive.
 We were unable to produce a manipulation which was sufficiently clear and strong to produce observable effects.
-It is plausible that people are sensitive to their knowledge of an advisor's confidence mapping, but it is also plausible that this degree of flexibility is beyond most people, and that simple heuristics (e.g.
-relying on cultural norms about the meanings of metacognitive terms \mccorrect{!TODO[cite Bang, Heyes, et al.
-on cultural metacognition]}) are used instead of complex calculations.
+It is plausible that people are sensitive to their knowledge of an advisor's confidence mapping, but it is also plausible that this degree of flexibility is beyond most people, and that simple heuristics (e.g. relying on cultural norms about the meanings of metacognitive terms \mccorrect{!TODO[cite Bang, Heyes, et al. on cultural metacognition]}) are used instead of complex calculations.
 The lack of flexibility on the timescale of a behavioural experiment does not, of course, negate the possibility of flexibility on the timescale of a human interpersonal relationship (perhaps there are a certain number of people whose confidence mappings we can track, a la Dunbar's number).
-Nor does it negate the possibility of an evolutionary or cultural-evolutionary mechanism baking in advice discounting as a protection against unknown confidence mapping, although it is questionable whether advice has been occuring in human societies for long enough to allow the former to take place.
-We have a plausbile explanation of egocentric which only relies on rational responses to environmental effects.
+Nor does it negate the possibility of an evolutionary or cultural-evolutionary mechanism baking in advice discounting as a protection against unknown confidence mapping, although it is questionable whether advice has been occurring in human societies for long enough to allow the former to take place.
+We have a plausible explanation of egocentric which only relies on rational responses to environmental effects.
 These effects are ubiquitous, and thus a ubiquitous egocentric bias prior to engaging with the specifics of a situation makes sense.
 It is entirely plausible that experiments showing egocentric discounting behaviour fail to overcome the hyperpriors held by participants that taking advice is risky for various reasons.
 
