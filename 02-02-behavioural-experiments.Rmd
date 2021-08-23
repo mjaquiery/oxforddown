@@ -755,25 +755,485 @@ Judges have to live with the consequences of their decisions, while advisors do 
 
 The [third scenario](#models-scenario-3) explored in the evolutionary models assigned each agent a confidence mapping, and demonstrated that discounting emerged as an appropriate response where the advisor's confidence mapping was unknown.
 The key difficulty in conducting behavioural experiments to test the effects of known vs unknown confidence mapping is finding a manipulation of confidence mapping knowledge which is not confounded by familiarity with an advisor or the amount of information provided by an advisor.
-We train people in two contexts, in both of which they receive advice with confidence from one of two advisors and see feedback on their final answers.
-In the first context, all the advice is well calibrated, and both advisors use either high or low confidence distributions.
-In the second context, one advisor uses a high and the other a low confidence distribution.
-Participants are then tested with a brief exposure to an advisor whose confidence distribution is drawn from the middle of the scale.
-Where participants are unprepared for different confidence mappings (the first context), they will treat the new advisor like the old advisors - considering the advice as high- or low-confidence (and weighting it accordingly) depending on whether it is high or low for the advisors' distributions.
-Where participants are prepared for different confidence mappings (the second context), they will treat the new advice as medium confidence, and weight it accordingly.
-There will be a difference in the weight on advice in the probe trials between contexts: WoA will be highest where both training advisors have a low-confidence distribution, middling where they have different distributions, and lowest where they both have a high-confidence distribution.
 
-### Individuality as a cue to confidence
+We attempted to investigate this in two ways. 
+Firstly, we performed an experiment where participants received advice over blocks of trials from either the same advisor on each trial or a different advisor on each trial.
+Secondly, we familiarised participants with two advisors who differed in their use of the confidence scale, and then tested whether participants responded differently based on whether they could identify which of those two advisors was providing advice.
+
+Neither experiment provided evidence consistent with the hypothesis that familiarity with an advisor's confidence calibration leads to greater trust in that advisor's advice.
+We suggest that this may be a failure in experimental design rather than reliable evidence of the absence of this feature of advice-taking behaviour.
+
+### Experiment 6: Individuality as a cue to confidence
+
+The expression of confidence is highly idiosyncratic [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017].
+Given this, we hypothesised that the same advice may be treated differently depending upon whether or not it was labelled as coming from repeated interactions with a single individual or from a series of one-off interactions with different individuals.
+Where the advice comes from the same individual over and over again, participants should become more aware of that individual's confidence calibration (the relationship between their confidence and the probability they are correct), and should thus be able to better discriminate higher-quality (more confident) advice.
+
+```{r be-ce-load, eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip')), include = F}
+
+source('scripts_and_filters/general_setup.R')
+
+select_experiment(
+  project = 'datequiz',
+  function(x) filter(x, study == 'confidenceExploration', version == 'v0-0-10')
+)
+
+AdvisedTrial <- annotate_responses(AdvisedTrial)
+Trial <- annotate_responses(Trial)
+
+# AdvisedTrial %>% 
+#   mutate(cor = advisor0adviceSide == correctAnswerSide) %>%
+#   select(advisor0idDescription, cor, advisor0adviceConfidence) %>%
+#   filter(!is.na(cor)) %>%
+#   mutate(bin = cut(advisor0adviceConfidence, 4)) %>% 
+#   group_by(advisor0idDescription, bin) %>%
+#   summarise(pCor = mean(cor), n = n()) %>%
+#   ggplot(aes(x = bin, y = pCor, colour = advisor0idDescription)) + 
+#   geom_point()
+
+```
+
+#### Open scholarship practices
+
+This experiment was not preregistered because it was highly exploratory, and we were doubtful that the manipulation would work.
+The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from \mccorrect{!TODO[OSFify Dates task data]}.
+A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/4d8aace6b864c4465cacd8579ec1abd870dd65d2/ACBin/ce.html.
+
+#### Method
+
+```{r be-ce-m-structure}
+
+tmp <- bind_rows(
+  mutate(practiceTrial, type = "practice", block = 0),
+  mutate(practiceAdvisedTrial, type = "advice_practice", block = 1),
+  mutate(Trial, type = "atn_check") %>% filter(!is.na(block)),
+  mutate(AdvisedTrial, type = "core") %>% filter(!is.na(block))
+) %>%
+  group_by(pid, type, block) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(type, block) %>%
+  summarise(across(-pid, mean), .groups = "drop") %>%
+  arrange(block)
+
+```
+
+##### Procedure
+
+`r length(unique(AdvisedTrial$pid))` participants each completed `r round(sum(ceiling(tmp$n)))` trials over `r max(tmp$block)` blocks of the binary version of the Dates task§\@ref(m-p-dates-b).
+On each trial, participants were presented with an historical event that occurred on a specific year between 1900 and 2000.
+They were then given an anchor year within the 1900-2000 range. 
+The task for the participant was to indicate whether the event occurred before or after the anchor year. 
+To answer 'before' they selected a point on the lefthand column, and to answer 'after' they selected a point on the righthand column.
+They indicated their confidence by the point they selected on the chosen column: the higher up the column they chose the greater confidence the signalled in their answer.
+
+Participants then received advice from an advisor indicating which of the columns the advisor considered the correct answer.
+The advisor also indicated a confidence in their response, indicated by the height of the advisor's avatar on the indicated bar (Figure \@ref(fig:be-ce-m-advice)).
+
+```{r be-ce-m-advice, fig.align='center', fig.caption="Advice confidence.  Advisors' markers shifted position vertically to indicate the confidence with which the advice was give. As with the participants' own responses, higher placement on the column indicated higher confidence.", out.width="80%", echo=F}
+knitr::include_graphics("figures/advisor-confidence.png")
+```
+
+Participants started with `r sum(tmp$type == "practice")` block of `r tmp %>% filter(type == "practice") %>% pull(n) %>% ceiling()` trials that contained no advice to allow them to familiarise themselves with the task.
+All trials in this section included feedback for all participants indicating whether or not the participant's response was correct.
+
+Participants then did `r tmp %>% filter(type == "advice_practice") %>% pull(n) %>% round()` trials with a practice advisor to get used to receiving advice.
+They also received feedback on these trials.
+They were informed that they would "get advice about the correct answer" and that the "advisors indicate their confidence in a similar way to you, by placing their marker higher on the scale if they are more sure".
+
+Participants then performed `r sum(tmp$type == "core")` blocks of trials that constituted the main experiment.
+These blocks came in pairs, with each pair containing one block of `r tmp %>% filter(block == 2) %>% pull(n) %>% sum()` trials that included feedback followed by one block of `r tmp %>% filter(block == 3) %>% pull(n) %>% sum()` trials that did not include feedback.
+`r tmp %>% filter(block == 2, type == "atn_check") %>% pull(n)` trial in the first block in each pair was an attention check trial.
+Each pair of blocks had a different advisor presentation.
+
+In one of the pairs of blocks, the advice was always labelled as coming from the same advisor. 
+In the other pair of blocks, the advice on each trial was labelled as coming from a different advisor.
+The order that the participants encountered these presentations in was counterbalanced.
+
+##### Advice profiles
+
+Despite differences in labelling, the advisors were identical in terms of how they actually produced advice.
+The advice was determined on each trial by selecting a point drawn from a normal distribution around the correct answer with standard deviation of `r AdvisedTrial %>% filter(!is.na(advisor0confidenceVariation)) %>% pull(advisor0confidenceVariation) %>% unique()` years.
+This point served as the advisor's internal estimate of the correct answer. 
+The advisor then gave the appropriate answer according to whether or not the internal estimate was before or after the anchor year, and scaled their confidence based on the distance between those two years.
+The advisor was maximally confident where the difference between the internal estimate and the anchor year was at least `r AdvisedTrial %>% filter(!is.na(advisor0confidence)) %>% pull(advisor0confidence) %>% unique()` years.
+
+#### Results
+
+##### Exclusions
+
+```{r be-ce-exclusions}
+
+nMaxOutliers <- 0
+maxTrialRT <- 60000
+minChangeRate = .1     ## some advice taken on 10%+ of trials
+
+exclusions <- AdvisedTrial %>% 
+  nest(d = -pid) %>%
+  mutate(
+    `Multiple attempts` = map_lgl(
+      pid,
+      ~ {
+        h <- unique(AdvisedTrial$pidHash[AdvisedTrial$pid == .])
+        p <- unique(AdvisedTrial$pid[AdvisedTrial$pidHash == h])
+        length(p) > 1
+      }
+    ),
+    `Not enough changes` = map_lgl(
+      d,
+      ~ {
+        diff <- mutate(
+          .,
+          diff = responseConfidence != responseConfidenceFinal,
+          diff = if_else(is.na(diff), F, diff)
+        ) %>%
+          pull(diff) %>% 
+          mean() 
+        diff < minChangeRate
+      }
+    )
+  ) %>% 
+select(-d)
+
+do_exclusions(exclusions)
+
+nMaxTrials <- AdvisedTrial %>% 
+  filter(block %in% c(3, 5)) %>%
+  group_by(pid) %>% 
+  summarise(n = n(), .groups = 'drop') %>% 
+  pull(n) %>% 
+  max()
+
+AdvisedTrial <- AdvisedTrial %>% filter(timeEnd < maxTrialRT)
+
+exclusions <- exclusions %>% 
+  mutate(
+    `Too many outlying trials` = 
+      map_lgl(pid, ~ AdvisedTrial %>% 
+                filter(pid == .x, block %in% c(3, 5)) %>%
+                summarise(n = n(), .groups = 'drop') %>% 
+                pull(n) < (nMaxTrials - nMaxOutliers)),
+    # if participants were already dropped don't mark them here
+    `Too many outlying trials` = if_else(!(pid %in% AdvisedTrial$pid),
+                                         F, `Too many outlying trials`)
+  )
+
+do_exclusions(exclusions, backup = F)
+
+```
+
+Participants (total *n* = `r nrow(exclusions)`) were excluded for a number of reasons: having fewer than `r nMaxTrials - nMaxOutliers` no-feedback trials which took less than `r maxTrialRT / 1000`s to complete, or providing final decisions which were the same as the initial estimate on more than `r round((1 - minChangeRate) * 100)`% of trials.
+Table \@ref(tab:be-ce-exclusions) shows the number of participants excluded and the reasons why.
+Participants who failed attention checks would have been immediately dropped, but no participants did so.
+
+The final participant list consists of `r length(unique(AdvisedTrial$pid))` participants who completed an average of `r num2str(mean(aggregate(advisor0 ~ pid, AdvisedTrial, length)$advisor0))` trials each.
+
+```{r be-ce-r-exclusion-table}
+
+exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
+n <- ncol(exclusions)
+exclusions %>% 
+  summarise(across(where(is.logical), sum)) %>%
+  mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
+  pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
+  kable(caption = "\\label{tab:be-ce-exclusions}Participant exclusions for Experiment 5") %>%
+  row_spec((n - 1):n, bold = T)
+
+```
+
+##### Task performance
+
+```{r be-ce-r-split}
+
+tmp <- AdvisedTrial %>%
+  filter(!is.na(advisor0idDescription)) %>%
+  mutate(
+    Advisor = advisor_description_name(advisor0idDescription),
+    Advisor = factor(Advisor),
+    Feedback = if_else(feedback, "Feedback", "No feedback")
+  ) %>%
+  order_factors()
+
+Familiarization <- tmp %>% filter(feedback)
+Test <- tmp %>% filter(!feedback)
+
+```
+
+```{r be-ce-r-performance, fig.caption="Task performance for Experiment 6.  A: Response accuracy. Faint lines show individual participant means, for which the violin and box plots show the distributions. The dashed line indicates chance performance. Dotted violin outlines show the distribution of actual advisor accuracy.  Because there were relatively few trials, the proportion of correct trials for a participant generally falls on one of a few specific values. This produces the lattice-like effect seen in the graph. Some participants had individual trials excluded for over-long response times, meaning that the denominator in the accuracy calculations is different, and thus producing accuracy values which are slightly offset from others'.  B: Confidence. Faint lines show individual participant means, for which the violin and box plots show the distributions.  C: Influence. Participants' weight on the advice for advisors in the Familiarization stage of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2]."}
+
+gg <- list()
+
+# Task performance figure
+dw <- .2
+
+# Accuracy
+acc <- Familiarization %>% 
+  group_by(Advisor, pid) %>%
+  summarise(
+    `Initial estimate` = mean(responseAnswerSideCorrect),
+    `Final decision` = mean(responseAnswerSideCorrectFinal),
+    .groups = 'drop'
+  ) %>%
+  pivot_longer(cols = c(`Initial estimate`, `Final decision`), 
+               names_to = 'Response', values_to = 'Accuracy') %>%
+  mutate(Advisor = factor(paste0(Advisor, '\n')))
+
+adv <- Familiarization %>%
+  group_by(Advisor, pid) %>%
+  summarise(
+    Response = 'Advice',
+    Accuracy = mean(advisor0adviceSideCorrect),
+    .groups = 'drop'
+  ) %>%
+  mutate(Advisor = factor(paste0(Advisor, '\n')))
+
+bf <- acc %>% 
+  nest(d = -Advisor) %>%
+  mutate(d = map(d, as.data.frame),
+    bf = map(d, ~ ttestBF(x = .$Accuracy[.$Response == 'Initial estimate'],
+                          y = .$Accuracy[.$Response == 'Final decision'], 
+                          data = ., paired = T)),
+         bf = map_chr(bf, ~ .@bayesFactor %>% .$bf %>% exp() %>% bf2str())) %>%
+  select(-d)
+
+gg$acc <- acc %>%
+  mutate(Response = factor(Response)) %>%
+  order_factors() %>%
+  ggplot(aes(x = Response, y = Accuracy, colour = Advisor)) +
+  scale_y_continuous(limits = c(NA, 1), expand = c(0, 0)) +
+  scale_x_discrete() +
+  coord_cartesian(clip = F) +
+  geom_hline(yintercept = .5, linetype = 'dashed') +
+  geom_line(aes(group = pid), alpha = .25) +
+  geom_split_violin(aes(x = nudge(Response, dw), 
+                        group = Response, fill = Advisor), 
+                    width = .9, colour = NA) +
+  geom_split_violin(aes(x = 2 + dw), 
+                    group = 2, fill = NA, colour = 'black', linetype = 'dotted', 
+                    data = adv) +
+  geom_boxplot(aes(x = nudge(Response, dw), group = Response),
+               outlier.shape = NA, size = 1, width = dw/2, colour = 'black') +
+  geom_segment(x = 1 - dw, xend = 2 + dw, y = 1.01, yend = 1.01, 
+               colour = 'black') +
+  geom_label(aes(label = paste0('BF = ', bf)), 
+             x = 1.5, y = 1.01, colour = 'black', data = bf) +
+  facet_wrap(~Advisor) +
+  broken_axis_bottom
+
+# Confidence
+conf <- Familiarization %>% 
+  mutate(`Initial estimate accuracy` = 
+           if_else(responseAnswerSideCorrect, 'Correct', 'Incorrect')) %>%
+  group_by(`Initial estimate accuracy`, pid) %>%
+  summarise(
+    `Initial estimate` = mean(responseConfidenceScore),
+    `Final decision` = mean(responseConfidenceScoreFinal),
+    .groups = 'drop'
+  ) %>%
+  pivot_longer(cols = c(`Initial estimate`, `Final decision`), 
+               names_to = 'Response', values_to = 'Confidence') %>%
+  mutate(response = factor(paste0(Response, '\n')),
+         Response = factor(Response))
+
+bf <- conf %>% 
+  nest(d = -response) %>%
+  mutate(d = map(d, as.data.frame),
+         bf = map(d, ~ ttestBF(
+           x = .$Confidence[.$`Initial estimate accuracy` == 'Correct'],
+           y = .$Confidence[.$`Initial estimate accuracy` == 'Incorrect'], 
+           data = ., paired = T)
+         ),
+         bf = map_chr(bf, ~ .@bayesFactor %>% .$bf %>% exp() %>% bf2str())) %>%
+  select(-d)
+
+gg$conf <- conf %>%
+  mutate(`Initial estimate accuracy` = factor(`Initial estimate accuracy`)) %>%
+  order_factors() %>%
+  ggplot(aes(x = `Initial estimate accuracy`, y = Confidence, colour = Response)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  scale_x_discrete() +
+  coord_cartesian(clip = F) +
+  geom_line(aes(group = pid), alpha = .25) +
+  geom_split_violin(aes(x = nudge(`Initial estimate accuracy`, dw), 
+                        group = `Initial estimate accuracy`, 
+                        fill = Response), 
+                    width = .9, colour = NA) +
+  geom_boxplot(aes(x = nudge(`Initial estimate accuracy`, dw), 
+                   group = `Initial estimate accuracy`),
+               outlier.shape = NA, size = 1, width = dw/2, colour = 'black') +
+  geom_segment(x = 1 - dw, xend = 2 + dw, y = 1.01, yend = 1.01, 
+               colour = 'black') +
+  geom_label(aes(label = paste0('BF = ', bf)), 
+             x = 1.5, y = 1.01, colour = 'black', data = bf) +
+  facet_wrap(~response)
+
+# Influence
+
+adv_inf <- bind_rows(Familiarization, Test) %>%
+  group_by(pid, Advisor, Feedback) %>%
+  select(c(matches('(influence|WOA)'), group_vars(.))) %>%
+  summarise_all(mean)
+
+bf <- adv_inf %>% 
+  nest(d = -Feedback) %>%
+  mutate(
+    bf = map(d, ~ select(., pid, Advisor, advisor0Influence) %>%
+               pivot_wider(names_from = Advisor, 
+                           values_from = advisor0Influence) %>%
+               filter_if(is.numeric, ~ !is.na(.)) %>%
+               as.data.frame() %$%
+               ttestBF(x = `Consistent individual`, y = `Group member`, data = ., paired = T))
+  ) 
+
+bf$BF <- sapply(1:nrow(bf), function(i) bf2str(exp(bf$bf[[i]]@bayesFactor$bf)))
+
+dw <- .1
+
+gg$inf <- ggplot(adv_inf, aes(x = Advisor, y = advisor0Influence, 
+                colour = Feedback, fill = Feedback)) +
+  geom_hline(yintercept = 0, colour = 'lightgrey', size = 1) +
+  geom_line(aes(group = pid), alpha = .25) +
+  geom_split_violin(aes(x = nudge(Advisor, dw),
+                        group = Advisor), width = 1,
+               colour = NA) +
+  geom_boxplot(outlier.shape = NA, size = 1, width = dw/2,
+               aes(x = nudge(Advisor, dw), 
+                   group = Advisor),
+               colour = 'black') +
+  geom_segment(x = 1, xend = 2, y = 1.55, yend = 1.55, colour = 'black') +
+  geom_label(y = 1.55, x = 1.5, colour = 'black', fill = 'white', 
+             aes(label = paste0('BF = ', BF)), data = bf) +
+  scale_y_continuous(limits = c(-.5, 1.6), 
+                     breaks = seq(-.5, 1.5, length.out = 6)) +
+  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
+  facet_grid(~Feedback) +
+  labs(x = 'Advisor advice profile', y = 'Influence of advice') +
+  broken_axis_y
+
+# Patchwork plots together
+(gg$acc / gg$conf / gg$inf) +
+  plot_annotation(tag_levels = 'A')
+
+```
+```{r ac-agr-dates-r-performance-aov}
+
+# Accuracy
+aov_acc <- acc %>%
+  mutate(across(-Accuracy, factor)) %>%
+  ezANOVA(
+    dv = Accuracy,
+    wid = pid,
+    within = c(Advisor, Response)
+  )
+
+mm_acc <- acc %>%
+  select(pid, Accuracy, Response, Advisor) %>%
+  mutate(Advisor = str_extract(Advisor, ".+")) %>%
+  marginalMeans(Accuracy, pid, "Improvement")
+
+message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
+
+s_acc <- summariseANOVA(aov_acc$ANOVA, mm_acc)
+
+# Confidence
+aov_conf <- conf %>%
+  rename(initialCor = `Initial estimate accuracy`) %>%
+  mutate(across(-Confidence, factor)) %>%
+  ezANOVA(
+    dv = Confidence,
+    wid = pid,
+    within = c(initialCor, Response)
+  )
+
+mm_conf <- conf %>%
+  select(pid, Confidence, Response, initialCor = `Initial estimate accuracy`) %>%
+  marginalMeans(Confidence, pid, "Increase")
+
+message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
+
+s_conf <- summariseANOVA(aov_conf$ANOVA, mm_conf)
+
+# Advice influence
+inf_aov <- suppressWarnings(
+  ezANOVA(
+    data = adv_inf,
+    dv = advisor0Influence,
+    wid = pid,
+    within = Advisor,
+    between = Feedback
+  )
+) 
+
+mm_inf <- adv_inf %>%
+  transmute(
+    pid, 
+    advisor0Influence, 
+    Advisor = fct_rev(Advisor),
+    Feedback
+  ) %>%
+  marginalMeans(advisor0Influence, pid, "Group-Individual")
+
+message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
+
+s_inf <- summariseANOVA(inf_aov$ANOVA, mm_inf)
+
+```
+
+
+##### Effect of advisor presentation
+
+#### Simulation
+
+#### Discussion
+
+* Participants may have learned about the calibration distributions just the same for individual and group advisors: statistically the experience is the same and we don't have great evidence that participants really attend to advisor identity a whole lot.
+
+### Experiment 7: Identifiability of advice
+
+The results of Experiment 6 were not promising.
+Consequently, we entirely redesigned the manipulation in an attempt to place the calibration of the advice in the forefront of participants' experience.
+To this end, we familiarised participants with two advisors whose accuracy, probability of agreement, and confidence calibration were identical, but whose use of the confidence scale differed. 
+A Low confidence advisor used the bottom two-thirds of the confidence scale, while a High confidence advisor used the top two-thirds. 
+
+On the test trials, participants frequently saw advice where the confidence lay in the middle third of the scale.
+On some of these trials, the advice was labelled as coming from a specific advisor.
+If the advice came from the Low confidence advisor it would represent high confidence advice, and imply a high probability that it was correct.
+If the advice came from the High confidence advisor, it would represent low confidence advice, and imply a low probability that it was correct.
+On the remainder of these trials, the advice was labelled as coming from an unknown one of those two advisors.
+We expected that advice that was labelled in this way would be treated differently relative to advice that was identifiable because it was impossible for participants to appropriately interpret the confidence (and therefore probability of correctness) of the advice.
+
+```{r be-ck-load, eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip')), include = F}
+
+source('scripts_and_filters/general_setup.R')
+
+select_experiment(
+  project = 'datequiz',
+  function(x) filter(x, study == 'calibrationKnowledge', version == 'v0-1-3')
+)
+
+AdvisedTrial <- annotate_responses(AdvisedTrial)
+Trial <- annotate_responses(Trial)
+
+AdvisedTrial %>% 
+  mutate(cor = advisor0adviceSide == correctAnswerSide) %>%
+  select(advisor0idDescription, cor, advisor0adviceConfidence) %>%
+  filter(!is.na(cor)) %>%
+  mutate(bin = cut(advisor0adviceConfidence, 5)) %>% 
+  group_by(advisor0idDescription, bin) %>%
+  summarise(pCor = mean(cor), n = n()) %>%
+  ggplot(aes(x = as.numeric(bin), y = pCor, colour = advisor0idDescription)) +
+  geom_point()
+
+```
 
 #### Method
 
 #### Results
 
-### Identifiability of advice
+#### Discussion
 
-#### Method
-
-#### Results
+* One of the things you lack if you just get confidence is a way to contextualise it - there's more to interactions with people than just confidence.  
+  * Perhaps we could have added more information about the speaker (stuff like reasons that they give, etc. - do they generally know what they're talking about but they're just not sure in this case?)
+  * Still falsifies the precise mechanistic model we're working with
 
 ## General discussion
 

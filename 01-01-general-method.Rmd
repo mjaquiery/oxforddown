@@ -515,6 +515,10 @@ The first version had a bug which meant that the advisors were identical in the 
 Both the first and second versions had a bug in which advisors who were supposed to agree with the participant's initial estimate gave the correct answer rather than agreeing.
 These participants' data could be included in an analysis which used a participant's actual experience of advice to predict their advice-taking and source selection behaviour, provided appropriate care was taken to reconstruct the advice data from the raw values instead of relying on the reported summaries.
 
+##### Experiment 6
+
+Two short pilot versions of this experiment were run, and participants' data were not analysed due to bugs in the experiment code.
+
 ## Open science approach {#open-science}
 
 ### Open science {#os-introduction}
