@@ -1094,7 +1094,7 @@ On average, the High accuracy advisor had lower error than the High agreement ad
 `r sum(ap$ErrorAP)`/`r nrow(ap)` (`r num2str(sum(ap$ErrorAP) / nrow(ap) * 100)`%) participants experienced the High accuracy advisor as having lower average error than the High agreement advisor, and `r sum(ap$DistAP)`/`r nrow(ap)` (`r num2str(sum(ap$DistAP) / nrow(ap) * 100)`%) participants experienced the High agreement advisor as offering advice closer to their initial estimates than the High accuracy advisor.
 Overall, this indicates that the manipulation was implemented as planned.
 
-##### \OpenScience{prereg} Hypothesis test
+##### \OpenScience{prereg} Hypothesis test {#ac-ava-dates-r-h1}
 
 ```{r ac-ava-dates-r-graph, fig.caption="Dates task advisor choice for high accuracy/agreement advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line. Participants in the Feedback condition received feedback during the Familiarization phase, but not during the Choice phase. The dotted outline indicates the distribution of participant means in the original experiment of which this experiment is a replication.", fig.height=6, fig.width=6}
 

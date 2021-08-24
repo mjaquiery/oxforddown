@@ -209,11 +209,12 @@ marginalMeans <- function(
   interaction = "Difference"
 ) {
   fx <- function(x) str_to_title(x) %>% str_replace_all(" ", "")
-  tmp <- rename(
-    data,
-    pid = {{wid}},
-    dv = {{dv}}
-  )
+  tmp <- data %>% 
+    ungroup %>%
+    rename(
+      pid = {{wid}},
+      dv = {{dv}}
+    )
   vars <- select(tmp, c(-pid, -dv)) %>% names()
   out <- list()
   # factors
@@ -347,6 +348,8 @@ advisor_description_name <- function(advisor0idDescription) {
     advisor0idDescription == 'outGroup' ~ 'Sometimes deceptive',
     advisor0idDescription == 'mass' ~ 'Group member',
     advisor0idDescription == 'single' ~ 'Consistent individual',
+    advisor0idDescription == 'lowConf' ~ 'Low confidence',
+    advisor0idDescription == 'highConf' ~ 'High confidence',
     T ~ NA_character_
   )
 }
