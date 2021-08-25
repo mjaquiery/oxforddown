@@ -729,7 +729,7 @@ Where they were in a context that suggested the advisor was not trustworthy, the
 These observations complement the evolutionary simulations and the benevolence component of the three-factor model of trust described by \mccorrect{Cite Mayer et al 1995}.
 Nevertheless, we have demonstrated sensitivity to context, but not universal discounting due to hyperpriors.
 It remains a matter of speculation that people exercise epistemic hygiene by ensuring that information comes from trusted sources before integrating it, and that no source is as trusted as one's own mind.
-This result is in keeping with evidence from experiments where initial estimates are labelled as advice (and vice-versa), in which participants frequently show an unusual level of acceptance of the advice suggestive of their performing egocentric discounting of their own initial estimate because they have accepted the labels and adopted the advice as their own initial estimate. \mccorrect{Cite whoever did those neat label-swapping studies} 
+This result is in keeping with evidence from experiments where initial estimates are labelled as advice (and vice-versa), in which participants frequently show an unusual level of acceptance of the advice suggestive of their performing egocentric discounting of their own initial estimate because they have accepted the labels and adopted the advice as their own initial estimate [@sollJudgmentalAggregationStrategies2011]. 
 
 #### Limitations
 
@@ -738,7 +738,7 @@ As with other Dates task studies, data collection stopped when the Bayes Factor 
 This, combined with the low trial count for each participant, meant that there were interesting follow-up questions that the data were unable to address.
 In keeping with the open science approach, we suggest that future investigations exploring those questions take them as preregistered hypotheses.
 
-The Dates task is one that participants find challenging, leading to generally high levels of advice taking in the absence of other effects [@ginoEffectsTaskDifficulty2007].
+The Dates task is one that participants find challenging, leading to generally high levels of advice taking in the absence of other effects [@ginoEffectsTaskDifficulty2007; @yonahTheyDonKnow2021].
 This means that the Honest advisor seemed to be entirely trusted.
 As discussed in the introduction to this section§\@ref(chapter-context), however, even greatly trusted advisors' advice is usually subject to some egocentric discounting.
 
@@ -1231,11 +1231,11 @@ The advice is generated probabilistically using the same rules for both advisor 
 The advisors' advice is not dependent on the participants' initial estimates, but it is useful nevertheless to compare the advisors' agreement and accuracy rates.
 The advisors were demonstrably similar in their agreement rates (`r .T.agr`), but not so in their accuracy rates (`r .T.acc`), driven by a difference in the likelihood of agreeing with incorrect initial estimates.
 It is unlikely, but plausible, that the Consistent individual advisor may have been slightly more influential because of their higher agreement rate, a systematic effect that would go in the same direction as our hypothesis and that would therefore require a caveat during interpretation. 
-We note here, however, that participants received feedback during this Familiarization phase, and that Experiment 3B§\@ref(ac-ava-dates-r-h1) demonstrated that accuracy is an important feature, and agreement an unimportant feature, in the Dates task where feedback is available.
+We note here, however, that participants received feedback during this Familiarization phase, and that Experiment 3B§\@ref(ac-ava-dates-r-h) demonstrated that accuracy is an important feature, and agreement an unimportant feature, in the Dates task where feedback is available.
 
 ##### Effect of advisor presentation
 
-```{r be-ce-r-h1}
+```{r be-ce-r-h}
 
 tmp <- adv_inf %>%
   ungroup() %>%
@@ -1978,7 +1978,7 @@ Test %>%
 
 ```
 
-```{r be-ck-r-h1, fig.caption="Advice influence in Experiment 7.  Participants' weight on the advice for advisors in the Test stage of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2]."}
+```{r be-ck-r-h, fig.caption="Advice influence in Experiment 7.  Participants' weight on the advice for advisors in the Test stage of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2]."}
 
 adv_inf <- Key %>%
   group_by(pid, Advisor, Hybrid) %>%

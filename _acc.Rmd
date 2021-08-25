@@ -1860,7 +1860,7 @@ It is during this phase that participants are learning about the value of the ad
 This means that influence cannot be used as a reliable outcome measure for this experimental design, but it is nevertheless useful to explore to get a sense of how participants responded to the advice.
 An inspection of the individual participants' data shows that very few participants had large influence differences between advisors (Figure \@ref(fig:ac-acc-dates-r-performance)E).
 
-##### \OpenScience{prereg} Hypothesis test
+##### \OpenScience{prereg} Hypothesis test {#ac-acc-dates-r-h}
 
 ```{r ac-acc-dates-r-graph, fig.caption="Dates task advisor choice for in/accurate advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line. Participants in the Feedback condition received feedback during the Familiarization phase, but not during the Choice phase.", fig.width=6, fig.height=6}
 

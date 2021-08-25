@@ -1437,7 +1437,7 @@ Table \@ref(tab:ac-cca-r-advice-t) shows that advisors agreed with the participa
 There was a larger than expected difference in agreement on correct answers overall, but this was not a significant difference (`r cat(md.ttest(pull(agr, 3), pull(agr, 4), paired = T, labels = glue("M~{names(agr)[3:4]}~")))`).
 The advisors were also further apart in terms of overall accuracy than desired, because of the different agreement rates for correct answers, although once again this difference was not significant (`r cat(md.ttest(pull(acc, 3), pull(acc, 4), paired = T, labels = glue("M~{names(acc)[3:4]}~")))`).
 
-##### \OpenScience{prereg} Hypothesis test
+##### \OpenScience{prereg} Hypothesis test {#ac-cca-dots-r-h}
 
 ```{r ac-cca-dots-r-graph, fig.caption="Dot task advisor choice for confidence-contingent advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line.", fig.height=6, fig.width=4}
 

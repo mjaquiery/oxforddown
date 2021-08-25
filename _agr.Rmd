@@ -1212,7 +1212,7 @@ This meant that advisors were distinguished by their overall agreement rates as 
 The accuracy of participants' initial estimates was not much above 50%, meaning that the overall accuracy rates of the advisors were similar to those projected (Table \@ref(tab:ac-agr-dates-r-advice-acc-t)).
 Most (`r n_ap`/`r length(unique(Familiarization$pid))`, `r num2str(n_ap / length(unique(Familiarization$pid)) * 100)`%) participants experienced the High accuracy advisor as providing more accurate advice than the Low accuracy advisor.
 
-##### \OpenScience{prereg} Hypothesis test
+##### \OpenScience{prereg} Hypothesis test {#ac-agr-dates-r-h}
 
 ```{r ac-agr-dates-r-graph, fig.caption="Dates task advisor choice for High/Low agreement advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line. Participants in the Feedback condition received feedback during the Familiarization phase, but not during the Choice phase.", fig.height=6, fig.width=6}
 

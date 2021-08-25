@@ -78,6 +78,8 @@ Task difficulty is a major factor, perhaps mediated by the judge's confidence, b
 The most prominent feature of the task which affects egocentric discounting is difficulty. 
 @ginoEffectsTaskDifficulty2007 asked participants to estimate a person's weight from a clear (easy condition) or blurry (hard condition) picture, and saw less discounting on the hard task. 
 Likewise, @wangWhyDoesAdvice2018 used blurring to increase the difficulty of estimating the number of coins in a photograph of a jar and found that participants discounted less in the blurry compared to the clear condition.
+@yonahTheyDonKnow2021 included a condition where there was no objectively correct answer in a random dot motion display, and saw increased willingness to take advice compared to conditions where participants were on average 67%.
+They also found that participants were less likely to seek advice where they rated their performance on the task as more competent, i.e. where they experienced the task as easier.
 
 #### Judge's confidence {#coa-ed-task-confidence}
 

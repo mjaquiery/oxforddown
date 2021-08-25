@@ -97,7 +97,7 @@ Interpersonal trust, or the degree to which one is prepared to place one's fortu
 by relying on their advice), is apportioned by Mayer et al.
 [-@mayerIntegrativeModelOrganizational1995] onto three properties of the advisor (as judged by the decision-maker): ability, benevolence, and integrity.
 To these three properties of the advisor we may add the decision-maker's general propensity to trust, as well as situational cues and task cues (e.g.
-the phenomenon that advice is more readily taken for hard tasks than easy ones, [@ginoEffectsTaskDifficulty2007]).
+the phenomenon that advice is more readily taken for hard tasks than easy ones, [@ginoEffectsTaskDifficulty2007; @yonahTheyDonKnow2021]).
 
 ### Ability {-}
 
