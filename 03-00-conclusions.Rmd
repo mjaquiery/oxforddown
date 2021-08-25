@@ -50,3 +50,5 @@ I haven't wasted 3 years of my life and Nick's time.
 * Frequency of advice-seeking as characterised in the thesis.
 
 * (Why) do people lump group advice together before discounting - this seems idiotic even with the adapativeness of discounting...
+
+\mccorrect{!TODO[If we have time, it'd be neat to see if we can get people's selection rates for advisors to recover after the advisors have been lying to them, showing that that how we curate information environment (source selection) also depends on the existing information environment properties.]}

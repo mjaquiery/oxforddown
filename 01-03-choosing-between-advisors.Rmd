@@ -106,11 +106,15 @@ This experiment would explore whether metacognitive processes are able to finess
 ## General discussion
 
 \mccorrect{!NICK[I guess this needs updating in light of the modelling work you've done now. General structure suggestion:
-Worth starting with a reminder of the original aims, because this is a long chapter! Previous work has looked at how advisor trust is learnt, with a particular interest in how trust is learnt when feedback is sparse/absent. Here we extended this to ask how these patterns of trust might affect advisor selection. Then give a brief integrative summary of the results: Experiments 1 and 2 showed such and such; Experiments 3 and 4 showed such and such. etc. 
+ Then give a brief integrative summary of the results: Experiments 1 and 2 showed such and such; Experiments 3 and 4 showed such and such. etc. 
 
 Next highlight key themes as they relate to your results specifically, and then to the modelling to come. Regarding the former, the themes seem to be: preference for accurate advice when this can be inferred from feedback, but not otherwise. Preference for agreeing advice when feedback is absent, but not when it's present. Relate back to previous literature -> mixed evidence on how people seek info. May depend on domain? (Cf. our conversation all those years ago with Jonathan Bright about different knowledge/info domains.) + the more detailed points you make below (e.g., about similarities and differences between the tasks)
 
 With regard to the modelling: preference for agreeing advice when feedback is absent, but also wide variation in this preference. When preferences are not strong at the population level, we see almost all selection behaviours from always choosing A to always choosing B.]}
+
+\mccorrect{NICK: Worth starting with a reminder of the original aims, because this is a long chapter! Previous work has looked at how advisor trust is learnt, with a particular interest in how trust is learnt when feedback is sparse/absent. Here we extended this to ask how these patterns of trust might affect advisor selection.}
+
+\mccorrect{NICK: }
 
 The patterns observed for advice taking are also evident in advisor selection.
 Modelling work \mccorrect{!TODO[lots of citations for this]} indicates that biased source selection can dramatically reshape communication networks and create echo chamber effects where accurate but unpalatable information is ignored.
