@@ -1,5 +1,10 @@
 breakStr <- "!!!BREAK!!!"
 files <- list.files(pattern = ".Rmd$")
+directory <- "_codeless_files"
+
+if (!dir.exists(directory))
+  dir.create(directory)
+
 for (f in files) {
   fr <- file(f, "r")
   content <- readLines(fr)
@@ -15,7 +20,7 @@ for (f in files) {
   )
   clean <- stringr::str_split_fixed(clean_chr, breakStr, Inf)
   
-  fw <- file(paste0("_codeless_files/", f), "w")
+  fw <- file(paste0(directory, "/", f), "w")
   writeLines(clean, fw)
   close(fw)
 }

@@ -335,12 +335,35 @@ bs_pick <- test %>%
   group_by(pid) %>%
   summarise(pPickBS = mean(Advisor == "Bias-sharing"))
 
+
+.T.first <- test %>% 
+  mutate(firstPos = choice1 == advisorId) %>% 
+  group_by(pid) %>% 
+  summarise(m = mean(firstPos)) %>% 
+  pull(m) %>%
+  md.ttest(mu = .5, labels = c("M~P(PickFirst)~"))
+
+positions <- test %>% 
+  pivot_longer(matches("choice[0-9]"), names_to = "choice", values_to = "adv") %>% 
+  select(id, pid, choice, adv) %>% 
+  left_join(advisors, by = c("pid", adv = "id")) %>% 
+  select(id, pid, choice, Advisor) %>% 
+  pivot_wider(names_from = choice, values_from = Advisor)
+
+.T.pos <- positions %>% 
+  group_by(pid) %>% 
+  summarise(x = mean(choice1 == "Bias-sharing")) %$%
+  md.ttestBF(x, mu = .5, labels = c("M~P(BiasSharingFirst)~"))
+
 ```
 
 We hypothesised that the participants would display different pick rates for the Bias Sharing advisor versus the Anti Bias advisor.
 This hypothesis was evaluated by calculating the proportion of choice trials on which each participant picked the Bias Sharing advisor, and then testing these values as a one-sample t-test against the null hypothesis that the pick rates would be 0.5.
 No support was found for this hypothesis (`r cat(md.ttest(bs_pick$pPickBS, mu = .5, labels = "M~P(BiasSharing)~"))`; Figure \@ref(fig:ac-ex1-r-selection)), although the Bayesian test indicated that the data were not sufficient to conclude that no effect was present.
 There was considerable variability across participants in the overall pick rate for the Bias Sharing advisor (range = [`r range(bs_pick$pPickBS) %>% num2str(isProportion = T) %>% paste(collapse = ", ")`]).
+
+Unlike in other experiments, there was no systematic effect of the position of the advisors on the screen (`r .T.first`).
+This placement is random, and has no relationship to the identity of the advisor (`r .T.pos`), so we expect that it would be random across participants.
 
 ```{r ac-ex1-r-selection, fig.align='center', fig.caption="Advisor selection.  Proportion of the time each participant picked the Bias Sharing advisor. Faint lines and dots indicate data from individual participants, while the large dot indicates the mean proportion across all participants. The dashed reference line indicates picking both advisors equally, as would be expected by chance. Error bars give 95\\% confidence intervals.", out.width="100%"}
 
@@ -1471,14 +1494,38 @@ ggplot(tmp, aes(x = '', y = pPickBS)) +
   summarise(pPickBS = mean(Advisor == "Bias-sharing"), .groups = "drop") %>%
   pull(pPickBS) %>%
   md.ttest(y = .5)
+
+.T.first <- test %>% 
+  mutate(firstPos = choice0 == advisorId) %>% 
+  group_by(pid) %>% 
+  summarise(m = mean(firstPos)) %>% 
+  pull(m) %>%
+  md.ttest(mu = .5, labels = c("M~P(PickFirst)~"))
+
+positions <- test %>% 
+  pivot_longer(starts_with("choice"), names_to = "choice", values_to = "adv") %>% 
+  select(id, pid, choice, adv) %>% 
+  left_join(advisors, by = c("pid", adv = "id")) %>% 
+  mutate(Advisor = advisor_profile_name(adviceType)) %>% 
+  select(id, pid, choice, Advisor) %>% 
+  pivot_wider(names_from = choice, values_from = Advisor)
+
+.T.pos <- positions %>% 
+  group_by(pid) %>% 
+  summarise(x = mean(choice0 == "Bias-sharing")) %$%
+  md.ttestBF(x, mu = .5, labels = c("M~P(BiasSharingFirst)~"))
   
 ```
 
 There was a strong tendency for participants to express no, or slight preferences between advisors (`r .T`).
 Intriguingly, almost all participants who expressed a stronger preference expressed it towards the Anti-bias advisor: in the direction counter to that hypothesised (Figure \@ref(fig:ac-cca-dots-r-graph)).  
-\mccorrect{QUESTION: The good thing about Bayes stats is we can quite happily go collect more data. Maybe we should do this because there's a chance we come out with a counter-to-expectations result here to do some talking and thinking about?}
 
 In the Medium confidence trials, where the Lab experiment showed a glimmer of a difference, there was evidence against the existence of a difference (`r cat(.T_med)`).
+
+In this experiment we saw an extremely strong effect of picking the advisor in the first position on the screen (`r .T.first`), an effect that we would hope would be random and even out across participants. 
+In this experiment, as a function of chance, the Bias-sharing advisor appeared in the favoured top position more frequently than we would expect (`r .T.pos`).
+The effect of preferring to pick the advisor in the first position, therefore, would enhance the pick rate of the Bias-sharing advisor.
+Despite this, we saw that the advisors were picked at equivalent rates, allowing us to be even more sure that there is no overall preference for the Bias-sharing advisor driven by that advisor's method of providing advice.
 
 #### Discussion
 

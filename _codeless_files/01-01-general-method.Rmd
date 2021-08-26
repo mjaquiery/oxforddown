@@ -309,6 +309,8 @@ Lastly, both the Dots task and the Dates task had an objectively correct answer 
 A substantial portion of everyday real-world advice-seeking behaviour concerns questions on which there is no readily-determinable objectively correct answer, such as where might be a good holiday destination, or whether one should pursue postgraduate education.
 These more subjective questions have received some attention by @vanswolForecastingAnotherEnjoyment2011, but are seldom studied in the advice-taking cognitive psychology literature.
 
+\mccorrect{TODO: explain No gender breakdown (simplicity/privacy vs data gap)}
+    
 ### Analysis {#m-analysis}
 
 #### Dependent variables {#m-analysis-dv}
@@ -505,6 +507,16 @@ Data for these participants could be included in a study that was agnostic about
 The first version had a bug which meant that the advisors were identical in the familiarisation phase.
 Both the first and second versions had a bug in which advisors who were supposed to agree with the participant's initial estimate gave the correct answer rather than agreeing.
 These participants' data could be included in an analysis which used a participant's actual experience of advice to predict their advice-taking and source selection behaviour, provided appropriate care was taken to reconstruct the advice data from the raw values instead of relying on the reported summaries.
+
+##### Experiment 5
+
+Several versions of this study were run in the course of developing the manipulation.
+The initial version had a bug that prevented the groups from being visually distinct. 
+Later versions introduced a clearer manipulation, equivalent rather than genuinely misleading advice for the Sometimes misleading advisor, and rating of advice deceptiveness, respectively.
+
+##### Experiment 6
+
+Two short pilot versions of this experiment were run, and participants' data were not analysed due to bugs in the experiment code.
 
 ## Open science approach {#open-science}
 

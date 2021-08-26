@@ -127,6 +127,9 @@ This hypothesis was evaluated by calculating the proportion of choice trials on 
 No support was found for this hypothesis (`r cat(md.ttest(bs_pick$pPickBS, mu = .5, labels = "M~P(BiasSharing)~"))`; Figure \@ref(fig:ac-ex1-r-selection)), although the Bayesian test indicated that the data were not sufficient to conclude that no effect was present.
 There was considerable variability across participants in the overall pick rate for the Bias Sharing advisor (range = [`r range(bs_pick$pPickBS) %>% num2str(isProportion = T) %>% paste(collapse = ", ")`]).
 
+Unlike in other experiments, there was no systematic effect of the position of the advisors on the screen (`r .T.first`).
+This placement is random, and has no relationship to the identity of the advisor (`r .T.pos`), so we expect that it would be random across participants.
+
 ```{r ac-ex1-r-selection, fig.align='center', fig.caption="Advisor selection.  Proportion of the time each participant picked the Bias Sharing advisor. Faint lines and dots indicate data from individual participants, while the large dot indicates the mean proportion across all participants. The dashed reference line indicates picking both advisors equally, as would be expected by chance. Error bars give 95\\% confidence intervals.", out.width="100%"}
 ```
 
@@ -318,16 +321,20 @@ Table \@ref(tab:ac-cca-r-advice-t) shows that advisors agreed with the participa
 There was a larger than expected difference in agreement on correct answers overall, but this was not a significant difference (`r cat(md.ttest(pull(agr, 3), pull(agr, 4), paired = T, labels = glue("M~{names(agr)[3:4]}~")))`).
 The advisors were also further apart in terms of overall accuracy than desired, because of the different agreement rates for correct answers, although once again this difference was not significant (`r cat(md.ttest(pull(acc, 3), pull(acc, 4), paired = T, labels = glue("M~{names(acc)[3:4]}~")))`).
 
-##### \OpenScience{prereg} Hypothesis test
+##### \OpenScience{prereg} Hypothesis test {#ac-cca-dots-r-h}
 
 ```{r ac-cca-dots-r-graph, fig.caption="Dot task advisor choice for confidence-contingent advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line.", fig.height=6, fig.width=4}
 ```
 
 There was a strong tendency for participants to express no, or slight preferences between advisors (`r .T`).
 Intriguingly, almost all participants who expressed a stronger preference expressed it towards the Anti-bias advisor: in the direction counter to that hypothesised (Figure \@ref(fig:ac-cca-dots-r-graph)).  
-\mccorrect{QUESTION: The good thing about Bayes stats is we can quite happily go collect more data. Maybe we should do this because there's a chance we come out with a counter-to-expectations result here to do some talking and thinking about?}
 
 In the Medium confidence trials, where the Lab experiment showed a glimmer of a difference, there was evidence against the existence of a difference (`r cat(.T_med)`).
+
+In this experiment we saw an extremely strong effect of picking the advisor in the first position on the screen (`r .T.first`), an effect that we would hope would be random and even out across participants. 
+In this experiment, as a function of chance, the Bias-sharing advisor appeared in the favoured top position more frequently than we would expect (`r .T.pos`).
+The effect of preferring to pick the advisor in the first position, therefore, would enhance the pick rate of the Bias-sharing advisor.
+Despite this, we saw that the advisors were picked at equivalent rates, allowing us to be even more sure that there is no overall preference for the Bias-sharing advisor driven by that advisor's method of providing advice.
 
 #### Discussion
 

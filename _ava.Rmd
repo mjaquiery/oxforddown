@@ -592,12 +592,111 @@ ggplot(tmp, aes(x = '', y = pChooseAcc)) +
   pull(pChooseAcc) %>%
   md.ttest(y = .5)
 
+.T.first <- test %>% 
+  mutate(firstPos = choice0 == advisor0id) %>% 
+  group_by(pid) %>% 
+  summarise(m = mean(firstPos)) %>% 
+  pull(m) %>%
+  md.ttest(mu = .5, labels = c("M~P(PickFirst)~"))
+
+positions <- test %>% 
+  pivot_longer(starts_with("choice"), names_to = "choice", values_to = "adv") %>% 
+  select(id, pid, choice, adv) %>% 
+  left_join(advisors, by = c("pid", adv = "id")) %>% 
+  mutate(Advisor = advisor_profile_name(adviceType)) %>% 
+  select(id, pid, choice, Advisor) %>% 
+  pivot_wider(names_from = choice, values_from = Advisor)
+
+.T.pos <- positions %>% 
+  group_by(pid) %>% 
+  summarise(x = mean(choice0 == "High accuracy")) %$%
+  md.ttestBF(x, mu = .5, labels = c("M~P(HighAccuracyFirst)~"))
+
 ```
 
 Despite the influence differences observed above, and counter to our predictions, Figure \@ref(fig:ac-ava-dots-r-graph) shows that there was no consistent picking preference in favour of either the High accuracy or the High agreement advisor.
 While several participants did develop very strong preferences, picking one or the other advisor nearly all the time, these preferences were not systematically oriented towards either advisor (`r .T`).
 
+For context, note that we did see a significant effect of picking the advisor in the first position on the screen (`r .T.first`), an effect that we would hope would be random and even out across participants. 
+In this experiment, as a function of chance, the High accuracy advisor appeared in the favoured top position less frequently than we would expect (`r .T.pos`).
+If there were a general preference for the High agreement advisor, as per our prediction, this would be _increased_ by that advisor appearing more often in the top position.
+Thus, even if the position of the advisors affected the results, it would not be confounding results in the direction of our prediction.
+
 ##### Follow-up tests
+
+###### Ability of participants
+
+```{r ac-ava-dots-r-follow-up-pp}
+
+nQuantiles <- range(familiarization$initialConfidence)[2] # confidence range
+
+tmp <- familiarization %>% 
+  pivot_longer(cols = c(starts_with('initial'), starts_with('final')),
+               names_to = c('Response', '.value'),
+               names_pattern = '(initial|final)(.*)') %>%
+  filter(Response == "initial") %>%
+  # calculate p(confidence > q) for in/correct answers at each quantile q
+  nest(d = c(-pid, -Response, -AnswerCorrect)) %>%
+  mutate(
+    d = map(d, ~ p_conf(., seq(0, 1, length.out = nQuantiles)))
+  ) %>%
+  unnest(cols = d) %>% 
+  unnest(cols = d)
+
+tmp <- tmp %>% 
+  mutate(
+    Response = factor(if_else(Response == 'initial', 
+                              'Initial estimate', 'Final decision')),
+    Confidence = factor(Confidence),
+    Confidence = fct_relabel(Confidence, ~prop2str(as.numeric(.)))
+  ) %>%
+  pivot_wider(names_from = AnswerCorrect, 
+              names_prefix = 'Correct', 
+              values_from = pConf) 
+
+auroc <- tmp %>% 
+  nest(d = c(-pid, -Response)) %>%
+  mutate(
+    d = map(d, ~arrange(., CorrectFALSE, rev(CorrectTRUE))),
+    d = map(d, ~mutate(., area = CorrectTRUE * 
+                         (CorrectFALSE - lag(CorrectFALSE)))),
+    area = map_dbl(d, ~ sum(.$area, na.rm = T))
+  ) %>%
+  select(-d) 
+
+tmp <- left_join(
+  familiarization %>% 
+    group_by(pid) %>%
+    summarise(acc = mean(initialAnswerCorrect), .groups = 'drop'),
+  test %>%
+    group_by(pid) %>%
+    summarise(pPickHigh = mean(Advisor == "High accuracy")),
+  by = "pid"
+) %>%
+  left_join(
+    auroc %>% select(-Response),
+    by = "pid"
+  )
+
+.acc <- cor.test(tmp$acc, tmp$pPickHigh) %>%
+  tidy() %>%
+  mutate(
+    bf = correlationBF(tmp$acc, tmp$pPickHigh)@bayesFactor$bf %>% exp(),
+    s = glue("r({parameter})={prop2str(estimate)}, p={prop2str(p.value)}, BF={bf2str(bf)}")
+  ) 
+.auc <- cor.test(tmp$area, tmp$pPickHigh) %>%
+  tidy() %>%
+  mutate(
+    bf = correlationBF(tmp$area, tmp$pPickHigh)@bayesFactor$bf %>% exp(),
+    s = glue("r({parameter})={prop2str(estimate)}, p={prop2str(p.value)}, BF={bf2str(bf)}")
+  ) 
+
+```
+
+Although participants did not have a clear preference for the agreeing over the accurate advisor, it may be the case that participants who were well-calibrated were able to detect the usefulness of the accurate advisor, and therefore tended to prefer to hear that advisor's advice. 
+The evidence was not sufficient to draw firm conclusions, but there was little indication of a correlation between preference for the High accuracy advisor and participant accuracy (`r .acc$s`) or confidence calibration (`r .auc$s`).
+
+###### Experience of advisors
 
 ```{r ac-ava-dots-r-follow-up}
 
@@ -1167,6 +1266,12 @@ Consistent with the result from the Dots task (Experiment 3A§\@ref(ac-ava-dots)
 In the Feedback condition, in contrast, the mean of the participants' selection rates clearly favoured the High accuracy advisor (`r cat(.T.fb)`).
 This is consistent with a strategy which attempts to maximise the accuracy of final decisions. 
 This qualitative difference from the No feedback condition also translated into a statistical difference: the two preference distributions were clearly different from one another (`r cat(.T.Int)`).
+
+It was discovered after the completion of experiments that the advisor position (whether the advisor appears on the top or bottom of the advisor choice panel) was not counterbalanced between advisors.
+It had been decided during development of the tests to keep the advisors in the same position for every trial so that participants did not get mixed up between them.
+Together, this meant that the High accuracy advisor always appeared at the top and the Low accuracy advisor always appeared at the bottom, for every trial for every participant.
+We are thus unable to confirm that pick rate differences, or the absence of those differences, are caused by participants' preferences for the advice the advisor would provide or the position the advisor was in on the screen.
+Furthermore, it is possible that any genuine preference for one advisor over the other was _induced_ by the position, rather than independent of it [@zajkowskiCrossDomainEffectsChoiceInduced2021].
 
 ##### Advisor influence
 

@@ -78,6 +78,8 @@ Task difficulty is a major factor, perhaps mediated by the judge's confidence, b
 The most prominent feature of the task which affects egocentric discounting is difficulty. 
 @ginoEffectsTaskDifficulty2007 asked participants to estimate a person's weight from a clear (easy condition) or blurry (hard condition) picture, and saw less discounting on the hard task. 
 Likewise, @wangWhyDoesAdvice2018 used blurring to increase the difficulty of estimating the number of coins in a photograph of a jar and found that participants discounted less in the blurry compared to the clear condition.
+@yonahTheyDonKnow2021 included a condition where there was no objectively correct answer in a random dot motion display, and saw increased willingness to take advice compared to conditions where participants were on average 67%.
+They also found that participants were less likely to seek advice where they rated their performance on the task as more competent, i.e. where they experienced the task as easier.
 
 #### Judge's confidence {#coa-ed-task-confidence}
 
@@ -153,7 +155,6 @@ Similarly, @schultzeInabilityIgnoreUseless2017 saw judges discount wildly implau
 The level of agreement may act as a cue to the plausibility of both the advice and the initial estimate. 
 Somewhat counter-intuitively, this can lead to agreeing advice being assigned less weight than we might expect because of its bolstering of the confidence in the initial estimate.
 
-
 #### Solicitation of advice
 
 The extent to which advice is discounted may also be related to whether advice is wanted.
@@ -169,9 +170,9 @@ In the real world, price is often an indicator of quality, albeit an imperfect o
 \mccorrect{!TODO[Michael and/or Naomi worked on seeking advice more when less confident? That's relevant here]}
 @hutterSeekingAdviceSampling2016 found that participants opted to see a large number of advisory estimates in a calorific content estimation task when allowed to sample ad lib, although the influence of the advice was low.
 
-#### Number of advisory estimates
+#### Number of advisory estimates {#context-number}
 
-@hutterSeekingAdviceSampling2016 \mccorrect{!TODO[There are definitely others! Yaniv for a start? Find them.]} saw levels of advice usage for multiple pieces of advice which were relatively similar to levels of advice usage for a single piece of advice.
+@hutterSeekingAdviceSampling2016 \mccorrect{!TODO[There are definitely others! Yaniv for a start? Find them. E.g. @yonahTheyDonKnow2021]} saw levels of advice usage for multiple pieces of advice which were relatively similar to levels of advice usage for a single piece of advice.
 In other words, people integrating their own opinion with two advisory estimates tend to integrate the advisory estimates and then treat them as a single piece of advice for integrating with their own opinion.
 This may be an artefact of presentation because all these studies presented multiple estimates simultaneously as a list.
 If this is a real phenomenon, however, it is a critical bias: while sensible motivations for favouring one's own opinion over another's will be posited below, it is far harder to argue that the weight assigned to one's own opinion should remain the same whether being integrated with one other estimate or ten other estimates.
@@ -180,7 +181,7 @@ If this is a real phenomenon, however, it is a critical bias: while sensible mot
 
 A common strategy in advice-taking experiments is to manipulate the properties of the advisors (either within- or between-participants). Expertise is often manipulated, but some research has investigated factors such as the pre-existing relationship between judge and advisor, whether advisors are human or algorithmic, and whether advisors have a clear conflict of interest.
 
-#### Expertise of advisors
+#### Expertise of advisors {#context-expertise}
 
 By far the most frequently manipulated property of advisors is their ability to perform the task in question, known as their expertise.
 Advisor expertise can be communicated to participants in various ways, which can be broadly categorised into 'showing' approaches in which participants build up a picture of advisors' performance over a series of instances, and 'telling' approaches where participants are presented with a summary of an advisor's performance.
@@ -205,7 +206,7 @@ Further experiments crossing labelling (high or low expertise) with experience (
 Both advisors whose expertise was experienced as low were weighted less heavily, with no clear differences between them.
 ^[Numerically, there was an indication of a backlash effect whereby the advisor labelled as high-expertise but demonstrating no expertise in practice was less influential than an advisor labelled as low-expertise and experienced as performing similarly.]
 
-#### Familiarity of advisors
+#### Familiarity of advisors {#context-familiarity}
 
 So far as I can ascertain, no one has reported on a Judge-Advisor system in which comparable advice is received from friends and non-friends. 
 @sniezekTrustConfidenceExpertise2001 and @vanswolFactorsAffectingAcceptance2005 found a correlation between the amount classmates had interacted and ratings of trust in those classmates as advisors, but they did not use a measure of advice-taking which allows calculation of advice weighting. 

@@ -106,6 +106,9 @@ Our key analysis concerned whether participants would have a systematic preferen
 Consistent with the key prediction of this experiment, advisor choice varied significantly as a function of advisor agreement rate (Figure \@ref(fig:ac-agr-dots-r-graph)): The High agreement advisor was preferred at a rate greater than that expected by chance (`r .T`).
 The modal preference remained at chance, but almost all participants who manifested a preference preferred the High agreement advisor. 
 
+While this effect is interesting, it is substantially smaller than participants' preference for picking the top advisor regardless of identity (`r .T.first`), an effect that we would hope would be random and even out across participants. 
+Note that because the advisor position is well balanced across advisors (`r .T.pos`) the presence of a preference for advisor by position would not cause a preference for an individual advisor.
+
 ##### Follow-up tests
 
 ```{r ac-agr-dots-r-choice-by-exp, fig.caption="Advisor choice by experience in the Dots task with dis/agreeing advisors.  Each dot is a participant's proportions. The difference in accuracy rates is calculated as the proportion of correct answers seen from the High accuracy advisor minus the proportion of correct answers seen from the Low accuracy advisor, and the difference in agreement rates similarly for agreement. The participants did not receive feedback on the correct answers"}
@@ -258,7 +261,7 @@ This meant that advisors were distinguished by their overall agreement rates as 
 The accuracy of participants' initial estimates was not much above 50%, meaning that the overall accuracy rates of the advisors were similar to those projected (Table \@ref(tab:ac-agr-dates-r-advice-acc-t)).
 Most (`r n_ap`/`r length(unique(Familiarization$pid))`, `r num2str(n_ap / length(unique(Familiarization$pid)) * 100)`%) participants experienced the High accuracy advisor as providing more accurate advice than the Low accuracy advisor.
 
-##### \OpenScience{prereg} Hypothesis test
+##### \OpenScience{prereg} Hypothesis test {#ac-agr-dates-r-h}
 
 ```{r ac-agr-dates-r-graph, fig.caption="Dates task advisor choice for High/Low agreement advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line. Participants in the Feedback condition received feedback during the Familiarization phase, but not during the Choice phase.", fig.height=6, fig.width=6}
 ```
@@ -276,6 +279,12 @@ One participant in the No feedback group here, for example, never chose the High
 Even where there were no systematic effects (No feedback condition in Experiment 1B, Feedback condition here), participants still had a range of preferences with some picking one or the other advisor exclusively.
 A substantial minority (`r num2str((bn$p.value < .05) * 100, 1)`%) of participants had preference strengths beyond those expected by chance when picking randomly.^[5% would be expected to have had strengths of these magnitudes if picking randomly.]
 As noted previously (Experiment 1: Discussion§\@ref(ac-acc-d)), this is in contrast to the behaviour in the Dots task, where preferences tend to mass towards even pick rates with a long tail differentiating the population preferences from chance.
+
+It was discovered after the completion of experiments that the advisor position (whether the advisor appears on the top or bottom of the advisor choice panel) was not counterbalanced between advisors.
+It had been decided during development of the tests to keep the advisors in the same position for every trial so that participants did not get mixed up between them.
+Together, this meant that the High accuracy advisor always appeared at the top and the Low accuracy advisor always appeared at the bottom, for every trial for every participant.
+We are thus unable to confirm that pick rate differences, or the absence of those differences, are caused by participants' preferences for the advice the advisor would provide or the position the advisor was in on the screen.
+Furthermore, it is possible that any genuine preference for one advisor over the other was _induced_ by the position, rather than independent of it [@zajkowskiCrossDomainEffectsChoiceInduced2021].
 
 ##### Follow-up tests
 

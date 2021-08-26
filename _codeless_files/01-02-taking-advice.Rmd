@@ -142,7 +142,7 @@ On average, the High accuracy advisor had lower error than the High agreement ad
 `r sum(ap$ErrorAP)`/`r nrow(ap)` (`r num2str(sum(ap$ErrorAP) / nrow(ap) * 100)`%) participants experienced the High accuracy advisor as having lower average error than the High agreement advisor, and `r sum(ap$DistAP)`/`r nrow(ap)` (`r num2str(sum(ap$DistAP) / nrow(ap) * 100)`%) participants experienced the High agreement advisor as offering advice closer to their initial estimates than the High accuracy advisor.
 Overall, this indicates that the manipulation was implemented as planned.
 
-##### \OpenScience{prereg} Hypothesis test
+##### \OpenScience{prereg} Hypothesis test {#ai-ava-r-h}
 
 ```{r ai-ava-r-graph, fig.caption="Dates task advisor influence for high accuracy/agreement advisors.  Shows the influence of the advice of the advisors. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The dashed outline shows the distribution of participant means in the original study of which this is a replication."}
 ```
@@ -160,7 +160,7 @@ These results are not wholly consistent with an account of advice-taking in whic
 Under such an account, we would expect participants in the No feedback condition to have shown a greater susceptibility to advice from the Agreeing advisor, but this did not happen.
 
 The equivalence of the influence of the advisors in the No feedback condition may be a consequence of relatively high levels of advice influence overall, producing a ceiling effect (the numerical advantage for the Agreeing advisor is as predicted by the theory).
-The relatively high levels of advice influence are a feature of the Dates task; the questions are difficult for most participants and consequently participants are likely to take more advice [@ginoEffectsTaskDifficulty2007].
+The relatively high levels of advice influence are a feature of the Dates task; the questions are difficult for most participants and consequently participants are likely to take more advice [@ginoEffectsTaskDifficulty2007; @yonahTheyDonKnow2021].
 Another possible explanation for the equivalence of influence between the advisors is that participants may not have had enough exposure to the advisors to properly learn about the value of their advice. 
 The limitation on exposure is another feature of the Dates task: while the Dots task provides participants with many tens of trials in which to update their assessment of advisors, the Dates task provides a level of exposure more similar to normal social interaction (although not necessarily very similar).
 

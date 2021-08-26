@@ -564,11 +564,35 @@ ggplot(tmp, aes(x = '', y = pChooseHigh)) +
   pull(pChooseHigh) %>%
   md.ttest(y = .5)
 
+
+.T.first <- test %>% 
+  mutate(firstPos = choice0 == advisorId) %>% 
+  group_by(pid) %>% 
+  summarise(m = mean(firstPos)) %>% 
+  pull(m) %>%
+  md.ttest(mu = .5, labels = c("M~P(PickFirst)~"))
+
+positions <- test %>% 
+  pivot_longer(starts_with("choice"), names_to = "choice", values_to = "adv") %>% 
+  select(id, pid, choice, adv) %>% 
+  left_join(advisors, by = c("pid", adv = "id")) %>% 
+  mutate(Advisor = advisor_profile_name(adviceType)) %>% 
+  select(id, pid, choice, Advisor) %>% 
+  pivot_wider(names_from = choice, values_from = Advisor)
+
+.T.pos <- positions %>% 
+  group_by(pid) %>% 
+  summarise(x = mean(choice0 == "High agreement")) %$%
+  md.ttestBF(x, mu = .5, labels = c("M~P(HighAgreementFirst)~"))
+
 ```
 
 Our key analysis concerned whether participants would have a systematic preference for choosing the High agreement advisor when they were given a choice of advisor. 
 Consistent with the key prediction of this experiment, advisor choice varied significantly as a function of advisor agreement rate (Figure \@ref(fig:ac-agr-dots-r-graph)): The High agreement advisor was preferred at a rate greater than that expected by chance (`r .T`).
 The modal preference remained at chance, but almost all participants who manifested a preference preferred the High agreement advisor. 
+
+While this effect is interesting, it is substantially smaller than participants' preference for picking the top advisor regardless of identity (`r .T.first`), an effect that we would hope would be random and even out across participants. 
+Note that because the advisor position is well balanced across advisors (`r .T.pos`) the presence of a preference for advisor by position would not cause a preference for an individual advisor.
 
 ##### Follow-up tests
 
@@ -1296,6 +1320,12 @@ One participant in the No feedback group here, for example, never chose the High
 Even where there were no systematic effects (No feedback condition in Experiment 1B, Feedback condition here), participants still had a range of preferences with some picking one or the other advisor exclusively.
 A substantial minority (`r num2str((bn$p.value < .05) * 100, 1)`%) of participants had preference strengths beyond those expected by chance when picking randomly.^[5% would be expected to have had strengths of these magnitudes if picking randomly.]
 As noted previously (Experiment 1: Discussion§\@ref(ac-acc-d)), this is in contrast to the behaviour in the Dots task, where preferences tend to mass towards even pick rates with a long tail differentiating the population preferences from chance.
+
+It was discovered after the completion of experiments that the advisor position (whether the advisor appears on the top or bottom of the advisor choice panel) was not counterbalanced between advisors.
+It had been decided during development of the tests to keep the advisors in the same position for every trial so that participants did not get mixed up between them.
+Together, this meant that the High accuracy advisor always appeared at the top and the Low accuracy advisor always appeared at the bottom, for every trial for every participant.
+We are thus unable to confirm that pick rate differences, or the absence of those differences, are caused by participants' preferences for the advice the advisor would provide or the position the advisor was in on the screen.
+Furthermore, it is possible that any genuine preference for one advisor over the other was _induced_ by the position, rather than independent of it [@zajkowskiCrossDomainEffectsChoiceInduced2021].
 
 ##### Follow-up tests
 

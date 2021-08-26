@@ -835,11 +835,34 @@ ggplot(tmp, aes(x = '', y = pChooseHigh)) +
   pull(pChooseHigh) %>%
   md.ttest(y = .5)
 
+.T.first <- test %>% 
+  mutate(firstPos = choice0 == advisorId) %>% 
+  group_by(pid) %>% 
+  summarise(m = mean(firstPos)) %>% 
+  pull(m) %>%
+  md.ttest(mu = .5, labels = c("M~P(PickFirst)~"))
+
+positions <- test %>% 
+  pivot_longer(starts_with("choice"), names_to = "choice", values_to = "adv") %>% 
+  select(id, pid, choice, adv) %>% 
+  left_join(advisors, by = c("pid", adv = "id")) %>% 
+  mutate(Advisor = advisor_profile_name(adviceType)) %>% 
+  select(id, pid, choice, Advisor) %>% 
+  pivot_wider(names_from = choice, values_from = Advisor)
+
+.T.pos <- positions %>% 
+  group_by(pid) %>% 
+  summarise(x = mean(choice0 == "High accuracy")) %$%
+  md.ttestBF(x, mu = .5, labels = c("M~P(HighAccuracyFirst)~"))
+
 ```
 
 With basic task performance as expected, our key analysis focused on participants' choice of advisors. 
 As predicted, and as shown in Figure \@ref(fig:ac-acc-dots-r-graph), participants selected the High accuracy advisor at a rate greater than would be expected if their choosing were random (`r .T`).
 The modal choice remained at chance level (.5), but almost all participants manifesting a preference preferred the High accuracy advisor.
+
+While this effect is interesting, it is substantially smaller than participants' preference for picking the top advisor regardless of identity (`r .T.first`), an effect that we would hope would be random and even out across participants. 
+Note that because the advisor position is well balanced (`r .T.pos`) across advisors the presence of a preference for advisor by position would not cause a preference for an individual advisor.
 
 ##### Follow-up tests {#ac-acc-dots-r-follow-up}
 
@@ -953,7 +976,7 @@ Perhaps, for example, participants may have a strong preference for the High acc
 This appeared not to be the case: we split participants' trials into high and low confidence based on their idiosyncratic median confidence, and conducted a paired t-test of the pick rates for the High accuracy advisor in each confidence category.
 The Bayes factor for this t-test indicated good evidence of no difference in pick rates ($\text{BF}_{10}=$ `r bf2str(exp(bf@bayesFactor$bf))`).
 
-##### Summary/Discussion
+##### Discussion
 
 In the absence of feedback, it should be possible for a person to evaluate advice using the proxy of whether or not the advice accords with their initial opinion, at least given some reasonable assumptions about the independence of the initial opinion and the advice.
 In this experiment, we tested whether participants would be able to exploit this heuristic to detect that one advisor was more useful than another, and whether they would choose to hear advice from the more useful advisor.
@@ -1935,7 +1958,58 @@ This indicates that participants could identify the more accurate advisor when f
 
 Interestingly, this meant that there was a difference in participants' preference for picking the High accuracy advisor according to their experimental condition (`r .T.comp`).
 
+It was discovered after the completion of experiments that the advisor position (whether the advisor appears on the top or bottom of the advisor choice panel) was not counterbalanced between advisors.
+It had been decided during development of the tests to keep the advisors in the same position for every trial so that participants did not get mixed up between them.
+Together, this meant that the High accuracy advisor always appeared at the top and the Low accuracy advisor always appeared at the bottom, for every trial for every participant.
+We are thus unable to confirm that pick rate differences, or the absence of those differences, are caused by participants' preferences for the advice the advisor would provide or the position the advisor was in on the screen.
+Furthermore, it is possible that any genuine preference for one advisor over the other was _induced_ by the position, rather than independent of it [@zajkowskiCrossDomainEffectsChoiceInduced2021].
+
 ##### Follow-up tests
+
+###### Ability of participants
+
+```{r ac-acc-dates-r-follow-up-participants}
+
+tmp <- left_join(
+  Familiarization %>% 
+    group_by(pid) %>%
+    summarise(
+      acc = mean(responseAnswerSideCorrect),
+      Feedback = unique(Feedback),
+      .groups = 'drop'
+    ),
+  Test %>%
+    group_by(pid) %>%
+    summarise(pPickHigh = mean(Advisor == "High accuracy")),
+  by = "pid"
+) %>%
+  left_join(
+    auroc %>% 
+      filter(str_starts(response, "Initial")) %>%
+      select(-response),
+    by = "pid"
+  ) %>%
+  filter(Feedback == "No feedback")
+
+.acc <- cor.test(tmp$acc, tmp$pPickHigh) %>%
+  tidy() %>%
+  mutate(
+    bf = correlationBF(tmp$acc, tmp$pPickHigh)@bayesFactor$bf %>% exp(),
+    s = glue("r({parameter})={prop2str(estimate)}, p={prop2str(p.value)}, BF={bf2str(bf)}")
+  ) 
+.auc <- cor.test(tmp$area, tmp$pPickHigh) %>%
+  tidy() %>%
+  mutate(
+    bf = correlationBF(tmp$area, tmp$pPickHigh)@bayesFactor$bf %>% exp(),
+    s = glue("r({parameter})={prop2str(estimate)}, p={prop2str(p.value)}, BF={bf2str(bf)}")
+  ) 
+
+```
+
+It is plausible that participants who were better at the task had more insight into which of their advisors was more accurate.
+There was not enough evidence to determine whether participants in the No feedback condition selected the High accuracy advisor more frequently where they were more accurate themselves (`r .acc$s`) or more well calibrated (as measured by area under the Receiver Operator Characteristics curve for initial estimates; `r .auc$s`).
+
+###### Experience of Advisors
 
 ```{r ac-acc-dates-r-follow-up, fig.caption="Preference predictors in the Dates task with in/accurate advisors.  Scatter plots of participants' experience with advisors in terms of agreement or accuracy rates. Differences are expressed as the experienced rate for the High accuracy advisor minus the experienced rate for the Low accuracy advisor during the Familiarization phase. Numbers in bold in the regression equations are significant at p < .05."}
 
@@ -2074,6 +2148,11 @@ We performed two experiments using different tasks, and found mixed results.
 In the branch of the Dates task where feedback was provided, participants had a clear preference for the more accurate advisor.
 This preference was also seen in the Dots task, in which no participants received feedback. 
 Contrary to these results, however, participants in the Dates task who did not receive feedback did not show a systematic preference for either advisor.
+
+The difference between the task results where feedback was denied to participants is probably due to the Dates task being a generally more difficult task for participants than the Dots task.
+This extra difficulty likely meant that participants in the Dates task were unable to tell the advisors apart.
+If the @pescetelliRoleDecisionConfidence2021 model of metacognitive evaluation of advice is accurate, participants may have been subjectively very unsure of whether their answer was correct or incorrect, and thus in the absence of feedback they cannot glean insight into the accuracy of advice by attending to whether or not the advice contradicts their initial estimate.
+Alternatively, if this process is not driving performance in the Dates task, the additional difficulty may simply have meant that participants' strong desire to see advice [@ginoEffectsTaskDifficulty2007] may have rendered the relative quality of the advice unimportant.
 
 In both tasks the advisor preferences included many participants whose preference was either neutral (all tasks) or in favour of the Low accuracy advisor (Dates task).
 This variability in pick rates from the participants in the No feedback condition of the Dates task, suggests that preferences are diverse both in terms of direction and strength in the absence of any systematic effects.

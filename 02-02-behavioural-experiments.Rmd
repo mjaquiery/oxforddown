@@ -431,7 +431,7 @@ The Bayes' Factor for the domain of agreement -- the absolute distance between t
 
 ```{r be-db-r-advice-ratings, fig.caption="Advice rating in Experiment 5.  The polar plots show the number of times each participant gave the given rating to the advice of each advisor. The colour density illustrates the number of participants who gave at least that many ratings to the advice of an advisor."}
 
-axes <- crossing(
+axes <- tidyr::crossing(
   Advisor = c("Always honest", "Sometimes deceptive"),
   x = c(1.5, 2.5, 3.5),
   y = c(3, 6)
