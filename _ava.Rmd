@@ -183,7 +183,7 @@ exclusions %>%
 
 In line with the pre-registration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or finish the experiment after `r preRegParticipants` participants have already submitted data which passed the other exclusion tests. 
 Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-ava-dots-exclusions).
-This number is somewhat higher than in the previous experiments, but this is largely due to collecting data in larger batches than previously: a large number of participants were excluded because their data was in excess of the preregistered sample size.
+This number is somewhat higher than in the previous experiments, but this is largely due to collecting data in larger batches than previously: a large number of participants were excluded because their data were in excess of the preregistered sample size.
 
 ##### Task performance
 
@@ -739,7 +739,7 @@ r_agr <- cor.test(tmp$estimate, tmp$Agreement)
 ```
 
 The lack of systematic preference from the participants was surprising. 
-Each participant's data was tested against a null hypothesis that their picking was random, and `r num2str(mean(tmp$sig) * 100, 1)`% of participants demonstrated a statistically significant preference.
+Each participant's data were tested against a null hypothesis that their picking was random, and `r num2str(mean(tmp$sig) * 100, 1)`% of participants demonstrated a statistically significant preference.
 As seen in Figure \@ref(fig:ac-ava-dots-r-graph), however, these preferences were quite evenly split between the High accuracy and the High agreement advisors, both in terms of frequency and strength (although with a slight advantage for the High accuracy advisor).
 
 The wide variation in preferences was not significantly correlated with either experienced agreement (`r glue("r={prop2str(r_agr$estimate)}, p={prop2str(r_agr$p.value)}")`) or experienced accuracy (`r glue("r={prop2str(r_acc$estimate)}, p={prop2str(r_acc$p.value)}")`).

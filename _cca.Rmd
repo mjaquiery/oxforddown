@@ -1549,7 +1549,7 @@ The Bias-sharing advisor agreed more frequently with a participant when the init
 Overall, there was no evidence that participants picked these advisors at different rates.
 Looking just at the medium confidence trials, where the advisors were exactly equivalent, there was very weak evidence that the Bias-sharing advisor was picked more frequently in the Lab experiment and reasonable evidence against any difference at all in the online replication.
 
-The data from these studies is not conclusive against the existence of this effect, especially when integrated with the findings of @pescetelliRoleDecisionConfidence2021. 
+The data from these studies were not conclusive against the existence of this effect, especially when integrated with the findings of @pescetelliRoleDecisionConfidence2021. 
 It is plausible, for instance, that metacognitive moderation does happen in advice evaluation, but that these effects are more subtle than the broader effects of accuracy and agreement, and that the studies here were too underpowered to detect these effects.
 It seems unlikely that metacognitive moderation effects would exist in the advisor evaluation domain (as showing in @pescetelliRoleDecisionConfidence2021) but not in the advisor choice domain, given the rough parity demonstrated between these domains across the dimensions of accuracy and agreement in previous experiments.
 

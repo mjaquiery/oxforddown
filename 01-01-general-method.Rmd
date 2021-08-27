@@ -13,7 +13,7 @@ bibliography:
 source('scripts_and_filters/general_setup.R')
 ```
 
-# Behavioural experiment method {#chapter-behavioural-experiment-method}
+# General method {#chapter-behavioural-experiment-method}
 \adjustmtc 
 
 <!-- The behavioural experiments all have similar methodology, so it makes sense to dedicate a chapter to detailing it and then summarise and explain deviances/specifics when reporting each individual experiment.
@@ -23,7 +23,7 @@ The behavioural experiments reported in this thesis share a common structure.
 This structure is detailed here to reduce repetition elsewhere in the thesis.
 Individual experiments have truncated methods sections in which the specific deviations from the general method are noted.
 
-## General method {#gm}
+## Behavioural experiments {#gm}
 
 The experiments take place using a judge-advisor system.
 Participants give an **initial estimate** for a decision-making task, receive **advice**, and then provide a **final decision**.
@@ -41,20 +41,12 @@ Participants were prevented from taking the study if they had participated in on
 Participants were paid approximately GBP10-15/hour pro rata.
 Experiments took the average participant between 10 and 30 minutes to complete.
 
-Some participants encountered technical problems, prompting them to contact me via the Prolific platform.
-These participants were thanked, and additional information about the problem sought if necessary.
-These participants were paid on an ad hoc basis depending upon the time taken before the errors emerged and the detail of the error reports.
-
 Later studies introduced attention checks which terminated the study as a consequence for failure.
 It is not clear whether this technique constitutes best practice on Prolific because automatic termination means participants may return the study rather than having their participation explicitly rejected (and thus affecting their Prolific participation rating).
-Participants who returned the studies were not paid.
-Participants who attempted to complete the study with an invalid code after having their participation terminated for failing attention checks were also not paid, and their completion attempt was rejected on the Prolific platform.
+Participants who failed these attention checks were not paid.
 There is an ongoing ethical debate concerning non-payment of participants who fail attention checks in online studies.
-The studies in this thesis used a mixture of paying for and not paying for participation attempts with failed attention checks.
 In online studies, where low-effort participation is a serious and enduring concern, platforms such as Prolific make clear to participants and researchers that payment is only expected for responses which are given with satisfactory effort.
 Participants are thus fully aware of and consenting to the process of screening results for adequate effort prior to payment.
-It is important to note the difference between low effort responses, for which payment may ethically be withheld, and atypical responses, which may represent genuine engagement with the task.
-It is unethical, in my view, to withhold payment from participants for atypical responses within an experiment (including low or high response times, accuracy, etc).^[Data may be excluded from _analysis_ for these reasons, but the participants should still be paid.] Participants should only be denied payment for failing to provide adequate responses to explicit attention checks.
 
 #### Demographics
 
@@ -98,9 +90,17 @@ knitr::include_graphics("figures/methods/dots-structure.jpg")
 
 \mccorrect{!TODO[Check feedback duration and style in image caption]}
 
-#### Perceptual decision (Dots Task) {#m-p-dots}
+#### Perceptual decision (Dots task) {#m-p-dots}
 
-Stimuli in the Dots Task consisted of two boxes arranged to the left and right of a fixation cross (Figure \@ref(fig:m-dots)).
+The Dots task is a two-alternative forced choice task that has been used in various forms for many experiments in our lab \mccorrect{QUESTION: Nick, can you give me some of your key citations for this, please? It's surprisingly hard to find this kind of thing by searching because of the plethora of RDM studies, etc.} and beyond [e.g. @rouaultFormingGlobalEstimates2019].
+This task has several key features that make it appealing for studying decision-making and advice.
+Firstly, stimuli are only presented very briefly, meaning that many trials can be performed in a relatively short experimental session.
+Secondly, the difficulty of the task can be titrated to bring all participants to a desired level of accuracy, and this process can be done continuallly and unobtrusively throughout the experiment.
+Thirdly, there is a good level of variation in the difficulty of individual tasks due to the specifics of the random patterns generated, meaning that the task produces an array of confidence judgements while controlling overall performance.
+Fourthly, the variation in subjective experience of the difficulty of objectively similar trials means that advice is plausible: someone else really could have seen the presentation more clearly than the participant.
+Lastly, the task is neutrally-valenced and unlikely to provoke strong associations in participants that might alter their processing of information.
+
+Stimuli in the Dots task consisted of two boxes arranged to the left and right of a fixation cross (Figure \@ref(fig:m-dots)).
 These boxes were briefly (300ms) and simultaneously filled with an array of non-overlapping dots, and the participant was instructed to identify the box with the most dots.
 The participant submitted their response by selecting a point on a horizontal bar: points to the left of the midpoint indicated the participant thought the lefthand box had more dots, and points to the right that they thought the righthand box had more dots. 
 The further away from the midpoint the participant selected on the bar, the more confidence they indicated in their response.
@@ -117,7 +117,7 @@ The Dots Task stimuli can be customised to make the discrimination easier or mor
 This means that the stimuli can be adjusted to maintain a specific accuracy for each individual participant, allowing confidence to be examined in the absence of confounds with the probability of being correct.
 Stimuli were continually adjusted throughout the experiment to maintain an initial estimate accuracy of around 71% using a 2-down-1-up staircase procedure.
 There were a substantial number of trials in the practice block so that participants could eliminate practice effects and thus experience a more stable objective difficulty during the core trial blocks.
-The specific number of practice trials differed between experiments as we sought to balance minimising the participant time requirement with minimising practice effects.
+The specific number of practice trials differed between experiments as we sought to balance minimising the participant time requirement with the need to minimise practice effects in the core experimental blocks.
 
 After the practice there were blocks where participants received advice on their initial estimates and made a final decision using the same response process as their initial estimate.
 Advice was presented with a representation of an advisor with a text bubble stretching out to the side the advisor endorsed, containing the text "I think it was on the RIGHT" or LEFT as appropriate.
@@ -137,18 +137,24 @@ Some free text responses may be redacted in the open data to prevent participant
 ##### Specific limitations of the Dots task
 
 The Dots task uses a perceptual decision with a high number of trials.
-This structure makes it plausible that participants respond to the advice primarily through simple reinforcement learning rather than through specific social processes thought to be at work in advice-taking and advisor evaluation.
+There is a longstanding debate concerning whether social learning processes are unique or merely the operation of general learning processes on social cues [@lockwoodComputationalModellingSocial2021], and this structure makes this task especially unsuitable for addressing this issue.
+It plausible that participants respond to the advice in this task primarily through simple reinforcement learning rather than through specific social processes even if those processes do exist.
+We can therefore draw only tentative conclusions that we are capturing fluctuations in trust in advisors during this task, as opposed to capturing fluctuations in the association between advice and stimuli.
 
 Whether or not the Dots task taps into social processes, both the task itself and the experimental structure are very different from most advice-taking and advisor evaluation in the real world. 
 Perceptual decisions are rarely the subject of advice, and thus the central task is an unusual one for joint decision-making.
 The amount of exposure to advisors also greatly exceeds that which would be obtained over a far longer period of time in most real world situations.
 This much greater level of exposure risks investing effects with artificial importance: while it is a strength of experimental designs to magnify the effects they aim to study we must not let such magnification blind us to the real relevance of these effects within the complex and dynamic context of real life.
 
-#### Estimation (Dates Task)
+To accommodate some of the limitations of this task, we aimed to replicate results from the Dots task in another task that afforded less precise control but that perhaps captures more everyday decision-making and advice.
 
-The Dates task presented participants with historical events that occurred in a specific year in the 20th century. 
+#### Estimation (Dates task)
+
+The Dates task is a real-world general knowledge trivia task that requires participants to estimate the dates of 20th century events.
+Participants were presented with historical events that occurred in a specific year in the 20th century. 
 Participants were then asked to either: a) drag a marker onto a timeline to indicate a range of years within which they thought the event occurred (continuous version); or b) state whether the event occurred before or after a specific date (binary version).
 Once they had made this initial estimate, they were presented with advice from an advisor and then asked to make a final decision.
+The advice took the same form as the initial estimate, a range of years in the first case and an indication of whether 'before' or 'after' was the correct answer in the second.
 
 During practice trials (either with or without advice), participants received feedback on their answers.
 Some participants were placed in a Feedback condition where they received feedback on all trials except those where they were asked to choose an advisor to provide advice.
@@ -203,8 +209,8 @@ Advice in the continuous version of the task was still conceptualised along dime
 While it is possible to operationalise these as binary properties, with accurate advice including all advice where the advisor's marker covered the correct year and agreeing advice including all advice where the advisor's maker intersected with the participant's initial estimate marker, we decided that this approach was prohibitively difficult to implement, especially where initial estimate markers were very wide. 
 Instead, accuracy and agreement were taken as continuous properties, measured from the centre of the advisor's marker to the correct year (for accuracy) or the centre of the participant's initial estimate marker (agreement).
 
-Advisors in these experiments typically placed their advice markers by identifying a target year, either the correct year or the centre of the participant's initial estimate marker, and then placing the centre of their advice marker on a year sampled from a normal distribution around that target year.
-On occasion, advisors would offer 'off-brand' advice, designed to neither be close to the participant's initial estimate nor the correct year. 
+Advisors in these experiments typically placed their advice markers by identifying a target year, either the correct year (where the advisor was defined in terms of its objective accuracy) or the centre of the participant's initial estimate marker (where the advisor was defined in terms of its propensity to agree vs. disagree with a participant's answer), and then placing the centre of their advice marker on a year sampled from a normal distribution around that target year.
+On occasion, advisors would offer 'off-brand' advice, designed to neither be close to the participant's initial estimate nor the correct year, to allow for comparisons of influence across advisors that were not confounded with differences in the advice provided.  
 
 When a choice of advisors was offered, the two advisors were shown next to one another vertically on the lefthand side of the screen, and the participant clicked on the advisor from whom they wished to receive advice.
 There was never a time limit for making this choice.
@@ -240,8 +246,10 @@ On trials with feedback, a gold star would appear next to the correct bar, along
 The feedback lasted 2s.
 
 As in the Dots task§\@ref(m-p-dots), advice was conceptualised along the binary dimensions of accuracy (whether the indicated bar was the correct one) and agreement (whether the indicated bar was the one selected in the participant's initial estimate).
-Where advisors gave estimates with a confidence, they first calculated an internal estimate of when they believed the event took place by drawing from a normal distribution around the correct year.
-They then determined their answer and their confidence by comparing their belief about the year the event took place with the anchor year, and scaling their confidence as a function of the distance between those years.
+In some experiments advisors gave estimates with an indication of confidence.
+The confidence for these ratings was calibrated with regard to objective accuracy and varied with the difficulty of the question (i.e., with the discrepancy between the anchor year and correct year of the event). 
+Specifically, the advice was generated by drawing a random year from a normal distribution centred around the correct year. 
+The advice was given according to whether this year fell before or after the anchor year, with confidence scaled as a function of the distance between those years.
 This method is a somewhat rationalist version of how participants themselves may generate confidence judgements in this task.
 
 When a choice of advisors was offered, advisor avatars were placed vertically in the centre of the screen, between the two bars, and participants clicked on the avatar of the advisor from whom they wished to hear advice.
@@ -268,8 +276,6 @@ Performance was especially dire for events from the nineteenth century.
 A new date range of 1900-2000 was chosen, and further events were added by revisiting the Wikipedia timeline for the 1900s [@Timeline20thCentury2021], as well as the Oxford Reference timeline of the 1900s [@20thCentury2012].
 The new list of questions performed better during piloting.
 Questions where respondents' answers were particularly accurate or inaccurate were removed, leaving a final list of around 80 events.
-
-\mccorrect{QUESTION: I'm pretty sure I can put my hands on the experimental code, screenshots of the estimation task, and the brief write-ups or analysis of the responses. Likely I have the raw data for the responses, too. Is it worth including that stuff, either here in brief or in an Appendix?}
 
 ##### Specific limitations of the Dates task
 
@@ -301,15 +307,12 @@ Secondly, artificial advisors may not trigger a number of human-centred processe
 The advice presented to participants in the experiments is specific and impersonal.
 During real-life advice-taking, advice is often provided within a discussion, with estimates accompanied by reasons and points responded interactively.
 Although studies have indicated that advice-taking behaviour remains similar where discussion is allowed [@libermanNaiveRealismCapturing2012; @minsonTwoTangoEffects2011], these experiments placed discussion within the context of advice exchanges over a decision made by both dyad members individually, and not with distinct roles for the advisor and judge as used in these experiments.
+The relationship between the judge and the advisor is also less rich than real-life relationships where numerous other factors may alter or overwhelm any advice-taking and advisor evaluation processes revealed by these experiments. 
 
 Further ecological validity limitations arise from the structure of the experiment.
 The task presents a series of trials sequentially, with a rapid procession through each.
 This structure is intended to condense a real-world relationship with an advisor, built up over repeated interactions over time, into as narrow a time window as possible. 
-It is likely that this temporal compression does not fundamentally alter the processes of advisor evaluation and trust formation, but we have little positive evidence to support this supposition.
-
-Another major difference between real-life advice and the advice offered in these experiments is in the richness of the relationship between advisor and judge.
-In a real-life relationship there would be numerous other factors at play which may alter or overwhelm any advice-taking and advisor evaluation processes revealed by these experiments. 
-How well a person gets along with another could matter beyond simply increasing the perceived benevolence of the other, for example.
+It is possible that this temporal compression does not fundamentally alter the processes of advisor evaluation and trust formation, but we have little positive evidence to support this supposition.
 
 Lastly, both the Dots task and the Dates task had an objectively correct answer on every question.
 A substantial portion of everyday real-world advice-seeking behaviour concerns questions on which there is no readily-determinable objectively correct answer, such as where might be a good holiday destination, or whether one should pursue postgraduate education.
@@ -317,11 +320,11 @@ These more subjective questions have received some attention by @vanswolForecast
 
 \mccorrect{TODO: explain No gender breakdown (simplicity/privacy vs data gap)}
     
-### Analysis {#m-analysis}
+## Analysis {#m-analysis}
 
-#### Dependent variables {#m-analysis-dv}
+### Dependent variables {#m-analysis-dv}
 
-##### Pick rate
+#### Pick rate
 
 Pick rate provides a measure of source selection behaviour. 
 In most experiments there are some trials that offer participants a choice of which advisor they would like to hear from. 
@@ -333,9 +336,8 @@ A participant's pick rate is an aggregate over a number of trials, and expresses
 The mentally represented preference for that advisor is not measured directly (if such a thing even exists), and cannot be determined from the observed pick rate without knowing the mapping function for each individual participant.
 Mapping functions (such as the logistic sigmoid function) produce stochastic choice behaviour from a preference marked on a continuous scale.
 The relationship between preference and pick rate is non-linear and idiosyncratic, but it is likely monotonic for all participants: the stronger the preference the higher the pick rate.
-Despite this monotonic relationship, it is important not to infer that one participant's preference for an advisor is stronger than another's on the basis of the former picking that advisor more frequently: it may be instead that, for the former participant, smaller differences in preference lead to more consistent picking behaviour.
 
-##### Weight on Advice {#m-analysis-dv-woa}
+#### Weight on Advice {#m-analysis-dv-woa}
 
 Weight on Advice, and its compliment Advice Taking, are commonly used to quantify the relative contributions of advice and initial estimates in making final decisions.
 It is obtained by dividing the amount an initial estimate was updated by the amount the advisor recommended adjusting the initial estimate.
@@ -349,11 +351,14 @@ These values are typically truncated to 0 and 1, respectively.
 In cases where the advice is exactly equal to the initial estimate, the denominator is equal to zero and the value for Weight on Advice is thus undefined. 
 Trials in which the advice is exactly equal to the initial estimate are consequently discarded when calculating Weight on Advice.
 
-##### Influence
+#### Influence
 
-##### Capped influence {#m-analysis-dv-influence}
+Participants on the binary tasks (Dots and Binary Dates task) make two responses with a direction and confidence.
+The amount that the confidence shifts between the initial estimate and final decision in the direction of the advice is termed the _influence_ of the advice.
+In most cases, participants increase their confidence when advisors offer agreeing advice and decrease their confidence when advisors offer disagreeing advice. 
+Both of these cases constitute positive influence of the advice.
 
-Influence, the dependant variable in some analyses, is calculated as the extent to which the judge’s initial decision is revised in the direction of the advisor’s advice.
+Influence is calculated as the extent to which the judge’s initial decision is revised in the direction of the advisor’s advice.
 The initial ($C_1$) and final ($C_2$) decisions are made on a scale stretching from -55 to +55 with zero excluded, where values <0 indicate a ‘left’ decision and values >0 indicate a ‘right’ decision, and greater magnitudes indicate increased confidence.
 Influence ($I$) is given for agreement trials by the shift towards the advice:
 
@@ -372,6 +377,8 @@ And by the inverse of this for disagreement trials:
 I|\text{disagree} = -I|\text{agree}
 (\#eq:m-influence-disagree)
 \end{align}
+
+##### Capped influence {#m-analysis-dv-influence}
 
 The confidence scale excludes 0, and thus the final decision can always be more extreme when moving against the direction of the initial answer than when moving further in the direction of the initial answer.
 A capped measure of influence was used to minimise biases arising from the natural asymmetry of the scale.
@@ -402,52 +409,20 @@ This approach often has the effect of overinflating influence of agreement, and 
 If, for example, a participant using a 50-point rating scale selected 48 for their initial estimate and received agreeing advice, a final decision of 49 would constitute an influence rating of 50% and a final decision of 50 an influence rating of 100%. 
 It is not at all clear that participants differentiate the positions on the scales with this decree of precision, and so we considered this approach to capping influence inappropriate.
 
-#### Inferential statistics
+### Inferential statistics
 
 Statistical analyses are conducted using a both Frequentist and Bayesian statistics.
 
-##### Frequentist statistics
-
-Frequentist statistics, often in psychology referred to simply as 'statistics', are a family of statistical tests which minimise the long-term error rates rates of the conclusions they invite.
-To perform one of these tests, the user first specifies a null hypothesis which the test will seek to reject.
-Next, the user selects a rate of false-positives that is acceptable, termed an alpha ($\alpha$).
-In psychology $\alpha$ is almost universally .05, meaning that 5% of results for tests where there is no true effect will be positives.
-The principle statistic of interest from these tests is the $p$-value: the chance that a sample equivalent to the user's sample would be as extreme or more extreme than the observed sample _assuming that the null hypothesis is true_.
-The $p$-value quantifies how expected the sample observations are where the null hypothesis is the model: its complement quantifies how surprising the data are given the null hypothesis is true.
-If the $p$-value is lower than the $\alpha$ the null hypothesis may be rejected on the reasoning that such an unlikely sample as the current one is more consistent with some other hypothesis.
-Where the null hypothesis is rejected the sample is labelled as being _significantly different_ from that expected from the null model, and this general feature of the difference is known as statistical significance.
-
-It is common practice when using frequentist statistics to set up experiments such that two, and only two hypotheses can possibly explain the data.
-One of these is deemed the null hypothesis and tested as described above.
-The other hypothesis is termed the 'alternate' hypothesis, and, if the null hypothesis is rejected, is accepted in place of the null hypothesis because there were only two possible explanations and the null hypothesis has been ruled out.
-
-Frequentist statistics are useful, better understood by psychologists than alternatives, and capable of delivering genuine insights when used correctly.
-A great many caveats surround their use and interpretation, however. 
-Frequentist statistics cannot express positive evidence for the null hypothesis (because the null hypothesis is an assumption of the tests): $p$-values are uniformly distributed among samples drawn from the null hypothesis [@murdochPValuesAreRandom2008] and so no argument can be made from any particular value that it constitutes more or less evidence for the null.
-Likewise, $p$-values below the chosen $\alpha$ cannot strictly be interpreted as expressing more or less evidence for the alternate hypothesis (or against the null hypothesis). 
-Frequentist statistics control long-term error rates rather than capturing relative likelihoods of theories, and thus the only legitimate inferences from a frequentist test are to accept or reject the null hypothesis.
-The uniform distribution of $p$-values under the null also means that repeated sampling from the null distribution without adjusting the $\alpha$ will increase the rate at which false-positive conclusions are drawn.
-This repeated sampling can happen in many ways such as running related tests on the same data, using slightly different data (e.g. by adjusting exclusions), and running tests at multiple time points in data collection (especially if a significant result terminates data collection).
+#### Frequentist statistics
 
 In this thesis a range of frequentist statistical tests are used, most frequently t-tests and analyses of variance (ANOVA).
 The $\alpha$ is always set at .05 unless otherwise stated.
 Null hypotheses are always the expected distribution if the effect being tested is nil.
 Where the level of influence exerted by two different advisors is studied, for example, the null hypothesis would be that there were no systematic differences in influence exerted by those advisors.
 
-##### Bayesian statistics
+#### Bayesian statistics
 
-Bayesian statistics consist in a statistical approach that attempts to capture the (posterior) likelihood of a hypothesis being true on the basis of its (prior) plausibility and the strength of the evidence.
-These tests are frequently adapted to quantify the relative likelihood of two competing hypotheses given their relative prior plausibilities and how consistent the observed evidence is with each theory.
-To perform these Bayesian statistical tests the user specifies the hypotheses to be compared, their relative likelihoods, and the evidence sampled.
-
-The principle statistic in Bayesian tests is the Bayes Factor (BF).
-BF quantifies the posterior likelihood of one hypothesis over another. 
-In the notation used here, BF always quantifies a more complex model over a simpler one: in the case of a Bayesian t-test it therefore quantifies the alternate hypothesis (in which there is an effect) over the null hypothesis (in which there is not an effect).
-The BF takes a value between 0 and infinity.
-Values below 1 indicate a greater likelihood for the simpler model, and that greater likelihood is given by 1/BF.
-Where BFs below 1 are reported in this manuscript the notation 1/BF is used to allow an intuitive reading of the strength of evidence in favour of the simpler model.
-
-Bayesian tests produce a continuous measure of relative likelihood which simply describes the data and prior beliefs. 
+Bayesian statistics measure relative likelihood between statistical models given observed data and prior beliefs. 
 In order to draw categorical inferences, thresholds are placed on this continuous outcome.
 Here these thresholds are 1/3 < BF < 3, meaning that a BF of less than 1/3 constitutes evidence in favour of the simpler model while a BF greater than 3 constitutes evidence in favour of the more complex model.
 These values are those suggested by \mccorrect{!TODO[CITE whoever has that neat little table. Jeffreys?]} as representing \mccorrect{!TODO[which word does the paper use?]} evidence in a given direction.
@@ -462,7 +437,7 @@ Neither the objective nor subjective approach is clearly superior.
 The subjective approach is used here because it is simpler.
 There is some risk that results will be a poor fit to reality because the priors are inappropriate, but this risk is fairly low and somewhat mitigated by the additional inclusion of frequentist statistics.
 
-##### Integrating statistical results
+#### Integrating statistical results
 
 In most cases, Bayesian and frequentist statistics produce the same conclusion \mccorrect{!TODO[pretty sure there's a paper which states/demonstrates this]}.
 Where this is not the case, results should be interpreted very cautiously: a significant frequentist test with an uninformative or null-favouring Bayesian test can indicate that the result may be a false-positive, while clear Bayesian support for the alternate hypothesis in the absence of a significant frequentist test can indicate that the priors in the Bayesian test are inappropriate. 
@@ -470,58 +445,59 @@ Where this is not the case, results should be interpreted very cautiously: a sig
 Where null conclusions are to be drawn, i.e. the null hypothesis is to be retained, only Bayesian statistics can be considered informative. 
 In these cases Bayesian statistics will be interpreted, with the caveat that the safeguard of using two independent approaches to draw statistical conclusions has lapsed.
 
-##### Software
+#### Software
 
 Data analysis was performed using R [@rcoreteamLanguageEnvironmentStatistical2018].
 For a full list of packages and software environment information, see \mccorrect{!TODO[figure out where to include this stuff.
 Appendix?
 Also link to a containerized version of this.]}
 
-#### Unanalysed data
+### Unanalysed data
 
 Early versions of several experiments had bugs in the experiment code made the results unreliable.
-The data collected during these runs is available alongside the data collected in the final versions of experiments.
+The data collected during these runs are available alongside the data collected in the final versions of experiments.
+These participants were paid on an ad hoc basis depending upon the time taken before the errors emerged and the detail of the error reports they submitted on the Prolific participant recruitment platform.
 For details on what went wrong with the experiments in which bugs were found, see the description column of the data files in the `esmData::` R package.
 While not useful for the hypotheses of the experiments for which the data were collected, some excluded data can be used for other purposes such as analysing responses to advice.
 
-\mccorrect{!TODO[Appendix these?]}
+\mccorrect{TODO: Put in appendix or (NICK) cut.}
 
-##### Experiment 0
-This branch of experiments was the core of the date task. 
+#### Experiment 0
+This branch of experiments was the core of the Dates task. 
 As such, most experimentation and piloting happened on this branch, meaning that there were many versions of the study where data were collected for which analysis is not included here. 
 
-##### Experiment 1A
+#### Experiment 1A
 The earliest versions contained a bug where advisors instructed to agree with a participant instead provided advice identifying the correct answer.
 Other versions had a bug in the staircasing code used to titrate the difficulty of the task was converging on too high a value (74% initial decision accuracy as opposed to 71%).
 Once the staircasing bug was fixed, two more experiments were run, one with 60 practice trials in which participants did not quite reach the desired accuracy before the beginning of the main experiment, and one with 120 practice trials which constitutes the data analysed below.
 
-##### Experiments 1B and 2B
+#### Experiments 1B and 2B
 Early versions included a bug which prevented feedback from being shown during the familiarisation phase even to participants in the Feedback condition.
 These participants could theoretically be included in the No feedback condition regardless of their condition label in the data, but this is not done here.
 
-##### Experiment 3A
+#### Experiment 3A
 
-Pilot data was collected to ensure the study functioned properly, and so the data are not analysed with regard to the hypotheses. 
-The v1 Mixed design data was conducted and run as a proper experiment in which participants learned about both advisors simultaneously (preregistered at https://osf.io/5z2fp), but there were no effects in the data. 
+Pilot data were collected to ensure the study functioned properly, and so the data are not analysed with regard to the hypotheses. 
+The v1 Mixed design was conducted and run as a proper experiment in which participants learned about both advisors simultaneously (preregistered at https://osf.io/5z2fp), but there were no effects in the data. 
 
-##### Experiment 3B
+#### Experiment 3B
 
 The first version included a bug in which the advisor choice options were not recorded, making it difficult or impossible to work out which trials included a choice of advisor. 
 Data for these participants could be included in a study that was agnostic about advisor choice.
 
-##### Experiment 4A
+#### Experiment 4A
 
 The first version had a bug which meant that the advisors were identical in the familiarisation phase.
 Both the first and second versions had a bug in which advisors who were supposed to agree with the participant's initial estimate gave the correct answer rather than agreeing.
 These participants' data could be included in an analysis which used a participant's actual experience of advice to predict their advice-taking and source selection behaviour, provided appropriate care was taken to reconstruct the advice data from the raw values instead of relying on the reported summaries.
 
-##### Experiment 5
+#### Experiment 5
 
 Several versions of this study were run in the course of developing the manipulation.
 The initial version had a bug that prevented the groups from being visually distinct. 
 Later versions introduced a clearer manipulation, equivalent rather than genuinely misleading advice for the Sometimes misleading advisor, and rating of advice deceptiveness, respectively.
 
-##### Experiment 6
+#### Experiment 6
 
 Two short pilot versions of this experiment were run, and participants' data were not analysed due to bugs in the experiment code.
 

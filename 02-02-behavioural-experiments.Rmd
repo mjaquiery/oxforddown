@@ -1509,7 +1509,6 @@ tmp %>%
 
 ```
 
-
 We conducted a simulation in which we modified participants' actual data by substituting the final confidence values for values calculated by a model that reduces egocentric discounting for the Consistent individual advisor by a set effect size. 
 The simulations indicated that, even where we directly simulated differences in egocentric discounting for each advisor, we were unable to detect the effects we were looking for (Figure \@ref(fig:be-ce-r-sim); `r .T.sim`).
 
