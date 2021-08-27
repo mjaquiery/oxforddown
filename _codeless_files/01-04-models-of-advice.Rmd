@@ -93,12 +93,12 @@ The two free parameters estimated during the parameter recovery process are: how
 
 The model and parameter recovery process are both tested using simulation. 
 The parameter recovery process is tested by attempting to recover data from simulated data (where the parameters are know), and shows a reasonable level of accuracy in recovering parameters from data, suggesting that the recovered values for participants are likely to capture some aspects of participants' behaviour on the task.
-The model itself is tested by comparing errors for fitted parameters to errors for those same parameters when fitted to data that has had the advisor agreement information scrambled.
+The model itself is tested by comparing errors for fitted parameters to errors for those same parameters when fitted to data that have had the advisor agreement information scrambled.
 Given the models are driven by the advisors' agreement with the judge's initial decision, scrambling this column should break the temporal relationship between experience and trust updating, leading to worse parameter fits. 
 This is indeed the case.
 
 The parameter recovery results, distributions and correlations of the coefficients, illustrate the heterogeneity of the participants. 
-Some participants' data does not fit well to the model, indicating that these participants may have used strategies which bear little resemblance to the model the data are fit to.
+Some participants' data do not fit well to the model, indicating that these participants may have used strategies which bear little resemblance to the model the data are fit to.
 
 We then explore the behaviour of the agent-based models (within a narrow area of their parameter space), varying the way agents' preferences for more trusted advisors are determined.
 The baseline model assigns all agents no preference for more trusted advisors, meaning that they sample from all possible advisors at random. 

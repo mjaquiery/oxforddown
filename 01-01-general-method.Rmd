@@ -137,7 +137,7 @@ Some free text responses may be redacted in the open data to prevent participant
 ##### Specific limitations of the Dots task
 
 The Dots task uses a perceptual decision with a high number of trials.
-There is a longstanding debate concerning whether social learning processes are unique or merely the operation of general learning processes on social cues [@lockwoodComputationalModellingSocial2021], and this structure makes this task especially unsuitable for addressing this issue.
+There is a longstanding debate concerning whether social learning processes are unique or merely the operation of general learning processes on social cues [@lockwoodComputationalModellingSocial2020], and this structure makes this task especially unsuitable for addressing this issue.
 It plausible that participants respond to the advice in this task primarily through simple reinforcement learning rather than through specific social processes even if those processes do exist.
 We can therefore draw only tentative conclusions that we are capturing fluctuations in trust in advisors during this task, as opposed to capturing fluctuations in the association between advice and stimuli.
 

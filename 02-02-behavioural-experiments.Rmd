@@ -59,7 +59,7 @@ for (E in c(.GlobalEnv, .prevStudy)) {
 ```
 
 The evolutionary models discussed [in the last chapter](#chapter-advice-taking-context) demonstrated that optimal advice-taking strategies depend in part upon the advice one receives being a genuine effort to help.
-Difference in benevolence, or the extent to which the interests of the advisor and the judge overlap, is one of the three pillars of the @Mayer model of advice-taking.
+Difference in benevolence, or the extent to which the interests of the advisor and the judge overlap, is one of the three pillars of the @mayerIntegrativeModelOrganizational1995 model of advice-taking.
 Despite this, relatively little investigation has been made into the role of benevolence in trust, as discussed previously§\@ref(context-familiarity).
 
 Advice-taking can be contingent on the properties of the advice, or on the properties of the advisor.
@@ -726,7 +726,7 @@ As advice got more distant from the initial estimate, i.e. decreased on our meas
 Where they were in a context that suggested the advisor was trustworthy, they were more likely to ascribe the error to themselves, rating the advice as honest and adopting it for their final decision. 
 Where they were in a context that suggested the advisor was not trustworthy, they were more likely to label the advice as misleading and to retain their initial estimate as their final decision.
 
-These observations complement the evolutionary simulations and the benevolence component of the three-factor model of trust described by \mccorrect{Cite Mayer et al 1995}.
+These observations complement the evolutionary simulations and the benevolence component of the three-factor model of trust described by @mayerIntegrativeModelOrganizational1995.
 Nevertheless, we have demonstrated sensitivity to context, but not universal discounting due to hyperpriors.
 It remains a matter of speculation that people exercise epistemic hygiene by ensuring that information comes from trusted sources before integrating it, and that no source is as trusted as one's own mind.
 This result is in keeping with evidence from experiments where initial estimates are labelled as advice (and vice-versa), in which participants frequently show an unusual level of acceptance of the advice suggestive of their performing egocentric discounting of their own initial estimate because they have accepted the labels and adopted the advice as their own initial estimate [@sollJudgmentalAggregationStrategies2011]. 

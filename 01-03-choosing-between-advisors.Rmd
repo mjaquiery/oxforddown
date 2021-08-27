@@ -110,7 +110,7 @@ We performed a series of experiments investigating whether the patterns observed
 Our experiments exercised tight control over the advisors' answers in the domains of agreement and accuracy, and allowed us to explore their relative contributions.
 
 Modelling and theoretical work indicates that biased source selection can dramatically reshape communication networks and create echo chamber effects where accurate but unpalatable information is ignored [@sunsteinRepublicCom2002; @madsenLargeNetworksRational2018].
-Empirical research on source selection behaviour has found relatively little indication that people behave this way in the real world [@marquartSelectiveExposureContext2016; @searsSelectiveExposureInformation1967; @nelsonMythPartisanSelective2017], particularly in terms of avoiding exposure to unpalatable information [@weeksPartisanEnclavesShared2016; @jangChallengesSelectiveExposure2014].
+Empirical research on source selection behaviour has found relatively little indication that people behave this way in the real world [@marquartSelectiveExposureContext2016; @searsSelectiveExposureInformation1967; @nelsonMythPartisanSelective2017], particularly in terms of avoiding exposure to unpalatable information [@weeksPartisanEnclavesShared2016; @jangChallengesSelectiveExposure2014a].
 If the effects seen by @pescetelliRoleDecisionConfidence2021 in the domain of advisor choice also occur in the domain of advisor selection, they may demonstrate in principle a psychological mechanism which could drive biased source selection that are rational and appropriate given the information available.
 
 #### Advisor choice results
