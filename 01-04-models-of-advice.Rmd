@@ -36,7 +36,7 @@ library(patchwork)
 
 The behavioural experiments in the previous chapter, along with predecessors from others in our lab [@pescetelliRoleDecisionConfidence2021], indicate that people show preferences for selecting advisors who agree with them and treat advice which agrees with their initial judgements as more valuable. 
 Previous modelling work has shown that either of these properties is sufficient to produce echo-chamber-like structures in networks wherein individuals increasingly disregard information from those likely to disagree with them [@pescetelliRoleDecisionConfidence2021; @madsenLargeNetworksRational2018a].
-In this chapter, similar models are constructed, with the parameters controlling the agents' trust updating and advice seeking behaviour based on values fitted to the participants in the behavioural experiments.
+In this chapter, similar models are constructed, with the parameters controlling the agents' trust updating and advice seeking behaviour based on values fitted to the participants in the Dots task behavioural experiments.
 We aimed to explore the network effects observed by @pescetelliRoleDecisionConfidence2021 and @madsenLargeNetworksRational2018a in a slightly different setup, with binary decisions that matched more closely to our behavioural tasks and, beyond this, to begin to explore the impact of individual variation.
 The models reproduce echo chamber effects and indicate that heterogeneity within the population may act as a brake on echo chamber formation, with individuals who are slow to trust or balanced in their advice-seeking behaviour exhibiting less pull towards extremes.
 
@@ -567,7 +567,7 @@ models.all <- agents.all %>%
 
 Agent-based modelling is used to simulate the interactive effects of repeated paired decision-making.
 The agents in the model perform a cycle of making an initial decision, selecting one of the other agents as an advisor, receiving advice from the chosen advisor, making a final decision, and updating their trust in their advisor and their internal beliefs about the world.
-The task the agents face is roughly analogous to the task faced by human participants in the Dots Task experiments ([§Perceptual decision (Dots Task)](#m-p-dots)), where the participants make a decision about which of two rapidly and simultaneously presented grids contained more dots.
+The task the agents face is roughly analogous to the task faced by human participants in the Dots task experiments ([§Perceptual decision (Dots Task)](#m-p-dots)), where the participants make a decision about which of two rapidly and simultaneously presented grids contained more dots.
 
 Each model consists of a population of agents implementing the same mathematical model of decision-making, trust-updating, and advisor selection, with different coefficients for parameters of that mathematical model (Table \@ref(tab:nw-m-agent-properties-table)) drawn from appropriate distributions.
 
@@ -704,7 +704,15 @@ The $\text{w}^a$ parameter is a crucial one in the model; it governs the steepne
 When its value is large (either negative or positive), an agent is much more consistent in their selections -- smaller differences in trust values in different potential advisors translate into a much higher likelihood of selecting advisors.
 When its value is low, the agent's trust in potential advisors exerts much less influence on which potential advisor is selected.
 
-```{r nw-m-sigmoid, fig.caption="Weighted selection parameter.  Example values of weighted selection are shown. For postive values of w, as relative trust increases, the selection weight also increases. Correspondingly, for negative values of w the selection weight decreases as trust increases. Compare the intercepts with the dashed lines: all seleciton weights are 0.5 where relative trust is zero, equating to random picking between equivalently-weighted advisors. Where w is 0 (green line), relative trust differences make no difference to selection weighting. Where it is large (purple line), on the other hand, relatively small differences in relative trust translate into much greater selection weighting."}
+```{r nw-m-sigmoid, fig.caption="Weighted selection parameter.  Example values of weighted selection are shown. For postive values of w, as relative trust increases, the selection weight also increases. Correspondingly, for negative values of w the selection weight decreases as trust increases. Compare the intercepts with the dashed lines: all seleciton weights are 0.5 where relative trust is zero, equating to random picking between equivalently-weighted advisors. Where w is 0 (green line), relative trust differences make no difference to selection weighting. Where it is large (purple line), on the other hand, relatively small differences in relative trust translate into much greater selection weighting.  The dotted line and shaded area represent the sigmoids calculated using the mean empirical value and its 95\\% confidence limits."}
+
+emp <- mean_cl_normal(recovered_parameters$ws_end) %>% 
+  tidyr::crossing(x = seq(-1.5, 1.5, length.out = 5000)) %>%
+  mutate(
+    y = adviseR:::sigmoid(x, y),
+    ymin = adviseR:::sigmoid(x, ymin),
+    ymax = adviseR:::sigmoid(x, ymax)
+  )
 
 tidyr::crossing(
   x = seq(-1.5, 1.5, length.out = 5000),
@@ -717,6 +725,11 @@ tidyr::crossing(
   ggplot(aes(x = x, y = y, colour = w)) +
   geom_vline(xintercept = 0, linetype = "dashed") +
   geom_vline(xintercept = 0.25, linetype = "dashed") +
+  geom_ribbon(
+    aes(ymin = ymin, ymax = ymax), data = emp, 
+    fill = "black", colour = NA, alpha = .1
+  ) + 
+  geom_line(size = 1, data = emp, colour = "black", linetype = "dotted") +
   geom_line(size = 1) +
   labs(
     x = "Relative trust",
@@ -898,6 +911,33 @@ The parameter is estimated on the basis of a sigmoid function applied to the tru
 
 These considerations mean that the model dynamics arising from using estimated coefficients may be informative, but only in an illustrative capacity. 
 Too much differs between the behavioural and simulated situations to draw strong conclusions.
+
+##### Behavioural data source
+
+The behavioural data were taken from participants who completed one of the Dots tasks experiments.
+This included participants in experiments that were unsuitable for analysis because of bugs in the experiment implementation.
+Participants in experiments that did not offer a choice of advisor were not included, because it is not possible to estimate the weighted selection parameter $\text{w}^a$ for participants who never make choices between advisors.
+Ultimately, this meant that data were drawn from `r nrow(recovered_parameters)` participants over `r str_match(recovered_parameters$uid, "(.+?) p[0-9]+$")[,2] %>% table() %>% nrow()` different experiments.
+Only trials that had advice were included, whether the advice came from a chosen advisor or an assigned advisor.
+Overall, there were `r .N <- mutate(recovered_parameters, n = map_int(data, nrow)) %>% pull(n) %>% sum(); .N` trials in the data, of which `r .n <- mutate(recovered_parameters, n = map_int(data, ~ filter(., !is.na(choice1)) %>% nrow())) %>% pull(n) %>% sum(); .n` trials (`r num2str(.n / .N * 100)`%) had a choice of advisor.
+
+The Dots task data were used for this because the Dots task presents a more consistent experience between participants.
+Whereas in the Dates task some participants perform far better than others, in the Dots task overall performance is clamped to around 71% using a staircase procedure.
+Another advantage to the Dots task data is that there are many more trials, meaning that the recovered parameters are much more precise.
+
+#### Model results analysis
+
+The model behaviours of interest are polarisation -- the extent to which the agents' biases tend towards extreme values -- and echo-chamber formation -- the extent to which agents for separate trust bubbles wherein they have high trust towards others inside the bubble but low trust towards those outside.
+The true probability of the binary answer being greater than 0.5 is 0.5; i.e. either answer is equally likely.
+
+Polarisation is operationalized as the mean absolute deviation of agents' biases from 0.5.
+Echo-chamber formation is quantified in two ways: shared bias-weight correlation and group ratio.
+Shared bias-weight correlation is the correlation between the amount of shared bias agents have (1 - the absolute difference between their biases) and the trust weight of one agent for the other. 
+This is calculated for each directional tie in the network, meaning that each shared bias is accompanied by two trust weights. 
+The overall correlation between these values gives the extent to which agents' trust in other agents is associated with their shared expectation about the result.
+Group ratio is calculated by splitting the population of agents into two groups based on whether or not their bias is above 0.5. 
+The mean of the trust weights for agents within their group is then divided by the mean of the trust weights for agents outside their group. 
+The higher this ratio, the more extreme agents' tendencies to trust those with similar biases compared to those with different biases.
 
 ## Results
 
@@ -1175,10 +1215,15 @@ In the Homogeneous and Heterogeneous simulations, $\lambda^a$ is again taken fro
 In the Empirical simulations, each agent selects a participant at random from the empirical data and uses that participant's estimated values of $\text{w}^a$ and $\lambda^a$.
 
 The model reproduces key effects of interest. 
+The key patterns of interest are visible even in the Baseline simulations, where agents update trust depending on agreement but do not preferentially select their advisors based on that trust.
 Firstly, agents reinforce one another's biases, leading to the emergence of extreme biases and echoing the effects in the literature.
-This can be seen in Figure \@ref(fig:nw-r-bias-evolution) where the biases of all but a handful of agents reach and remain at extreme values. 
+This can be seen in Figure \@ref(fig:nw-r-bias-evolution) (top row) where the biases of all but a handful of agents reach and remain at extreme values.
+Whether or not the entire population tends collapse into a single bubble, adopting the same extreme value, or to polarise into two distinct bubbles depends upon whether or not the trust network is already network-chamber-like (left versus right columns).
 Secondly, agents develop greater trust in agents who share their bias, as shown by @pescetelliRoleDecisionConfidence2021.
-This can be seen in Figure \@ref(fig:nw-r-weight-by-bias-evolution) where the correlations between agents' shared bias with an advisor and their trust in that advisor rises over time.
+This can be seen in Figure \@ref(fig:nw-r-weight-by-bias-evolution) (top) where the correlations between agents' shared bias with an advisor and their trust in that advisor rises over time.
+Agents who have more similar biases to one another ought to arrive at the same conclusion as one another more frequently, meaning that they will agree more frequently. 
+This, in turn, leads to greater trust over the course of repeated interactions, producing the correlation in Figure \@ref(fig:nw-r-weight-by-bias-evolution) that offers a rough measure of the extent to which agents' trust in one another is dictated by the similarity in their biases.
+Below, we explore how these features vary as a function of our different sampling strategies for $\text{w}^a$ and $\lambda^a$.
 
 #### Random vs evolved trust networks
 
@@ -1187,20 +1232,33 @@ The models in @pescetelliRoleDecisionConfidence2021 implemented this approach, a
 
 Where the models are started with random trust weights, agents also tend towards extremes, but there is a single consensus for all agents in the model.
 When this happens, the population is no more accurate than in other models, but _is_ more unified.
+This happens because of differences in the initial correlation between agents' biases and levels of trust.
+In the random case, the network starting state has no correlation between agents' biases and levels of trust (Figure \@ref(fig:nw-r-weight-by-bias-evolution), left). 
+As a consequence, early on, agents equally strongly influenced by others with different biases as they are by others with similar biases.
+In the case with Evolved trust there is an initial correlation between agents' biases and their levels of trust (figure \@ref(fig:nw-r-weight-by-bias-evolution), right, unshaded area), meaning that the network begins with correlated biases and trust.
+This results in segregation into two stable, self-reinforcing sub-networks.
+This is further reinforced by agents' acquiring negative trust in agents with dissimilar biases (Figure \@ref(fig:nw-r-weight-distribution), top-right). 
+Trust values between 0 and 0.5 indicate that agents believe other agents are predictive of the truth, but that their advice points _away_ from the truth.
+This means that interaction with others serves to _strengthen_ rather than weaken biases.
 
 Figure \@ref(fig:nw-r-all-models-summary) shows an overview of this pattern for multiple runs with different random seeds: the evolved trust weight runs tend to show higher group ratios, indicating greater polarisation.
 
 #### Effect of weighted selection
 
-Providing the agents with weighted selection has little effect, likely because the mean value estimated from the Dots task participants was small.
+Figure \@ref(fig:nw-r-bias-evolution) (second row) plots the evolution of biases when we add weighted selection of advisors to the simulations. 
+Specifically, in this Homogeneous case, all agents used the mean value of $\text{w}^a$ that we observed in the parameters estimated from our participants' data. 
+The agents used this value to weight their selection of advisors.
+The figure shows that this form of weighted selection has very modest effects of network dynamics. This is likely because the mean value estimated from the Dots task participants was small.
 There is virtually no effect on bias trajectories, and only a slight one on the distribution of trust weights (Figure \@ref(fig:nw-r-weight-distribution)), with fewer very low weights in the weighted selection runs.
 The most notable effect was in the correlation between shared bias and trust weight where trust weights are random.
 In this case, the correlation between shared bias and trust weight does not increase as fast or get as high when weighted selection is introduced. 
-The group ratio, which is the ratio of agents' weights for their ingroup members to their weights for their outgroup members, is nearly always lower when weighted selection is introduced. 
+The group ratio is nearly always lower when weighted selection is introduced. 
 
 These effects are due to agents becoming increasingly unlikely to sample advice from advisors as the trust in those advisors decreases, which in turn means that only the higher trust weights are likely to be adjusted. 
 In effect, when weighted selection occurs the lower tail is ignored, meaning that trust remains unchanged whether the shared bias is moderate or low, and thus reducing the correlation between them.
 In this sense, the effects of weighted selection itself are more a feature of the operationalisation than the underlying model.
+The models offer agents a choice of advisors at each step, and leave the trust weights of unsampled advisors static.
+Other plausible modelling choices might not show this pattern, for example if agents' trust in unsampled advisors gradually decayed to a neutral value; or if the overall level of trust in potential advisors were normalised such that an increase (or decrease) in trust in one agent meant that trust in all other agents underwent a slight decrease (or increase), perhaps proportional to their current trust values.
 
 #### Heterogeneity
 
