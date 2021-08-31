@@ -84,7 +84,8 @@ These results included a demonstration of majority influence (the authors descri
 Regarding minority influence, @gaoDiffusionOpinionsComplex2015 reported that agents preferring to hear from likeminded others allowed stable minority opinion to persist where agents had to subscribe to one or other opinion.^[This paper is extremely brief in its reporting of the agent-based model, and it is difficult to determine precisely what was done.].
 The persistence of these minority opinions in the face of widespread majority influence is was consequence of the self-reinforcing nature of the minority echo chamber. 
 
-\mccorrect{!TODO[Maybe discuss dugginsPsychologicallyMotivatedModelOpinion2017]}
+@dugginsPsychologicallyMotivatedModelOpinion2017 offers a model of similar phenomena -- social influence of opinions -- using a somewhat different approach. 
+The @dugginsPsychologicallyMotivatedModelOpinion2017 model uses spatial placement of agents to govern their ability to interact with others, and is based on a model of social influence driven by the difference between agents' perspectives alone, and does not include the agents' trust in one another as here.
 
 These studies use agent-based models to approach questions concerning how people might decide where to get their information from. 
 We employ the same method to the same ends, with a particular interest in how the heterogeneity.
@@ -108,14 +109,16 @@ The parameter recovery results, distributions and correlations of the coefficien
 Some participants' data do not fit well to the model, indicating that these participants may have used strategies which bear little resemblance to the model the data are fit to.
 
 We then explore the behaviour of the agent-based models (within a narrow area of their parameter space), varying the way agents' preferences for more trusted advisors are determined.
-The baseline model assigns all agents no preference for more trusted advisors, meaning that they sample from all possible advisors at random. 
+The Baseline model assigns all agents no preference for more trusted advisors, meaning that they sample from all possible advisors at random. 
 The Homogenous model applies the mean of the recovered parameter distribution to all agents. 
 The Heterogeneous model draws values from a distribution defined by the mean and standard deviation of the recovered parameter distribution. 
 The Empirical model selects values from those observed in the recovered parameter data (with replacement).
 For the first three models, trust update values are sampled from a distribution with the mean and standard deviation of the recovered parameters, while in the Empirical model the agents receive the trust update value for the agent whose preference strength coefficient they received.
 Two versions of each model are run, one which starts with a random trust network and one which starts with a homophilic trust network.
 
-\mccorrect{NICK: Unpack the goals in a paragraph here, in terms of what you aim/expect to learn: Comparison between the Baseline and Homogeneous model provides a basic proof-of-concept replication of previous work described above: We expect to find XYZ. Comparison between the Homogenous and Hetergeneous model extends this approach to ask XYZ, etc.}
+In short, we set up a comparison between the Baseline and Homogeneous model that provides a basic proof-of-concept replication of previous work described above: we expect to see polarisation of opinions and the emergence of echo-chamber-like structures.
+Then we comapre the Homogenous model to the Hetergeneous and Empirical models, asking whether variation in agents' advice-taking and advisor selection behaviour changes the network dynamics.
+We also compare the Hetereogeneous and Empirical models to explore whether the use of idiosyncratic parameter sets results in further alterations to the network dynamics.
 
 ### Current model {#ne-i-model}
 
@@ -925,7 +928,7 @@ The Dots task data were used for this because the Dots task presents a more cons
 Whereas in the Dates task some participants perform far better than others, in the Dots task overall performance is clamped to around 71% using a staircase procedure.
 Another advantage to the Dots task data is that there are many more trials, meaning that the recovered parameters are much more precise.
 
-#### Model results analysis
+#### Model results analysis {#nw-m-analysis}
 
 The model behaviours of interest are polarisation -- the extent to which the agents' biases tend towards extreme values -- and echo-chamber formation -- the extent to which agents for separate trust bubbles wherein they have high trust towards others inside the bubble but low trust towards those outside.
 The true probability of the binary answer being greater than 0.5 is 0.5; i.e. either answer is equally likely.
@@ -1264,6 +1267,8 @@ Other plausible modelling choices might not show this pattern, for example if ag
 
 Allowing heterogeneity in weighted selection coefficients has a more pronounced effect.
 Whether the heterogeneity comes from sampling from the distribution of estimated participant coefficients (Heterogeneous) or sampling directly from the empirically-estimated values themselves (Empirical), varied weighted selection values create subsets of agents who polarise away from the consensus value formed when starting trust weights are random.
+In Figure \@ref(fig:nw-r-bias-evolution) this is visible in the lefthand column: in the bottom two panels there is a small cluster of lines that trend towards 1 rather than 0, and that remain there throughout the simulation.
+Additionally, there is more heterogeneity in the agents' biases, with several agents retaining moderate biases (lines that do to tend to extremes in Figure \@ref(fig:nw-r-bias-evolution)).
 
 There are differences, too, between the Heterogeneous and Empirical sampling approaches.
 Compared to the Heterogeneous sampling, the model with Empirical sampling shows more moderate biases and more extreme weights (Figure \@ref(fig:nw-r-all-models-summary)).
@@ -1271,21 +1276,28 @@ This apparently contradictory finding is explicable because agents in the Empiri
 This leads to the peaks of weights at both the 0 and 1 end of the histogram for evolved weights.
 The negative weighted selection values can also drive agents to sample advice that is likely to disagree with them, moderating their biases as seen by a larger minority of agents with moderate biases in the Empirical run than in other runs.
 @madsenLargeNetworksRational2018a termed agents with this advice-seeking strategy 'Socratic' because they aimed to engage with others of a different opinion.
+This sampling approach may be behind the fact that many more agents switch the direction of their bias in the Empirical simulations than in the other simuations.
+
+Finally, Figure \@ref(fig:nw-r-weight-distribution) illustrates that a substantial minority of weights reach the maximum value in the Empirical simulations.
+This suggests that many agents adopt a favourite advisor and stick with that advisor because they tend to agree more often than not, meaning they retain their relative advantage over other advisors.
+This likely happens more in the Empirical simulations because more of the agents have extreme values of $\text{w}^a$.
 
 ### Friends in strange places
 
 Combining the results above, the models raise the interesting observation that consensuses form much more readily where issues arise on which people are likely to encounter different opinions within their circle of trusted informants.
-It is important to note that, at least in these models, the consensus is not more accurate than the alternative (and is less accurate than the starting positions), but it is nevertheless intriguing to see dynamics that resemble broad versus insular consultation.
+This can be seen in Figure \@ref(fig:nw-r-bias-evolution): in the Random case, where agents are likely to have trusted potential advisors who have very different biases, the population tends to drift together towards a single majority consensus.
+It is important to note that, at least in these models, the extreme that is selected by consensus is not more accurate than the extreme that is neglected by the consensus (and is less accurate than the starting positions), but it is nevertheless intriguing to see dynamics that resemble broad versus insular consultation.
 
 Heterogeneous weighted selection can prevent a full consensus forming where individuals have access to trusted advisors of a variety of different opinions.
-\mccorrect{NICK: This was evident in terms of...}
+This was evident in the Random starting trust weights simulations in Figure \@ref(fig:nw-r-bias-evolution): minority groups emerge and reinforce their own biases to adopt the opposite extreme to the consensus favoured by the majority; and several agents continue to occupy the middle-ground long after the majority and minority groups have adopted their extreme positions.
 This pattern in the Heterogeneous and Empirical simulations emerges because those who have a strong preference for agreement rapidly disregard the advice of their previously-trusted advisors who offers a different opinion.
 These agents form their own polarised minority, consulting and advising one another consistent with their bias (as the majority are also doing, just with the other bias).
+This pattern differed from the Baseline and Homogeneous simulations, illustrating the impact of inter-individual variability on network level behaviour.
 
 ### Consistency of the models
 
 Each model was run `r length(unique(agents$random_seed))` times with different random seeds to check which features were consistent across runs, indicating the level of stochastic uncertainty [@bruchAgentBasedModelsEmpirical2015]. 
-The features described above were all consistent across runs, as can be seen by observing the variability in Figure \@ref(fig:nw-r-all-models-summary).
+The features described above were all consistent across runs, as can be seen by observing the variability in Figure \@ref(fig:nw-r-all-models-summary) in both of the outcome variables§\@ref(nw-m-analysis).
 
 For parameter sets in which all agents' biases tend towards the same extreme, which extreme was favoured varied according to the random seed used. 
 This stochasticity is akin to placing a ball on a gabled roof: tiny variations in the initial conditions affect which way it will roll, but it will always roll down one pitch or the other.
@@ -1295,20 +1307,37 @@ This effect is not consistent between runs with different random seeds, and is a
 
 Output in the style of Figures \@ref(fig:nw-r-bias-evolution), \@ref(fig:nw-r-weight-by-bias-evolution), and \@ref(fig:nw-r-weight-distribution) for different random seeds can be visualised by tweaking the [source code for this chapter](https://github.com/mjaquiery/oxforddown/blob/dockertest/01-04-models-of-advice.Rmd#L995).
 
-\mccorrect{NICK: I'd suggest finishing this section with a short paragraph summarising the results captured in Figure 6.6: Weighted selection isn't necessary for the formation of echo chambers. Indeed, perhaps counterintuitively, we found some tendency that weighted selection can reduce these effects, because unsampled others aren't learnt about (and therefore distrusted). But heterogeneity complicates and richens (if that's a word???) this picture in interesting ways.}
+### Summary
+
+The results shown in Figure \@ref(fig:nw-r-all-models-summary) capture the key observations of this work.
+Weighted selection ($\text{w}^a$) isn't necessary for the formation of echo chambers. 
+Indeed, perhaps counterintuitively, we found some tendency that weighted selection can reduce these effects, because unsampled potential advisors aren't learnt about (and therefore aren't distrusted over other unsampled potential advisors). 
+Heterogeneity complicates and enriches this picture in interesting ways, supporting the various minority strategies visible in Figure \@ref(fig:nw-r-bias-evolution).
 
 ## Discussion
 
 As with previous simulation-based approaches ([§Similar models in the literature](#ne-i-lit)), this work showed that echo chambers and polarisation can occur in networks of agents using heuristics that appear from the agent's perspective to be rational. 
-This emergence of collective irrationality from the interaction of rational individuals is similar to the well-known phenomenon of the [Tragedy of the Commons](https://en.wikipedia.org/wiki/Tragedy_of_the_commons), in which individual rewards purchased with distributed costs results in everyone becoming poorer.
+In the absence of an objective source of information, using your own opinion as a proxy for the truth is a viable strategy under a range of broadly-true assumptions [@pescetelliRoleDecisionConfidence2021].
+Likewise, choosing to hear advice from more trusted sources, and choosing to hear advice you are more likely to take (often the same thing in our models and in real life), is a reasonable strategy.
+The emergence of collective irrationality from the interaction of rational individuals is similar to the well-known phenomenon of the [Tragedy of the Commons](https://en.wikipedia.org/wiki/Tragedy_of_the_commons), in which individual rewards purchased with distributed costs results in everyone becoming poorer.
 
 ### Weighted selection
 
-The models indicate that weighted selection, the extent to which agents prefer to receive advice from those whom they consider most trustworthy, has relatively little effect on model dynamics, at least at the level estimated from participant behaviour. 
+The models indicate that weighted selection ($\text{w}^a$), the extent to which agents prefer to receive advice from those whom they consider most trustworthy, has relatively little effect on model dynamics, at least at the level estimated from participant behaviour. 
 The results from more heterogeneous runs discussed below indicate that agents with high weighted selection values do behave in notably different ways.
 During development we observed that higher weighted selection values (above 10) tended to accelerate the polarisation of the model. 
 
+We must note, however, that the weighted selection parameter is used somewhat differently in the model than its analogue was in the behavioural experiments from which it was derived.
+In those experiments, participants were familiarized with two advisors and then offered the choice between them. 
+In our model, there are numerous potential advisors available and the weighted selection parameter weights the relative probability that each of those advisors is selected. 
+This means that the parameter values derived from our empirical observations may not correspond closely to the values we would have obtained had the behavioural task been a closer match to the simulated one. 
+While our models illustrate that variation in weighted selection plays a part, therefore, we do not make strong claims that the specific values used are meaningful, even in the Empirical case.
+
 ### Heterogeneity
+
+Most work using agent-based models, in particular the work on the topic of advice-taking [@pescetelliRoleDecisionConfidence2021; @madsenLargeNetworksRational2018a], has used agents whose key properties either do nor vary or vary in a predictable way (e.g. sampling from a standard distribution).
+Here, we explored the effect of sampling agents' properties directly from a collection of values estimated from participants in our behavioural experiments. 
+This variation potentially allows us to see the effects of minority strategies that may be hidden where extreme values, or particular combinations of values, are smoothed away by the use of a mean or normal distribution to describe the entire population.
 
 Beyond the basic effects of including weighted selection, some models used weighted selection coefficients that were heterogeneous across agents. 
 In both the Heterogeneous and Empirical models, heterogeneous weighted selection coefficients led to the emergence of hold-out groups -- small subsets of the population who formed their own minority consensus at the opposite extreme to the majority consensus.
@@ -1321,8 +1350,18 @@ These effects, the presence of hold-out groups and the speeding up of polarisati
 The hold-out groups captured in the heterogeneity models is an observable feature of opinion networks in the real world. 
 For each consensus opinion there is likely to be an outspoken minority who cling resolutely to the opposite opinion. 
 The models presented here cannot tell us how such heterogeneity comes about, but they do underscore its importance in the wider ecosystem of opinion interactions, and invite questions concerning its origins. 
-One suggestion we raise here is that being contrarian may be a stable sub-strategy within an environment where consensus dominates. 
-\mccorrect{!TODO[what do we mean by this, exactly? Can we offer an example? Potentially having diverse needs/wants/opinions/tolerances means you can exploit underexploited resources/explore new things. But this seems a bit hand-wavy and not quite what we're modelling...]}
+One suggestion we raise here is that being contrarian may be a stable sub-strategy within an environment where consensus dominates.
+
+We acknowledge that the specific values of parameters estimated here may not be a good description of people's tendencies in the kind of task simulated: because of differences between the binary advisor choice situation faced by the participants and the mulitple advisor choice situation faced by the agents; or because of difficulties in accurately estimating the coefficients for some participants; or because the the participant population may deviate somewhat from humanity in general.
+Despite this, we are confident that individual variation in these advice-taking and source-selection propensities exists, and that it matters in interesting ways for network dynamics.
+Idiosyncrasies certainly occur in confidence ratings [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017], and likely in advice-seeking and advice-taking behaviour, too [@sollJudgmentalAggregationStrategies2011; @pescetelliConfidenceAdviceSeeking2021].
+Additionally, there may be variation in confidence across personality and psychiatric dimensions \mccorrect{QUESTION: Nick, do you know good citations for this?}, and computational models are increasingly used to explore the implications of these kind of variations in psychiatric disorders \mccorrect{QUESTION: Also a citation for this - Nick, do you know of one? I guess it's computational psychiatry in general?}.
+
+There are numerous potential causes for inter-individual variation in advice-taking and source selection behaviour. 
+In behavioural experiments in our lab, we often see a small minority of participants will take no advice at all -- never seeking it or changing their answer if they receive it -- and these participants typically report very high subjective confidence. 
+It is plausible, therefore, that whatever causes the hetereogeneity seen here, it has some relationship to confidence. 
+Advice-seeking is has been argued to serve several purposes, including increasing accuracy [@sollStrategiesRevisingJudgment2009], diffusing responsibility [@raderAdviceFormSocial2017], and social inclusion [@mahmoodiEqualityBiasImpairs2015].
+Correspondingly, individual variation in the importance of any of these components may alter the tendency to seek and use advice.
 
 \mccorrect{!MAYBE[Are these contrarians related to the people who don't take advice in our studies - can we do stats to find out (relate low trust update and/or weighted sampling to low influence? Ideally among people who show a strong preference for one or another advisor to avoid people who just aren't engaged skewing the analysis)]}
 
@@ -1359,8 +1398,12 @@ The constant model parameters were tuned during development to give sensible res
 \mccorrect{!MAYBE[can we do a comparison of variability for participants who saw multiple pairs of advisors?]}
 
 The second generalisability concern is in the conflict between the model behaviour and the results of research into the level of polarisation and consensus in society.
-Research consistently demonstrates that most people occupy central positions on political issues.
-\mccorrect{!TODO[Pretty sure this is true, Pew and other surveys usually show bell curve stuff. Sunder Katwala has things on this, but are there non-think-tank publications? Interpretation slightly depends on what we think models are showing - are they showing the drift leftwards of political opinion over time (consensus forming) or giving us misleading ideas about the uninhabitability of moderate areas? This is all pretty complicated because whether people polarise or not and what changes that is a massive open question and partly what my thesis is about. This would be better framed as the debate into which my work feeds in a broader discussion chapter.]}
+Research demonstrates that most people occupy central positions on political issues, and that while political polarization varies across operationalizations and across time, it is not becoming increasingly pronounced in recent years [@parkHowAreWe2018; @perrettDividedKingdomVariation2021].^[The paper by @parkHowAreWe2018 covers politics of the USA prior to the controversial tenure of President Donald Trump.]
+The interpretation of the simulations in terms of real-world politics is dependent on what we think models are showing.
+We may consider them as showing the drift leftwards of political opinion over time on moral issues [@parkHowAreWe2018], i.e. as models of consensus formation.
+Alternatively, we may view them as suggesting that moderate areas are uninhabitable, which is clearly not the case on most issues.
+The model does allow for the emergence of a middle-ground (accurate) consensus where feedback rates are higher, however, although what constitutes feedback in real-world political scenarios is debatable; we pursue this work in part because we regard real-world decisions as frequently lacking in timely actionable feedback.
+The precise nature of political polarization, whether and to what extent it occurs and what modifies it, is an open question and the subject of an entire literature in its own right.
 
 #### Known psychological aspects which are left out
 The modelling work in this chapter follows the recommendations of @bruchAgentBasedModelsEmpirical2015, who suggest that modelling is best used to characterise the effects on system dynamics of a particular effect derived from empirical observation, and @jacksonAgentBasedModelingGuide2017, who advocate for simplicity where possible. 
@@ -1368,20 +1411,17 @@ Consequently, many decision-making and advice-taking phenomena reported in the l
 @eastImprovingAgentbasedModels2016 argue that an agent-based model only achieves sufficiency by including "all relevant processes and conditions". 
 To allow the reader to determine whether the omissions are important, this section briefly covers those aspects which are left out of the models.  
 
-Advice in the models, as in the experiments, is a one-way transaction. 
+Firstly, advice is the key feature of the model rather than the task, and so the agents' performance on the task does not vary over time (they don't get better or worse, and they don't get bored). 
+Advice in the model, as in the experiments, is a one-way transaction. 
 The agents giving advice are unaffected by having given the advice, except by the roundabout route of potentially causing other agents to give advice in the future which is likely to make them appear trustworthy to the agent. 
 This means that there is no deliberate reciprocity to advice-seeking behaviours [@mahmoodiEqualityBiasImpairs2015], and agents do not alter their advice to appear more paletable to others or so that they are selected as advisors more frequently [@hertzNeuralComputationsUnderpinning2017; @hertzIntrinsicValueSocial2018].
-
-Advice is given as an absolute recommendation, as in the Dot task experiments for which the model task in an analogue.
-This means that \mccorrect{!QUESTION[does this actually have a relevant implication?]}
 
 The agents use advice rationally, given their estimation of the trustworthiness of their advisor.
 A plethora of research has shown that people do not do this in practice.
 Most research has documented processes which result in the underweighting of advice [e.g. @yanivAdviceTakingDecision2000 and many others], while some has indicated conditions under which people are over-reliant on advice [@schultzeInabilityIgnoreUseless2017; @dietvorstIntentionallyBiasedPeople2019].
-This literature is reviewed in the chapter on the [Context of Advice](#chapter-context).  
-
-* Agents don't have a drive for novelty \mccorrect{!TODO[Cite something about the attractiveness of novelty for humans; talk about people perhaps picking randomly where they don't have a preference?]}
-* Agents don't get bored with the task \mccorrect{!TODO[Something on attentional effects in psychophysics/cognitive tasks]}
+This literature is reviewed in the chapter on the [Context of Advice](#chapter-context).
+Capping the extent to which agents take advice to within a relatively narrow range between a minimum and maximum might alter the simulations quite extensively: the simulations where agents consider advisors as anti-predictive would no longer occur; and the time taken to differentiate groups and form consensuses would likely increase because the range of trusts would be lower.
+The effect of weighted selection, and the effects of heterogeneity in trust volatility and weighted selection values, would likely also diminish because the range in which they can operate is narrower.
   
 #### Paths not taken
 

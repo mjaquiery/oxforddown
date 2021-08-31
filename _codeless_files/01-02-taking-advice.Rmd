@@ -123,13 +123,13 @@ A browser compatibility issue in this study meant that any participants completi
 
 Participants had lower error on final decisions than on their initial estimates (`r s_acc$s[1]`), indicating improved performance after seeing advice.
 They also had lower error on their answers with the High accuracy advisor (`r s_acc$s[2]`).
-As expected, there was an interaction: participants reduced their error much more following advice from the High accuracy advisor (`r s_acc$s[3]`; Figure \@ref(fig:ai-ava-r-performance)). 
+As expected, there was an interaction: participants reduced their error much more following advice from the High accuracy advisor (`r s_acc$s[3]`; Figure \@ref(fig:ai-ava-r-performance)A). 
 
 Generally, we expect participants to be more confident on trials on which they are correct compared to trials on which they are incorrect.
 Confidence can be measured by the width of the marker selected by the participant.
 Where participants are more confident in their response, they can maximise the points they receive by selecting a thinner marker. 
 Where participants are unsure, they can maximise their chance of getting the answer correct by selecting a wider marker.
-Participants' error was lower for each marker width in final decisions than initial estimates (Figure \@ref(fig:ai-ava-r-confidence)). 
+Participants' error was lower for each marker width in final decisions than initial estimates (Figure \@ref(fig:ai-ava-r-performance)B). 
 For both initial estimates and final decisions, error was higher for wider markers than for narrower ones.
 
 ##### Advisor performance
