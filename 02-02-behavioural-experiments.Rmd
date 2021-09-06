@@ -36,7 +36,7 @@ We also include a brief discussion of the literature on advisor expertise.
 
 ## Experiment 5: Benevolence of the advisor population {#be-db}
 
-```{r be-db-load, eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip')), include = F}
+```{r be-db-load, include = F}
 
 select_experiment(
   project = 'datequiz',
@@ -492,7 +492,7 @@ This indicates that participants understood the task and that the manipulation w
 
 ##### \OpenScience{prereg} Effect of advice
 
-```{r be-db-r-advice, results='asis', eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip'))}
+```{r be-db-r-advice, results='asis'}
 
 # Actual test
 x <- Familiarization %>% 
@@ -781,7 +781,7 @@ While participants are learning about the advisors, and learning more about the 
 Nevertheless, this is a useful experiment because it is capable of indicating the absence of an effect: if the manipulation proves unable to produce greater influence from the individual advisor it will do so without a confound. 
 If the experiment demonstrates higher influence for the individual advisor then further experiments can be run to attempt to isolate confidence calibration knowledge from mere exposure.
 
-```{r be-ce-load, eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip')), include = F}
+```{r be-ce-load, include = F}
 
 source('scripts_and_filters/general_setup.R')
 
@@ -1540,7 +1540,7 @@ If the advice came from the High confidence advisor, it would represent low conf
 On the remainder of these trials, the advice was labelled as coming from an unknown one of those two advisors.
 We expected that advice that was labelled in this way would be treated differently relative to advice that was identifiable because it was impossible for participants to appropriately interpret the confidence (and therefore probability of correctness) of the advice.
 
-```{r be-ck-load, eval = !(hasName(.Options, 'ESM.skip') && getOption('ESM.skip')), include = F}
+```{r be-ck-load, include = F}
 
 source('scripts_and_filters/general_setup.R')
 
