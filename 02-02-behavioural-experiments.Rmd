@@ -58,7 +58,7 @@ for (E in c(.GlobalEnv, .prevStudy)) {
 
 ```
 
-The evolutionary models discussed [in the last chapter](#chapter-advice-taking-context) demonstrated that optimal advice-taking strategies depend in part upon the advice one receives being a genuine effort to help.
+The evolutionary models discussed in the last chapter§\@ref(chapter-advice-taking-context) demonstrated that optimal advice-taking strategies depend in part upon the advice one receives being a genuine effort to help.
 Difference in benevolence, or the extent to which the interests of the advisor and the judge overlap, is one of the three pillars of the @mayerIntegrativeModelOrganizational1995 model of advice-taking.
 Despite this, relatively little investigation has been made into the role of benevolence in trust, as discussed previously§\@ref(context-familiarity).
 
@@ -744,7 +744,7 @@ As discussed in the introduction to this section§\@ref(chapter-context), howeve
 
 ## Noise in the advice
 
-The [second scenario](#models-scenario-2) explored in the evolutionary models added noise to the advice agents received and demonstrated that this provided an evolutionary pressure towards egocentric discounting.
+The second scenario§\@ref(models-scenario-2) explored in the evolutionary models added noise to the advice agents received and demonstrated that this provided an evolutionary pressure towards egocentric discounting.
 The addition of noise in a point-value estimation task lowers the relative performance, and thus this scenario was essentially a manipulation of advisor expertise. 
 This scenario is not explored in behavioural experiments because its conclusions are well supported by existing literature.
 Specifically, the literature demonstrates the normativity of discounting where the judge outperforms the advisor, that advice-taking is sensitive to advisor expertise, and that people are likely to consider themselves superior to the average advisor.
@@ -760,7 +760,7 @@ Judges have to live with the consequences of their decisions, while advisors do 
 
 ## Confidence mapping
 
-The [third scenario](#models-scenario-3) explored in the evolutionary models assigned each agent a confidence mapping, and demonstrated that discounting emerged as an appropriate response where the advisor's confidence mapping was unknown.
+The third scenario§\@ref(models-scenario-3) explored in the evolutionary models assigned each agent a confidence mapping, and demonstrated that discounting emerged as an appropriate response where the advisor's confidence mapping was unknown.
 The key difficulty in conducting behavioural experiments to test the effects of known vs unknown confidence mapping is finding a manipulation of confidence mapping knowledge which is not confounded by familiarity with an advisor or the amount of information provided by an advisor.
 
 We attempted to investigate this in two ways. 
