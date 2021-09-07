@@ -100,6 +100,10 @@ broken_axis_right <- theme(axis.line.x = element_line(arrow = arrow(ends = 'last
 broken_axis_left <- theme(axis.line.x = element_line(arrow = arrow(ends = 'first', length = unit(6, 'points'), type = 'closed')))
 
 
+scale_fill_advisor <- function(...) scale_fill_viridis_d(..., begin = .25, end = .9, option = "C")
+scale_fill_decision <- function(...) scale_fill_viridis_d(..., begin = .3, end = .5, option = "A")
+scale_fill_feedback <- function(...) scale_fill_viridis_d(..., begin = .5, end = .9, option = "D")
+
 simulation <- theme(
   plot.background = element_rect(linetype = 'dashed', colour = 'black', size = 1),
   plot.margin = margin(10, 10, 10, 10, 'pt')

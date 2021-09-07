@@ -224,7 +224,6 @@ gg$acc <- tmp %>%
   ggplot(aes(x = Response, y = Accuracy, colour = advisor)) +
   scale_y_continuous(limits = c(NA, 1), expand = c(0, 0)) +
   scale_x_discrete() +
-  scale_colour_discrete(name = 'Advisor', aesthetics = c('fill', 'colour')) +
   coord_cartesian(clip = F) +
   geom_hline(yintercept = .5, linetype = 'dashed') +
   geom_segment(aes(y = Accuracy, yend = Accuracy, x = 0, xend = 1.5),
@@ -242,9 +241,10 @@ gg$acc <- tmp %>%
   geom_label(x = 1.5, y = 1, aes(label = paste0('BF = ', bf)), colour = 'black',
              data = bf) +
   facet_wrap(~Advisor) +
-  theme(legend.position = 'none') +
+  theme(legend.position = 'none', text = element_text(size = 12)) +
   labs(x = "") +
-  broken_axis_bottom
+  broken_axis_bottom + 
+  scale_fill_advisor(aesthetics = c("fill", "colour"))
 
 tmp <- familiarization %>%
   mutate(`Initial estimate accuracy` =
@@ -291,8 +291,9 @@ gg$conf <- tmp %>%
   geom_label(aes(label = paste0('BF = ', bf)),
              x = 1.5, y = 1, colour = 'black', data = bf) +
   labs(x = "") +
-  theme(legend.position = 'none') +
-  facet_wrap(~response)
+  theme(legend.position = 'none', text = element_text(size = 12)) +
+  facet_wrap(~response) +
+  scale_fill_decision(aesthetics = c("fill", "colour"))
 
 tmp <- familiarization %>%
   group_by(pid, adviceType) %>%
@@ -336,8 +337,9 @@ gg$inf <- ggplot(tmp, aes(x = adviceTypeName, y = adviceInfluence,
   coord_cartesian(clip = F) +
   facet_grid(~paste0(`Feedback condition`, '\n')) +
   labs(x = "", y = 'Advice influence') +
-  theme(legend.position = 'none') +
-  broken_axis_y
+  theme(legend.position = 'none', text = element_text(size = 12)) +
+  broken_axis_y +
+  scale_fill_feedback(aesthetics = c("fill", "colour"))
 
 (gg$acc / gg$conf / gg$inf) + plot_annotation(tag_levels = 'A')
 
@@ -558,7 +560,8 @@ ggplot(tmp, aes(x = '', y = pChooseHigh)) +
            x = 1, y = 1.05) +
   scale_y_continuous(limits = c(0, 1.1), breaks = seq(0, 1, length.out = 5)) +
   labs(y = 'p(Choose High agreement advisor)', x = '') +
-  theme(axis.ticks.x = element_blank(), axis.line.x = element_blank())
+  theme(axis.ticks.x = element_blank(), axis.line.x = element_blank()) +
+  scale_fill_advisor(aesthetics = c("fill", "colour"))
 
 .T <- tmp %>%
   pull(pChooseHigh) %>%
@@ -660,7 +663,7 @@ tmp <- tmp %>%
 
 ggplot(tmp, aes(x = Difference, y = pPickHigh)) +
   geom_vline(xintercept = 0, linetype = 'dashed') +
-  geom_smooth(method = 'lm', formula = y ~ x) +
+  geom_smooth(method = 'lm', formula = y ~ x, fullrange = T) +
   geom_point(alpha = .25) +
   # coord_fixed() +
   scale_y_continuous(limits = 0:1) +
@@ -970,7 +973,8 @@ gg$acc <- acc %>%
   geom_label(aes(label = paste0('BF = ', bf)), 
              x = 1.5, y = 1.01, colour = 'black', data = bf) +
   facet_wrap(~Advisor) +
-  broken_axis_bottom
+  broken_axis_bottom +
+  scale_fill_advisor(aesthetics = c("fill", "colour"))
 
 # Confidence
 conf <- Familiarization %>% 
@@ -1017,7 +1021,8 @@ gg$conf <- conf %>%
                colour = 'black') +
   geom_label(aes(label = paste0('BF = ', bf)), 
              x = 1.5, y = 1.01, colour = 'black', data = bf) +
-  facet_wrap(~response)
+  facet_wrap(~response) +
+  scale_fill_decision(aesthetics = c("fill", "colour"))
 
 # Influence
 
@@ -1072,10 +1077,10 @@ gg$inf <- ggplot(adv_inf, aes(x = Advisor, y = advisor0Influence,
              aes(label = paste0('BF = ', BF)), data = bf) +
   scale_y_continuous(limits = c(-.5, 1.6), 
                      breaks = seq(-.5, 1.5, length.out = 6)) +
-  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
   facet_grid(~`Feedback condition`) +
   labs(x = 'Advisor advice profile', y = 'Influence of advice') +
-  broken_axis_y
+  broken_axis_y +
+  scale_fill_feedback(aesthetics = c("fill", "colour"))
 
 # Patchwork plots together
 (gg$acc / gg$conf / gg$inf) +
@@ -1279,7 +1284,8 @@ ggplot(tmp, aes(x = feedbackCondition, y = pChooseHigh)) +
   scale_y_continuous(limits = c(0, 1.2), breaks = seq(0, 1, length.out = 5)) +
   scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
   labs(y = 'p(Choose High agreement advisor)', x = '') +
-  theme(axis.line.x = element_blank(), axis.ticks.x = element_blank())
+  theme(axis.line.x = element_blank(), axis.ticks.x = element_blank()) +
+  scale_fill_feedback(aesthetics = c("fill", "colour"))
 
 .T.fb <- tmp %>%
   filter(feedbackCondition == 'Feedback') %>%

@@ -419,7 +419,8 @@ pick %>%
   scale_y_continuous(limits = c(0, 1.15), breaks = seq(0, 1, length.out = 5)) +
   scale_x_discrete(limits = levels(pick$confidenceCategory)) +
   labs(y = 'p(Choose Bias-sharing advisor)', x = "Confidence category") +
-  theme(axis.ticks.x = element_blank(), axis.line.x = element_blank())
+  theme(axis.ticks.x = element_blank(), axis.line.x = element_blank()) +
+  scale_fill_feedback(aesthetics = c("fill", "colour"))
 
 ```
 
@@ -585,7 +586,8 @@ tmp %>%
                size = 4, position = position_dodge(width = .25)) +
   facet_grid(~trialType) +
   labs(x = "Agreement between advisor and participant",
-       y = "Influence of the advice (raw)") 
+       y = "Influence of the advice (raw)") +
+  scale_fill_advisor(aesthetics = c("fill", "colour"))
 
 ```
 
@@ -1124,7 +1126,6 @@ gg$acc <- tmp %>%
   ggplot(aes(x = Response, y = Accuracy, colour = advisor)) +
   scale_y_continuous(limits = c(NA, 1), expand = c(0, 0)) +
   scale_x_discrete() +
-  scale_colour_discrete(name = 'Advisor', aesthetics = c('fill', 'colour')) +
   coord_cartesian(clip = F) +
   geom_hline(yintercept = .5, linetype = 'dashed') +
   geom_segment(aes(y = Accuracy, yend = Accuracy, x = 0, xend = 1.5),
@@ -1144,7 +1145,8 @@ gg$acc <- tmp %>%
   facet_wrap(~Advisor) +
   theme(legend.position = 'none') +
   labs(x = "") +
-  broken_axis_bottom
+  broken_axis_bottom +
+  scale_fill_advisor(aesthetics = c("fill", "colour"))
 
 tmp <- familiarization %>%
   mutate(`Initial estimate accuracy` =
@@ -1192,7 +1194,8 @@ gg$conf <- tmp %>%
              x = 1.5, y = 1, colour = 'black', data = bf) +
   labs(x = "") +
   theme(legend.position = 'none') +
-  facet_wrap(~response)
+  facet_wrap(~response) +
+  scale_fill_decision(aesthetics = c("fill", "colour"))
 
 tmp <- familiarization %>%
   group_by(pid, adviceType) %>%
@@ -1237,7 +1240,8 @@ gg$inf <- ggplot(tmp, aes(x = adviceTypeName, y = adviceInfluence,
   facet_grid(~paste0(`Feedback condition`, '\n')) +
   labs(x = "", y = 'Advice influence') +
   theme(legend.position = 'none') +
-  broken_axis_y
+  broken_axis_y +
+  scale_fill_feedback(aesthetics = c("fill", "colour"))
 
 (gg$acc / gg$conf / gg$inf) + plot_annotation(tag_levels = 'A')
 
@@ -1482,7 +1486,8 @@ ggplot(tmp, aes(x = '', y = pPickBS)) +
            x = 1, y = 1.1) +
   scale_y_continuous(limits = c(0, 1.1), breaks = seq(0, 1, length.out = 5)) +
   labs(y = 'p(Choose Bias sharing advisor)', x = '') +
-  theme(axis.ticks.x = element_blank(), axis.line.x = element_blank())
+  theme(axis.ticks.x = element_blank(), axis.line.x = element_blank()) +
+  scale_fill_feedback(aesthetics = c("fill", "colour"))
 
 .T <- tmp %>%
   pull(pPickBS) %>%

@@ -243,7 +243,6 @@ gg$acc <- tmp %>%
   ggplot(aes(x = Response, y = Accuracy, colour = advisor)) +
   scale_y_continuous(limits = c(NA, 1), expand = c(0, 0)) +
   scale_x_discrete() +
-  scale_colour_discrete(name = 'Advisor', aesthetics = c('fill', 'colour')) +
   coord_cartesian(clip = F) +
   geom_hline(yintercept = .5, linetype = 'dashed') +
   geom_segment(aes(y = Accuracy, yend = Accuracy, x = 0, xend = 1.5),
@@ -263,7 +262,9 @@ gg$acc <- tmp %>%
   facet_wrap(~Advisor) +
   theme(legend.position = 'none') +
   labs(x = "") +
-  broken_axis_bottom
+  broken_axis_bottom +
+  scale_fill_advisor(aesthetics = c("fill", "colour")) +
+  scale_fill_advisor(aesthetics = c("fill", "colour"))
 
 tmp <- familiarization %>%
   mutate(`Initial estimate accuracy` =
@@ -311,7 +312,9 @@ gg$conf <- tmp %>%
              x = 1.5, y = 1, colour = 'black', data = bf) +
   labs(x = "") +
   theme(legend.position = 'none') +
-  facet_wrap(~response)
+  facet_wrap(~response) +
+  scale_fill_decision(aesthetics = c("fill", "colour")) +
+  scale_fill_decision(aesthetics = c("fill", "colour"))
 
 tmp <- familiarization %>%
   group_by(pid, adviceType) %>%
@@ -356,7 +359,8 @@ gg$inf <- ggplot(tmp, aes(x = adviceTypeName, y = adviceInfluence,
   facet_grid(~paste0(`Feedback condition`, '\n')) +
   labs(x = "", y = 'Advice influence') +
   theme(legend.position = 'none') +
-  broken_axis_y
+  broken_axis_y +
+  scale_fill_feedback(aesthetics = c("fill", "colour"))
 
 (gg$acc / gg$conf / gg$inf) + plot_annotation(tag_levels = 'A')
 
@@ -586,7 +590,8 @@ ggplot(tmp, aes(x = '', y = pChooseAcc)) +
            x = 1, y = 1.1) +
   scale_y_continuous(limits = c(0, 1.1), breaks = seq(0, 1, length.out = 5)) +
   labs(y = 'p(Choose High accuracy advisor)', x = '') +
-  theme(axis.ticks.x = element_blank(), axis.line.x = element_blank())
+  theme(axis.ticks.x = element_blank(), axis.line.x = element_blank()) +
+  scale_fill_feedback(aesthetics = c("fill", "colour"))
 
 .T <- tmp %>%
   pull(pChooseAcc) %>%
@@ -1000,7 +1005,6 @@ gg$acc <- tmp %>%
   ggplot(aes(x = Response, y = Error, colour = advisor)) +
   scale_y_continuous(limits = c(0, 50), expand = c(0, 0)) +
   scale_x_discrete() +
-  scale_colour_discrete(name = 'Advisor', aesthetics = c('fill', 'colour')) +
   coord_cartesian(clip = F) +
   geom_line(aes(group = pid), alpha = .25) +
   geom_split_violin(aes(x = nudge(Response, dw), 
@@ -1017,7 +1021,8 @@ gg$acc <- tmp %>%
              x = 1.5, y = 50, colour = 'black', data = bf) +
   facet_wrap(~Advisor) +
   labs(y = 'Mean error') +
-  broken_axis_top
+  broken_axis_top +
+  scale_fill_advisor(aesthetics = c("fill", "colour"))
 
 # Confidence
 dw <- .4
@@ -1096,7 +1101,8 @@ gg$conf <- tmp %>%
   geom_label(aes(x = mid, y = y, label = paste0('BF = ', bf2str(bf))),
              colour = 'black', data = bf) +
   facet_wrap(~response) +
-  broken_axis_top
+  broken_axis_top +
+  scale_fill_decision(aesthetics = c("fill", "colour"))
 
 # Patchwork plots together
 (gg$acc / gg$conf) +
@@ -1239,9 +1245,9 @@ ggplot(tmp, aes(x = feedbackCondition, y = pChooseAcc)) +
   annotate(geom = 'segment', x = 1, xend = 2, y = 1.2, yend = 1.2) +
   annotate(geom = 'label', x = 1.5, y = 1.2, label = paste0('BF = ', bf.comp)) +
   scale_y_continuous(limits = c(0, 1.2), breaks = seq(0, 1, length.out = 5)) +
-  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
   labs(y = 'p(Choose High accuracy advisor)', x = '') +
-  theme(axis.line.x = element_blank(), axis.ticks.x = element_blank())
+  theme(axis.line.x = element_blank(), axis.ticks.x = element_blank()) +
+  scale_fill_feedback(aesthetics = c("fill", "colour"))
 
 .T.fb <- tmp %>%
   filter(feedbackCondition == 'Feedback') %>%
@@ -1329,10 +1335,10 @@ ggplot(tmp, aes(x = Advisor, y = advisor0WOA,
   geom_label(y = 1, x = 1.5, colour = 'black', fill = 'white', 
              aes(label = paste0('BF = ', BF)), data = bf) +
   scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour'), guide = "none") +
   coord_cartesian(clip = F) +
   facet_grid(~Feedback) +
-  labs(x = 'Advisor advice profile', y = 'Weight on Advice')
+  labs(x = 'Advisor advice profile', y = 'Weight on Advice') +
+  scale_fill_feedback(aesthetics = c("fill", "colour"), guide = "none")
 
 
 # Marginal means
