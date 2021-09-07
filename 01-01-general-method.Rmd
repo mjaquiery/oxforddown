@@ -555,4 +555,4 @@ This thesis is written in RMarkdown, with the data fetched and analysed at the t
 Some parts of the thesis use computational modelling or model fitting. 
 These parts use cached datasets, also available online, in order to reduce the time required to create the thesis from its source files from hours to minutes using a high-end desktop personal computer.
 The caching behaviour can be prevented for those wishing to evaluate the validity of the modelling components by setting the value of the R option `ESM.recalculate` to higher values (documented in the `index.Rmd` file).
-A Docker environment copying the environment used to produce this document is available at \mccorrect{!TODO[the containerisation thing]}
+A Docker environment copying the environment used to produce this document is available at \mccorrect{MAYBE: do the containerisation thing if there's time}
