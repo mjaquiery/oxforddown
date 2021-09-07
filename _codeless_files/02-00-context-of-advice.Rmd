@@ -111,7 +111,7 @@ When judges are more confident, they tend to be less influenced by advice, and t
 #### Similarity of advice to the initial estimate
 
 A frequently-manipulated property of advice, and the most interesting in the context of the first part of this thesis, is the similarity of the advice to the initial estimate. 
-This is sometimes expressed as agreement or reasonableness of advice.[^Note that the influence of advice that is perfectly in accord with an initial estimate is undefined when using [§Weight on Advice](#m-analysis-dv-woa) measures.]
+This is sometimes expressed as agreement or reasonableness of advice.^[Note that the influence of advice that is perfectly in accord with an initial estimate is undefined when using Weight on Advice§\@ref(m-analysis-dv-woa) measures.]
 The evidence on the effects of advice distance on advice influence is equivocal.
 Some studies show that advice is less influential the further it is from the initial estimate, while other studies show a greater influence of more distant advice.
 Other studies have indicated that the relationship is quadratic: low weight is assigned to advice which is too near or far from the initial estimate, and a greater weight assigned to advice which is in the moderately distant.
@@ -140,7 +140,7 @@ This mechanisms can be extended to explain the results in @yanivReceivingOtherPe
 If updating is a two-stage process wherein confidence is updated first, and then the updated confidence value is used to determine the extent to which the estimate is adjusted, we can reproduce the U-shaped relationship from two monotonic relationships.
 First, confidence is increased by nearby advice (and perhaps decreased by distant advice). 
 Second, advice is more influential the nearer it is to the initial estimate.
-This means that, for nearby advice, the judge's confidence is boosted by agreement, meaning that the ostensibly highly-influential nearby advice is subsequently assigned very little weight (because highly confident judges ascribe little weight to advice - [§Judge's confidence](#coa-ed-task-confidence)).
+This means that, for nearby advice, the judge's confidence is boosted by agreement, meaning that the ostensibly highly-influential nearby advice is subsequently assigned very little weight (because highly confident judges ascribe little weight to advice - Judge's confidence§\@ref(coa-ed-task-confidence)).
 For advice that lies at a middle distance, there is no boost to confidence and advice is somewhat influential. 
 At greater distances, while the judge's confidence in their own opinion might be reduced slightly, there is little potential influence in the advice.
 
@@ -354,7 +354,7 @@ If Sally does not adjust for the fact that Hanan is always more confident about 
 
 ### Compatability with existing explanations
 
-As noted by @troucheVigilantConservatismEvaluating2018, ultimate explanations of the kind offered here do not invalidate proximal explanations of the kind offered in the middle of this chapter ([§Purported explanations for egocentric discounting](#coa-ex)).
+As noted by @troucheVigilantConservatismEvaluating2018, ultimate explanations of the kind offered here do not invalidate proximal explanations of the kind offered in the middle of this chapter§\@ref(coa-ex).
 My view is most consistent with a Bayesian integration view in which advice is weighted by a range of features of advice, advisor, and context, with the further proviso that there are hyperpriors which govern the default level of discounting.
 I am thus content to observe the contest to provide proximal explanations for changes in the level of egocentric discounting, and only baulk at claims that egocentric discounting is 'irrational'.
 I suggest that, once egocentric discounting as a default is accepted, the adjustments in the level of discounting are almost all transparently rational.

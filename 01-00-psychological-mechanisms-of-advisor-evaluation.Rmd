@@ -21,7 +21,10 @@ params:
 \adjustmtc 
 
 <!--
-Include a bit of a review of stuff on source selection
+* Include a bit of a review of stuff on source selection
+* Fold into previous chapter (Introduction)?
+* Take-aways: here's how we're conceptualising advice/selection more formally
+* Useful to have this context before the models come in
 -->
 
 Where feedback is unavailable, people may use their own sense of certainty as a yardstick for evaluating advice [@pescetelliRoleDecisionConfidence2018; @pescetelliUseMetacognitiveSignals2017]: advisors who agree when one is confident are perceived as more helpful; while those who disagree when one is confident are perceived as less helpful.
@@ -30,8 +33,8 @@ higher confidence is indicative of a greater probability of being correct).
 
 ## Use of advice {-}
 
-[Normative models of advice taking](#normative-models-of-advice-taking) state that averaging estimates minimises errors.
-As discussed at length in [Section III](#context-of-advice), the assumptions underlying the normative model do not always hold in the real world.
+Normative models of advice taking§\@ref(normative-models-of-advice-taking) state that averaging estimates minimises errors.
+As discussed at length in Section III§\@ref(context-of-advice), the assumptions underlying the normative model do not always hold in the real world.
 The performance of the normative model can be characterised according to differences between the advisor and the decision-maker on ability and bias [@sollStrategiesRevisingJudgment2009] \mccorrect{!TODO[how does PAR relate to what's going on here?]}.
 Recall that the normative model states that advice should contribute to the final decision in proportion to the ability of the advisor compared to the decision-maker.
 
@@ -61,9 +64,9 @@ In the normative model, the weighting is equivalent to the ratio of variance of 
 \end{align}
 
 The normative model thus represents weighting by relative ability.
-Precise knowledge of the ability of others relative to oneself is rarely available in the real world, however, and, as discussed in [Section III](#context-of-advice), other assumptions concerning the trustworthiness or interpretability of advice may be violated.
+Precise knowledge of the ability of others relative to oneself is rarely available in the real world, however, and, as discussed in Section III§\@ref(context-of-advice), other assumptions concerning the trustworthiness or interpretability of advice may be violated.
 
-The normative model can be adapted to provide a more psychologically-realistic account of advice usage by substituting the [three factor model of trust](#three-factor-model-of-trust) into the equations in place of the ability variable.
+The normative model can be adapted to provide a more psychologically-realistic account of advice usage by substituting the three factor model of trust§\@ref(three-factor-model-of-trust) into the equations in place of the ability variable.
 We start with the statement within the three factor model that trust ($\omega$) is proportional to ability ($a$), benevolence ($b$), and integrity ($g$).
 
 \begin{align}
@@ -98,7 +101,7 @@ It is thus worth taking a little space to highlight areas in which this model is
 
 #### Generality beyond judge-advisor systems
 
-Firstly, the model is an idealised situation approximated by the [experimental method](#judge-advisor-system): a decision-maker makes an explicit initial estimate, then receives advice, then makes an explicit final decision.
+Firstly, the model is an idealised situation approximated by the experimental method§\@ref(judge-advisor-system): a decision-maker makes an explicit initial estimate, then receives advice, then makes an explicit final decision.
 @yanivExploitingWisdomOthers2012 showed that preventing decision-makers from making initial decisions resulted in very different advice weighting, suggesting that this may be a model of a specific scenario rather than of advice integration per se.
 The model presented here could in principle explain an integration process where an initial estimate can only be made after the advice is known, but empirically performs poorly.
 At best, it could be argued that pre-exposure to the advice either anchors the initial estimate (thus moving $e_i^I$ systematically closer to $a_i$), or that having to trust advice because one cannot make one's own decision inflates the weighting of the advisor.
@@ -155,8 +158,8 @@ The effects in the real world of interactivity between trust dimensions and game
 A single piece of advice can be evaluated using its own properties and the properties of the advisor giving the advice.
 Furthermore, that evaluation can serve to update the properties of the advisor.
 A piece of advice's own properties will include its plausibility (e.g.
-participants in estimation tasks discount advice which is distant from their own initial estimates more heavily [@yanivReceivingOtherPeople2004]), while the properties of the advisor will include the advisor's trustworthiness ([see above](#use-of-advice)).
-The updating of trust following experience of advice is likely to be largely in the domain of [ability](#ability), although other domains may be affected where the advice is particularly egregious.
+participants in estimation tasks discount advice which is distant from their own initial estimates more heavily [@yanivReceivingOtherPeople2004]), while the properties of the advisor will include the advisor's trustworthiness (see above§\@ref(use-of-advice)).
+The updating of trust following experience of advice is likely to be largely in the domain of ability§\@ref(ability), although other domains may be affected where the advice is particularly egregious.
 
 ## Updating advisor evaluations {-}
 
