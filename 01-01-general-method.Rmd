@@ -67,6 +67,7 @@ Ethical approval for the studies in the thesis was granted by the University of 
 Participants visited the Uniform Resource Locator (URL) for the study by following a link from Prolific using their own device (Figure \@ref(fig:m-participant-experience)).
 Early studies only supported computers, but later studies included support for tablets and smartphones.
 After viewing an information sheet describing the study and giving their consent to participate, participants began the study proper.
+For studies with conditions, participants were assigned to a condition using an algorithm that produced shuffled sequences of conditions.
 The study introduced the software to the participant interactively, demonstrating the decision-making task and how responses could be made.
 Next, participants were given a block of practice trials to familiarise them with the decision-making task.
 Participants were then introduced to advice, and given a block of practice trials in which they received advice.
