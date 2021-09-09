@@ -33,9 +33,9 @@ Using computational agent-based evolutionary simulations, we demonstrate that co
 
 As discussed in the [previous chapter]}(#chapter-context), conservatism is optimal under some circumstances, and thus we expect that simulated agents allowed to evolve an advice-taking policy in those circumstances will evolve a conservative policy.
 We explored this tendency as a function of three plausible scenarios.
-The [first scenario](#models-scenario-1) is one in which agents occasionally give deliberately poor advice to their advisee, which represents situations where advisors’ interests may sometimes be contrary to judges’ interests, unbeknownst to the judges.
-In the [second scenario](#models-scenario-2), advice is simply noisier than the judge’s own initial estimate, either because the judge is less competent at the task, less willing to exert the required effort for the task, or because the advice is communicated imperfectly.
-In the [third scenario](#models-scenario-3), agents belong to either a ‘cautious’ or a ‘confident’ group in how they express and interpret advice, which is a simple analogue of the observation that people’s expressions of confidence are idiosyncratic [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017].
+The first scenario§\@ref(models-scenario-1) is one in which agents occasionally give deliberately poor advice to their advisee, which represents situations where advisors’ interests may sometimes be contrary to judges’ interests, unbeknownst to the judges.
+In the second scenario§\@ref(models-scenario-2), advice is simply noisier than the judge’s own initial estimate, either because the judge is less competent at the task, less willing to exert the required effort for the task, or because the advice is communicated imperfectly.
+In the third scenario§\@ref(models-scenario-3), agents belong to either a ‘cautious’ or a ‘confident’ group in how they express and interpret advice, which is a simple analogue of the observation that people’s expressions of confidence are idiosyncratic [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017].
 In each of these three scenarios, we hypothesised that some level of egocentric discounting will emerge as the dominant strategy, i.e., the mean population weighting for initial estimates versus advice will be greater than .50.
 
 ```{r ed-load}
@@ -48,7 +48,7 @@ The code is available at https://github.com/oxacclab/EvoEgoBias, and the specifi
 
 The models reported here use 100 generations of 1000 agents which each make 60 decisions/generation on which they receive the advice of another agent.
 Each scenario is run with 7 different strengths of the manipulation value, and each of these instances is run 50 times.
-Decisions are either point estimation (Scenarios [1](#models-scenario-1) and [2](#models-scenario-2)) or categorical decision with confidence (Scenario [3](#models-scenario-3)).
+Decisions are either point estimation (Scenarios 1§\@ref(models-scenario-1) and 2§\@ref(models-scenario-2)) or categorical decision with confidence (Scenario 3§\@ref(models-scenario-3)).
 Each agent combines their own initial estimate with the advice of another agent, with the relative weights of the initial estimate and advice set by the agent’s egocentric bias parameter, to produce a final decision.
 Final decisions are evaluated by comparison with the objective answer, and an agent’s fitness is the sum of its performance over the 60 decisions of its lifetime.
 
@@ -83,20 +83,20 @@ f^a_t = i^a_t \cdot w^a + i^{a,a'}_t \cdot (1 - w^a)
 (\#eq:models-final-decision)
 \end{align}
 
-The final decisions in [Scenario 3](#models-scenario-3) are more complex, but follow a similar structure.
+The final decisions in Scenario 3§\@ref(models-scenario-3) are more complex, but follow a similar structure.
 
 ### Reproduction
 
 Roulette wheel selection is used to bias reproduction in favour of agents performing best on the decisions.
 Performance is determined by a fitness function which differs slightly between categorical and continuous decisions.
-For scenarios [1](#models-scenario-1) and [2](#models-scenario-2), which use continuous decisions, this fitness is obtained by subtracting the absolute difference between the final decision and the true value for each decision (mean absolute deviance):
+For scenarios 1§\@ref(models-scenario-1) and 2§\@ref(models-scenario-2), which use continuous decisions, this fitness is obtained by subtracting the absolute difference between the final decision and the true value for each decision (mean absolute deviance):
 
 \begin{align}
 u^a = - \sum^{60}_{t=1} |v_t - f_t^a|
 (\#eq:models-fitness-continuous)
 \end{align}
 
-[Scenario 3](#models-scenario-3) uses categorical decisions. 
+Scenario 3§\@ref(models-scenario-3) uses categorical decisions. 
 These are processed using a fitness function that awards agents -1 point for each incorrect categorisation of the true world value.
 
 The selection algorithm proceeds as follows: The worst performance is subtracted from each agent’s fitness and 1 added to put fitness scores in a positive range.
@@ -155,7 +155,7 @@ This could reflect a difference in effort or in expertise.
 
 ### Method
 
-As with [Scenario 1](#models-scenario-1), the true value ($v_t$) is fixed at 50.
+As with Scenario 1§\@ref(models-scenario-1), the true value ($v_t$) is fixed at 50.
 
 Advice in this scenario has additional noise added by increasing the standard deviation of the advisors' error term by the manipulation value:
 
@@ -254,5 +254,5 @@ More generally, the results indicate that properties of the advice-giving milieu
 
 These models establish that it is plausible that people have deeply ingrained hyperpriors towards discounting advice.
 It is also possible, however, that people can flexibly respond to contexts, modulating their advice-taking appropriately.
-The voluminous experiments in advice taking discussed in the [introduction to this section](#context-of-advice) can be seen as eliciting exactly this behaviour.
+The voluminous experiments in advice taking discussed in the introduction to this section§\@ref(context-of-advice) can be seen as eliciting exactly this behaviour.
 In the next chapter I present new behavioural experiments which suggest that people do indeed modulate their advice-taking to the specifics of the context in which they are in.
