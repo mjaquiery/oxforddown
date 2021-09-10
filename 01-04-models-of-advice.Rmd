@@ -151,6 +151,7 @@ if (must_rerun_pe) {
   parameterRecovery(
     savePath = fName,
     nShuffles = 9,
+    includeSplits = TRUE,
     fixedParameters = c(NA, NA),
     customFilter = \(x) x,
     nCores = parallel::detectCores(),
@@ -570,7 +571,7 @@ models.all <- agents.all %>%
 
 Agent-based modelling is used to simulate the interactive effects of repeated paired decision-making.
 The agents in the model perform a cycle of making an initial decision, selecting one of the other agents as an advisor, receiving advice from the chosen advisor, making a final decision, and updating their trust in their advisor and their internal beliefs about the world.
-The task the agents face is roughly analogous to the task faced by human participants in the Dots task experiments ([§Perceptual decision (Dots Task)](#m-p-dots)), where the participants make a decision about which of two rapidly and simultaneously presented grids contained more dots.
+The task the agents face is roughly analogous to the task faced by human participants in the Dots task experiments§\@ref(m-p-dots), where the participants make a decision about which of two rapidly and simultaneously presented grids contained more dots.
 
 Each model consists of a population of agents implementing the same mathematical model of decision-making, trust-updating, and advisor selection, with different coefficients for parameters of that mathematical model (Table \@ref(tab:nw-m-agent-properties-table)) drawn from appropriate distributions.
 
@@ -954,16 +955,55 @@ This produced simulated data generated from known coefficients.
 The recovery model was then run on these simulated data, and the recovered estimates for the $\text{w}^a$ and $\lambda^a$ parameters were compared with the known coefficients used to generate the data.
 This illustrated that known coefficients could be recovered.
 
-\mccorrect{!TODO[Graph with parameter recovery accuracy stuff]}
-\mccorrect{!MAYBE[Figure showing the shuffling process?]}
-
 Secondly, error scores were compared for coefficients fitted to each participants' advice-taking and advisor selection data and coefficients fitted to versions of that participant's data where the advisor agreement column values had been shuffled. 
 Overwhelmingly, the fitting error on the shuffled data tended to be higher than the fit to the original data, indicating that the models were sensitive to participant patterns related to advisor agreement.
 
 Finally, the error for coefficients fitted to the participants' data were compared to errors for the same coefficients fitted to shuffled data. 
 Error values for the shuffled data tended to be higher than values for the original data, suggesting that participants' behaviour shared some features with the model's expectations.
 
-\mccorrect{!TODO[Error distributions for real/shuffled data and shuffle positions]}
+```{r nw-r-shuffle-positions}
+
+positions <- bind_rows(
+  recovered_parameters %>% 
+    mutate(source = "real") %>% 
+    select(uid, source, ends_with("error")),
+  shuffles %>% 
+    mutate(source = "shuffle") %>%
+    select(uid, source, ends_with("error"))
+) %>%
+  nest(d = -uid) %>%
+  mutate(
+    ws_rank = map_int(
+      d,
+      ~ arrange(., ws_error) %>%
+        rowid_to_column("rank") %>%
+        filter(source == "real") %>%
+        pull(rank) %>%
+        .[1]
+    ),
+    tu_rank = map_int(
+      d,
+      ~ arrange(., tu_error) %>%
+        rowid_to_column("rank") %>%
+        filter(source == "real") %>%
+        pull(rank) %>%
+        .[1]
+    ),
+    d = map_int(d, nrow)
+  )
+
+positions %>%
+  filter(d > 1) %>%
+  mutate(across(ends_with("rank"), ~ . / d)) %>%
+  pivot_longer(ends_with("rank"), names_to = "Dimension", values_to = "Rank") %>%
+  ggplot(aes(x = Rank)) +
+  geom_histogram(binwidth = .1) +
+  scale_x_continuous(limits = 0:1) +
+  facet_wrap(~Dimension)
+  
+```
+
+\mccorrect{TODO: Shuffles for all participants; use a joint error to calculate shuffle position.}
 
 ### Participants' coefficients
 
@@ -1316,7 +1356,7 @@ Heterogeneity complicates and enriches this picture in interesting ways, support
 
 ## Discussion
 
-As with previous simulation-based approaches ([§Similar models in the literature](#ne-i-lit)), this work showed that echo chambers and polarisation can occur in networks of agents using heuristics that appear from the agent's perspective to be rational. 
+As with previous simulation-based approaches§\@ref(ne-i-lit), this work showed that echo chambers and polarisation can occur in networks of agents using heuristics that appear from the agent's perspective to be rational. 
 In the absence of an objective source of information, using your own opinion as a proxy for the truth is a viable strategy under a range of broadly-true assumptions [@pescetelliRoleDecisionConfidence2021].
 Likewise, choosing to hear advice from more trusted sources, and choosing to hear advice you are more likely to take (often the same thing in our models and in real life), is a reasonable strategy.
 The emergence of collective irrationality from the interaction of rational individuals is similar to the well-known phenomenon of the [Tragedy of the Commons](https://en.wikipedia.org/wiki/Tragedy_of_the_commons), in which individual rewards purchased with distributed costs results in everyone becoming poorer.
@@ -1352,18 +1392,16 @@ For each consensus opinion there is likely to be an outspoken minority who cling
 The models presented here cannot tell us how such heterogeneity comes about, but they do underscore its importance in the wider ecosystem of opinion interactions, and invite questions concerning its origins. 
 One suggestion we raise here is that being contrarian may be a stable sub-strategy within an environment where consensus dominates.
 
-We acknowledge that the specific values of parameters estimated here may not be a good description of people's tendencies in the kind of task simulated: because of differences between the binary advisor choice situation faced by the participants and the mulitple advisor choice situation faced by the agents; or because of difficulties in accurately estimating the coefficients for some participants; or because the the participant population may deviate somewhat from humanity in general.
+We acknowledge that the specific values of parameters estimated here may not be a good description of people's tendencies in the kind of task simulated: because of differences between the binary advisor choice situation faced by the participants and the multiple advisor choice situation faced by the agents; or because of difficulties in accurately estimating the coefficients for some participants; or because the the participant population may deviate somewhat from humanity in general.
 Despite this, we are confident that individual variation in these advice-taking and source-selection propensities exists, and that it matters in interesting ways for network dynamics.
 Idiosyncrasies certainly occur in confidence ratings [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017], and likely in advice-seeking and advice-taking behaviour, too [@sollJudgmentalAggregationStrategies2011; @pescetelliConfidenceAdviceSeeking2021].
-Additionally, there may be variation in confidence across personality and psychiatric dimensions \mccorrect{QUESTION: Nick, do you know good citations for this?}, and computational models are increasingly used to explore the implications of these kind of variations in psychiatric disorders \mccorrect{QUESTION: Also a citation for this - Nick, do you know of one? I guess it's computational psychiatry in general?}.
+Additionally, there may be variation in confidence across personality and psychiatric dimensions, and computational models are increasingly used to explore the implications of these kind of variations in psychiatric disorders [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017; @rouaultPsychiatricSymptomDimensions2018; @moses-paynePostdecisionEvidenceIntegration2019; @hauserIncreasedDecisionThresholds2017].
 
 There are numerous potential causes for inter-individual variation in advice-taking and source selection behaviour. 
 In behavioural experiments in our lab, we often see a small minority of participants will take no advice at all -- never seeking it or changing their answer if they receive it -- and these participants typically report very high subjective confidence. 
 It is plausible, therefore, that whatever causes the hetereogeneity seen here, it has some relationship to confidence. 
 Advice-seeking is has been argued to serve several purposes, including increasing accuracy [@sollStrategiesRevisingJudgment2009], diffusing responsibility [@raderAdviceFormSocial2017], and social inclusion [@mahmoodiEqualityBiasImpairs2015].
 Correspondingly, individual variation in the importance of any of these components may alter the tendency to seek and use advice.
-
-\mccorrect{!MAYBE[Are these contrarians related to the people who don't take advice in our studies - can we do stats to find out (relate low trust update and/or weighted sampling to low influence? Ideally among people who show a strong preference for one or another advisor to avoid people who just aren't engaged skewing the analysis)]}
 
 ### Considerations
 
@@ -1411,7 +1449,7 @@ Consequently, many decision-making and advice-taking phenomena reported in the l
 @eastImprovingAgentbasedModels2016 argue that an agent-based model only achieves sufficiency by including "all relevant processes and conditions". 
 To allow the reader to determine whether the omissions are important, this section briefly covers those aspects which are left out of the models.  
 
-Firstly, advice is the key feature of the model rather than the task, and so the agents' performance on the task does not vary over time (they don't get better or worse, and they don't get bored). 
+Advice is the key feature of the model rather than the task, and so the agents' performance on the task does not vary over time (they don't get better or worse, and they don't get bored). 
 Advice in the model, as in the experiments, is a one-way transaction. 
 The agents giving advice are unaffected by having given the advice, except by the roundabout route of potentially causing other agents to give advice in the future which is likely to make them appear trustworthy to the agent. 
 This means that there is no deliberate reciprocity to advice-seeking behaviours [@mahmoodiEqualityBiasImpairs2015], and agents do not alter their advice to appear more paletable to others or so that they are selected as advisors more frequently [@hertzNeuralComputationsUnderpinning2017; @hertzIntrinsicValueSocial2018].
@@ -1419,9 +1457,12 @@ This means that there is no deliberate reciprocity to advice-seeking behaviours 
 The agents use advice rationally, given their estimation of the trustworthiness of their advisor.
 A plethora of research has shown that people do not do this in practice.
 Most research has documented processes which result in the underweighting of advice [e.g. @yanivAdviceTakingDecision2000 and many others], while some has indicated conditions under which people are over-reliant on advice [@schultzeInabilityIgnoreUseless2017; @dietvorstIntentionallyBiasedPeople2019].
-This literature is reviewed in the chapter on the [Context of Advice](#chapter-context).
+This literature is reviewed in the chapter on the Context of Advice§\@ref(chapter-context).
 Capping the extent to which agents take advice to within a relatively narrow range between a minimum and maximum might alter the simulations quite extensively: the simulations where agents consider advisors as anti-predictive would no longer occur; and the time taken to differentiate groups and form consensuses would likely increase because the range of trusts would be lower.
 The effect of weighted selection, and the effects of heterogeneity in trust volatility and weighted selection values, would likely also diminish because the range in which they can operate is narrower.
+
+Lastly, and in keeping with the simplicity aim advocated by @jacksonAgentBasedModelingGuide2017, the reader is encouraged to consider the differences that including empirically estimated coefficients in the model makes to the overall dynamics, and draw their own conclusions as to the necessity of including these in similar models.
+We feel the effects are interesting, although, depending on the purpose of the model in question, they may not exert sufficient influence on the dominant network dynamics to be a necessary inclusion.
   
 #### Paths not taken
 
@@ -1465,13 +1506,23 @@ Stochastic uncertainty has been addressed to the extent it is possible given tem
 Model uncertainty is more difficult to address. 
 There are certainly values for model parameters which have substantial effects on dynamics.
 A trivial example is that when agents are given feedback on every decision they tend towards very low bias magnitudes.
-Feedback and other parameters were explored to some extent during the development of the model, as documented in [§Constant parameters](#nw-m-constant-parameters).
+Feedback and other parameters were explored to some extent during the development of the model, as documented in Constant parameters§\@ref(nw-m-constant-parameters).
 Despite this, readers should be aware that the parameter space is very large, and there are likely to be substantial interaction effects which were not found during development.
 
 Many models in the literature use very large populations. 
-While the models discussed in [§Similar models in the literature](#ne-i-lit) had smaller sizes, the largest being 1000 agents, it is not uncommon to see models with 2-3000 agents [@nowakPrivateAttitudePublic1990; @dugginsPsychologicallyMotivatedModelOpinion2017; @songDynamicSpiralsPut2017].
+While the models discussed in Similar models in the literature§\@ref(ne-i-lit) had smaller sizes, the largest being 1000 agents, it is not uncommon to see models with 2-3000 agents [@nowakPrivateAttitudePublic1990; @dugginsPsychologicallyMotivatedModelOpinion2017; @songDynamicSpiralsPut2017].
 The size of the current model runs seems sufficient to illustrate the effects of interest, but it is possible that different effects may emerge in larger populations. 
 Smaller populations examined during testing showed less consistent effects.
 For very large models the underlying package code would have to be adjusted and the data extracted from model runs sampled much more sparsely. 
 
-\mccorrect{NICK: Add a brief conclusion paragraph here in the spirit of "These limitations notwithstanding, the simulations show..."} Given this is the end of this line of work, it might make sense to consider the simulations together with the experiments in the previous chapter, along the lines of: Here I've used agent-based models to explore the implications of selective advice sampling. The experiments in Chapter 5 showed XYZ. The simulations here showed ABC.}
+### Conclusion
+
+We used agent-based models to explore the implications of selective advice sampling. 
+The experiments in Chapter 5 showed that, people use their own opinion as a proxy for the truth when evaluating advice, although the extent to which they do this varies dramatically from person to person.
+The limitations of the simulations notwithstanding, they show that simple models of interaction on the basis of homophily are enriched by including the kind of variety observed in human participants.
+
+Source selection on the basis of similarity of opinion does seem to occur, although it depends on the absence of feedback and does not appear to be universal. 
+There are enough people for whom it does occur, however, for it to disrupt the uniform dynamics of simulated networks of information exchange, allowing stable bubbles of minority opinion and individuals who preserve more moderate opinions.
+
+In the chapters that follow, we turn our attention from exploring how individuals seek and take advice to the reasons why people take less advice than normative models predict.
+We argue that this phenomenon, known as egocentric discounting, may be due to prior expectations beyond the scope of the experimental tasks used to study advice-taking behaviours, and that these expectations are warranted given typical advice-taking conditions.
