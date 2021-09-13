@@ -173,10 +173,9 @@ The updating of trust following experience of advice is likely to be largely in 
 ## Updating advisor evaluations
 
 While a single piece of advice must be taken on its own terms, people can construct relatively accurate estimates of advisors' advice when provided with feedback on the decisions they use the advice to make [@pescetelliUseMetacognitiveSignals2017; @sahCheapTalkCredibility2013; @yanivAdviceTakingDecision2000].
-This likely happens as an analogue of reinforcement learning, where feedback allows an error signal to be used to update the estimate of the advisor's ability ($\hat{s}^{a}$) rather than one's own beliefs about the world, according to some learning rate ($\lambda$).
+This likely happens as an analogue of reinforcement learning, where feedback allows an error signal to be used to update the estimate of the advisor's ability ($\widehat{\text{ability}}_{a,a'}$) rather than one's own beliefs about the world, according to some learning rate ($\lambda$).
 \begin{align}
-\text{this is wrong; need to check RL models for an analogue}\\
-\hat{s}_{t+1} = \hat{s}_{t} + |e^{a}_{t} - v|\cdot\lambda
+\widehat{\text{ability}}^{a,a'}_{t+1} = \widehat{\text{ability}}^{a,a'}_t + |i^{a'}_t - v_t|\cdot\lambda
 (\#eq:advisor-evaluation)
 \end{align}
 
@@ -190,50 +189,40 @@ It is not obvious that there are many situations in the course of everyday relat
 Additionally, @heyesKnowingOurselvesTogether2020 have argued that social learning is wholly explicable in terms of general reinforcement learning processes paired with attentional biases to social stimuli.
 Reinforcement learning in the social domain operates on the basis of rapid feedback, just as in the non-social domain.
 Below, the advisor evaluation model is extended to cases where objective feedback is not available by substituting the decision-maker's confidence for objective feedback.
-While not foolproof, the method allows better-than-average approximation of the quality of advisors provided several plausible assumptions are met \mccorrect{!TODO[Discuss assumptions somewhere: independence of errors, better-than-chance accuracy, trying to help, rough metacognitive calibration/resolution]}.
+While not foolproof, the method allows better-than-average approximation of the quality of advisors provided several plausible assumptions are met [@pescetelliRoleDecisionConfidence2021].
 
 ## Advisor evaluation without feedback
 
-Where feedback is not available, participants in experiments continue to demonstrate an ability to respond rationally to differences in advisor quality [@pescetelliUseMetacognitiveSignals2017].
+Where feedback is not available, participants in experiments continue to demonstrate an ability to respond rationally to differences in advisor quality [@pescetelliConfidenceAdviceSeeking2021].
 This is evidently not done through access to the correct real-world values, because feedback providing those values is unavailable, and, were participants aware of those values themselves, it stands to reason they would have provided those values (and thus not require advice!).
-Pescetelli and Yeung [-@pescetelliUseMetacognitiveSignals2017] suggest the mechanism for this ability to discriminate between advisors in the absence of feedback is performing updates based on confidence-weighted agreement.
+@pescetelliRoleDecisionConfidence2021 suggest the mechanism for this ability to discriminate between advisors in the absence of feedback is performing updates based on confidence-weighted agreement.
 
-### Agreement {-}
+### Agreement
 
-Consider first the non-weighted agreement case, where the advisor's estimate at time $t$ ($e^{a}_{t}$) and the decision-maker's estimates ($e^d$) are binary ($\in0,1$).
-The estimate of the advisor's ability ($\hat{s}^{a}$) is updated positively if the advisor and decision-maker agree, and negatively otherwise, according to the learning rate $\lambda$.
+Consider first the non-weighted agreement case, where the advisor's estimate ($i^{a'}_{t}$) and the decision-maker's estimate ($i^a_t$) at time $t$ are binary ($\in0,1$).
+The estimate of the advisor's ability ($\widehat{\text{ability}}^{a,a'}$) is updated positively if the advisor and decision-maker agree, and negatively otherwise, according to the learning rate $\lambda$.
 
 \begin{align}
-\hat{s}^a_{t+1} = \hat{s}^a_{t} + (-2 \text{ } |e^{d}_{t}-e^{a}_{t}|+1)\cdot\lambda
+\widehat{\text{ability}}^{a,a'}_{t+1} = \begin{cases}
+\widehat{\text{ability}}^{a,a'}_t + \lambda, & i^a_t - i^{a'}_t = 0 \\
+\widehat{\text{ability}}^{a,a'}_t - \lambda, & i^a_t - i^{a'}_t \neq 0
+\end{cases}
 (\#eq:advisor-agreement-binary)
 \end{align}
 
-#### Confidence-weighted agreement {-}
+#### Confidence-weighted agreement
 
-The updating of advice contingent on agreement may be weighted by confidence in the initial decision ($c^d$), such that agreement and disagreement are considered more informative about the quality of the advice when the decision with which they agree or disagree is more certain.
+The updating of advice contingent on agreement may be weighted by confidence in the initial decision ($c^a_t$), such that agreement and disagreement are considered more informative about the quality of the advice when the decision with which they agree or disagree is more certain.
 \begin{align}
-\hat{s}^a_{t+1} = \hat{s}^a_{t} + (-2 \text{ } |e^{d}_{t}-e^{a}_{t}|+1)\cdot c^d_t \cdot \lambda
+\widehat{\text{ability}}^{a,a'}_{t+1} = \begin{cases}
+\widehat{\text{ability}}^{a,a'}_t + c^a_t \lambda, & i^a_t - i^{a'}_t = 0 \\
+\widehat{\text{ability}}^{a,a'}_t - c^a_t \lambda, & i^a_t - i^{a'}_t \neq 0
+\end{cases}
 (\#eq:advisor-agreement-weighted-binary)
 \end{align}
 
-#### Continuous estimate case {-}
+## Use of the framework
 
-## Measuring advice-taking
-
-## Table of experiments {-}
-
-\mccorrect{This is now outdated. Update or remove?}
-
-Advisors | Choice | Task | Feedback | Result
----------|--------|------|----------|-------
-AiC vs AiU | Yes | Perceptual, binary (MATLAB) | No | Suggestive
-AiC vs AiU | Yes | Perceptual, binary | No | Inconclusive
-In/accurate| Yes | Perceptual, binary | No | Accuracy selected more often
-Low/High agreement| Yes | Perceptual, binary | No | Agreement selected more often
-Accurate vs Agreement | No | Estimation, continuous | Yes and No | Accurate preferred given feedback, agreement preferred without feedback
-
-<!-- This is where the maths for advisor quality estimation should go.
-How do we work out the quality of an advisor using individual bits of advice as evidence?
-Feedback, no feedback.
--->
-
+This model of agreement-dependent advisor evaluation in the absence of feedback (whether confidence-weighted or non-confidence-weighted) forms the framework on which the experiments and computational models in this thesis are based. 
+We present behavioural experiments that aim to explore the validity of this framework, and computational models that explore its implications. 
+The behavioural experiments do not offer severe tests of the framework because they are primarily concerned with advisor choice: a lack of evidence for a preference between advisors on any given experiment may be explicable by a failure to translate a higher assessment of an advisor's advice into a preference for selecting that advisor rather than a failure to acquire a higher assessment of an advisor's advice.
