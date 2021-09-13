@@ -6,6 +6,9 @@ output:
   bookdown::html_document2: default
 params:
   corrections: true
+bibliography: 
+  - bibliography/references.bib
+bibliography-heading-in-pdf: Works Cited
 documentclass: book
 ---
 
@@ -13,7 +16,11 @@ documentclass: book
 
 # Introduction {#chapter-introduction}
 
+<!-- For PDF output, we must include this LaTeX command after unnumbered headings, otherwise the numbers in the mini table of contents will be incorrect -->
+
 \adjustmtc 
+
+
 <!-- This introduction should be more overarchingly theoretical 
   - how do people think about trust, homophily, echo chambers 
   - what kind of real-work issues are we interested in
@@ -23,55 +30,45 @@ documentclass: book
   
 -->
 
-<!-- For PDF output, we must include this LaTeX command after unnumbered headings, otherwise the numbers in the mini table of contents will be incorrect -->
-
 \mccorrect{!TODO[Style notes]}: 
 
 * Graphs:  
     * Continuous axes which show theoretical limits should have small expand, axes which do not show those limits should have arrowheads from broken_axis_*  
-
-
-\mccorrect{!TODO[update evo models to use this terminology]}
-
-$a_{i,t}$ - advice agent $i$ receives at time $t$  
-$b_{i,t}$ - bias of agent $i$ at time $t$  
-$c_{i,t}^{I/A/F}$ - agent $i$'s confidence in their initial/advisory/final estimate at time $t$  
-$e_{i,t}^{I/A/F}$ - agent $i$'s initial/advisory/final estimate at time $t$  
-$i$, $j$ - agent identifiers  
-$s_{i,t}$ - sensitivity of agent $s$ at time $t$  
-$u_i$ - fitness/utility of agent $i$  
-$v$ - true value in the world  
-$\lambda$ - learning rate  
-$\omega_{i,t}$ - weighting for agent $i$'s estimate at time $t$  
-
+* Terminology:  
+    * Participants are human individuals.  
+    * Agents are simulated individuals.  
+    * Judge and advisor are roles, that can be played by either participants or agents.  
 
 <!-- this adds an image in gitbook output --> 
 <img src="figures/cover.png" width="315" height="445" alt="Cover image" align="right" style="margin: 0 1em 0 1em" />
 
-This thesis attempts to determine whether individual psychological processes in the seeking and taking of advice are sufficient to produce entrenched biases at the network level.
-The work includes empirical investigation into the individual psychological processes underlying advice seeking and advice taking using behavioural experiments; computational modelling and behavioural experimentation exploring the effects of contextual factors on advice-taking; agent-based computational modelling of the effects interactions between agents with psychological advisor evaluation processes that produce biases in assimilation of information and source selection; and a comparison between the structures of networks produced in these models and those naturally occurring social networks.
-The organisation is as follows: this introduction establishes the core concepts invoked in this thesis, and describes their treatment in the literature; the following sections each include a short chapter on the specific question addressed and the techniques used, a detailed description of the work conducted, and a short discussion of the conclusions drawn from the work; and a final section offers broader conclusions arising as a consequence of the presented work, alongside some suggestions for related research.
+This thesis explores two questions in the domain of advice-seeking and advice-taking: does the way individuals seek advice produce echo chamber-like networks?; and is the well-established phenomenon of people irrationally underweighing advice explicable as a rational process?
+The first of these questions is addressed using online empirical behavioural experiments to characterise the individual psychological processes underlying advice seeking, followed by agent-based computational simulations that implement the variation in those processes observed in human participants.
+The second question is addressed using computational agent-based evolutionary simulations to explore the adaptiveness of underweighting advice under a range of plausibly-ubiquitous circumstances, and the flexibility of human participants in responding to changes in those circumstances is explored using online behavioural experiments.
+The organisation is as follows: this introduction establishes the core concepts invoked in this thesis, and describes their treatment in the literature.
+Then, the two questions are addressed; each includes a short introduction to the specific question addressed, a detailed description of the work conducted, and a short discussion of the conclusions drawn from the work.
+The final section offers broader conclusions arising as a consequence of the presented work, alongside some suggestions for related research.
 
-## Overview {-}
+## Overview
 
-The first line of behavioural experiments report investigates whether people decide which advisors to consult using internal signals where external feedback is unavailable, extending a previous finding concerning the influence of advice [@pescetelliRoleDecisionConfidence2018] into the domain of advisor choice.
-While little support is found for the metacognitive mechanisms underpinning the influence of advice, the frequency of agreement is shown to be a good indicator of advisor choice.
-Next, the effects of advisor agreement are explored in terms of influence using a different decision-making domain; a date estimation rather than perceptual decision task.
-Again, people denied objective feedback on the quality of advice are shown to attend to agreement.
-The work above demonstrates how the influence of advice depends upon the reputation of an advisor built up over time.
+The first line of behavioural experiments investigates whether people decide which advisors to consult using internal signals where external feedback is unavailable, extending a previous finding concerning the influence of advice [@pescetelliRoleDecisionConfidence2018] into the domain of advisor choice.
+The main observation that the frequency of agreement is a good indicator of advisor choice is replicated, although little support is found for metacognitive mechanisms underpinning the influence of advice.
+The results are interpreted within the a framework that sees the likelihood of an advisor's being chosen over another as dependent upon the relative strengths of their reputations, built up over time through providing credible advice.
 
-These results highlight the heterogeneity of individuals' tendencies to change their trust in advisors and select advisors on the basis of that trust. 
+The results reveal substantial heterogeneity in individuals' tendencies to change their trust in advisors and select advisors on the basis of that trust. 
 Agent-based modelling is used to explore the effects of this heterogeneity on how the whole population's opinions and advice-seeking behaviour evolve over time.
 This modelling work demonstrates that heterogeneity may stabilise these networks, slowing the emergence of polarised echo chamber-like structures.
 
-In a second line of experiments, reputations of advisors are established at the outset and the responses to different pieces of advice are explored.
+In the second line of research, reputations of advisors are established at the outset and the responses to different pieces of advice are explored.
 Evolutionary modelling demonstrates that the presence of a few bad actors in a population can mean that distrusting all advice from all sources a little is adaptive.
 The evolutionary models are extended to show that this kind of general distrust, known as egocentric discounting, emerges as adaptive even where none of the agents deliberately mislead others, and even where all agents are equally skilled and fully cooperative.
 
 Example behavioural experiments are reported which support the implications from the evolutionary models.
 Participants considered both the properties of advice and the properties of advisors, placing less trust in advice which appeared suspicious or which came from a suspicious source.
 
-## Advice {-}
+\mccorrect{TODO: summarise conclusion main points}
+
+## Advice
 
 Advice is broadly defined as information which comes from a social source.
 Advice is therefore different from other sources of information in that it is the result of (at least) mental processing of other information.
@@ -79,55 +76,75 @@ In some cases, it may additionally include discussions among different group mem
 advice from the International Advisory Panel on Climate Change).
 Throughout this thesis, the focus is primarily on advice which comes from a single, stable source, as when we see a post by an acquaintance on social media, or when a stranger provides us with advice.
 
-## Advice-taking {-}
+## Advice-taking
 
 Advice occurs in the context of a decision, and forms a part of the information which is integrated during the decision-making process to produce a decision.
 To the extent that the decision reached differs from the decision that would have occurred had the advice not been presented, the advice has had an effect on the decision; to the extent that this difference changes the decision in a way consistent with the advice, the advice has been 'taken' (as opposed to 'rejected').
 
-It is tacitly implied by many operationalizations of advice-taking that the informational content of the advice determines the extent to which it is taken or rejected \mccorrect{!TODO[CITE]}.
+It is tacitly implied by many operationalizations of advice-taking that the informational content of the advice determines the extent to which it is taken or rejected.
+For example, _weight on own estimate_ and its derivatives quantify advice-taking as the amount an opinion is updated in the direction of advice [@yanivAdviceTakingDecision2000].
 Insofar as the identity of the advisor matters, it matters because it functions as a cue to the informational content of the advice.
 This is likely a major oversimplification, however, because in many real-world contexts advice-giving and advice-taking form part of a developing social relationship: being consulted for advice and having one's advice followed are inherently rewarding [@hertzIntrinsicValueSocial2018; @hertzNeuralComputationsUnderpinning2017]; and taking advice can serve as a (sometimes costly) social signal of valuing a relationship with a person or group [@byrneOstracismReducesReliance2016].
-Furthermore, some authors have argued that people may perceive taking advice as sacrificing their independence or autonomy \mccorrect{!TODO[CITATIONNEEDED]}.
+Furthermore, some authors have argued that people may perceive taking advice as sacrificing their independence or autonomy [@raderAdviceFormSocial2017; @ronayneWhenGoodAdvice2018].
 While this thesis follows previous literature in omitting to consider the wider social concerns influencing the taking of advice, it is nevertheless important to remember that the processes investigated herein take place in a variety of social contexts where complex social agents attempt to optimise over numerous goals over numerous timescales.
 
-## Three-factor model of trust {-}
+## Three-factor model of trust
 
 The degree to which advice is taken is proportional to the trust placed in the advisor by the decision-maker.
 Interpersonal trust, or the degree to which one is prepared to place one's fortune in the hands of another (e.g.
 by relying on their advice), is apportioned by @mayerIntegrativeModelOrganizational1995 onto three properties of the advisor (as judged by the decision-maker): ability, benevolence, and integrity.
-To these three properties of the advisor we may add the decision-maker's general propensity to trust, as well as situational cues and task cues (e.g.
-the phenomenon that advice is more readily taken for hard tasks than easy ones, [@ginoEffectsTaskDifficulty2007; @yonahTheyDonKnow2021]).
+To these three properties of the advisor we may add the decision-maker's general propensity to trust, as well as situational cues and task cues (e.g. the phenomenon that advice is more readily taken for hard tasks than easy ones, [@ginoEffectsTaskDifficulty2007; @yonahTheyDonKnow2021]).
 
-### Ability {-}
+### Ability {#i-ability}
 
 Ability captures the expertise of an advisor: their raw ability to perform the task for which they are giving advice.
 In some cases this is relatively straightforward, as in the expertise of a General Practitioner in matters of health and disease, and in others more complex, as in the expertise of a hairdresser when deciding on a haircut (when matters of personal taste comingle with aesthetic considerations of facial structure, practical considerations of hair constitution, and social considerations of fashion).
 The greater the ability of an advisor, the greater the influence of their advice, as demonstrated by experiments showing that participants' decisions are more affected by the advice of advisors who are labelled as more expert in a relevant domain [@sahCheapTalkCredibility2013; @schultzeInabilityIgnoreUseless2017; @sniezekImprovingJudgementPrepaid2004; @sniezekTrustConfidenceExpertise2001; @sollJudgmentalAggregationStrategies2011], or are shown to be more expert empirically [@pescetelliUseMetacognitiveSignals2017; @sahCheapTalkCredibility2013; @yanivAdviceTakingDecision2000].
 
-### Benevolence {-}
+### Benevolence
 
 Benevolence refers to the extent to which the advisor seeks to further the interests of the decision-maker.
 Where ability represents the absolute limit on the quality of advice, benevolence represents the extent to which the advice approaches this limit.
 The advice of even a renouned expert may be doubted if there is reason to believe their goal is to mislead, a vital lesson for medieval monarchs with their councils of politicking advisors.
-Experimental work has shown that psychology students relied more on the advice of their friends than on the advice of labelled experts \mccorrect{!TODO[CITATIONNEEDED]}, and that participants are more inclined to reject advice when uncertainty is attributed to malice rather than ignorance [@schulInfluencesDistrustTrust2015]}.
+Experimental work has shown that participants are more inclined to reject advice when uncertainty is attributed to malice rather than ignorance [@schulInfluencesDistrustTrust2015]}.
 
-### Integrity {-}
+### Integrity
 
 Advisors with integrity exhibit adherence to principles which the decision-maker endorses.
 As with benevolence, integrity acts to determine the extent to which advice approaches the limit imposed by ability.
-While not mutually exclusive, integrity is typically important where relationships are less personal (e.g.
-we may place great trust in a General Practitioner because of their expertise in medical matters and their _integrity_ in adhering to a set of professional ethical and conduct requirements).
-\mccorrect{!TODO[Some description of the research]}
+While not mutually exclusive, integrity is typically important where relationships are less personal (e.g. we may place great trust in a General Practitioner because of their expertise in medical matters and their _integrity_ in adhering to a set of professional ethical and conduct requirements).
+In many cases, integrity is difficult to disentangle from ability, because subscription to values often indicates a knowledge of a domain, which can act as a cue for ability.
+Where professional societies are involved, for example, many require formally-recognised training for membership.
+Likewise, expression of shared values can promote in-group effects that are, in this model, in something of a grey area between integrity and benevolence.
 
-## Normative models of advice-taking {-}
+## Source selection and advice-taking
+
+From the perspective of this thesis, the two key components of advice are its source and its informational content.
+In our underlying framework§\@ref(chapter-advisor-evaluation), we view the informational content of advice as providing information about the source of the advice, and both as contributing to the likelihood of the advice being incorporated into a final decision.
+The literatures on source selection (where we look for advice) and advice-taking (how we use advice when it is provided) are grounded in different academic traditions.
+Source selection is usually studied within the context of Social and Personality Psychology, with choices viewed as minimising cognitive dissonance [@festingerTheoryCognitiveDissonance1957] or protecting a positive self-concept [@knobloch-westerwickSelectiveExposureSelf2015].
+Advice-taking, on the other hand, is formally investigated in the Organisational and Cognitive Psychology literatures on judgement and decision-making and forecasting, and frames behaviour with reference to normative models§\@ref(i-normative).
+
+In this work, we take steps towards joining these literatures by extending a framework for advisor evaluation in the absence of feedback§\@ref(chapter-advisor-evaluation) to the domain of source selection, referred to here as advisor choice.
+This thesis thus uses an approach more similar to the advice-taking literature than to the source selection literature.
+We find moderate evidence for source selection on the basis of agreement in the absence of feedback.
+
+## Judge-advisor system
+
+The paradigm we use for the behavioural experiments and as a framing for the computational simulations is a Judge-Advisor System [@yanivAdviceTakingDecision2000; @sniezekImprovingJudgementPrepaid2004].
+In this paradigm, two individuals contribute to making a decision, one as the judge and the other as the advisor.
+The judge makes an initial estimate alone, then receives advice from the advisor, and then makes a final decision integrating the advice with their initial estimate as they see fit.
+This paradigm allows advice to be quantified on the assumption that any systematic differences between initial estimates and final decisions are properties of the advice.
+
+## Normative models of advice-taking {#i-normative}
 
 Advice-taking can be evaluated formally with reference to a normative model.
 The simplest and most common of these views the decision-making task as an estimation problem (or combination of estimation problems), and provides an approximately Bayesian variance-weighted integration of independent estimates.
 To borrow from Galton [-@galtonVoxPopuliWisdom1907]}, consider the task of judging the weight of a bullock.
-We can model any single guess ($e$) as the true weight ($v$) plus some error ($\epsilon$):
+We can model any single guess ($i$) as the true weight ($v$) plus some error ($\epsilon$):
 
 \begin{equation}
-e = v + \epsilon
+i = v + \epsilon
 (\#eq:estimate)
 \end{equation}
 
@@ -136,10 +153,10 @@ As the number of samples from this distribution increases, the mean of those sam
 Thus, the more estimates are taken, the closer on average the sum of errors will be to 0.
 
 \begin{align}
-\frac{\sum_{i}^{N}(e_{i})}{N} &= \frac{\sum_{i}^{N}(v + \mathcal{N}(\mu=0,\,\sigma^{2}_{i}))}{N}\\
-\frac{\sum_{i}^{N}(e_{i})}{N} &= \frac{\sum_{i}^{N}(v)}{N} + \frac{\sum_{i}^{N}(\mathcal{N}(\mu=0,\,\sigma^{2}_{i}))}{N}\\
-\frac{\sum_{i}^{N}(e_{i})}{N} &= \frac{Nv}{N} + \hat{0}\\
-\frac{\sum_{i}^{N}(e_{i})}{N} &\approx v
+\frac{\sum_{a}^{N}(i_{a})}{N} &= \frac{\sum_{a}^{N}(v + \mathcal{N}(\mu=0,\,\sigma^{2}_{a}))}{N}\\
+\frac{\sum_{a}^{N}(i_{a})}{N} &= \frac{\sum_{a}^{N}(v)}{N} + \frac{\sum_{a}^{N}(\mathcal{N}(\mu=0,\,\sigma^{2}_{a}))}{N}\\
+\frac{\sum_{a}^{N}(i_{a})}{N} &= \frac{Nv}{N} + \hat{0}\\
+\frac{\sum_{a}^{N}(i_{a})}{N} &\approx v
 (\#eq:wisdom-of-crowds)
 \end{align}
 <!-- Could extend the above to include individual bias ($\mu_{i}$).
@@ -147,46 +164,52 @@ This could then be used to show that correlated biases produce systematic distor
 -->
 
 Observe that this formulation is true no matter the value of $N$.
-On average, it is always better to have more estimates than fewer.
-This suggests that, even in the situation where there are only two estimates (the decision-maker's and the advisor's), the best policy will be to incorporate both estimates into the final decision.
+On average, it is always better to have more estimates than fewer, because as the number of estimates increases the sum of their errors approaches 0.
+Even in the situation where there are only two estimates (the decision-maker's and the advisor's), the best policy will be to incorporate both estimates into the final decision.
 
-The variance of the normal distribution from which errors are derived ($\sigma^{2}_{i}$) is, in the example above, drawn from a normal distribution itself ($\sigma^{2}_{i} \sim \mathcal{N}(\mu=0,\,\text{sd}^{2})$meaning that it is also cancelled out on average over repeated samples).
-Where few estimates are taken, weighting those estimates by the variance of the error distributions will increase the accuracy of the estimates in proportion to the difference between the variances:
+Where variances of the error distributions are known ($\sigma^{2}_{i}$), estimates can be weighted by those variances:
 
-$$e^F = \frac{\frac1N \sum_{i}^{N} \omega_i e_i^I}{\sum_i^N \omega_i}$$
-Where $\omega_i$ is $1/\sigma^2_i$.
+\begin{align}
+f = \frac{\sum_{a}^{N} (\omega_a i_a)}{\sum_a^N \omega_a}
+(\#eq:variance-weights)
+\end{align}
 
-Many experimental implementations of this model avoid weighting issues by calibrating decision-makers and advisors to be equally accurate on average ($\sigma^{2}_{\text{decision-maker}}=\sigma^{2}_{\text{advisor}}$).
+Where $\omega_a$ is $1/\sigma^2_a$.
+This will increase the accuracy of the estimates in proportion to the difference between the variances.
+
+Many experimental implementations of this model avoid weighting issues by calibrating judges (decision-makers) and advisors to be equally accurate on average ($\sigma^{2}_{\text{judge}}=\sigma^{2}_{\text{advisor}}$).
 The result of this constraint is that the optimal policy is simply to average all estimates together:
 
-$$e^F = \frac{1}{N}\sum_i^N e_i^I \approx v$$
+\begin{align}
+f &= \frac{\sum_a^N (i_a)}{N} \\
+&\approx v
+(\#eq:optimal-averaging)
+\end{align}
 
 [^symmetrical-distribution]: The normal distribution is well-supported by empirical evidence, but note that any symmetrical distribution around 0 will lead to the same conclusion.
 
-## Egocentric-discounting {-}
+## Egocentric-discounting
 
-From the perspective of the [normative model above](#normative-models-of-advice-taking), decision-makers should weigh their own estimate equally with each other estimate they receive in the process of coming to their decision.
+From the perspective of the normative model above§\@ref(i-normative), decision-makers should weigh their own estimate equally with each other estimate they receive in the process of coming to their decision.
 One of the most robust findings in the literature on advice-taking is that people routinely underweight advisory estimates relative to their own estimates, a phenomenon known as _egocentric discounting_[@danaAdviceChoice2015; @ginoEffectsTaskDifficulty2007; @hutterSeekingAdviceSampling2016; @libermanNaiveRealismCapturing2012; @minsonCostCollaborationWhy2012; @raderAdviceFormSocial2017; @ronayneIgnoringGoodAdvice2018; @seeDetrimentalEffectsPower2011; @sollJudgmentalAggregationStrategies2011; @troucheVigilantConservatismEvaluating2018; @yanivAdviceTakingDecision2000; @yanivExploitingWisdomOthers2012; @yanivUsingAdviceMultiple2007].
 Egocentric discounting occurs in both feedback and no-feedback contexts [@yanivAdviceTakingDecision2000].
 Explanations for egocentric discounting are usually framed in terms of personal-level psychology: decision-makers have better access to reasons for their decision [@yanivAdviceTakingDecision2000]; overrate their own competence [@sniezekImprovingJudgementPrepaid2004]; may have a desire to appear consistent [@yanivUsingAdviceMultiple2007]; may see opinions as possessions [@sollJudgmentalAggregationStrategies2011]; may be loss-averse to providing a worse final estimate due to advice-taking [@sollJudgmentalAggregationStrategies2011]; or have difficulty avoiding anchoring [@schultzeInabilityIgnoreUseless2017] or repetition bias effects [@troucheVigilantConservatismEvaluating2018].
-None of these explanations has survived rigorous empirical testing, however, and recently suggestions have widened to include consideration of aggregate-level rather than personal-level causes, with Trouche et al.
-[-@troucheVigilantConservatismEvaluating2018] arguing that the potential for misaligned incentives between decision-maker and advisor motivate discounting of advice.
-In the course of this thesis `crossref needed`, I demonstrate that egocentric discounting may be a stable metastrategy which protects against exploitation, carelessness, incompetence, and miscommunication.
+None of these explanations has survived rigorous empirical testing, however, and recently suggestions have widened to include consideration of aggregate-level rather than personal-level causes, with @troucheVigilantConservatismEvaluating2018 arguing that the potential for misaligned incentives between decision-maker and advisor motivate discounting of advice.
+In the latter part of this thesis§\@ref(chapter-advice-taking-context), we demonstrate that egocentric discounting may be a stable meta-strategy which protects against exploitation, carelessness, incompetence, and miscommunication.
 From this perspective, the normative model pertains to a particular instantiation of a problem with questionable ecological validity given the typical ethology of advice-taking in humans.
 While such considerations affect the conclusions one draws from egocentric discounting relative to the normative model, they do not detract substantially from the practice of using the normative model as an optimum 'set point' from which to evaluate advice-taking behaviour.
 
-## Homophily and echo-chambers {-}
+## Homophily and echo-chambers
 
 Homophily is the ubiquitous phenomenon that individuals more closely connected to one another within a social network tend to be more similar to one another than would be expected by chance across numerous dimensions, from demographics to attitudes [@mcphersonBirdsFeatherHomophily2001].
+Polarisation is the phenomenon whereby the distribution of opinions in a population trend toward extremes over time, with moderate stances becoming increasingly less popular. 
+Polarisation can be one-way, as when a consensus forms on a topic and that consensus shifts the entire ground of the debate (as with the core feminist principle that women and men deserve equal respect), or two-way as with divisive issues like the suitability of former President Donald Trump for office.
 Whether homophily in virtual social networks is responsible for increases in polarisation is debated.
 
-Proponents point to increases in polarisation (e.g. in politics: \mccorrect{!TODO[`Pew Research Center, 2014`]}), to empirical studies demonstrating homophily in virtual social networks [@cardosoTopicalHomophilyOnline2017; @colleoniEchoChamberPublic2014], and to studies examining selective exposure online [@kobayashiSelectiveExposurePolitical2009], and to echo chambers: egregious examples of highly homophilous networks with pathological polarisation [@sunsteinRepublicCom2002; @sunsteinRepublicDividedDemocracy2018].
-The empirical components of the argument are contested, with evidence that virtual social networks are less homogenous than offline social networks [and hence depolarising, @barberaHowSocialMedia2015], and that selective exposure, and especially selective avoidance, is a somewhat dubious finding which does not show up clearly online [@garrettEchoChambersOnline2009; @garrettPoliticallyMotivatedReinforcement2009; @nelsonMythPartisanSelective2017; @searsSelectiveExposureInformation1967].
+Proponents point to increases in polarisation [@perrettDividedKingdomVariation2021, although Perret presents recent increases as less concerning in a broader historical context], to empirical studies demonstrating homophily in virtual social networks [@cardosoTopicalHomophilyOnline2017; @colleoniEchoChamberPublic2014], and to studies examining selective exposure on-line [@kobayashiSelectiveExposurePolitical2009], and to echo chambers: egregious examples of highly homophilic networks with pathological polarisation [@sunsteinRepublicCom2002; @sunsteinRepublicDividedDemocracy2018].
+The empirical components of the argument are contested, with evidence that virtual social networks are less homogeneous than offline social networks [and hence depolarising, @barberaHowSocialMedia2015]; that the parts of the population polarising most rapidly are those least likely to use social media [@boxellGreaterInternetUse2017]; and that selective exposure, and especially selective avoidance, is a somewhat dubious finding which does not show up clearly on-line [@garrettEchoChambersOnline2009; @garrettPoliticallyMotivatedReinforcement2009; @nelsonMythPartisanSelective2017; @searsSelectiveExposureInformation1967].
 Modelling work demonstrates, however, that where there is a bias in assimilation of information, homophily exacerbates polarisation [@dandekarBiasedAssimilationHomophily2013].
-Where polarisation in turn increases homophily, for example through selective exposure or avoidance, a self-reinforcing spiral emerges wherein social connections become increasingly homogenous and attitudes increasingly extreme [@songDynamicSpiralsPut2017].
+Where polarisation in turn increases homophily, for example through selective exposure or avoidance, a self-reinforcing spiral emerges wherein social connections become increasingly homogeneous and attitudes increasingly extreme [@songDynamicSpiralsPut2017].
 
-## Source selection and information weighting {-}
-
-
-
-## Context-dependency of epistemic processes {-}
+In this thesis, we demonstrate that when these models include hetereogeneity of the kind observed in our human participants, polarisation and echo-chamber formation are slowed down.
+This, in combination with lower levels of selective exposure and influence in the real world than those estimated in models, may explain the discrepancies between modelling work and empirical observation.

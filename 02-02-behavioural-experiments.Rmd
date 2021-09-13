@@ -23,6 +23,8 @@ library(lmerTest)
 Present behavioural experiments in which we show sensitivity to both the advisor and the advice, and discuss the relatively high levels of advice-taking (hard task!), and how the results support the impressions gleaned from the evolutionary models: context matters in advice-taking, and discounting may be a feature of vigilant conservatism (hyperprior for deceit).
 -->
 
+<!-- Include directBenevolenceContexts stuff! -->
+
 We suggest that the long-standing view that egocentric discounting reflects sub-optimal information processing is a consequence of taking a narrow view of the problem being solved.
 While it is indeed demonstrable that people in Judge-Advisor System experiments would perform better and earn more reward if they took more advice \mccorrect{CITE}, the people who participate in those experiments also have to function in the real world where being too trusting can produce very negative outcomes.
 Furthermore, advice-taking and decision-making are, like the behaviour of other organisms, ultimately mechanisms for the more efficient propagation of genes.
