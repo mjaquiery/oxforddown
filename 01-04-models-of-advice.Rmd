@@ -135,6 +135,26 @@ This dual update, of both expectation about the world and trust in the advisor, 
 The estimate-advice-decision-update cycle is repeated thousands of times.
 The models illustrate the dynamics of advice interactions: how prior expectations change over time and whether and how polarisation or consensuses emerge; and how agents' trust in one another changes as they gain experience with one another.
 
+```{r nw}
+tmpEnv <- new.env()
+recovered_parameters <- NULL
+shuffles <- NULL
+status <- NULL
+splits <- NULL
+
+for (f in list.files(
+  "~/Downloads/thesis-parameter-estimation", 
+  full.names = T,
+  pattern = "\\.Rdata$"
+)) {
+  load(f, envir = tmpEnv)
+  recovered_parameters <- bind_rows(recovered_parameters, tmpEnv$recovered_parameters)
+  shuffles <- bind_rows(shuffles, tmpEnv$shuffles)
+  status <- bind_rows(status, tmpEnv$status)
+  splits <- bind_rows(splits, tmpEnv$splits)
+}
+```
+
 ```{r nw-m-run-fitting, include = F}
 t1 <- Sys.time()
 # !TODO[Change this to link to Zenodo version when uploaded]
