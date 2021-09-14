@@ -447,7 +447,7 @@ conf_r_f <- correlationBF(r$finalAccuracy, r$finalConfidence, paired = T)
 
 ```
 
-Basic behavioural performance was similar to that observed with the same Dots task in Experiment 1A§\@ref(ac-acc-dots-r-performance). 
+Basic behavioural performance was similar to that observed with the same Dots task in Experiment 1A§\@ref(fig:ac-acc-dots-r-performance). 
 Initial decision accuracy converged on the target 71%, and participants may have benefited from advice in terms of their final decisions being more accurate than their initial decisions (`r s_acc$s[2]`; Figure \@ref(fig:ac-agr-dots-r-performance)A).
 There was no evidence of a general difference in participants' overall accuracy between advisors (`r s_acc$s[1]`), nor was there evidence of a difference in participants' improvement in accuracy between advisors (`r s_acc$s[3]`).
 
@@ -1324,7 +1324,7 @@ Interestingly, despite different patterns of preferences when compared to chance
 This may be a consequence of the variability of preferences: as with the Dates task using High accuracy and Low accuracy advisors (Experiment 1B§\@ref(ac-acc-dates)), the participants in both Feedback and No feedback conditions spanned the entire gamut of preference strengths and directions. 
 One participant in the No feedback group here, for example, never chose the High agreement advisor. 
 Even where there were no systematic effects (No feedback condition in Experiment 1B, Feedback condition here), participants still had a range of preferences with some picking one or the other advisor exclusively.
-A substantial minority (`r num2str((bn$p.value < .05) * 100, 1)`%) of participants had preference strengths beyond those expected by chance when picking randomly.^[5% would be expected to have had strengths of these magnitudes if picking randomly.]
+A substantial minority (`r num2str(mean(bn$p.value < .05) * 100, 1)`%) of participants had preference strengths beyond those expected by chance when picking randomly.^[5% would be expected to have had strengths of these magnitudes if picking randomly.]
 As noted previously (Experiment 1: Discussion§\@ref(ac-acc-d)), this is in contrast to the behaviour in the Dots task, where preferences tend to mass towards even pick rates with a long tail differentiating the population preferences from chance.
 
 It was discovered after the completion of experiments that the advisor position (whether the advisor appears on the top or bottom of the advisor choice panel) was not counterbalanced between advisors.

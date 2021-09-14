@@ -254,5 +254,5 @@ More generally, the results indicate that properties of the advice-giving milieu
 
 These models establish that it is plausible that people have deeply ingrained hyperpriors towards discounting advice.
 It is also possible, however, that people can flexibly respond to contexts, modulating their advice-taking appropriately.
-The voluminous experiments in advice taking discussed in the introduction to this section§\@ref(context-of-advice) can be seen as eliciting exactly this behaviour.
+The voluminous experiments in advice taking discussed in the introduction to this section§\@ref(chapter-context) can be seen as eliciting exactly this behaviour.
 In the next chapter I present new behavioural experiments which suggest that people do indeed modulate their advice-taking to the specifics of the context in which they are in.

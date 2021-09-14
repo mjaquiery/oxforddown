@@ -263,7 +263,6 @@ gg$acc <- tmp %>%
   theme(legend.position = 'none') +
   labs(x = "") +
   broken_axis_bottom +
-  scale_fill_advisor(aesthetics = c("fill", "colour")) +
   scale_fill_advisor(aesthetics = c("fill", "colour"))
 
 tmp <- familiarization %>%
@@ -313,7 +312,6 @@ gg$conf <- tmp %>%
   labs(x = "") +
   theme(legend.position = 'none') +
   facet_wrap(~response) +
-  scale_fill_decision(aesthetics = c("fill", "colour")) +
   scale_fill_decision(aesthetics = c("fill", "colour"))
 
 tmp <- familiarization %>%
@@ -468,7 +466,7 @@ conf_r_f <- correlationBF(r$finalAccuracy, r$finalConfidence, paired = T)
 
 ```
 
-Basic behavioural performance was similar to that observed with the same Dots task in Experiments 1A§\@ref(ac-acc-dots-r-performance) and 2A§\@ref(ac-agr-dots-r-performance). 
+Basic behavioural performance was similar to that observed with the same Dots task in Experiments 1A§\@ref(fig:ac-acc-dots-r-performance) and 2A§\@ref(fig:ac-agr-dots-r-performance). 
 Initial decision accuracy converged on the target 71%, and, as shown in Figure \@ref(fig:ac-ava-dots-r-performance)A, participants benefited from advice in terms of their final decisions being more accurate than their initial decisions (ANOVA main effect of Time: `r s_acc$s[2]`), especially following advice from the High accuracy advisor (interaction of Time and Advisor: `r s_acc$s[3]`).
 There was no main effect of Advisor (`r s_acc$s[1]`).
 

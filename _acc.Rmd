@@ -1677,7 +1677,7 @@ This in turn suggests that, despite the low number of trials on the task, we are
 \mccorrect{QUESTION: What to do about this section. The observation that confidence change/influence might be a bit of a broken measure is important, but that means it needs explanation, meaning this section is quite long. We could leave the actual analysis of this out and just mention the thing in the discussion?}
 
 The extent and manner of decision and confidence changes is an important indicator of the extent to which participants treat advice as informative (Figure \@ref(fig:ac-acc-dates-r-influence)).
-As with the Dots task (Figure \@ref(fig:ac-acc-dots-r-influence), when participants receive agreeing advice they tend to increase their confidence in their initial response, suggesting they are paying attention to the task and attempting to maximize the calibration and accuracy of their final decisions. 
+As expected, when participants receive agreeing advice they tend to increase their confidence in their initial response, suggesting they are paying attention to the task and attempting to maximize the calibration and accuracy of their final decisions. 
 Likewise, where participants receive disagreeing advice, they tend to reduce their confidence in their answer. 
 As before, when participants change their decision (a relatively uncommon event) they quite often make their final decision with a confidence equivalent to their initial estimate, producing the distinctive off-diagonal pattern along the $y = -x$ line. 
 This pattern was explained as largely an artefact of aggregating data from multiple individual participants in the Dots task, but the same explanation is less tenable here.
@@ -1716,8 +1716,8 @@ Familiarization %>%
 
 ```
 
-The individual participant data suggest that some participants may actually be porting their confidence from the initial estimate directly into the final decision, despite the fact that they have changed their mind (Figure \@ref(fig:ac-acc-dates-confidence-change-p)).
-Whereas in the Dots task the off-diagonal pattern in the aggregate data looked to be an artefact of combining data from individual participants with relatively little variation within their confidence responses placed at various points along the off-diagonal (Figure \@ref(fig:ac-acc-dots-confidence-change)), data from this task suggested that several participants were using a range of values for their final decisions and displaying a clear positive correlation between initial and final confidence.
+The individual participant data suggest that some participants may actually be porting their confidence from the initial estimate directly into the final decision, despite the fact that they have changed their mind (Figure \@ref(fig:ac-acc-dates-r-confidence-change-p)).
+Whereas in the Dots task the off-diagonal pattern in the aggregate data looked to be an artefact of combining data from individual participants with relatively little variation within their confidence responses placed at various points along the off-diagonal, data from this task suggested that several participants were using a range of values for their final decisions and displaying a clear positive correlation between initial and final confidence.
 
 This increased tendency for participants to response in this way on the Dates task may be a consequence of the layout of the response bars on the screen.
 In the Dots task, the bars were oriented horizontally, such that the extreme values for one were furthest away from extreme values for the other (Figure \@ref(fig:m-dots)). 

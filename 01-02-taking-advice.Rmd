@@ -292,7 +292,7 @@ for (E in c(.GlobalEnv, .prevStudy)) {
 
 ```
 
-```{r ai-ava-r-performance, fig.caption="Task performance for Experiment 0.  A: Response error.  Faint lines show individual participant mean error (the absolute difference between the participant's response and the correct answer), for which the violin and box plots show the distributions. The dashed line indicates chance performance. Dotted violin outlines show the distribution of participant means on the original study which this is a replication. The dependent variable here is error, the distance between the correct answer and the participant's answer, and consequently lower values represent better performance. The theoretical limit for error is around 100.  B: Error by marker width.  Faint lines show individual participant mean error (distance from the centre of the participant's marker to the correct answer) for each width of marker used, and box plots show the distributions. Some participants did not use all markers, and thus not all lines connect to each point on the horizontal axis. The dashed box plots show the distributions of participant means in the original experiment of which this is a replication. The faint black points indicate outliers.  Grey bars show half of the marker width: mean error scores within this range mean the marker covers the correct answer."}
+```{r ai-ava-r-performance, fig.caption="Task performance for Experiment 0.  A: Response error.  Faint lines show individual participant mean error (the absolute difference between the participant's response and the correct answer), for which the violin and box plots show the distributions. The dashed line indicates chance performance. Dotted violin outlines show data from the original study which this is a replication. The dependent variable is error, the distance between the correct answer and the participant's answer; lower values represent better performance. The theoretical limit for error is around 100.  B: Error by marker width.  Faint lines show individual participant mean error (distance from the centre of the participant's marker to the correct answer) for each width of marker used, and box plots show the distributions. Some participants did not use all markers, and thus not all lines connect to each point on the horizontal axis. Grey box plots show data from the original experiment. The faint black points indicate outliers. Grey bars show half of the marker width: mean error scores within this range mean the marker covers the correct answer.", fig.height=7}
 
 gg <- list()
 
@@ -328,7 +328,6 @@ gg$acc <- tmp %>%
   ggplot(aes(x = Response, y = Error, colour = advisor)) +
   scale_y_continuous(limits = c(0, 50), expand = c(0, 0)) +
   scale_x_discrete() +
-  scale_colour_discrete(name = 'Advisor', aesthetics = c('fill', 'colour')) +
   coord_cartesian(clip = F) +
   geom_line(aes(group = pid), alpha = .25) +
   geom_split_violin(aes(x = nudge(Response, dw), 
@@ -345,7 +344,8 @@ gg$acc <- tmp %>%
              x = 1.5, y = 50, colour = 'black', data = bf) +
   facet_wrap(~Advisor) +
   labs(y = 'Mean error') +
-  broken_axis_top
+  broken_axis_top +
+  scale_fill_advisor(aesthetics = c("fill", "colour"))
 
 # Confidence
 dw <- .4
@@ -416,7 +416,7 @@ gg$conf <- tmp %>%
                linetype = 'solid', width = dw/2, colour = 'grey', 
                data = .prevStudy$tmp) +
   geom_boxplot(aes(group = `Marker width`), size = 1, outlier.alpha = .2,
-               width = dw/2, colour = 'black') +
+               width = dw/2) +
   geom_line(aes(group = pid), alpha = .25) +
   # BF labels
   geom_segment(aes(x = x, xend = xend, y = y, yend = y),
@@ -424,7 +424,8 @@ gg$conf <- tmp %>%
   geom_label(aes(x = mid, y = y, label = paste0('BF = ', bf2str(bf))),
              colour = 'black', data = bf) +
   facet_wrap(~response) +
-  broken_axis_top
+  broken_axis_top +
+  scale_fill_decision(aesthetics = c("fill", "colour"))
 
 # Patchwork plots together
 (gg$acc / gg$conf) +
@@ -569,7 +570,7 @@ ggplot(tmp, aes(x = advisor0idDescription, y = advisor0WOA,
   scale_y_continuous(limits = c(0, 1), 
                      breaks = seq(0, 1, length.out = 6), 
                      expand = expansion(add = c(0, 0.1))) +
-  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
+  scale_fill_feedback(aesthetics = c("fill", "colour")) +
   facet_grid(~Feedback) +
   labs(x = 'Advisor advice profile', y = 'Influence of advice')
 

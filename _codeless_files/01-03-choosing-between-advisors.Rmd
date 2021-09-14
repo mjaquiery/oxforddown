@@ -115,8 +115,6 @@ Experiments 3A and 3B indicated that this preference for agreement in the absenc
 These results are consistent with an account of advisor trust updating which uses agreement as a proxy for advisor accuracy when more reliable information is not available, although some additional mechanism is required to explain how accuracy can with agreement in the absence of feedback.
 @pescetelliRoleDecisionConfidence2021 offer confidence as an additional mechanism, but attempts to replicate their advisor influence experiment in the domain of advisor choice (Experiments 4A and the Lab experiment) did not provide empirical support for this.
 
-\mccorrect{NICK: Highlight key themes as they relate to your results specifically. The themes seem to be: 1. preference for accurate advice when this can be inferred from feedback, but not otherwise. 2. Preference for agreeing advice when feedback is absent, but not when it's present. Relate back to previous literature -> mixed evidence on how people seek info. May depend on domain? (Cf. our conversation all those years ago with Jonathan Bright about different knowledge/info domains.) + the more detailed points you make below (e.g., about similarities and differences between the tasks)}
-
 #### Accuracy of advice
 
 Our experiments showed that people will prefer to seek advice from an advisor who is more accurate, provided that they can identify that advisor.
@@ -169,8 +167,6 @@ Overall, the results of this suite of experiments suggest that trust in advisors
 One of these factors may be confidence-contingent agreement, or agreement more generally.
 We have offered some speculation as to properties of the task and context that might alter the extent to which confidence-contingent agreement determines trust in advisors.
 Whether there is any dominant mechanism in play that accounts for a sizeable amount of the variation in trust remains unknown, but it appears unlikely that confidence-contingent agreement is that mechanism.
-
-\mccorrect{NICK: Highlight how results relate to the modelling to come: preference for agreeing advice when feedback is absent, but also wide variation in this preference. When preferences are not strong at the population level, we see almost all selection behaviours from always choosing A to always choosing B.}
 
 #### Variability between participants
 

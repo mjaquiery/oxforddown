@@ -41,8 +41,8 @@ Confidence functions well in this role insofar as the judge has high metacogniti
 
 ## Use of advice {#pm-use}
 
-Normative models of advice taking§\@ref(normative-models-of-advice-taking) state that averaging estimates minimises errors.
-As discussed at length later§\@ref(context-of-advice), the assumptions underlying the normative model do not always hold in the real world.
+Normative models of advice taking§\@ref(i-normative) state that averaging estimates minimises errors.
+As discussed at length later§\@ref(chapter-context), the assumptions underlying the normative model do not always hold in the real world.
 The performance of the normative model can be characterised according to differences between the advisor and the decision-maker on ability and bias [@sollStrategiesRevisingJudgment2009], proving effective for the kinds of decisions on which the errors made by judge and advisor are independent of one another.
 Equation \@ref(eq:variance-weights) for our normative model states that advice should contribute to the final decision in proportion to the ability of the advisor compared to the decision-maker.
 In the two-estimate case (initial estimate and advice), this can be expressed as:
@@ -70,7 +70,7 @@ In the normative model, the weighting is equivalent to the ratio of variance of 
 \end{align}
 
 The normative model thus represents weighting by relative ability.
-Precise knowledge of the ability of others relative to oneself is rarely available in the real world, however, and, as discussed in Section III§\@ref(context-of-advice), other assumptions concerning the trustworthiness or interpretability of advice may be violated.
+Precise knowledge of the ability of others relative to oneself is rarely available in the real world, however, and, as discussed later§\@ref(chapter-context), other assumptions concerning the trustworthiness or interpretability of advice may be violated.
 
 The normative model can be adapted to provide a more psychologically-realistic account of advice usage by substituting the three factor model of trust§\@ref(three-factor-model-of-trust) into the equations in place of the ability variable.
 We start with the statement within the three factor model that trust ($\omega$) is proportional to $\text{ability}$, $\text{benvolence}$, and $\text{integrity}$.
@@ -153,7 +153,7 @@ For clarity, two simplifiying assumptions are made in the explanation below.
 Firstly, while it is probable that properties of the advice are used to inform the dimensions of ability, integrity, and benevolence simultaneously, the examples below will deal with ability in isolation.
 Another project could explore in detail how experience of advice on any given trial updates an advisor's position in 3-dimensional trust space in a Bayesian manner according to the relative certainties about each dimension.
 This would capture the task of assigning blame for erroneous advice (e.g. was it unintentionally poor - a failure of ability - or deliberately misleading - a failure of benevolence?).
-Such an undertaking is beyond the scope of this project; in this thesis only cursory attempts are made to manipulate perceptions of dimensions other than ability (e.g. Experiment 5§\@ref(db-be)).
+Such an undertaking is beyond the scope of this project; in this thesis only cursory attempts are made to manipulate perceptions of dimensions other than ability (e.g. Experiment 5§\@ref(be-db)).
 
 Secondly, it is assumed that advice is judged on its own merit as an estimate rather than on its usefulness as advice.
 The former means that advice is assessed in terms of the optimality of the decision recommended by the advice itself.
@@ -172,7 +172,7 @@ The updating of trust following experience of advice is likely to be largely in 
 
 ## Updating advisor evaluations
 
-While a single piece of advice must be taken on its own terms, people can construct relatively accurate estimates of advisors' advice when provided with feedback on the decisions they use the advice to make [@pescetelliUseMetacognitiveSignals2017; @sahCheapTalkCredibility2013; @yanivAdviceTakingDecision2000].
+While a single piece of advice must be taken on its own terms, people can construct relatively accurate estimates of advisors' advice when provided with feedback on the decisions they use the advice to make [@pescetelliRoleDecisionConfidence2021; @sahCheapTalkCredibility2013; @yanivAdviceTakingDecision2000].
 This likely happens as an analogue of reinforcement learning, where feedback allows an error signal to be used to update the estimate of the advisor's ability ($\widehat{\text{ability}}_{a,a'}$) rather than one's own beliefs about the world, according to some learning rate ($\lambda$).
 \begin{align}
 \widehat{\text{ability}}^{a,a'}_{t+1} = \widehat{\text{ability}}^{a,a'}_t + |i^{a'}_t - v_t|\cdot\lambda

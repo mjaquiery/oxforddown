@@ -299,7 +299,7 @@ Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded,
 ```{r ac-cca-dots-r-performance-aov}
 ```
 
-Basic behavioural performance was similar to that observed with the same Dots task in Experiments 1A§\@ref(ac-acc-dots-r-performance) and 2A§\@ref(ac-agr-dots-r-performance). 
+Basic behavioural performance was similar to that observed with the same Dots task in Experiments 1A§\@ref(fig:ac-acc-dots-r-performance) and 2A§\@ref(fig:ac-agr-dots-r-performance). 
 Initial decision accuracy converged on the target 71%, and, as shown in Figure \@ref(fig:ac-cca-dots-r-performance)A, participants benefited from advice in terms of their final decisions being more accurate than their initial decisions (ANOVA main effect of Time: `r s_acc$s[2]`), predominantly driven by following advice from the Anti-bias advisor (interaction of Time and Advisor: `r s_acc$s[3]`).
 There was no main effect of Advisor (`r s_acc$s[1]`).
 
