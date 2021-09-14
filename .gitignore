@@ -27,3 +27,4 @@ _[0-9][0-9]-[0-9][0-9]-*
 _cache/*
 cache/*
 _knit_thesis_output_format.rda
+_sandbox*

@@ -56,7 +56,7 @@ Models such as @songDynamicSpiralsPut2017 that include inter-agent influence but
 @pescetelliRoleDecisionConfidence2021 present a model which is a conceptual predecessor for the current model.
 In this model, agents make a single binary decision at each step on the basis of a perception of the true value and an idiosyncratic (static) bias.
 Agents then consult another agent for advice, and reach a final decision by integrating that advice with their initial estimate, weighted by the trust they have in their advisor. 
-Model parameters varied according to whether or not agents received feedback, and whether or not agents sought out other agents in whom they had higher trust (similar to weighted sampling in our model).
+Model parameters varied according to whether or not agents received feedback, and whether or not agents sought out other agents in whom they had higher trust (similar to weighted selection in our model).
 They showed a cluster of interesting results, starting with the demonstration that using agreement as a proxy for accuracy in the absence of feedback is beneficial provided that individual agents' biases are uncorrelated.
 Secondly, they found that agents' trust weights aggregated into separate camps defined by shared biases where feedback was infrequent.
 These separate camps are analogous to echo chambers in human social networks.
@@ -195,7 +195,10 @@ Agents are created in the [`make_agents`](https://github.com/oxacclab/adviseR/bl
 
 The same stimulus is presented to each agent, in the form of a value ($v_t$) drawn from a normal distribution with mean ($V^\mu$) and standard deviation ($V^\sigma$) defined in the model settings:
 
-$$v_t \sim N(V^\mu, V^\sigma)$$
+\begin{align}
+v_t \sim N(V^\mu, V^\sigma)
+(\#eq:nw-m-stim)
+\end{align}
 
 The agents' task is to determine whether $v_t$ is greater than or less than zero.
 
@@ -207,12 +210,18 @@ This default can be seen in the `truth_fun` parameter for the [`runSimulation`](
 
 Agents' perception of the stimulus is imperfect, simulated by combining the true stimulus value with random noise ($\epsilon^a_t$), to produce a percept $q^a_t$.
 
-$$q^a_t = v_t + \epsilon^a_t$$
+\begin{align}
+q^a_t = v_t + \epsilon^a_t
+(\#eq:nw-m-initial)
+\end{align}
 Where: $\epsilon^a_t \sim N(0, \frac{1}{s^a})$
 
 This sensory percept is then converted into a subjective probability that the stimulus was greater than zero ($p^a_t$) using a sigmoid function with a slope defined by the agent's subjective confidence scaling parameter.
 
-$$p^a_t = \varsigma(q^a_t, c^a)$$
+\begin{align}
+p^a_t = \varsigma(q^a_t, c^a)
+(\#eq:nw-m-scale)
+\end{align}
 Where: $\varsigma(x, y) = \frac{1}{1 + e^{-xy}}$
 
 The conversion of the percept ($q^a_t$) to the subjective probability ($p^a_t$) changes the representation from a theoretically-unbounded normal distribution centred around 0 to a probability in the interval [0,1] centred around 0.5. 
@@ -224,11 +233,12 @@ The inclusion of the agent's confidence scaling is done as part of the second st
 This subjective probability is then integrated with the agent's prior expectation about whether stimuli are generally less than or greater than 0 ($b^a_t$), or 'bias', to produce an initial decision, $i^a_t$.
 This integration is performed using Bayes' rule. 
 
-$$
+\begin{align}
 i^a_t = \frac
   {b^a_t \cdot P(p^a_t | v_t > 0)}
   {b^a_t \cdot P(p^a_t | v_t > 0) + (1 - b^a_t) \cdot P(p^a_t | v_t \leq 0)}
-$$
+(\#eq:nw-m-bayes)
+\end{align}
 
 Where: $P(p^a_t | v_t > 0) = z(p^a_t, 1, V^\sigma)$;  
 and: $P(p^a_t | v_t \leq 0) = z(p^a_t, 0, V^\sigma)$;  
@@ -255,11 +265,14 @@ This choice is made based on the trust in each potential advisor scaled by the s
 The identity of an agent's advisor on a given trial is designated by $a'$, and the weight assigned to advisor $a'$ by agent $a$ at step $t$ by $\omega^{a,a'}_t$.
 Each agent's trust value is adjusted to be relative to the most (or least) trusted advisor, depending upon whether the agent prefers trusted ($\text{w}^a > 0$) or untrusted ($\text{w}^a \leq 0$) advisors.
 
-$$\omega'~^{a,a'} = 
+\begin{align}
+\omega'~^{a,a'} = 
 \begin{cases}
 \text{w}^a > 0, \omega^{a,a'}_t - \text{max}(\Omega^a_t)\\
 \text{w}^a \leq 0, \omega^{a,a'}_t - \text{min}(\Omega^a_t)
-\end{cases}$$
+\end{cases}
+(\#eq:nw-m-advisor-selection)
+\end{align}
 
 Where $\Omega^a_t$ is the set of trust weights in all potential advisors for agent $a$ at step $t$.
 
@@ -292,24 +305,33 @@ Advice takes the form of a binary recommendation, and is weighted by the trust t
 
 First, initial decisions and advice are reoriented to the direction of the initial decision, such that initial decisions represent confidence in the initial decision and advice represents agreement with that decision.
 
-$$i'~^a_t = 
+\begin{align}
+i'~^a_t = 
 \begin{cases}
 i < 0.5, 1 - i^a_t \\
 i \geq 0.5, i^a_t
-\end{cases}$$
+\end{cases}
+(\#eq:nw-m-final)
+\end{align}
 
-$$i'~^{a,a'}_t = 
+\begin{align}
+i'~^{a,a'}_t = 
 \begin{cases}
 i < 0.5, \text{round}(1 - i^{a,a'}_t) \\
 i \geq 0.5, \text{round}(i^{a,a'}_t)
-\end{cases}$$
+\end{cases}
+(\#eq:nw-m-advice)
+\end{align}
 
 The trust weight is slightly truncated to avoid very extreme values, and oriented based on whether the advice agrees, giving the expectedness of the advice provided the initial answer was correct: 
-$$\omega'~^{a,a'}_t = 
+\begin{align}
+\omega'~^{a,a'}_t = 
 \begin{cases}
 i'~^{a,a'}_t = 0, 1 - \text{min}(0.95, \text{max}(0.05, \omega^{a,a'}_t)) \\
 i'~^{a,a'}_t = 1, \text{min}(0.95, \text{max}(0.05, \omega^{a,a'}_t))
-\end{cases}$$
+\end{cases}
+(\#eq:nw-m-trust-weight-cap)
+\end{align}
 
 The final decision is obtained by performing Bayesian integration.
 In Bayesian terms, agents are trying to discover the probability of their final answer being correct given the agreement (or disagreement) observed from their advisor. 
@@ -317,13 +339,20 @@ Thus they multiply the initial probability of being correct (subjective confiden
 This is divided by all of the options that could have led to the observed advice: the probability that they are correct multiplied by the probability of the advice if they are (the numerator), plus the probability that they are incorrect multiplied by the probability of the advice if they are incorrect. 
 Because correctness and advice agreement probability are both mutually exclusive binaries, the probability of being incorrect is 1 - the probability of being correct, and the probability of the advice if they are incorrect is 1 - the probability of the advice if they are correct.
 
-$$f'~^a_t = \frac{i'~a_t \cdot \omega'~^{a,a'}_t}{i'~a_t \cdot \omega'~^{a,a'}_t + (1 - i'~a_t)(1 - \omega'~^{a,a'}_t)}$$
+\begin{align}
+f'~^a_t = \frac{i'~a_t \cdot \omega'~^{a,a'}_t}{i'~a_t \cdot \omega'~^{a,a'}_t + (1 - i'~a_t)(1 - \omega'~^{a,a'}_t)}
+(\#eq:nw-m-conf-bayes)
+\end{align}
+
 The final decision (with confidence) is acquired by reversing the transformation applied earlier:
-$$f^a_t = 
+\begin{align}
+f^a_t = 
 \begin{cases}
 i < 0.5, 1 - f'~^a_t \\
 i \geq 0.5, f'~^a_t
-\end{cases}$$
+\end{cases}
+(\#eq:nw-m-conf-final)
+\end{align}
 
 Final decisions are calculated in the code in the [`bayes`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L442) function.
 
@@ -347,11 +376,17 @@ Participants in perceptual decision experiments can update their prior expectati
 Indeed, [@haddaraImpactFeedbackPerceptual2020] suggest part of the effect of feedback is to reduce bias.
 Bias is specifically updated according to the following equation:
 
-$$b'~^a_{t+1} = b^a \cdot (1 - \lambda^a) + f^a_t \cdot \lambda^a$$
+\begin{align}
+b'~^a_{t+1} = b^a \cdot (1 - \lambda^a) + f^a_t \cdot \lambda^a
+(\#eq:nw-m-bias-update)
+\end{align}
 
 The bias is clamped to within 0.05 and 0.95 to keep agents at least a little open-minded. 
 
-$$b^a_{t+1} = \text{min}(0.95, \text{max}(0.05, b'~^a_{t+1}))$$
+\begin{align}
+b^a_{t+1} = \text{min}(0.95, \text{max}(0.05, b'~^a_{t+1}))
+(\#eq:nw-m-bias-clamp)
+\end{align}
 
 This is implemented using the [`getUpdatedBias`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L496) function.
 
@@ -362,10 +397,16 @@ This is the second of our key parameters in the model (alongside weighted select
 High values of trust volatility lead to an agent rapidly deciding an advisor is excellent or worthless, and will dramatically alter the likelihood of selecting that advisor again, depending on the agent's weighted selection parameter.
 Trust update volatility is given by:
 
-$$x = w^{a,a'}_t \cdot (1 - \tau^a) + i'~^{a,a'}_t \cdot \tau^a$$
+\begin{align}
+x = w^{a,a'}_t \cdot (1 - \tau^a) + i'~^{a,a'}_t \cdot \tau^a
+(\#eq:nw-m-trust-update)
+\end{align}
 
 A tiny cap is used for truncation to prevent agents wholly disregarding or blindly trusting others:
-$$w^{a,a'}_{t+1} = \text{min}(0.9999, \text{max}(0.0001, x))$$
+\begin{align}
+w^{a,a'}_{t+1} = \text{min}(0.9999, \text{max}(0.0001, x))
+(\#eq:nw-m-trust-cap)
+\end{align}
 
 Trust updates are accomplished using the [`newWeightsByDrift`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L563) function.
 
@@ -399,7 +440,7 @@ The main parameters which could in principle vary but which are held constant ar
 The bias reduction effect is as expected from @haddaraImpactFeedbackPerceptual2020.
 * $B^\mu$, which increases polarisation and homophily by separating the mean of the agent groups
 * $B^\sigma$, which has little effect independent of $B^\mu$, but can increase the frequency of extreme and moderate biases
-* $S^\mu$ and $S^\sigma$, which interact with `truth_sd` and $C^\mu$, $C^\sigma$ to determine agreement rates given a constant bias, increasing or decreasing the power of weighted sampling to shape network dynamics
+* $S^\mu$ and $S^\sigma$, which interact with `truth_sd` and $C^\mu$, $C^\sigma$ to determine agreement rates given a constant bias, increasing or decreasing the power of weighted selection to shape network dynamics
 * $\Lambda ^\mu$ and $\Lambda ^\sigma$, which increase the speed of the network dynamics (so that similar trajectories occur over fewer generations)
 * and `confidence_weighted`, which decreases the speed of the network dynamics.
 
@@ -468,17 +509,15 @@ Overwhelmingly, the fitting error on the shuffled data tended to be higher than 
 Finally, the error for coefficients fitted to the participants' data were compared to errors for the same coefficients fitted to shuffled data. 
 Error values for the shuffled data tended to be higher than values for the original data, suggesting that participants' behaviour shared some features with the model's expectations.
 
-```{r nw-r-shuffle-positions}
+```{r nw-r-shuffle-positions, fig.caption="Real vs shuffled data fitting error.  Each participant's data were shuffled such that the advisor agreement value for each trial was no longer systematically tied to the trial on which it actually occurred. This process was repeated 9 times, and then joined to the real data. A joint error score was created by summing standardized scores for trust volatility error and weighted selection error. The plot shows the distribution of position of the real data within the combined dataset, with lower numbers indicating lower combined error. For many participants, especially those encountering advisors with particularly high or low agreement rates, this shuffling effect may be quite small, meaning that the difference between shuffled and unshuffled data is less pronounced and that therefore the chance of a better fit to shuffled data is higher."}
 ```
-
-\mccorrect{TODO: Shuffles for all participants; use a joint error to calculate shuffle position.}
 
 ### Participants' coefficients
 
 ```{r nw-r-pe-hist, fig.caption="Histograms of recovered parameters."}
 ```
 
-```{r nw-r-pe-cor, fig.caption="Correlation of recovered parameters.  Two outliers with extremely low trust volatility values (z < -5) have been dropped, and are shown on the inset plot for context. Each point is a participant, and the solid blue line shows the overall relationship (with 95\\% confidence intervals shaded in grey). The formula for the line is given in the top-left. Dashed line indicates a 1:1 correlation."}
+```{r nw-r-pe-cor, fig.caption="Correlation of recovered parameters.  Outliers with extreme trust volatility values (|z| > 5) have been dropped, and are shown on the inset plot for context. Each point is a participant, and the solid blue line shows the overall relationship (with 95\\% confidence intervals shaded in grey). The formula for the line is given in the top-left. Dashed line indicates a 1:1 correlation."}
 ```
 
 The mathematical model was fit to participant each participant's data using a gradient descent algorithm.
@@ -489,11 +528,23 @@ The resulting coefficients were clustered close to zero for most participants, w
 The values are generally greater than zero for both $\text{w}^a$ (`r .T.ws`) and $\lambda^a$ (`r .T.tu`).
 This makes sense because it indicates that participants tended to trust advisors more to the extent that their advice agreed with participants' own initial judgements ($\lambda^a$), and that people tended to choose advisors they trusted more over less trusted advisors ($\text{w}^a$). 
 Nevertheless there was considerable variability in these estimates. 
-There was a slight correlation between trust volatility and weighted selection, though this was only significant when excluding two participants with outlying trust volatility coefficients (Figure \@ref(fig:nw-r-pe-cor)).
+There was no significant correlation between trust volatility and weighted selection (Figure \@ref(fig:nw-r-pe-cor)).
 
 \mccorrect{VIVA: Nick: Perhaps more for the viva than for detailed unpacking in the thesis, I wonder if the model is well specified in terms of distinguishing between cases where both weighted selection and trust updates are positive vs. both are negative.}
 
-\mccorrect{!MAYBE[Other stuff of interest -- maybe we want to relate the variables to participants' ability to do the task or propensity to pick one advisor over another?]}
+#### Stability of coefficients
+
+```{r nw-r-stability}
+```
+
+Several participants performed experiments that had two core sections. 
+In each of these sections, participants were familiarised with and then allowed to choose between pairs of advisors who had the same advice profiles but different identities.
+For example, a participant in a High versus Low advisor accuracy experiment might see two pairs of advisors, with each pair having one High accuracy and one Low accuracy advisor, and all the advisors having different names and visual presentations.
+This repetition meant that we could perform parameter recover on the data for each participant separately for each of the repetitions. 
+If the coefficients estimated for each of these repetitions were more similar within a participant than between participants in the same experiment, then that would provide evidence that the parameters we recover are stable properties of a participant.
+
+We performed this analysis and ran a t-test to compare the absolute differences between a participant's first and second estimate versus the absolute differences between a participant's first estimate and the second estimate of another participant in that experiment.
+The results provided strong evidence that the differences were indistinguishable, indicating that either the coefficients recovered did not represent a stable property of a participant, or that we were not able to estimate them precisely enough to demonstrate this (Trust volatility: `r .T.tu_split`; Weighted selection: `r .T.ws_split`).
 
 ### Validity of the model
 
@@ -577,7 +628,7 @@ Additionally, there is more heterogeneity in the agents' biases, with several ag
 
 There are differences, too, between the Heterogeneous and Empirical sampling approaches.
 Compared to the Heterogeneous sampling, the model with Empirical sampling shows more moderate biases and more extreme weights (Figure \@ref(fig:nw-r-all-models-summary)).
-This apparently contradictory finding is explicable because agents in the Empirical runs include both positive and negative weighted sampling coefficients. 
+This apparently contradictory finding is explicable because agents in the Empirical runs include both positive and negative weighted selection coefficients. 
 This leads to the peaks of weights at both the 0 and 1 end of the histogram for evolved weights.
 The negative weighted selection values can also drive agents to sample advice that is likely to disagree with them, moderating their biases as seen by a larger minority of agents with moderate biases in the Empirical run than in other runs.
 @madsenLargeNetworksRational2018a termed agents with this advice-seeking strategy 'Socratic' because they aimed to engage with others of a different opinion.
@@ -673,6 +724,14 @@ Correspondingly, individual variation in the importance of any of these componen
 There are several considerations which should be borne in mind while interpreting the results of the models.
 These considerations fall into several different categories, from technical constraints to limitations on generalisability.
 
+#### Stability of coefficients
+
+We were unable to demonstrate that independent estimates of participants' coefficients were more similar than would be expected by chance. 
+This means that we are unable to rule out the suggestion that there is as much variation in advice-taking and -seeking behaviour within people as between them.
+In our models, agents have set individual propensitites governing how they take and use advice.
+The literature suggests that people have idiosyncracies governing confidence and its relationship with advice-seeking [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017; @pescetelliConfidenceAdviceSeeking2021], but it is nevertheless plausible that these idiosyncrasies vary dramatically across time and context. 
+Further simulation work might investigate the effects of heterogeneity within rather than between agents.
+
 #### Context
 
 Polarisation and homophily are not inherently bad features.
@@ -698,7 +757,6 @@ What is less clear, however, is whether these coefficients represent a stable an
 It is a basic assertion of the model that the coefficients observed for an individual do not change during the model: the size of the trust update is the same at decision 1000 as it is at decision 1, and likewise the strength of preference for hearing from an advisor who is more likely to agree.
 The results of the model can inform us about what might happen if these properties are stable, although even then it is unlikely that the values themselves are exactly accurate to some posited underlying propensity. 
 The constant model parameters were tuned during development to give sensible results given the mean value of weighted selection and the mean and standard deviations of trust volatility, so the performance of the model should not be taken as strong evidence for the existence of the posited psychological features.
-\mccorrect{!MAYBE[can we do a comparison of variability for participants who saw multiple pairs of advisors?]}
 
 The second generalisability concern is in the conflict between the model behaviour and the results of research into the level of polarisation and consensus in society.
 Research demonstrates that most people occupy central positions on political issues, and that while political polarization varies across operationalizations and across time, it is not becoming increasingly pronounced in recent years [@parkHowAreWe2018; @perrettDividedKingdomVariation2021].^[The paper by @parkHowAreWe2018 covers politics of the USA prior to the controversial tenure of President Donald Trump.]
@@ -709,6 +767,7 @@ The model does allow for the emergence of a middle-ground (accurate) consensus w
 The precise nature of political polarization, whether and to what extent it occurs and what modifies it, is an open question and the subject of an entire literature in its own right.
 
 #### Known psychological aspects which are left out
+
 The modelling work in this chapter follows the recommendations of @bruchAgentBasedModelsEmpirical2015, who suggest that modelling is best used to characterise the effects on system dynamics of a particular effect derived from empirical observation, and @jacksonAgentBasedModelingGuide2017, who advocate for simplicity where possible. 
 Consequently, many decision-making and advice-taking phenomena reported in the literature are left out.
 @eastImprovingAgentbasedModels2016 argue that an agent-based model only achieves sufficiency by including "all relevant processes and conditions". 
@@ -740,7 +799,7 @@ The networks used here do not have these properties, and are instead fully-conne
 These implementations are not mutally exclusive, but there are several reasons why fully-connected networks are used here rather than small-world or small-world scale-free networks.
 
 Firstly, the impetus for this work arose from @pescetelliRoleDecisionConfidence2021, in which fully-connected networks were used.
-Secondly, small-world scale-free networks are not necessary for exploring the role of weighted sampling in agent interactions.
+Secondly, small-world scale-free networks are not necessary for exploring the role of weighted selection in agent interactions.
 Thirdly, using non-fully-connected structures with trust weight updating would mean that agents ought to be able to drop and forge new connections, transforming the conceptualisation about what is being modelled and inviting open-ended questions of how this is implemented and how it relates to trust weight updating. 
 These issues, and similar questions about whether new connections and/or dropped connections ought to prompt reciprocal connections create a fascinating but extremely large problem space.
 Lastly, using non-fully-connected networks means that it becomes important to understand how an agent's position within the network affects their behaviour [@mcclainPathwayForwardsSocial2016], which requires a full investigation beyond the scope of this thesis.

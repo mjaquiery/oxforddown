@@ -67,6 +67,14 @@ knitr::opts_chunk$set(
   messages = F
 )
 
+#' @inheritDotParams kableExtra::linebreak
+linebreak <- function(x, ...) {
+  if (knitr::is_latex_output())
+    kableExtra::linebreak(x, ...)
+  else
+    x
+}
+
 # Options -----------------------------------------------------------------
 
 ESM.recalculate <- 
