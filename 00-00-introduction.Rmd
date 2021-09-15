@@ -38,6 +38,8 @@ documentclass: book
     * Participants are human individuals.  
     * Agents are simulated individuals.  
     * Judge and advisor are roles, that can be played by either participants or agents.  
+    
+\mccorrect{TODO: acknowledgements, dedication (MAF)}
 
 <!-- this adds an image in gitbook output --> 
 <img src="figures/cover.png" width="315" height="445" alt="Cover image" align="right" style="margin: 0 1em 0 1em" />
@@ -112,36 +114,45 @@ The greater the ability of an advisor, the greater the influence of their advice
 
 Benevolence refers to the extent to which the advisor seeks to further the interests of the decision-maker.
 Where ability represents the absolute limit on the quality of advice, benevolence represents the extent to which the advice approaches this limit.
-The advice of even a renouned expert may be doubted if there is reason to believe their goal is to mislead, a vital lesson for medieval monarchs with their councils of politicking advisors.
+The advice of even a renowned expert may be doubted if there is reason to believe their goal is to mislead, a vital lesson for medieval monarchs with their councils of politicking advisors.
 Experimental work has shown that participants are more inclined to reject advice when uncertainty is attributed to malice rather than ignorance [@schulInfluencesDistrustTrust2015]}.
 
 ### Integrity
 
 Advisors with integrity exhibit adherence to principles which the decision-maker endorses.
-As with benevolence, integrity acts to determine the extent to which advice approaches the limit imposed by ability.
-While not mutually exclusive, integrity is typically important where relationships are less personal (e.g. we may place great trust in a General Practitioner because of their expertise in medical matters and their _integrity_ in adhering to a set of professional ethical and conduct requirements).
+"Integrity" in this sense is related to the common-use sense of integrity as following a code or set of principles unwaveringly, but with the caveat that the principles have to be ones shared with or respected by the decision-maker. 
+To borrow an example from @mayerIntegrativeModelOrganizational1995, a ruthless dedication to "profit seeking at all costs" would lead to an advisor being highly trusted, except where the person doing the trusting also endorsed that value.
+While not mutually exclusive, integrity is typically important where relationships are less personal (e.g. we may place great trust in a General Practitioner because of their expertise in medical matters and their integrity in adhering to a set of professional ethical and conduct requirements).
 In many cases, integrity is difficult to disentangle from ability, because subscription to values often indicates a knowledge of a domain, which can act as a cue for ability.
 Where professional societies are involved, for example, many require formally-recognised training for membership.
-Likewise, expression of shared values can promote in-group effects that are, in this model, in something of a grey area between integrity and benevolence.
+Providing a concise and accurate definition of integrity, complete with appropriate qualifiers and explanations, is well beyond the scope of this thesis: integrity has long suffered from conceptual confusion and disagreement between researchers [@palanskiIntegrityLeadershipClearing2007], with recent concensus perhaps emerging that it is best understood as a multi-dimensional construct [@moormanUnderstandingHowPerceived2018] that may or may not bear close resemblance to the construct imagined by @mayerIntegrativeModelOrganizational1995.
+
+Within the scope of this thesis, integrity can be thought of as a commitment to fulfilling one's role in an experiment, in the case of advisors giving advice according to stated goals (usually doing one's best to help the decision-maker). 
+In combination with benevolence, integrity acts to determine the extent to which the helpfulness of advice approaches the limit imposed by the advisor's ability.
 
 ## Source selection and advice-taking
 
 From the perspective of this thesis, the two key components of advice are its source and its informational content.
-In our underlying framework§\@ref(chapter-advisor-evaluation), we view the informational content of advice as providing information about the source of the advice, and both as contributing to the likelihood of the advice being incorporated into a final decision.
+In our underlying framework§\@ref(chapter-advisor-evaluation), we view the informational content of advice as providing information not only about the external world and the best way to act, but also as providing information about the source of advice itself.
+Both the advice itself and information about its source can contribute to the likelihood of the advice being incorporated into a final decision.
 The literatures on source selection (where we look for advice) and advice-taking (how we use advice when it is provided) are grounded in different academic traditions.
 Source selection is usually studied within the context of Social and Personality Psychology, with choices viewed as minimising cognitive dissonance [@festingerTheoryCognitiveDissonance1957] or protecting a positive self-concept [@knobloch-westerwickSelectiveExposureSelf2015].
 Advice-taking, on the other hand, is formally investigated in the Organisational and Cognitive Psychology literatures on judgement and decision-making and forecasting, and frames behaviour with reference to normative models§\@ref(i-normative).
 
 In this work, we take steps towards joining these literatures by extending a framework for advisor evaluation in the absence of feedback§\@ref(chapter-advisor-evaluation) to the domain of source selection, referred to here as advisor choice.
 This thesis thus uses an approach more similar to the advice-taking literature than to the source selection literature.
-We find moderate evidence for source selection on the basis of agreement in the absence of feedback.
 
 ## Judge-advisor system
 
 The paradigm we use for the behavioural experiments and as a framing for the computational simulations is a Judge-Advisor System [@yanivAdviceTakingDecision2000; @sniezekImprovingJudgementPrepaid2004].
-In this paradigm, two individuals contribute to making a decision, one as the judge and the other as the advisor.
+In this paradigm, two or more individuals contribute to making a decision, one as the judge and the other as the advisor.
 The judge makes an initial estimate alone, then receives advice from the advisor, and then makes a final decision integrating the advice with their initial estimate as they see fit.
 This paradigm allows advice to be quantified on the assumption that any systematic differences between initial estimates and final decisions are properties of the advice.
+
+In theory, any decision-making task can be used for a Judge-Advisor System provided it allows for the judge to make two decisions and advisors to provide plausible advice.
+Estimation tasks are commonly-used in the literature, such as estimating life expectancies in difference countries [@troucheVigilantConservatismEvaluating2018], the dates of historical events [@yanivAdviceTakingDecision2000], the price of an item from its features [@sniezekImprovingJudgementPrepaid2004], people's weights [@ginoEffectsTaskDifficulty2007], sports teams' performances [@sollJudgmentalAggregationStrategies2011], opinion prevalence rates [@libermanNaiveRealismCapturing2012], and calorie values of foods [@yanivExploitingWisdomOthers2012].
+Other studies have used perceptual estimation tasks requiring visual perceptual decisions about displays of dots [@pescetelliRoleDecisionConfidence2021; @rouaultFormingGlobalEstimates2019], or the presence or absence of a visual target [@mahmoodiEqualityBiasImpairs2015].
+In the behavioural experiments in this thesis we use historical date estimation and perceptual dot-discrimination tasks. 
 
 ## Normative models of advice-taking {#i-normative}
 
@@ -193,24 +204,53 @@ f &= \frac{\sum_a^N (i_a)}{N} \\
 (\#eq:optimal-averaging)
 \end{align}
 
+This framework provides a formal basis for understanding and assessing how information is integrated in social and group scenarios.
+As a normative model, the framework provides an optimal strategy for using advice by modelling how advice can improve a decision-makers accuracy.
+Additionally, the framework formalises the notion of the "wisdom of crowds" -- the observation that groups can often come to decisions that are better than the best individual's decision.
+Below, we show how this framework extends to cover the use of advice where agents have systematically different capabilities§\@ref(i-use).
+
 [^symmetrical-distribution]: The normal distribution is well-supported by empirical evidence, but note that any symmetrical distribution around 0 will lead to the same conclusion.
 
 ## Egocentric-discounting
 
 From the perspective of the normative model above§\@ref(i-normative), decision-makers should weigh their own estimate equally with each other estimate they receive in the process of coming to their decision.
+This is because the errors in the judgements made by the decision-maker and the advisors are interchangeable, mathematically-speaking, and on average one will approximate the correct answer most nearly by allowing all of the errors to cancel one another out, which is achieved by averaging across all estimates as show in Equation \@ref(eq:wisdom-of-crowds).
 However, one of the most robust findings in the literature on advice-taking is that people routinely underweight advisory estimates relative to their own estimates, a phenomenon known as _egocentric discounting_[@danaAdviceChoice2015; @ginoEffectsTaskDifficulty2007; @hutterSeekingAdviceSampling2016; @libermanNaiveRealismCapturing2012; @minsonCostCollaborationWhy2012; @raderAdviceFormSocial2017; @ronayneIgnoringGoodAdvice2018; @seeDetrimentalEffectsPower2011; @sollJudgmentalAggregationStrategies2011; @troucheVigilantConservatismEvaluating2018; @yanivAdviceTakingDecision2000; @yanivExploitingWisdomOthers2012; @yanivUsingAdviceMultiple2007].
+
+@yanivAdviceTakingDecision2000 provided a classic example of egocentric discounting in a task that required participants to provide initial estimates of historical dates (e.g. "When were the Dead Sea Scrolls first discovered?"), and then provide final decisions of the same after seeing advice (taken from a random participant's answer in a previous study).
+Despite both the initial estimates and the advice estimates being similarly accurate, participants' final decisions were much closer to their initial estimates than to the advice.
+Instead of producing decisions that were midway between the two estimates, as would be achieved with mathematically optimal averaging, participants weighted their initial estimate about 70:30 with the advice they received.
+
 Egocentric discounting occurs in both feedback and no-feedback contexts [@yanivAdviceTakingDecision2000].
 Explanations for egocentric discounting are usually framed in terms of personal-level psychology: decision-makers have better access to reasons for their decision [@yanivAdviceTakingDecision2000]; overrate their own competence [@sniezekImprovingJudgementPrepaid2004]; may have a desire to appear consistent [@yanivUsingAdviceMultiple2007]; may see opinions as possessions [@sollJudgmentalAggregationStrategies2011]; may be loss-averse to providing a worse final estimate due to advice-taking [@sollJudgmentalAggregationStrategies2011]; or have difficulty avoiding anchoring [@schultzeInabilityIgnoreUseless2017] or repetition bias effects [@troucheVigilantConservatismEvaluating2018].
 None of these explanations has survived rigorous empirical testing, however, and recently suggestions have widened to include consideration of aggregate-level rather than personal-level causes, with @troucheVigilantConservatismEvaluating2018 arguing that the potential for misaligned incentives between decision-maker and advisor motivate discounting of advice.
-In the latter part of this thesis§\@ref(chapter-advice-taking-context), we demonstrate that egocentric discounting may be a stable meta-strategy which protects against exploitation, carelessness, incompetence, and miscommunication.
-From this perspective, the normative model pertains to a particular instantiation of a problem with questionable ecological validity given the typical ethology of advice-taking in humans.
-While such considerations affect the conclusions one draws from egocentric discounting relative to the normative model, they do not detract substantially from the practice of using the normative model as an optimum 'set point' from which to evaluate advice-taking behaviour.
+In the latter part of this thesis§\@ref(chapter-advice-taking-context), we explore whether egocentric discounting may be a stable meta-strategy which protects against exploitation, carelessness, incompetence, and miscommunication.
+From this perspective, the normative model is only normative within the very particular scenario it describes.
+When we broaden the scope to consider how that particular scenario fits into a background of advice-taking in humans as the product of genetic and cultural evolution and individual experience, we find that the normative model must be altered to account for these features.
 
 ## Homophily and echo-chambers
 
 Homophily is the ubiquitous phenomenon that individuals more closely connected to one another within a social network tend to be more similar to one another than would be expected by chance across numerous dimensions, from demographics to attitudes [@mcphersonBirdsFeatherHomophily2001].
+@mcphersonBirdsFeatherHomophily2001 review a wealth of examples, including the tendency for married couples to be more similar to one another than chance would dictate in their ethnicity, age, and religion (and along many other dimensions).
+The use of homophily as a concept has increased dramatically in the last few decades, across a range of different research fields.
+Different fields (and researchers) provide different measurements, such as asking people to nominate their friends and comparing demographic information [@mccormickFeasibleRigorousRelevant2015] or comparing social media users' content similarity and interactivity [@cardosoTopicalHomophilyOnline2017], but the unifying idea is that more similar individuals are more likely to have closer contact with one another [@lawrenceHomophilyMeasuresMeaning2020].
+
+Homophily is often discussed negatively, especially in the context of ethnic differences and intergroup tensions [@mcphersonBirdsFeatherHomophily2001], but in many contexts it is not only expected but desired.
+Homophily on the basis of shared interests is unavoidable: provided people spend time doing things they are interested in, for example playing a sport, they will tend to spend time with other people doing those things.
+Similarly, many romantic matchmaking services deliberately use similarity on dimensions such as age to identify likely partnerships.
+Due to association between the many dimensions in which homophily operates, such as ethnicity and religion, it is often difficult in practice to separate out the dimensions along which homophily is operating.
+
+Social influence processes combine with homophily to create a self-reinforcing spiral: individuals who are more similar to one another are more likely to associate with one another; and individuals who associate with one another are more likely to become more similar to one another.
+Again, this can be benign, as when newcomers to a social group are welcomed and absorb the social norms of interaction.
+Where this cycle generates concern is when reciprocal influence produces increasingly extreme attributes, for example political opinions.
+This process is known as "polarisation".
+
 Polarisation is the phenomenon whereby the distribution of opinions in a population trend toward extremes over time, with moderate stances becoming increasingly less popular. 
 Polarisation can be one-way, as when a consensus forms on a topic and that consensus shifts the entire ground of the debate (as with the core feminist principle that women and men deserve equal respect), or two-way as with divisive issues like the suitability of former President Donald Trump for office.
+While in both cases the whole population has acquired an extreme opinion, in the former the population remains united whereas in the latter the population is deeply divided, with little middle ground.
+
+Homophily has been argued to increase polarisation by reducing the input from dissenting voices [@sunsteinRepublicCom2002].
+\mccorrect{NICK: Unpack the idea here: Homophily could explain polarisation if we assume that XYZ. However, whether this is true remains debated.}
 Whether homophily in virtual social networks is responsible for increases in polarisation is debated.
 
 Proponents point to increases in polarisation [@perrettDividedKingdomVariation2021, although Perret presents recent increases as less concerning in a broader historical context], to empirical studies demonstrating homophily in virtual social networks [@cardosoTopicalHomophilyOnline2017; @colleoniEchoChamberPublic2014], and to studies examining selective exposure on-line [@kobayashiSelectiveExposurePolitical2009], and to echo chambers: egregious examples of highly homophilic networks with pathological polarisation [@sunsteinRepublicCom2002; @sunsteinRepublicDividedDemocracy2018].

@@ -38,6 +38,7 @@ I haven't wasted 3 years of my life and Nick's time.
 
 * I've demonstrated how those changes might attenuate or exacerbate the formation of pathological network structures. 
 
+\mccorrect{While the broader contextual considerations highlighted by our evolutionary simulations affect the conclusions one draws from egocentric discounting relative to the normative model, they do not detract substantially from the practice of using the normative model as an optimum 'set point' from which to evaluate advice-taking behaviour.}
 
 ## Open questions
 
