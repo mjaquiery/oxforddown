@@ -226,3 +226,22 @@ The updating of advice contingent on agreement may be weighted by confidence in 
 This model of agreement-dependent advisor evaluation in the absence of feedback (whether confidence-weighted or non-confidence-weighted) forms the framework on which the experiments and computational models in this thesis are based. 
 We present behavioural experiments that aim to explore the validity of this framework, and computational models that explore its implications. 
 The behavioural experiments do not offer severe tests of the framework because they are primarily concerned with advisor choice: a lack of evidence for a preference between advisors on any given experiment may be explicable by a failure to translate a higher assessment of an advisor's advice into a preference for selecting that advisor rather than a failure to acquire a higher assessment of an advisor's advice.
+
+## Overview
+
+The first line of behavioural experiments investigates whether people decide which advisors to consult using internal signals where external feedback is unavailable, extending a previous finding concerning the influence of advice [@pescetelliRoleDecisionConfidence2018] into the domain of advisor choice.
+The main observation that the frequency of agreement is a good indicator of advisor choice is replicated, although little support is found for metacognitive mechanisms underpinning the influence of advice.
+The results are interpreted within the a framework that sees the likelihood of an advisor's being chosen over another as dependent upon the relative strengths of their reputations, built up over time through providing credible advice.
+
+The results reveal substantial heterogeneity in individuals' tendencies to change their trust in advisors and select advisors on the basis of that trust. 
+Agent-based modelling is used to explore the effects of this heterogeneity on how the whole population's opinions and advice-seeking behaviour evolve over time.
+This modelling work demonstrates that heterogeneity may stabilise these networks, slowing the emergence of polarised echo chamber-like structures.
+
+In the second line of research, reputations of advisors are established at the outset and the responses to different pieces of advice are explored.
+Evolutionary modelling demonstrates that the presence of a few bad actors in a population can mean that distrusting all advice from all sources a little is adaptive.
+The evolutionary models are extended to show that this kind of general distrust, known as egocentric discounting, emerges as adaptive even where none of the agents deliberately mislead others, and even where all agents are equally skilled and fully cooperative.
+
+Example behavioural experiments are reported which support the implications from the evolutionary models.
+Participants considered both the properties of advice and the properties of advisors, placing less trust in advice which appeared suspicious or which came from a suspicious source.
+
+\mccorrect{TODO: summarise conclusion main points}

@@ -42,39 +42,44 @@ documentclass: book
 <!-- this adds an image in gitbook output --> 
 <img src="figures/cover.png" width="315" height="445" alt="Cover image" align="right" style="margin: 0 1em 0 1em" />
 
-This thesis explores two questions in the domain of advice-seeking and advice-taking: does the way individuals seek advice produce echo chamber-like networks?; and is the well-established phenomenon of people irrationally underweighing advice explicable as a rational process?
-The first of these questions is addressed using online empirical behavioural experiments to characterise the individual psychological processes underlying advice seeking, followed by agent-based computational simulations that implement the variation in those processes observed in human participants.
-The second question is addressed using computational agent-based evolutionary simulations to explore the adaptiveness of underweighting advice under a range of plausibly-ubiquitous circumstances, and the flexibility of human participants in responding to changes in those circumstances is explored using online behavioural experiments.
+Animals (and possibly other organisms) make decisions continually.
+They need to decide how to act, often on the basis of judgements on the state of the world.
+The average person will make hundreds of conscious decisions a day, and thousands of unconscious ones: what do I want for breakfast?; do I take an umbrella?; what should I get my child for their birthday?; is that other pedestrian going to bump into me?; and so on.
+Crucially, for many of these decision-makers, useful information can be obtained from other people: seeing what other diners are having in a restaurant; listening to a meteorologist forecast the weather; paying attention to your child's insistent requests.
+This kind of social information suffuses the world of human decision-making, and so too do judgements about its usefulness.
+
+To use social information appropriately, people need to know whether the information is useful for them: it may be a mistake for someone looking for a lavatory in a theatre to join the longest queue on the assumption that it indicates the most popular choice.
+Beyond misinterpretation, there is the ever-present threat of duplicity: the history of cooperation is inextricably entwined with the history of free-loading, cheating, and deception.
+Who we trust, and how far, is a matter of great practical importance.
+This thesis investigates two questions in this area: whether we rely too much on those similar to us, and whether we rely too little on others in general.
+
+Two key ideas in social influence concern echo chambers and egocentric discounting.
+Echo chambers are social environments where only one opinion is able to exist: everyone within the echo chamber expresses the same opinion, an opinion that is then 'echoed' back to them by others, making it appear ubiquitous and certain.
+Egocentric discounting is the name for the general observation that people do not use information from others as efficiently as they could.
+
+This thesis explores two questions related to those ideas: does the way individuals seek advice produce echo chamber-like networks?; and is the well-established phenomenon of people irrationally under-weighting advice explicable as a rational process?
+The first of these questions concerns how people learn about the trustworthiness of others who give them advice, especially where they have no objective way of knowing how useful that advice actually is.
+We ask whether people are more likely to seek advice from others whom they consider more trustworthy, and whether this might lead to forming echo-chambers full of like-minded individuals who assess one another as trustworthy because they parrot their own opinions back again.
+This question is addressed using on-line empirical behavioural experiments to characterise the individual psychological processes underlying advice seeking, followed by agent-based computational simulations that implement the variation in those processes observed in human participants.
+
+The second question takes as its starting point the observation that people do not take as much advice as they _should_ (as defined by a mathematical model of information). 
+There has been much discussion concerning the reasons for this, and we develop our own contribution to this debate: we suggest that most of the time it really is better to take a cautious approach to advice-taking to avoid being too vulnerable to ignorance, malice, and miscommunication.
+The question is addressed using computational agent-based evolutionary simulations to explore the adaptiveness of under-weighting advice under a range of circumstances.
+We then explore people's flexibility in responding to changes in those circumstances using on-line behavioural experiments.
 The organisation is as follows: this introduction establishes the core concepts invoked in this thesis, and describes their treatment in the literature.
-Then, the two questions are addressed; each includes a short introduction to the specific question addressed, a detailed description of the work conducted, and a short discussion of the conclusions drawn from the work.
-The final section offers broader conclusions arising as a consequence of the presented work, alongside some suggestions for related research.
-
-## Overview
-
-The first line of behavioural experiments investigates whether people decide which advisors to consult using internal signals where external feedback is unavailable, extending a previous finding concerning the influence of advice [@pescetelliRoleDecisionConfidence2018] into the domain of advisor choice.
-The main observation that the frequency of agreement is a good indicator of advisor choice is replicated, although little support is found for metacognitive mechanisms underpinning the influence of advice.
-The results are interpreted within the a framework that sees the likelihood of an advisor's being chosen over another as dependent upon the relative strengths of their reputations, built up over time through providing credible advice.
-
-The results reveal substantial heterogeneity in individuals' tendencies to change their trust in advisors and select advisors on the basis of that trust. 
-Agent-based modelling is used to explore the effects of this heterogeneity on how the whole population's opinions and advice-seeking behaviour evolve over time.
-This modelling work demonstrates that heterogeneity may stabilise these networks, slowing the emergence of polarised echo chamber-like structures.
-
-In the second line of research, reputations of advisors are established at the outset and the responses to different pieces of advice are explored.
-Evolutionary modelling demonstrates that the presence of a few bad actors in a population can mean that distrusting all advice from all sources a little is adaptive.
-The evolutionary models are extended to show that this kind of general distrust, known as egocentric discounting, emerges as adaptive even where none of the agents deliberately mislead others, and even where all agents are equally skilled and fully cooperative.
-
-Example behavioural experiments are reported which support the implications from the evolutionary models.
-Participants considered both the properties of advice and the properties of advisors, placing less trust in advice which appeared suspicious or which came from a suspicious source.
-
-\mccorrect{TODO: summarise conclusion main points}
+Then, the two questions are addressed in separate sections of the thesis. Each section includes a short introduction to the specific question addressed, a detailed description of the work conducted, and a short discussion of the conclusions drawn from the work.
+The final section offers broader conclusions arising as a consequence of the presented work, alongside some suggestions for future research.
 
 ## Advice
 
-Advice is broadly defined as information which comes from a social source.
-Advice is therefore different from other sources of information in that it is the result of (at least) mental processing of other information.
+Advice can be broadly defined as information which comes from a social source.
+Defined this way, it includes things most people would intuitively understand as advice, such as guidance from a mentor or lawn care tips, and things most people may not, such as advertisements, traffic, and recommender algorithms in on-line shops.
+Advice is different from other sources of information, such as the forbiddingness of a storm cloud or the rattle of a rattlesnake, in that it is the result of human mental processing of other information.^[There are of course cases that defy this categorisation: for example, it seems uncontentious to allow that Honey Guides and Guide Dogs offer advice to their human counterparts.]
 In some cases, it may additionally include discussions among different group members (e.g.
 advice from the International Advisory Panel on Climate Change).
+
 Throughout this thesis, the focus is primarily on advice which comes from a single, stable source, as when we see a post by an acquaintance on social media, or when a stranger provides us with advice.
+This is generally within the marrow of what is understood by "advice", and the aim of the investigations herein are to shed light on the way humans exchange information with one another and the consequences of those exchanges.
 
 ## Advice-taking
 
@@ -87,6 +92,8 @@ Insofar as the identity of the advisor matters, it matters because it functions 
 This is likely a major oversimplification, however, because in many real-world contexts advice-giving and advice-taking form part of a developing social relationship: being consulted for advice and having one's advice followed are inherently rewarding [@hertzIntrinsicValueSocial2018; @hertzNeuralComputationsUnderpinning2017]; and taking advice can serve as a (sometimes costly) social signal of valuing a relationship with a person or group [@byrneOstracismReducesReliance2016].
 Furthermore, some authors have argued that people may perceive taking advice as sacrificing their independence or autonomy [@raderAdviceFormSocial2017; @ronayneWhenGoodAdvice2018].
 While this thesis follows previous literature in omitting to consider the wider social concerns influencing the taking of advice, it is nevertheless important to remember that the processes investigated herein take place in a variety of social contexts where complex social agents attempt to optimise over numerous goals over numerous timescales.
+
+\mccorrect{NICK: This is a good point -- and perhaps something you can come back to in the final chapter. In some ways, it develops the theme from your evolutionary modelling, about what's locally optimal sometimes (oftentimes?) differing from what's globally optimum.}
 
 ## Three-factor model of trust
 
@@ -191,7 +198,7 @@ f &= \frac{\sum_a^N (i_a)}{N} \\
 ## Egocentric-discounting
 
 From the perspective of the normative model above§\@ref(i-normative), decision-makers should weigh their own estimate equally with each other estimate they receive in the process of coming to their decision.
-One of the most robust findings in the literature on advice-taking is that people routinely underweight advisory estimates relative to their own estimates, a phenomenon known as _egocentric discounting_[@danaAdviceChoice2015; @ginoEffectsTaskDifficulty2007; @hutterSeekingAdviceSampling2016; @libermanNaiveRealismCapturing2012; @minsonCostCollaborationWhy2012; @raderAdviceFormSocial2017; @ronayneIgnoringGoodAdvice2018; @seeDetrimentalEffectsPower2011; @sollJudgmentalAggregationStrategies2011; @troucheVigilantConservatismEvaluating2018; @yanivAdviceTakingDecision2000; @yanivExploitingWisdomOthers2012; @yanivUsingAdviceMultiple2007].
+However, one of the most robust findings in the literature on advice-taking is that people routinely underweight advisory estimates relative to their own estimates, a phenomenon known as _egocentric discounting_[@danaAdviceChoice2015; @ginoEffectsTaskDifficulty2007; @hutterSeekingAdviceSampling2016; @libermanNaiveRealismCapturing2012; @minsonCostCollaborationWhy2012; @raderAdviceFormSocial2017; @ronayneIgnoringGoodAdvice2018; @seeDetrimentalEffectsPower2011; @sollJudgmentalAggregationStrategies2011; @troucheVigilantConservatismEvaluating2018; @yanivAdviceTakingDecision2000; @yanivExploitingWisdomOthers2012; @yanivUsingAdviceMultiple2007].
 Egocentric discounting occurs in both feedback and no-feedback contexts [@yanivAdviceTakingDecision2000].
 Explanations for egocentric discounting are usually framed in terms of personal-level psychology: decision-makers have better access to reasons for their decision [@yanivAdviceTakingDecision2000]; overrate their own competence [@sniezekImprovingJudgementPrepaid2004]; may have a desire to appear consistent [@yanivUsingAdviceMultiple2007]; may see opinions as possessions [@sollJudgmentalAggregationStrategies2011]; may be loss-averse to providing a worse final estimate due to advice-taking [@sollJudgmentalAggregationStrategies2011]; or have difficulty avoiding anchoring [@schultzeInabilityIgnoreUseless2017] or repetition bias effects [@troucheVigilantConservatismEvaluating2018].
 None of these explanations has survived rigorous empirical testing, however, and recently suggestions have widened to include consideration of aggregate-level rather than personal-level causes, with @troucheVigilantConservatismEvaluating2018 arguing that the potential for misaligned incentives between decision-maker and advisor motivate discounting of advice.
