@@ -24,7 +24,7 @@ library(patchwork)
 # Psychology of advice-taking {#chapter-advice-taking}
 \adjustmtc 
 
-The model of advice-taking presented earlier§\@ref(chapter-advisor-evaluation) has some empirical support from previous work in our lab [@pescetelliRoleDecisionConfidence2021].
+The model of advice-taking presented earlier§\@ref(i-framework) has some empirical support from previous work in our lab [@pescetelliRoleDecisionConfidence2021].
 In those experiments, participants completed a perceptual decision-making task within a judge-advisor system.
 Participants provided a judgement (including a confidence rating) concerning which of two briefly presented boxes of dots contained more dots. 
 They then received advice on the answer from an advisor and provided a final decision, again including a confidence judgement.

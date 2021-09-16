@@ -353,7 +353,7 @@ The amount that the confidence shifts between the initial estimate and final dec
 In most cases, participants increase their confidence when advisors offer agreeing advice and decrease their confidence when advisors offer disagreeing advice. 
 Both of these cases constitute positive influence of the advice.
 
-Influence is calculated as the extent to which the judge’s initial decision is revised in the direction of the advisor’s advice.
+Influence is calculated as the extent to which the judge’s initial estimate is revised in the direction of the advisor’s advice.
 The initial ($C_1$) and final ($C_2$) decisions are made on a scale stretching from -55 to +55 with zero excluded, where values <0 indicate a ‘left’ decision and values >0 indicate a ‘right’ decision, and greater magnitudes indicate increased confidence.
 Influence ($I$) is given for agreement trials by the shift towards the advice:
 
@@ -462,7 +462,7 @@ As such, most experimentation and piloting happened on this branch, meaning that
 
 #### Experiment 1A
 The earliest versions contained a bug where advisors instructed to agree with a participant instead provided advice identifying the correct answer.
-Other versions had a bug in the staircasing code used to titrate the difficulty of the task was converging on too high a value (74% initial decision accuracy as opposed to 71%).
+Other versions had a bug in the staircasing code used to titrate the difficulty of the task was converging on too high a value (74% initial estimate accuracy as opposed to 71%).
 Once the staircasing bug was fixed, two more experiments were run, one with 60 practice trials in which participants did not quite reach the desired accuracy before the beginning of the main experiment, and one with 120 practice trials which constitutes the data analysed below.
 
 #### Experiments 1B and 2B

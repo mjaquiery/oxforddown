@@ -100,7 +100,7 @@ Liberman and colleagues did manage to eliminate discounting where, between excha
 
 ### Advice properties {#coa-ed-advice}
 
-Several features of advice itself have been explored: the confidence of advice, its similarity to the initial decision, whether it is solicited, and the amount of it provided.
+Several features of advice itself have been explored: the confidence of advice, its similarity to the initial estimate, whether it is solicited, and the amount of it provided.
 
 #### Confidence of the advice
 
@@ -281,7 +281,7 @@ In a more thorough set of studies, @schultzeInabilityIgnoreUseless2017 observed 
 While these cases for anchoring may be admitted, they are to do with over-weighting advice rather than the under-weighting advice which characterises egocentric discounting.
 This is because the putative anchor is the advisory estimate.
 
-Historically, it has been suggested that the judge's initial decision acts as an anchor [@harveyTakingAdviceAccepting1997], but this was later ruled out when @harveyEffectsJudgesForecasting2004 demonstrated egocentric discounting persevered when the labels for the judge's initial estimate and the advisor's advice were switched.
+Historically, it has been suggested that the judge's initial estimate acts as an anchor [@harveyTakingAdviceAccepting1997], but this was later ruled out when @harveyEffectsJudgesForecasting2004 demonstrated egocentric discounting persevered when the labels for the judge's initial estimate and the advisor's advice were switched.
 If anchoring to the initial estimate were responsible for egocentric discounting the relative weighting of initial estimate and advice would have followed the actual values rather than the labelled values, whereas the data showed that discounting occurred towards the _labelled_ rather than _actual_ initial estimate.
 
 ### Sunk costs

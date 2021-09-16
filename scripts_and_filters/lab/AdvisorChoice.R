@@ -52,7 +52,7 @@ adviceTypes <- list(neutral = 0, # neutral: agree|correct = .7
 adviceTypeNames <- list('Agree-in-confidence', 'Agree-in-uncertainty')
 adviceTypeShortNames <- list('AiC', 'AiU')
 
-# the 'step' variable for a trial tells us whether the initial decision was high/med/low confidence with respect to recent scale usage
+# the 'step' variable for a trial tells us whether the initial estimate was high/med/low confidence with respect to recent scale usage
 # NOTE: this is only available for correct trials
 confidenceTypes <- list(low = -1,
                         medium = 0,
@@ -323,7 +323,7 @@ getPlot <- function(df) {
     stat_summary(geom = 'line', fun = mean, aes(group = 1)) +
     geom_point(alpha = 0.25) +
     geom_line(alpha = 0.25, aes(group = as.factor(participantId))) +
-    scale_x_discrete(name = '', labels = c('Initial Decision', 'Final Decision')) +
+    scale_x_discrete(name = '', labels = c('Initial estimate', 'Final Decision')) +
     style.long
 }
 
@@ -463,7 +463,7 @@ print(paste0('Evidence strength for preferential AiC picking: BF = ', round(exp(
 print('## 3) ANOVA investigating influence ##############################################')
 
 #Influence is defined as the extent to which the judge's (participant's) final
-#decision has moved from their initial decision in the direction of the advice
+#decision has moved from their initial estimate in the direction of the advice
 #received.
 
 # 2x2x2 ANOVA investigating effects of advisor type
@@ -1010,7 +1010,7 @@ graph.Q.aicPickRate.difference
 
 print('## 8) ANOVA investigating capped influence ##############################################')
 
-# The asymmetry in the scale (arising from the fact the initial decision is
+# The asymmetry in the scale (arising from the fact the initial estimate is
 # never on the midpoint so that there is always more potential for shifting away
 # from the inital answer than shifting more in that direction) means that the
 # effect of agreement found earlier (disagree>agree) is trivial. We calculated a
@@ -1231,7 +1231,7 @@ graph.accuracy <- ggplot(participants.accuracy, aes(x = variable, y = value, col
   # rescale y axis and remove padding
   scale_y_continuous(limits = c(0.65, 0.75), expand = c(0,0.005)) + 
   # Nice x labels
-  scale_x_discrete(labels = c('Initial decision', 'Final decision')) +
+  scale_x_discrete(labels = c('Initial estimate', 'Final decision')) +
   # clean background
   theme_light() +
   # remove vertical gridlines
@@ -1267,7 +1267,7 @@ graph.accuracy <- ggplot(participants.accuracy, aes(variable, value)) +
                shape = 23, fill = "white", size = 4) +
   geom_point(alpha = .2, shape = 16) +
   scale_y_continuous(limits = c(0.5, 1), expand = c(0,0)) + 
-  scale_x_discrete(labels = c('Initial decision', 'Final decision')) +
+  scale_x_discrete(labels = c('Initial estimate', 'Final decision')) +
   theme_light() +
   theme(panel.grid.major.x = element_blank()) +
   labs(title = "Decision accuracy details",
@@ -1383,14 +1383,14 @@ graph.influence.byConfidence <- ggplot(trials[which(is.finite(trials$influence))
   theme(panel.grid = element_blank(),
         panel.grid.major.y = element_line(color = '#CCCCCC', size = 0.5)) +
   labs(title = "Advice influence by confidence",
-       subtitle = paste(strwrap(paste("Effect of initial decision confidence on the influence of advice.",
+       subtitle = paste(strwrap(paste("Effect of initial estimate confidence on the influence of advice.",
                                       "Points indicate data from a single trial. Points are semi-transparent, so darker",
                                       "points indicate multiple observations.",
                                       "Dashed line shows the best-fit regression line with shaded 99% confidence intervals.", 
                                       sep = " "), 
                                 width = 115), collapse = "\n"),
        legend = NULL,
-       x = "Initial decision confidence",
+       x = "Initial estimate confidence",
        y = "Influence of advice") 
 graph.influence.byConfidence
 # ggsave(paste0(figPath, "influence by confidence.png"), plot = graph.influence.byConfidence)

@@ -448,7 +448,7 @@ conf_r_f <- correlationBF(r$finalAccuracy, r$finalConfidence, paired = T)
 ```
 
 Basic behavioural performance was similar to that observed with the same Dots task in Experiment 1A§\@ref(fig:ac-acc-dots-r-performance). 
-Initial decision accuracy converged on the target 71%, and participants may have benefited from advice in terms of their final decisions being more accurate than their initial decisions (`r s_acc$s[2]`; Figure \@ref(fig:ac-agr-dots-r-performance)A).
+Initial estimate accuracy converged on the target 71%, and participants may have benefited from advice in terms of their final decisions being more accurate than their initial estimates (`r s_acc$s[2]`; Figure \@ref(fig:ac-agr-dots-r-performance)A).
 There was no evidence of a general difference in participants' overall accuracy between advisors (`r s_acc$s[1]`), nor was there evidence of a difference in participants' improvement in accuracy between advisors (`r s_acc$s[3]`).
 
 Figure \@ref(fig:ac-agr-dots-r-performance)B and ANOVA indicated that participants were more confident in their correct answers than their incorrect ones (`r s_conf$s[2]`), and less confident in their final decisions than their initial estimates (`r s_conf$s[1]`).
@@ -534,7 +534,7 @@ The advisors agreed with the participants' initial estimates at close to target 
 Nevertheless, some participants experienced in practice 10-20% differences in advisor accuracy (although neither advisor was systematically more accurate across participants). 
 All participants experienced the intended relationship wherein the High agreement advisor agreed with them more than the Low agreement advisor.
 
-##### \OpenScience{prereg} Hypothesis test {#ac-agr-r-h}
+##### \OpenScience{prereg} Hypothesis test {#ac-agr-dots-r-h}
 
 ```{r ac-agr-dots-r-graph, fig.caption="Dot task advisor choice for high/low agreement advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line.", fig.height=6, fig.width=5}
 
@@ -1152,7 +1152,7 @@ s_inf <- summariseANOVA(inf_aov$ANOVA, mm_inf)
 
 ```
 
-There were some similarities to and some differences from the basic behavioural performances compared to the same Dates task in Experiment 1B§\@ref(ac-acc-dates-r-performance). 
+There were some similarities to and some differences from the basic behavioural performances compared to the same Dates task in Experiment 1B§\@ref(fig:ac-acc-dates-r-performance). 
 
 Participants' accuracy (Figure \@ref(fig:ac-agr-dates-r-performance)A), which was uncontrolled in this task, was greater on final decisions than on initial estimates (`r s_acc$s[2]`).
 There was no significant difference between advisors (`r s_acc$s[1]`), but the increase in final decision accuracy was greater for the Low agreement advisor than the High agreement advisor (`r s_acc$s[3]`).

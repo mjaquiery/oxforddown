@@ -82,9 +82,9 @@ There were an equal number of these trials for each participant for each advisor
 ```{r ac-acc-dots-r-accuracy}
 ```
 
-Accuracy of initial decisions was controlled by a staircasing procedure which aimed to pin accuracy to 71%.
+Accuracy of initial estimates was controlled by a staircasing procedure which aimed to pin accuracy to 71%.
 The accuracy of final decisions was free to vary according to the ability of the participant to take advantage of the advice on offer.
-As Figure \@ref(fig:ac-acc-dots-r-performance)A shows, participants' accuracy scores for initial decisions were close to the target values (partly because participants whose accuracy scores diverged considerably were excluded).
+As Figure \@ref(fig:ac-acc-dots-r-performance)A shows, participants' accuracy scores for initial estimates were close to the target values (partly because participants whose accuracy scores diverged considerably were excluded).
 Participants tended to improve the accuracy of their responses following advice from High accuracy advisors, while the evidence was unclear as to whether there was any difference in response accuracy with Low accuracy advice.
 This is supported statistically by an ANOVA of response accuracy by Advisor and Time: there was no discernible effect of Advisor (`r s$s[[1]]`), but there was an interaction between Advisor and Time (`r s$s[[3]]`); and there was an effect of Time `r s$s[[2]]`. 
 
@@ -134,7 +134,7 @@ It is thus important to get a sense of the actual advice experienced by the part
 ```{r ac-acc-dots-r-advice-acc}
 ```
 
-The advisors' performance was stochastic, with the advisors agreeing or disagreeing with set probabilities depending upon whether the participant was correct or incorrect in their initial decision. 
+The advisors' performance was stochastic, with the advisors agreeing or disagreeing with set probabilities depending upon whether the participant was correct or incorrect in their initial estimate. 
 The performance of the advisors in practice was as specified (Table \@ref(tab:ac-acc-dots-r-advice-agr-t)).
 The participants' accuracy rates were controlled with an adaptive staircase, meaning that the advisors' agreement strategies produced overall advice accuracy at target rates.
 The advisors' actual accuracies matched the target accuracies (Table \@ref(tab:ac-acc-dots-r-advice-acc-t)), with `r n_ap`/`r length(unique(familiarization$pid))` participants experiencing the planned relationship wherein the High accuracy advisor's advice was more accurate than the Low accuracy advisor's advice.
@@ -353,7 +353,7 @@ Likewise, where participants receive disagreeing advice, they tend to reduce the
 As before, when participants change their decision (a relatively uncommon event) they quite often make their final decision with a confidence equivalent to their initial estimate, producing the distinctive off-diagonal pattern along the $y = -x$ line. 
 This pattern was explained as largely an artefact of aggregating data from multiple individual participants in the Dots task, but the same explanation is less tenable here.
 
-```{r ac-acc-dates-r-influence, fig.caption="Advice influence on the Dates task with in/accurate advisors.  Each point shows the initial and final confidence on a single trial. Final confidence is coded relative to initial confidence so that increasing confidence in the opposite decision (i.e. confidence on trials where the participant changed their mind) is increasingly negative. Points above the dashed y = x line represent increased confidence, while those below it give decreased confidence. Points close to the y = x line indicate relatively little change, while points further away indicate relatively greater change. The shaded grey area shows the zone outside which influence is capped (by moving vertically towards the grey zone boundary) when using the capped influence measure. Agreement and disagreement trials are plotted seperately, with trials coloured according to whether the initial decision was correct."}
+```{r ac-acc-dates-r-influence, fig.caption="Advice influence on the Dates task with in/accurate advisors.  Each point shows the initial and final confidence on a single trial. Final confidence is coded relative to initial confidence so that increasing confidence in the opposite decision (i.e. confidence on trials where the participant changed their mind) is increasingly negative. Points above the dashed y = x line represent increased confidence, while those below it give decreased confidence. Points close to the y = x line indicate relatively little change, while points further away indicate relatively greater change. The shaded grey area shows the zone outside which influence is capped (by moving vertically towards the grey zone boundary) when using the capped influence measure. Agreement and disagreement trials are plotted seperately, with trials coloured according to whether the initial estimate was correct."}
 ```
 
 The individual participant data suggest that some participants may actually be porting their confidence from the initial estimate directly into the final decision, despite the fact that they have changed their mind (Figure \@ref(fig:ac-acc-dates-r-confidence-change-p)).

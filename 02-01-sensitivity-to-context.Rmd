@@ -192,7 +192,7 @@ Overall, there is a balance between the frequency and extremity of bad advice an
 
 ## Scenario 2: noisy advice {#models-scenario-2}
 
-In this scenario, agents offer advice which is of slightly lower quality on average than their own initial decisions.
+In this scenario, agents offer advice which is of slightly lower quality on average than their own initial estimates.
 This could reflect a difference in effort or in expertise.
 
 ### Method
@@ -208,7 +208,7 @@ i^{a,a'}_t = v_t + N(0, s^{a'} + x)
 
 Where $x$ = 0 in the no-noise condition and 5 in the noise condition.
 
-Models were also run where the advisors' initial decisions were used as the basis for advice, and noise added onto that (perhaps to represent noisy communication rather than less effort being made in the assessment):
+Models were also run where the advisors' initial estimates were used as the basis for advice, and noise added onto that (perhaps to represent noisy communication rather than less effort being made in the assessment):
 
 \begin{align}
 i^{a,a'}_t = i^{a'}_t + N(0,x)
@@ -225,7 +225,7 @@ As before, egocentric discounting emerges rapidly in the active condition and re
 
 Where the advice is of worse quality on average, encoded here as additional variation, egocentric discounting tailors the relative weights of the estimates according to their average quality.
 As with situations in which an advice-seeker is more competent at making the relevant decision than their advisor, some measure of egocentric discounting is warranted in this scenario.
-It is worth noting that different competencies are not the only reason why advice may be systematically less valuable than initial decisions: difficulties in communicating the advice or different levels of conscientiousness in decision-making may also produce this effect.
+It is worth noting that different competencies are not the only reason why advice may be systematically less valuable than initial estimates: difficulties in communicating the advice or different levels of conscientiousness in decision-making may also produce this effect.
 
 ## Scenario 3: confidence confusion {#models-scenario-3}
 

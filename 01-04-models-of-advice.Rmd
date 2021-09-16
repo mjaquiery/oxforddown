@@ -103,7 +103,7 @@ The two free parameters estimated during the parameter recovery process are: how
 The model and parameter recovery process are both tested using simulation. 
 The parameter recovery process is tested by attempting to recover data from simulated data (where the parameters are know), and shows a reasonable level of accuracy in recovering parameters from data, suggesting that the recovered values for participants are likely to capture some aspects of participants' behaviour on the task.
 The model itself is tested by comparing errors for fitted parameters to errors for those same parameters when fitted to data that have had the advisor agreement information scrambled.
-Given the models are driven by the advisors' agreement with the judge's initial decision, scrambling this column should break the temporal relationship between experience and trust updating, leading to worse parameter fits. 
+Given the models are driven by the advisors' agreement with the judge's initial estimate, scrambling this column should break the temporal relationship between experience and trust updating, leading to worse parameter fits. 
 This is indeed the case.
 
 The parameter recovery results, distributions and correlations of the coefficients, illustrate the heterogeneity of the participants. 
@@ -577,7 +577,7 @@ models.all <- agents.all %>%
 ## Method 
 
 Agent-based modelling is used to simulate the interactive effects of repeated paired decision-making.
-The agents in the model perform a cycle of making an initial decision, selecting one of the other agents as an advisor, receiving advice from the chosen advisor, making a final decision, and updating their trust in their advisor and their internal beliefs about the world.
+The agents in the model perform a cycle of making an initial estimate, selecting one of the other agents as an advisor, receiving advice from the chosen advisor, making a final decision, and updating their trust in their advisor and their internal beliefs about the world.
 The task the agents face is roughly analogous to the task faced by human participants in the Dots task experiments§\@ref(m-p-dots), where the participants make a decision about which of two rapidly and simultaneously presented grids contained more dots.
 
 Each model consists of a population of agents implementing the same mathematical model of decision-making, trust-updating, and advisor selection, with different coefficients for parameters of that mathematical model (Table \@ref(tab:nw-m-agent-properties-table)) drawn from appropriate distributions.
@@ -652,7 +652,7 @@ The establishing of true values is achieved in the code within the [`simulationS
 The default function, used in all models described below, is drawing from the normal distribution.
 This default can be seen in the `truth_fun` parameter for the [`runSimulation`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L107) function.
 
-##### Initial decision-making
+##### Initial estimate-making
 
 Agents' perception of the stimulus is imperfect, simulated by combining the true stimulus value with random noise ($\epsilon^a_t$), to produce a percept $q^a_t$.
 
@@ -674,9 +674,9 @@ The conversion of the percept ($q^a_t$) to the subjective probability ($p^a_t$) 
 The subjective probability expresses a judgement about whether or not $v_t$ is greater than or less than zero, but does not contain an estimate of $v_t$ itself.
 
 In the code, the percept is calculated using [`getPercept`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L345). 
-The inclusion of the agent's confidence scaling is done as part of the second step in the determination of the initial decision.
+The inclusion of the agent's confidence scaling is done as part of the second step in the determination of the initial estimate.
 
-This subjective probability is then integrated with the agent's prior expectation about whether stimuli are generally less than or greater than 0 ($b^a_t$), or 'bias', to produce an initial decision, $i^a_t$.
+This subjective probability is then integrated with the agent's prior expectation about whether stimuli are generally less than or greater than 0 ($b^a_t$), or 'bias', to produce an initial estimate, $i^a_t$.
 This integration is performed using Bayes' rule. 
 
 \begin{align}
@@ -692,20 +692,20 @@ with: $z(x, \mu, \sigma)$ giving the density of $N(\mu, \sigma)$ at $x$.
 
 The prior, $b^a_t$, is equal the prior probability that the value is greater than 0: $b^a_t = P(v_t > 0)$
 
-In the code, the calculation of initial decision from the percept (including the scaling of the percept according to the agent's confidence scaling parameter) is performed in [`getConfidence`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L359).
+In the code, the calculation of initial estimate from the percept (including the scaling of the percept according to the agent's confidence scaling parameter) is performed in [`getConfidence`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L359).
 
-Note that in these initial decision equations the agents have direct access to a model property, $V^\sigma$, the standard deviation of the true values of the stimuli. 
+Note that in these initial estimate equations the agents have direct access to a model property, $V^\sigma$, the standard deviation of the true values of the stimuli. 
 Ideally, in an agent-based model, the agents would not have such direct access to non-observable properties, and would instead build up specific expectations about the variability of stimuli from observation, perhaps seeded with a loosely-informative prior. 
 The agents are allowed to know the value here as a shorthand for such exploration. 
 This makes the agents' task analogous to well-practised real-world tasks such as perceptual decision-making.
 It is unlikely to seriously affect any conclusions or illustrations drawn from the models.
 
-The initial decision contains both a discrete decision (whether the stimulus value was more likely to be less than zero, $i^a_t < 0.5$, or greater than zero $i^a_t \geq 0.5$), and how much so ($|i^a_t - 0.5|$). 
+The initial estimate contains both a discrete decision (whether the stimulus value was more likely to be less than zero, $i^a_t < 0.5$, or greater than zero $i^a_t \geq 0.5$), and how much so ($|i^a_t - 0.5|$). 
 It thus represents both the agent's decision and the confidence in that decision.
 
 ##### Advisor selection {#nw-m-ws}
 
-Having made an initial decision, each agent selects a single advisor from whom to receive advice.
+Having made an initial estimate, each agent selects a single advisor from whom to receive advice.
 This choice is made based on the trust in each potential advisor scaled by the strength of the agent's preference for receiving more-trusted advice.
 
 The identity of an agent's advisor on a given trial is designated by $a'$, and the weight assigned to advisor $a'$ by agent $a$ at step $t$ by $\omega^{a,a'}_t$.
@@ -777,10 +777,10 @@ Code for the implementation of advisor choice fitting can be found in the functi
 
 ##### Final decision-making {#nw-m-final}
 
-Final decisions are made by Bayesian integration of the initial decision and advice.
+Final decisions are made by Bayesian integration of the initial estimate and advice.
 Advice takes the form of a binary recommendation, and is weighted by the trust the agent has in their advisor.
 
-First, initial decisions and advice are reoriented to the direction of the initial decision, such that initial decisions represent confidence in the initial decision and advice represents agreement with that decision.
+First, initial estimates and advice are reoriented to the direction of the initial estimate, such that initial estimates represent confidence in the initial estimate and advice represents agreement with that decision.
 
 \begin{align}
 i'~^a_t = 

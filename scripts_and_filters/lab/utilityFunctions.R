@@ -60,12 +60,12 @@ scanTrials <- function(trialSet, suffix = NULL) {
   # The medium-confidence trials come in handy, so cache them here
   medSet <- trialSet[which(trialSet$step==confidenceTypes$medium),]
   df$trialCount <- dim(trialSet)[1]
-  # Proportion of trials in which the initial decision was correct
+  # Proportion of trials in which the initial estimate was correct
   df$proportionCorrect <- length(which(trialSet$cor1==1)) / dim(trialSet)[1]
-  # Proportion of trials in which the initial decision was correct and the agree-in-confidence advisor was selected
+  # Proportion of trials in which the initial estimate was correct and the agree-in-confidence advisor was selected
   df$aicProportionCorrect <- length(which(trialSet$cor1==1 & trialSet$adviceType==adviceTypes$AiC)) /
     length(which(trialSet$adviceType==adviceTypes$AiC))
-  # Proportion of trials in which the initial decision was correct and the agree-in-uncertainty advisor was selected
+  # Proportion of trials in which the initial estimate was correct and the agree-in-uncertainty advisor was selected
   df$aiuProportionCorrect <- length(which(trialSet$cor1==1 & trialSet$adviceType==adviceTypes$AiU)) /
     length(which(trialSet$adviceType==adviceTypes$AiU))
   # Proportion of trials in which the final decision was correct
@@ -83,23 +83,23 @@ scanTrials <- function(trialSet, suffix = NULL) {
   # Proportion of choice trials on which the agree-in-confidence advisor was selelcted
   df$aicPickRate <- length(which(trialSet$hasChoice & trialSet$adviceType==adviceTypes$AiC)) / 
     length(which(trialSet$hasChoice))
-  # Number of choice trials on which the initial decision was correct and the
+  # Number of choice trials on which the initial estimate was correct and the
   # agree-in-confidence advisor was selected
   df$aicPickCount.correct <- length(which(trialSet$hasChoice
                                           & trialSet$adviceType==adviceTypes$AiC
                                           & trialSet$cor1==1))
-  # Number of choice trials on which the initial decision was correct and the
+  # Number of choice trials on which the initial estimate was correct and the
   # agree-in-uncertainty advisor was selected
   df$aiuPickCount.correct <- length(which(trialSet$hasChoice
                                           & trialSet$adviceType==adviceTypes$AiU
                                           & trialSet$cor1==1))
-  # Proportion of choice trials on which the initial decision was correct and
+  # Proportion of choice trials on which the initial estimate was correct and
   # the agree-in-confidence advisor was selected
   df$aicPickRate.correct <- length(which(trialSet$hasChoice 
                                          & trialSet$adviceType==adviceTypes$AiC 
                                          & trialSet$cor1==1)) / 
     length(which(trialSet$hasChoice & trialSet$cor1==1))
-  # NB: all confidence-category selections require the initial decision to have
+  # NB: all confidence-category selections require the initial estimate to have
   # been correct. 
   
   # Number of low-confidence choice trials on which the agree-in-confidence
@@ -122,8 +122,8 @@ scanTrials <- function(trialSet, suffix = NULL) {
   df$aicPickCount.medConf <- length(which(medSet$hasChoice & medSet$adviceType==adviceTypes$AiC))
   # Number of medium choice trials on which the agree-in-uncertainty advisor was selected
   df$aiuPickCount.medConf <- length(which(medSet$hasChoice & medSet$adviceType==adviceTypes$AiU))
-  # Proportion of choice trials on which the initial decision was correct,
-  # confidence in the initial decision was moderate, and the agree-in-confidence
+  # Proportion of choice trials on which the initial estimate was correct,
+  # confidence in the initial estimate was moderate, and the agree-in-confidence
   # advisor was selected
   df$aicPickRate.medConf <- length(which(trialSet$hasChoice 
                                          & trialSet$adviceType==adviceTypes$AiC 
@@ -137,8 +137,8 @@ scanTrials <- function(trialSet, suffix = NULL) {
   df$aiuPickCount.highConf <- length(which(trialSet$hasChoice 
                                            & trialSet$adviceType==adviceTypes$AiU 
                                            & trialSet$step == 1))
-  # Proportion of choice trials on which the initial decision was correct,
-  # confidence in the initial decision was high, and the agree-in-confidence
+  # Proportion of choice trials on which the initial estimate was correct,
+  # confidence in the initial estimate was high, and the agree-in-confidence
   # advisor was selected
   df$aicPickRate.highConf <- length(which(trialSet$hasChoice 
                                           & trialSet$adviceType==adviceTypes$AiC 

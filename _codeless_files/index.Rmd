@@ -34,7 +34,7 @@ acknowledgements: |
   `r paste(readLines("front-and-back-matter/_acknowledgements.Rmd"), collapse = '\n  ')`
 abbreviations: |
   `r paste(readLines("front-and-back-matter/_abbreviations.Rmd"), collapse = '\n  ')`
-dedication: For TBC
+dedication: For Mary Ann Furze
 
 #######################
 ## bibliography path ##
