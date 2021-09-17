@@ -17,27 +17,17 @@ documentclass: book
 source('scripts_and_filters/general_setup.R')
 ```
 
-<!-- 
-Here we discuss the evolutionary models and the results, which tell us that egocentric discounting can evolve in environments where various different abberations of typical experimental conditions are present.
-We argue that these may be baked in as hyperpriors (esp.
-since even agents who never experience deceit need to do discounting).
-We introduce the idea of flexible responding: while the hyperpriors might reduce ALL advice-taking, flexible behaviour may nevertheless mean that the reductions are stronger in some contexts than others.
-
-Notes:
-* Agents in these models don't learn about other agents - better model of taking advice from strangers than evolving friends
--->
-
 Advice-taking is often overly-conservative as compared to the normative level of advice-taking for a given experimental design.
 We argue that participants' performances in advice-taking experiments reflect both the specifics of the experimental design and prior expectations about advice-taking situations.
 Demonstrating the existence of prior expectations is difficult, because they are beyond the bounds of any task, but we aim instead to demonstrate that they are adaptive.
-Using computational agent-based evolutionary simulations, we demonstrate that conservatism can emerge within a population even where detrimental advice is rarely experienced, and can even emerge where individuals always interact in good faith.
+Using computational agent-based evolutionary simulations, we demonstrate in this chapter that conservatism can emerge within a population even where detrimental advice is rarely experienced, and can even emerge where individuals always interact in good faith.
 
 As discussed in the [previous chapter]}(#chapter-context), conservatism is optimal under some circumstances, and thus we expect that simulated agents allowed to evolve an advice-taking policy in those circumstances will evolve a conservative policy.
 We explored this tendency as a function of three plausible scenarios.
 The first scenario§\@ref(models-scenario-1) is one in which agents occasionally give deliberately poor advice to their advisee, which represents situations where advisors’ interests may sometimes be contrary to judges’ interests, unbeknownst to the judges.
 In the second scenario§\@ref(models-scenario-2), advice is simply noisier than the judge’s own initial estimate, either because the judge is less competent at the task, less willing to exert the required effort for the task, or because the advice is communicated imperfectly.
 In the third scenario§\@ref(models-scenario-3), agents belong to either a ‘cautious’ or a ‘confident’ group in how they express and interpret advice, which is a simple analogue of the observation that people’s expressions of confidence are idiosyncratic [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017].
-In each of these three scenarios, we hypothesised that some level of egocentric discounting will emerge as the dominant strategy, i.e., the mean population weighting for initial estimates versus advice will be greater than .50.
+In each of these three scenarios, we hypothesised that some level of egocentric discounting will emerge as the dominant strategy, i.e., the mean population weighting for an agent's initial estimates versus advice they receive will be greater than .50.
 
 ```{r ed-load}
 
@@ -57,10 +47,10 @@ load(fName)
 
 ## General method
 
-Agent-based computational models of an evolutionary process were programmed in R [@rcoreteamLanguageEnvironmentStatistical2018] and run variously on a home computer and the Oxford Advanced Research Computing cluster [@richardsUniversityOxfordAdvanced2015].
+Agent-based computational models of an evolutionary process were programmed in R [@rcoreteamLanguageEnvironmentStatistical2018] and run variously on a desktop computer and the Oxford Advanced Research Computing cluster [@richardsUniversityOxfordAdvanced2015].
 The code is available at https://github.com/oxacclab/EvoEgoBias, and the specific data presented below are archived at \mccorrect{!TODO[find somewhere...]}
 
-The models reported here use 100 generations of 1000 agents which each make 60 decisions/generation on which they receive the advice of another agent.
+The models reported here use 100 generations of 1000 agents which each make 60 decisions in each generation on which they receive the advice of another agent.
 Each scenario is run with 7 different strengths of the manipulation value, and each of these instances is run 50 times.
 Decisions are either point estimation (Scenarios 1§\@ref(models-scenario-1) and 2§\@ref(models-scenario-2)) or categorical decision with confidence (Scenario 3§\@ref(models-scenario-3)).
 Each agent combines their own initial estimate with the advice of another agent, with the relative weights of the initial estimate and advice set by the agent’s egocentric bias parameter, to produce a final decision.
@@ -78,10 +68,14 @@ i^a_t = v_t + N(0, s^a)
 (\#eq:models-initial-estimate)
 \end{align}
 
+This structure is the same as in the normative model of advice-taking§\@ref(i-normative) presented in Equation \@ref(eq:estimate).
+The normally distributed error terms cancel out on average over multiple estimates.
+Where $s^a$ and $s^a'$ (an advisor's sensitivity) are equal or unknown (as in these simulations) the normative model indicates that the best strategy is to average these values.
+
 ### Advice 
 
 Each agent receives advice from another agent which it combines with its initial estimate to reach a final decision.
-Each agents is connected to 10 other agents at random when they are spawned, and on each decision they receive advice from one of their connections at random.
+Each agents is reciprocally connected to 10 other agents at random when they are spawned, and on each decision they receive advice from one of their connections at random.^[A small number of connections allows agents to sample multiple pieces of advice form the same advisors over their lifetime. The agents do not update during their lifetime, so more realistic connectivity structures are not needed in these simulations.]
 The advice has a probability of being mutated in some fashion.
 The mutation depends upon the scenario and is described separately for each.
 
@@ -101,6 +95,9 @@ The final decisions in Scenario 3§\@ref(models-scenario-3) are more complex, bu
 
 ### Reproduction
 
+After their 60 decisions are up, agents reproduce and then die, creating a new generation that will perform their 60 decisions and reproduce, and so on. 
+Reproduction favours those agents who performed better on their 60 decisions, and each newly created agent has a small chance to mutate slightly.
+
 Roulette wheel selection is used to bias reproduction in favour of agents performing best on the decisions.
 Performance is determined by a fitness function which differs slightly between categorical and continuous decisions.
 For scenarios 1§\@ref(models-scenario-1) and 2§\@ref(models-scenario-2), which use continuous decisions, this fitness is obtained by subtracting the absolute difference between the final decision and the true value for each decision (mean absolute deviance):
@@ -114,7 +111,6 @@ Scenario 3§\@ref(models-scenario-3) uses categorical decisions.
 These are processed using a fitness function that awards agents -1 point for each incorrect categorisation of the true world value.
 
 The selection algorithm proceeds as follows: The worst performance is subtracted from each agent’s fitness and 1 added to put fitness scores in a positive range.
-These scores are then multiplied by 10 to improve resolution.
 Each agent is then given a probability to reproduce equal to their share of the sum of all fitness scores:
 
 \begin{align}
@@ -125,28 +121,35 @@ p^a = \frac{u^a}{\sum_{j=1}^{n}u^j}
 where $n$ is the number of agents and $u$ has undergone the transformations described above.
 
 Reproducing agents pass on their egocentric bias to their offspring.
-Other agent features, e.g. decision-making accuracy, are randomised when they are created.
+When spawned this way, each agent has a 1% chance to mutate slightly, taking instead a value sampled from a normal distribution around its parent's egocentric bias with a standard deviation of .1.
+All other agent features, decision-making accuracy, neighbours, and confidence scaling (in Scenario 3§\@ref(models-scenario-3)) are randomised when they are created.
+
 In the present simulations, agents receive no feedback on decisions, and cannot learn about or discriminate between their advisors.
 The key outcome of interest in each simulation is whether the population evolves towards egocentric discounting (higher $w^a$) as the dominant adaptive strategy.
 
 ## Scenario 1: misleading advice {#models-scenario-1}
 
-```{r ed-plot, fig.caption="Egocentric discounting simulation results.  The mean weight on agents' own advice is shown averaged across 50 runs of each scenario at each manipulation strength. The dashed line shows equal weighting (.5), the mathematically optimal value for integrating a single estimate from an advisor of equivalent ability to oneself."}
+```{r ed-plot, fig.caption="Egocentric discounting simulation results.  The mean weight on agents' own advice is shown averaged across 50 runs of each scenario at each manipulation strength. The width of the ribbons shows the mean 95\\% confidence intervals for the population self weights over the 50 runs. The dashed line shows equal weighting (.5), the mathematically optimal value for integrating a single estimate from an advisor of equivalent ability to oneself."}
 
 d %>% 
+  select(-run) %>%
   mutate(
     scenario = str_replace(scenario, "communication", "confusion"),
+    scenario = str_to_sentence(scenario),
+    scenario = str_replace(scenario, " ", "\n"),
     scenario = factor(
-      str_to_sentence(scenario),
-      levels = c("Bad advice", "Noisy advice", "Confidence confusion")
+      scenario,
+      levels = c("Bad\nadvice", "Noisy\nadvice", "Confidence\nconfusion")
     ),
     across(-c(generation, starts_with("selfWeight")), factor)
   ) %>%
+  group_by(generation, corruption, scenario, model) %>%
+  summarise(across(everything(), mean), .groups = "drop") %>%
   ggplot(aes(
     x = generation, y = selfWeight_mean, fill = corruption, colour = corruption
   )) +
   geom_hline(yintercept = .5, linetype = "dashed") +
-  stat_summary(geom = "ribbon", fun.data = mean_cl_normal, alpha = .5, colour = NA) +
+  geom_ribbon(aes(ymin = selfWeight_ci95_min, ymax = selfWeight_ci95_max), alpha = .5, colour = NA) +
   stat_summary(geom = "line", fun = mean) +
   facet_grid(scenario ~ .) +
   scale_fill_viridis_d(
@@ -176,8 +179,17 @@ If an agent gives extreme advice they add 3 standard deviations of their own sen
 
 ### Results
 
-Where advice is always genuine ($x = 0$), egocentric discounting does not emerge and the $w^a$ parameters creep towards the mathematically optimal value of .5 (Figure \@ref(fig:ed-plot), top).
-Where advice is sometimes misleading, however, egocentric discounting emerges rapidly and remains stable throughout the rest of the stimulation.
+Figure \@ref(fig:ed-plot) (top) shows the results of 350 simulations (50 at each level of bad advice frequency). 
+The starting value of self-weight in all simulations is set to .45 so that evolution should still occur in the absence of a manipulation towards the optimum level of self-weight in that case (.5). 
+The evolutionary pressure in the absence of a manipulation is quite low, so over the 100 generations modelled the mean self-weight in simulations without a manipulation barely moves towards .5.
+Longer simulations show that the population does evolve to and remains at the optimum value of .5 in the manipulation-free cases.
+
+Where advice is sometimes misleading, egocentric discounting emerges rapidly. 
+In longer simulations, this value remains stable throughout the rest of the stimulation.
+The greater the probability of misleading advice, the more rapid the rise towards higher mean self-weights, and the higher the stable self-weight value eventually attained.
+
+The actual values of self-weight evolved in the population are dependent upon how frequently bad advice occurs and how bad the advice is when it does occur. 
+For the particularly bad advice offered by the agents in this scenario, probabilities of bad advice around 0.6-0.9% produce average self-weights in the 70-80% region typically observed experimentally [@yanivAdviceTakingDecision2000].
 
 ### Discussion
 
@@ -186,6 +198,7 @@ Egocentric discounting may be a viable strategy, even if there is no difference 
 
 Note that, because of the rarity of bad advice (it occurs at most `r d$corruption %>% unique() %>% as.numeric() %>% max()`% of the time in the most pronounced case), most individuals never experience bad advice. 
 This means that any mutant that is more conservative than their parent is likely to lose fitness by ignoring good advice much of the time, but in the rare cases where bad advice is given they save themselves from taking such a heavy penalty.
+Perhaps the advice in these simulations is too bad to go undetected in more realistic interactions (the agents here do not consider the plausibility of the advice they receive); more plausible misleading advice would have to be more common to produce the same magnitude of effects in self-weight evolution, but the results would be qualitatively similar.
 The reproductive function also matters: if we selected a single agent to spawn the entire subsequent generation, we would likely see a wholly trusting agent be selected each time, just one that happened to never be given bad advice. 
 Of course, in many models of this kind of behaviour there would be a fitness benefit to deceiving other agents, leading to an increase in the frequency of bad advice [@alexanderEvolutionaryGameTheory2021].
 Overall, there is a balance between the frequency and extremity of bad advice and the specific nature of the reproductive function, but the simulations demonstrate that, in circumstances where bad advice is a possibility, it is adaptive to guard against it to some extent.
@@ -206,7 +219,7 @@ i^{a,a'}_t = v_t + N(0, s^{a'} + x)
 (\#eq:models-scenario-2-advice)
 \end{align}
 
-Where $x$ = 0 in the no-noise condition and 5 in the noise condition.
+Where $x$ is the manipulation strength for the condition.
 
 Models were also run where the advisors' initial estimates were used as the basis for advice, and noise added onto that (perhaps to represent noisy communication rather than less effort being made in the assessment):
 
@@ -220,6 +233,8 @@ The results were the same and are not reported here.
 ### Results
 
 As before, egocentric discounting emerges rapidly in the active condition and remains stable throughout the rest of the simulation (Figure \@ref(fig:ed-plot), middle).
+To attain mean self-weight values in the 70-80% region usually observed experimentally, the manipulation strength needs to be around 0.3. 
+The population $s^a$ values are drawn from a distribution with mean 1, so this equates to roughly 30% extra noise on the advice compared to the initial estimates.
 
 ### Discussion
 
@@ -232,7 +247,7 @@ It is worth noting that different competencies are not the only reason why advic
 While lackadaisical, incompetent, deliberately bad, or poorly communicated advice produces an obvious adaptive advantage for egocentric discounting, it is plausible that scenarios may exist where equally competent, wholly well-intentioned advice may still favour egocentric discounting.
 A common feature of advice is the communication of confidence, and this improves outcomes [@bahramiOptimallyInteractingMinds2010].
 Notably, however, there are large and consistent individual differences in people’s expressions of confidence, both when expressed numerically [@aisIndividualConsistencyAccuracy2016; @songRelatingInterindividualDifferences2011] and when expressed verbally [@macleodCommunicatingRiskVariability2017; @wallstenMeasuringVagueMeanings1986].
-In this scenario agents are equally competent at the task, and do their best to assist one another, but may be hampered by expressing their estimates and advice with different understanding of how expressed confidence maps onto internal confidence.
+In this scenario, we therefore investigated emergent strategies when agents are equally competent at the task, and do their best to assist one another, but may be hampered by expressing their estimates and advice with different understanding of how expressed confidence maps onto internal confidence.
 
 ### Method
 
@@ -297,4 +312,10 @@ More generally, the results indicate that properties of the advice-giving milieu
 These models establish that it is plausible that people have deeply ingrained hyperpriors towards discounting advice.
 It is also possible, however, that people can flexibly respond to contexts, modulating their advice-taking appropriately.
 The voluminous experiments in advice taking discussed in the introduction to this section§\@ref(chapter-context) can be seen as eliciting exactly this behaviour.
-In the next chapter I present new behavioural experiments which suggest that people do indeed modulate their advice-taking to the specifics of the context in which they are in.
+All advice-taking experiments occur in a context that differs from a hypothetical average advice-taking context, but some experiments specifically manipulate the context as part of their investigation.
+In the clearest example of this, @sollJudgmentalAggregationStrategies2011 generated advice so that participants would either be better, the same as, or worse than advisors at a task where they had to estimate basketball teams' points-per-game from other team statistics.
+The participants paired with advisors who were better than they were had lower average self-weights in their final decisions, indicating that they were more influenced by the advice.
+Those participants who were paired with advisors whose competence matched their own still placed more weight on their own initial estimates, but not so much as the participants paired with more accurate advisors.
+The participants paired with advisors less accurate than themselves took the least advice.
+This response to a context that mimics the manipulation in scenario 2§\@ref(models-scenario-2) (the relative accuracy of advisor and judge) indicates that, unlike the fixed agents in our model, people can flexibly adapt to different contexts.
+In the next chapter I present new behavioural experiments which suggest that people can indeed modulate their advice-taking to the specifics of the context in which they are in, and show that this happens rapidly.

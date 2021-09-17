@@ -154,12 +154,13 @@ The simplest and most common of these views the decision-making task as an estim
 To borrow from Galton [-@galtonVoxPopuliWisdom1907]}, consider the task of judging the weight of a bullock.
 We can model any single guess ($i$) as the true weight ($v$) plus some error ($\epsilon$):
 
-\begin{equation}
-i = v + \epsilon
+\begin{align}
+i &= v + \epsilon
+\epsilon &= \mathcal{N}(\mu=0,\,\sigma^{2})
 (\#eq:estimate)
-\end{equation}
+\end{align}
 
-The key insight is to observe that the error is drawn from a normal distribution ($\mathcal{N}(\mu=0,\,\sigma^{2})$)[^symmetrical-distribution].
+The key insight is to observe that the error is drawn from a normal distribution (Equation \@ref(eq:estimate))[^symmetrical-distribution].
 As the number of samples from this distribution increases, the mean of those samples tends towards the mean of the distribution.
 Thus, the more estimates are taken, the closer on average the sum of errors will be to 0.
 
