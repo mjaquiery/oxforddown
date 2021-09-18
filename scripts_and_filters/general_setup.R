@@ -358,6 +358,8 @@ advisor_description_name <- function(advisor0idDescription) {
     advisor0idDescription == 'Agreeing' ~ 'High agreement',
     advisor0idDescription == 'inGroup' ~ 'Always honest',
     advisor0idDescription == 'outGroup' ~ 'Sometimes deceptive',
+    advisor0idDescription == 'honest' ~ 'Honest group',
+    advisor0idDescription == 'deceptive' ~ 'Deceptive group',
     advisor0idDescription == 'mass' ~ 'Group member',
     advisor0idDescription == 'single' ~ 'Consistent individual',
     advisor0idDescription == 'lowConf' ~ 'Low confidence',
