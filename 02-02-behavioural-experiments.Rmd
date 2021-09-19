@@ -96,7 +96,7 @@ A snapshot of the state of the code for running the experiment at the time the e
 This is a replication of a study of identical design that produced the same results. 
 The data for the original study can be obtained from the `esmData::` R package or from \mccorrect{!TODO[OSFify]}.
 
-There were a number of deviations from the preregistered analysis in this Experiment.
+There were two deviations from the preregistered analysis in this experiment.
 Several participants used translation software to translate the experiment website. 
 We could not guarantee that the questions were accurately translated and so these participants were excluded.
 Some participants never rated the Sometimes deceptive advisor's advice as 'honest', and so they were excluded in the t-test comparing advisors.
@@ -145,7 +145,9 @@ In each of these blocks participants had a single advisor for `r tmp %>% filter(
 No feedback was given on answers in the main experiment blocks.
 
 The two advisors were identical in how they generated advice, but they were labelled differently.
-The advisors had different coloured backgrounds (e.g., purple and green), and participants were told that the advisor who matched the participant's colour "will give you the **best advice that they can**", while the advisor who did not match the participant's colour "might sometimes try to direct you **away from the correct answer**".
+The advisors had different coloured backgrounds (e.g., purple and green), and participants were told that the advisor whose background colour matched the participant's colour "will give you the **best advice that they can**", while the advisor who did not match the participant's colour "might sometimes try to direct you **away from the correct answer**".
+The advisor whose background matched the participant's colour was labelled as being in 'group one', while the other advisor was labelled as being in 'group two'.
+This visual presentation arose from earlier experiments that implemented (unsuccessfully) a minimal groups paradigm.
 Colours and the order in which the advisors were encountered were counterbalanced.
 
 ##### Advice profiles
