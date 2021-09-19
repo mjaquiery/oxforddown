@@ -154,7 +154,7 @@ Colours and the order in which the advisors were encountered were counterbalance
 
 Despite differences in labelling, the advisors were identical in terms of how they actually produced advice.
 The advisors offered advice by placing an `r AdvisedTrial %>% filter(!is.na(advisor0confidence)) %>% pull(advisor0confidence) %>% unique()`-year wide marker on the timeline.
-The marker was placed with its centre on a point sampled from a roughly normal distribution around the correct answer with a standard deviation of `r AdvisedTrial %>% filter(!is.na(advisor0confidenceVariation)) %>% pull(advisor0confidenceVariation) %>% unique()` years.
+The marker was placed with its centre on a point sampled from a normal distribution around the correct answer with a standard deviation of `r AdvisedTrial %>% filter(!is.na(advisor0confidenceVariation)) %>% pull(advisor0confidenceVariation) %>% unique()` years in the manner described earlier§\@ref(m-p-dates-c).
 
 #### Results
 
@@ -483,7 +483,8 @@ s <- glue("({chi$parameter})={num2str(chi$statistic)}, p={prop2str(chi$p.value)}
 
 ```
 
-The advisors' advice was rated differently by the participants, as shown in Figure \@ref(fig:be-dba-r-advice-ratings) ($\chi^2$`r s`).
+The advisors' advice was rated differently by the participants, as shown in Figure \@ref(fig:be-dba-r-advice-ratings).
+The difference was statistically significant, indicating that the patterns of ratings differed depending on the advisor giving the advice ($\chi^2$`r s`).
 This indicates that participants understood the task and that the manipulation worked as intended, with more suspicion applied to the advice from the Sometimes deceptive advisor.
 
 ###### \OpenScience{prereg} Effect of advice
@@ -522,7 +523,7 @@ In all, `r length(unique(x$pid))`/`r length(unique(Familiarization$pid))` (`r nu
 The weight on advice differed according to the rating assigned the advice (`r s_advice$s[1]`; Mauchly's test for Sphericity W=`r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][2][[1]])`, p=`r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][3][[1]])`).
 As expected, participants were more influenced by advice they rated as Honest compared to advice they rated as Deceptive.
 
-###### \OpenScience{prereg} Effect of advisor
+###### \OpenScience{prereg} Effect of advisor {#be-dba-r-h-advisor}
 
 ```{r be-dba-r-advisor, fig.caption="Weight on Advice in Experiment 5.  Shows the weight of the advice of the advisors. Only trials where the participant rated the advice as Honest are included. The shaded area and boxplots indicate the distribution of the individual participants' mean weight on advice. Individual means for each participant are shown with lines in the centre of the graph. The dashed outline shows the distribution of participant means in the original study of which this is a replication."}
 for (E in c(.GlobalEnv, .prevStudy)) {
@@ -597,7 +598,7 @@ This approach has the limitation that `r lost` (`r num2str(lost / length(unique(
 
 Comparing the two (Figure \@ref(fig:be-dba-r-advisor)) showed that participants placed more weight on the Honest advice from the Always honest advisor (`r .T`).
 
-##### Exploration
+##### Exploratory analyses
 
 ```{r be-dba-r-overall, fig.caption="Advice response in Experiment 5.  Scatter plot of advice distance and advice influence. The dashed line shows x = y. Colours represent different advice ratings. Dots represent individual trials, and lines show the pattern within each rating."} 
 
@@ -690,11 +691,12 @@ coefs <- left_join(
 
 ```
 
-Figure \@ref(fig:be-dba-r-overall) shows the overall pattern of advice-taking in the experiment. 
+Figure \@ref(fig:be-dba-r-overall) shows the overall pattern of advice-taking in the experiment.
+Each point is a single trial, coloured according to the rating given to the advice by the participant. 
+The horizontal axis gives the distance between the centre of the participant's initial estimate marker and the centre of the advisor's advice marker, and the vertical axis gives the distance the participant's final decision had moved in the direction of the advisor's advice. 
+Points that lie on the dashed line indicate that the participant moved their marker all the way to the advisor's marker, thus wholly adopting the advisory estimate as their final decision.
 The difference in the number of dots of each colour reflects the difference in participants' ratings of advice between advisors. 
-
-The lines illustrate the relationship between the distance of the advice from the participant's initial estimate and the amount the participant moved the marker towards the advisor's advice for their final decision.
-The dashed line indicates complete acceptance of the advice, while the bottom triangle below the dashed line indicates incomplete acceptance.
+The lines are best-fits to the dots, and illustrate the relationship between the distance of the advice from the participant's initial estimate and the amount the participant moved the marker towards the advisor's advice for their final decision.
 
 A linear mixed model was used to better understand the significance of the relationships in the figure, predicting influence on a trial from the advisor, the distance of the advice, and rating (dummy-coded). 
 Random intercepts were included for participant.
@@ -710,12 +712,14 @@ There are other patterns in Figure \@ref(fig:be-dba-r-overall) that do not come 
 The relationship of advice rated Honest is similar between the advisors: as the advice gets further away it retains its level of influence and the participants are willing to go further to match it.
 This is not tested directly in the stats, but there is no significant effect of advisor alone ($\beta$=`r coefs$s[2]`), the presence of which would indicate that Honest-rated advice differed between advisors.
 The Bayesian analogue of the test indicated that there was not enough evidence to decide whether Advisor alone was an important factor.
+The preregistered test of this relationship above§\@ref(be-dba-r-h-advisor), however, did indicate that there was a difference when tested directly.
 
 Similarly, there may be a difference in the way the Possibly Deceptive advice was received from the Sometimes deceptive advisor as compared to the Always honest advisor (`r coefs$s[7]`), or in how the influence of this advice related to the distance between the advice and initial estimate markers (`r coefs$s[11]`).
 The statistics did not support this, and the Bayesian statistics suggested that there was sufficient evidence against either effect being present.
 
 #### Discussion
 
+This experiment provided a first test of the sensitivity of participants' egocentric discounting behaviour to the context of advice, specifically the likely benevolence (honesty) of the advisor and specific pieces of advice.
 Both the source and the plausibility of the advice matter, and in this task they interacted such that discounting primarily occurred where advice was offered that differed substantially from the participant's initial estimate and came from the advisor the participants were told might mislead them.
 Participants adapted to the context of the advice, both in terms of how readily they were to categorise the advice as dishonest and in terms of how much they were influenced by the advice.
 As advice got more distant from the initial estimate, i.e. decreased on our measure of plausibility, participants had to decide whether the discrepancy was due to their own error or their advisor's.
