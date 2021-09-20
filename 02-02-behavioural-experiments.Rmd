@@ -331,7 +331,7 @@ gg$acc <- tmp %>%
   ggplot(aes(x = Response, y = Error, colour = advisor)) +
   scale_y_continuous(limits = c(0, 50), expand = c(0, 0)) +
   scale_x_discrete() +
-  scale_colour_discrete(name = 'Advisor', aesthetics = c('fill', 'colour')) +
+  scale_fill_advisor(name = 'Advisor', aesthetics = c('fill', 'colour')) +
   coord_cartesian(clip = F) +
   geom_line(aes(group = pid), alpha = .25) +
   geom_split_violin(aes(x = nudge(Response, dw), 
@@ -458,6 +458,7 @@ suppressWarnings(
     ) +
     coord_polar() +
     facet_wrap(~Advisor) +
+    scale_fill_advisor(aesthetics = c('fill', 'colour')) +
     theme(
       axis.line = element_blank(),
       axis.ticks = element_blank(),
@@ -587,7 +588,7 @@ tmp %>%
   scale_y_continuous(limits = c(0, 1),
                      breaks = seq(0, 1, length.out = 6),
                      expand = expansion(add = c(0, 0.1))) +
-  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
+  scale_fill_feedback(aesthetics = c('fill', 'colour')) +
   facet_grid(~Feedback) +
   labs(x = 'Advisor advice profile', y = 'Weight of "Honest" advice') 
 
@@ -598,9 +599,9 @@ This approach has the limitation that `r lost` (`r num2str(lost / length(unique(
 
 Comparing the two (Figure \@ref(fig:be-dba-r-advisor)) showed that participants placed more weight on the Honest advice from the Always honest advisor (`r .T`).
 
-##### Exploratory analyses
+##### Exploratory analyses {#be-dba-r-h-explore}
 
-```{r be-dba-r-overall, fig.caption="Advice response in Experiment 5.  Scatter plot of advice distance and advice influence. The dashed line shows x = y. Colours represent different advice ratings. Dots represent individual trials, and lines show the pattern within each rating."} 
+```{r be-dba-r-overall, fig.caption="Advice response in Experiment 5.  Each point is a single trial, coloured according to the rating given to the advice by the participant. Coloured lines give the best fit linear regression for dots of that colour. The horizontal axis gives the distance between the centre of the participant's initial estimate marker and the centre of the advisor's advice marker, and the vertical axis gives the distance the participant's final decision had moved in the direction of the advisor's advice. Points that lie on the dashed line indicate that the participant moved their marker all the way to the advisor's marker, thus wholly adopting the advisory estimate as their final decision."} 
 
 tmp <- Familiarization %>%
   mutate(
@@ -692,9 +693,6 @@ coefs <- left_join(
 ```
 
 Figure \@ref(fig:be-dba-r-overall) shows the overall pattern of advice-taking in the experiment.
-Each point is a single trial, coloured according to the rating given to the advice by the participant. 
-The horizontal axis gives the distance between the centre of the participant's initial estimate marker and the centre of the advisor's advice marker, and the vertical axis gives the distance the participant's final decision had moved in the direction of the advisor's advice. 
-Points that lie on the dashed line indicate that the participant moved their marker all the way to the advisor's marker, thus wholly adopting the advisory estimate as their final decision.
 The difference in the number of dots of each colour reflects the difference in participants' ratings of advice between advisors. 
 The lines are best-fits to the dots, and illustrate the relationship between the distance of the advice from the participant's initial estimate and the amount the participant moved the marker towards the advisor's advice for their final decision.
 
@@ -705,6 +703,7 @@ A similar Bayesian model was included to produce Bayes factors.
 Overall, the distance between the initial estimate and the advice was hugely influential, with an increase in distance leading to an approximately equal increase in influence ($\beta$=`r coefs$s[3]`).
 This indicates that the advice rated Honest from the Always honest advisor was generally followed, as is shown clearly in Figure \@ref(fig:be-dba-r-overall).
 This pattern indicates that the participants see the difference between their own estimates and the advisor's as indicating that they themselves are mistaken.
+Conversely, the relationship between distance and influence was decreased when the advice came from the Sometimes deceptive advisor, even for advice rated as Honest ($\beta$=`r coefs$s[6]`).
 
 Advice rated as Deceptive from the Sometimes deceptive advisor was substantially less influential ($\beta$=`r coefs$s[8]`), and this was complemented by the relationship between distance and influence being substantially reduced in this case ($\beta$=`r coefs$s[12]`).
 
@@ -717,19 +716,25 @@ The preregistered test of this relationship above§\@ref(be-dba-r-h-advisor), ho
 Similarly, there may be a difference in the way the Possibly Deceptive advice was received from the Sometimes deceptive advisor as compared to the Always honest advisor (`r coefs$s[7]`), or in how the influence of this advice related to the distance between the advice and initial estimate markers (`r coefs$s[11]`).
 The statistics did not support this, and the Bayesian statistics suggested that there was sufficient evidence against either effect being present.
 
-#### Discussion
+#### Discussion {#be-dba-d}
 
 This experiment provided a first test of the sensitivity of participants' egocentric discounting behaviour to the context of advice, specifically the likely benevolence (honesty) of the advisor and specific pieces of advice.
 Both the source and the plausibility of the advice matter, and in this task they interacted such that discounting primarily occurred where advice was offered that differed substantially from the participant's initial estimate and came from the advisor the participants were told might mislead them.
 Participants adapted to the context of the advice, both in terms of how readily they were to categorise the advice as dishonest and in terms of how much they were influenced by the advice.
 As advice got more distant from the initial estimate, i.e. decreased on our measure of plausibility, participants had to decide whether the discrepancy was due to their own error or their advisor's.
-Where they were in a context that suggested the advisor was trustworthy, they were more likely to ascribe the error to themselves, rating the advice as honest and adopting it for their final decision. 
-Where they were in a context that suggested the advisor was not trustworthy, they were more likely to label the advice as misleading and to retain their initial estimate as their final decision.
+Where they believed the advisor was trustworthy, they were more likely to ascribe the error to themselves, rating the advice as honest and adopting it for their final decision.
+Where they believed the advisor was not trustworthy, they were more likely to label the advice as misleading and to retain their initial estimate as their final decision.
+Going beyond the obvious, we also saw that participants were more sceptical of advice from the less trustworthy advisor _even when they believed the advice was well-meaning_.
 
 These observations complement the evolutionary simulations and the benevolence component of the three-factor model of trust described by @mayerIntegrativeModelOrganizational1995.
 Nevertheless, we have demonstrated sensitivity to context, but not universal discounting due to hyperpriors.
 It remains a matter of speculation that people exercise epistemic hygiene by ensuring that information comes from trusted sources before integrating it, and that no source is as trusted as one's own mind.
-This result is in keeping with evidence from experiments where initial estimates are labelled as advice (and vice-versa), in which participants frequently show an unusual level of acceptance of the advice suggestive of their performing egocentric discounting of their own initial estimate because they have accepted the labels and adopted the advice as their own initial estimate [@sollJudgmentalAggregationStrategies2011]. 
+This result is in keeping with evidence from experiments where initial estimates are labelled as advice (and vice-versa).
+@sollJudgmentalAggregationStrategies2011 collected initial estimates from participants and then presented those estimates back to participants along with advice so participants could provide final decisions in a classic Judge-Advisor System.
+Unbeknownest to the participants, for some of the questions, the participant's initial estimate was labelled as the advice, and the advice was labelled as the participant's initial estimate. 
+For those questions that were switched in this manner, the participants appeared to treat the advice as if it were their own initial decision -- placing more weight on the advice than their actual initial decision.
+If egocentric discounting of advice were due to judges having better access to the reasons for their own estimates, for example, their own initial estimates ought to appear most reasonable and therefore be more influential, regardless of whether they were labelled as "initial estimate" or "advice". 
+On the other hand, if people use a heuristic that their own opinion is more trustworthy because it is _their own_ opinion, they will rely most on whichever figure is presented as their own initial estimate, as indeed they did.
 
 ##### Limitations
 
@@ -806,8 +811,9 @@ All trials in this section included feedback for all participants indicating whe
 
 Participants then did `r tmp %>% filter(type == "advice_practice") %>% pull(n) %>% round()` trials with a practice advisor to get used to receiving advice.
 They also received feedback on these trials.
-They were informed that they would "get advice on the answers you give" and that the feedback they received would "tell you about how well the advisor does, as well as how well you do".
+They were informed that they would "get advice about the correct answer".
 Before starting the main experiment they were told that they would receive advice from multiple advisors and that "advisors might behave in different ways, and it's up to you to decide how useful you think each advisor is, and to use their advice accordingly".
+They were also notified that "some of the advisors may try to deceive you", and that they would be warned before starting those blocks.
 
 Participants then performed `r sum(tmp$type == "core")` blocks of trials that constituted the main experiment.
 In each of these blocks participants had a single advisor for `r tmp %>% filter(block == 2, type == "core") %>% pull(n) %>% round()` trials, plus `r tmp %>% filter(block == 2, type == "atn_check") %>% pull(n) %>% round()` attention check.
@@ -1049,7 +1055,7 @@ s_acc <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 ```
 
 Participants decreased the error between the midpoint of their answer and the true answer from the initial estimate to the final decision (`r s_acc$s[1]`), which suggests that they incorporated the advice, which was indicative of the correct answer (Figure \@ref(fig:be-dbc-r-performance)).
-The participants had less error on decisions made with the Honest group of advisors than the Deceptive group of advisors (`r s_acc$s[2]`), although surprisingly there was no evidence that this was due to greater reduction in error scores over time for those advisors (`r s_acc$s[3]`).
+The participants had less error on decisions made with the Honest group of advisors than the Deceptive group of advisors (`r s_acc$s[2]`), although once again there was no evidence that this was due to greater reduction in error scores over time for those advisors (`r s_acc$s[3]`).
 
 Participants only had one marker they could place, and separate confidence judgements were not asked for, so we cannot directly assess confidence in these data.
 
@@ -1122,6 +1128,7 @@ suppressWarnings(
     ) +
     coord_polar() +
     facet_wrap(~Advisor) +
+    scale_fill_advisor(aesthetics = c('fill', 'colour')) +
     theme(
       axis.line = element_blank(),
       axis.ticks = element_blank(),
@@ -1147,7 +1154,7 @@ s <- glue("({chi$parameter})={num2str(chi$statistic)}, p={prop2str(chi$p.value)}
 
 ```
 
-The advisors' advice was rated differently by the participants, as shown in Figure \@ref(fig:be-dbc-r-advice-ratings) ($\chi^2$`r s`).
+The advice was rated differently by the participants according to context they were in, as shown in Figure \@ref(fig:be-dbc-r-advice-ratings) ($\chi^2$`r s`).
 This indicates that participants understood the task and that the manipulation worked as intended, with more suspicion applied to the advice from the advisors in the Deceptive group.
 
 ###### \OpenScience{prereg} Effect of advice
@@ -1183,7 +1190,7 @@ Using a more complete test, such as 2x3 ANOVA, would have suffered greatly from 
 
 To explore the effect of advice, a 1x3 ANOVA was run on weight on advice across ratings. 
 In all, `r length(unique(x$pid))`/`r length(unique(Familiarization$pid))` (`r num2str(length(unique(x$pid)) / length(unique(Familiarization$pid)) * 100)`%) participants had at least one trial rated with each of the three ratings.
-The weight on advice differed according to the rating assigned the advice (`r s_advics[1]`; Mauchly's test for Sphericity W=`r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][2][[1]])`, p=`r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][3][[1]])`).
+The weight on advice differed according to the rating assigned the advice (`r s_advice[1]`; Mauchly's test for Sphericity W=`r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][2][[1]])`, p=`r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][3][[1]])`).
 As expected, participants were more influenced by advice they rated as Honest compared to advice they rated as Deceptive.
 
 ###### \OpenScience{prereg} Effect of advisor
@@ -1243,7 +1250,7 @@ tmp %>%
   scale_y_continuous(limits = c(0, 1),
                      breaks = seq(0, 1, length.out = 6),
                      expand = expansion(add = c(0, 0.1))) +
-  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
+  scale_fill_feedback(aesthetics = c('fill', 'colour')) +
   facet_grid(~Feedback) +
   labs(x = 'Advisor advice profile', y = 'Weight of "Honest" advice') 
 
@@ -1254,9 +1261,9 @@ This approach has the limitation that `r lost` (`r num2str(lost / length(unique(
 
 Comparing the two (Figure \@ref(fig:be-dbc-r-advisor)) showed that participants placed more weight on the Honest advice from advisors in the Honest group (`r .T`), although the Bayes factor was not at our threshold of 3.
 
-##### Exploration
+##### Exploratory analyses
 
-```{r be-dbc-r-overall, fig.caption="Advice response in Experiment 6.  Scatter plot of advice distance and advice influence. The dashed line shows x = y. Colours represent different advice ratings. Dots represent individual trials, and lines show the pattern within each rating."} 
+```{r be-dbc-r-overall, fig.caption="Advice response in Experiment 6.  Each point is a single trial, coloured according to the rating given to the advice by the participant. Coloured lines give the best fit linear regression for dots of that colour. The horizontal axis gives the distance between the centre of the participant's initial estimate marker and the centre of the advisor's advice marker, and the vertical axis gives the distance the participant's final decision had moved in the direction of the advisor's advice. Points that lie on the dashed line indicate that the participant moved their marker all the way to the advisor's marker, thus wholly adopting the advisory estimate as their final decision."} 
 
 tmp <- Familiarization %>%
   mutate(
@@ -1329,8 +1336,8 @@ ef <- BF@bayesFactor %>%
     bf = 1/exp(bf)
   ) %>%
   mutate(
-    Effect = str_replace(Effect, "A", "AdvisorDeceptive group"),
     Effect = str_replace(Effect, "D", "Distance"),
+    Effect = str_replace(Effect, "A", "AdvisorDeceptive group"),
     Effect = str_replace(Effect, "rd", "RatingDeceptive"),
     Effect = str_replace(Effect, "rpd", "RatingPossibly Deceptive")
   )
@@ -1346,10 +1353,40 @@ coefs <- left_join(
   )
 
 ```
-\mccorrect{TODO: Describe graph and models. Relate to results from Experiment 5.}
+
+Figure \@ref(fig:be-dbc-r-overall) shows the overall pattern of advice-taking in the experiment.
+A linear mixed model was used to better understand the significance of the relationships in the figure, predicting influence on a trial from the advisor, the distance of the advice, and rating (dummy-coded). 
+Random intercepts were included for participant.
+A similar Bayesian model was included to produce Bayes factors.
+
+The overall pattern showed both advisors were responded to similarly to the Sometimes deceptive advisor in Experiment 5 (Figure \@ref(be-dba-r-overall)).
+For advice rated as Honest from the Honest group of advisors, the distance between the initial estimate and the advice was hugely influential, with an increase in distance leading to an approximately equal increase in influence ($\beta$=`r coefs$s[3]`).
+This pattern was neither clearly different nor clearly the same for advice rated as Honest from the Deceptive group of advisors ($\beta$=`r coefs$s[6]`).
+
+Advice rated as Deceptive had a much flatter relationship with distance when coming from the Honest group of advisors ($\beta$=`r coefs$s[10]`), and this relationship was the same when the advice came from the Deceptive group of advisors ($\beta$=`r coefs$s[12]`).
+Advice rated as Possibly Deceptive did not show this pattern, but neither was it clearly the same as advice rated Honest in its relationship with distance ($\beta$=`r coefs$s[9]`), and it is likely more evidence would reveal a subtler pattern in the direction of that found for advice rated as Deceptive. 
+The relationship of advice rated as Possibly Deceptive to distance was, however, different between advisor groups, with the Possibly Deceptive advice being considered more trustworthy as it got more distant when it came from the Deceptive group of advisors ($\beta$=`r coefs$s[11]`).
+This surprising result may be due to participants applying different criteria to judging the deceptiveness of advice according to the advisors giving it.
+
+More clearly visible in Figure \@ref(be-dbc-r-overall) than Figure \@ref(bd-dba-r-overall), but present in both, is the tendency for participants to rate advice as Deceptive more frequently as it is further away from their initial estimates.
+Notably, this appears more common for the Sometimes deceptive advisor and the Deceptive group of advisors.
+For the Always honest advisor and the Honest group of advisors, even advice that is far away from the participant's initial estimate is often rated as and treated as honest.
 
 #### Discussion
 
+This experiment followed up on the findings in Experiment 5§\@ref(be-dba-d) by presenting participants with a context in which advisors were more or less likely to be benevolent, rather than having participants form a relationship with an advisor who was more or less likely to be benevolent. 
+This shift from relationship to context means that the experiment is slightly closer to scenario 1 in our evolutionary models§\@ref(models-scenario-1).
+
+Whereas in Experiment 5 we saw that both the advice and its source mattered for how much participants followed advice, in Experiment 6 only the advice mattered in this respect. 
+Nevertheless, in both cases participants were more likely to appraise advice as helpful (and to follow it accordingly) when the source of the advice was trustworthy. 
+In terms of our simulations, this suggests that the effect of context may increase egocentric discounting through increasing the frequency with which judges wholly disregard advice rather than through decreasing the extent to which they take advice uniformly across all interactions.
+Put simply, they are more on their guard for bad advice, but once they accept advice is good they will treat it normally.
+
+
+This differs somewhat from the effect of building a relationship with a single advisor. 
+In this case, while advice is judged similarly warily when it might be deceptive, even advice judged as Honest is accepted more hesitantly.
+Both ignoring advice more frequently and accepting advice more tentatively appear the same when the advice taking is represented using an average over multiple trials.
+Overall, the results of Experiments 5 and 6 illustrate that people respond flexibly to changes in the likely benevolence of advice, and that this can affect their relationships with individual advisors.
 
 ## Noise in the advice
 
@@ -1360,11 +1397,11 @@ Specifically, the literature demonstrates the normativity of discounting where t
 This demonstration is supplemented with a more comprehensive model of the utility of advice according to the ability to identify the more expert opinion, the relative accuracy of the advisor and judge, and the independence of the opinions [@sollStrategiesRevisingJudgment2009].
 A more complete account of the effects of advisor expertise was provided earlier§\@ref(context-expertise).
 
-Views of relative expertise may also be affected by self-enhancement bias [@brownEvaluationsSelfOthers1986].
-We expect that this is somewhat dependent upon the difficulty of the task presented; people faced with a difficult task will under- rather than overestimate their ability relative to others [@ginoEffectsTaskDifficulty2007].
-Taken together, then people are likely to consider themselves more able on a given task than an arbitrary advisor, and consequently that they are likely to downweight advice relative to their own initial estimate.
+Views of relative expertise may also be affected by self-enhancement bias wherein people typically assess their own abilities to be above average [@brownEvaluationsSelfOthers1986].
+We expect that perception of relative expertise is somewhat dependent upon the difficulty of the task presented; people faced with a difficult task will under- rather than overestimate their ability relative to others [@ginoEffectsTaskDifficulty2007].
+Taken together, then, people are likely to consider themselves more able on a given task than an arbitrary advisor, and consequently that they are likely to down-weight advice relative to their own initial estimate.
 This behaviour is supported by normative models which show biasing towards the better estimator (in this case the judge) is the optimal strategy [@sollStrategiesRevisingJudgment2009; @mahmoodiEqualityBiasImpairs2015].
-As discussed in the scenario, the belief that one is better at a task than the average advisor may not be misguided: advisors may not dedicate the same amount of time, concentration, or thought to producing advice as judges do for initial estimates.
+As discussed in scenario 2§\@ref(models-scenario-2-d), the belief that one is better at a task than the average advisor may not be misguided: advisors may not dedicate the same amount of time, concentration, or thought to producing advice as judges do for initial estimates.
 Judges have to live with the consequences of their decisions, whereas advisors do not.
 
 ## Confidence mapping

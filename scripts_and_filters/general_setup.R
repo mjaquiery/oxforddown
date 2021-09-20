@@ -382,6 +382,7 @@ order_factors <- function(x) {
     if (
       all(str_detect(levels(f), c('^[hH]igh ?accuracy', 
                                   '^[hH]igh ?agreement'))) ||
+      all(str_detect(levels(f) , c('^[dD]eceptive', '^[hH]onest'))) ||
       all(str_detect(levels(f), c('^[bB]ias', '^[aA]nti'))) ||
       all(str_detect(levels(f), c('^[hH]igh', '^[lL]ow'))) ||
       all(str_detect(levels(f), c('^[fF]inal', '^[iI]nitial'))) ||

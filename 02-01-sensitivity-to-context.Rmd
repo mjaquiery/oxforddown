@@ -236,7 +236,7 @@ As before, egocentric discounting emerges rapidly in the active condition and re
 To attain mean self-weight values in the 70-80% region usually observed experimentally, the manipulation strength needs to be around 0.3. 
 The population $s^a$ values are drawn from a distribution with mean 1, so this equates to roughly 30% extra noise on the advice compared to the initial estimates.
 
-### Discussion
+### Discussion {#models-scenario-2-d}
 
 Where the advice is of worse quality on average, encoded here as additional variation, egocentric discounting tailors the relative weights of the estimates according to their average quality.
 As with situations in which an advice-seeker is more competent at making the relevant decision than their advisor, some measure of egocentric discounting is warranted in this scenario.
