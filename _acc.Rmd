@@ -196,7 +196,7 @@ save(dots_rt, file = paste0(tempdir(), "/.dot_rt.rda"))
 
 ```
 
-```{r ac-acc-dots-r-performance, fig.caption="Task performance for the Dots task with in/accurate advisors.  A: Response accuracy. Faint lines show individual participant means, for which the violin and box plots show the distributions. The half-width horizontal dashed lines show the level of accuracy which the staircasing procedure targeted, while the full width dashed line indicates chance performance. Dotted violin outlines show the distribution of actual advisor accuracy.  B: Confidence. Faint lines show individual participant means, for which the violin and box plots show the distributions.  C: Influence. Participants' weight on the advice for advisors in the Familiarization stage of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2].", fig.height=7}
+```{r ac-acc-dots-r-performance, fig.caption="Task performance for the Dots task with in/accurate advisors.  A: Response accuracy. Faint lines show individual participant means, for which the violin and box plots show the distributions. The half-width horizontal dashed lines show the level of accuracy which the staircasing procedure targeted, while the full width dashed line indicates chance performance. Dotted violin outlines show the distribution of actual advisor accuracy.  B: Confidence. Faint lines show individual participant means, for which the violin and box plots show the distributions. Final confidence is negative where the answer side changes. Theoretical range of confidence scores is initial: [0,1]; final: [-1,1].  C: Influence. Participants' weight on the advice for advisors in the Familiarization stage of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2].", fig.height=7}
 
 gg <- list()
 
@@ -282,7 +282,13 @@ tmp <- familiarization %>%
   group_by(`Initial estimate accuracy`, pid) %>%
   summarise(
     `Initial estimate` = mean(initialConfidenceScore),
-    `Final decision` = mean(confidenceShiftRaw),
+    `Final decision` = mean(
+      if_else(
+        initialAnswer == finalAnswer, 
+        finalConfidenceScore, 
+        -finalConfidenceScore
+      )
+    ),
     .groups = 'drop'
   ) %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`),
@@ -305,7 +311,7 @@ bf <- tmp %>%
 gg$conf <- tmp %>%
   order_factors() %>%
   ggplot(aes(x = `Initial estimate accuracy`, y = Confidence, colour = Response)) +
-  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(-.5, 1), expand = c(0, 0)) +
   scale_x_discrete() +
   coord_cartesian(clip = F) +
   geom_line(aes(group = pid), alpha = .25) +
@@ -323,7 +329,8 @@ gg$conf <- tmp %>%
   labs(x = "") +
   theme(legend.position = 'none', text = element_text(size = 12)) +
   facet_wrap(~response) +
-  scale_fill_decision(aesthetics = c("fill", "colour"))
+  scale_fill_decision(aesthetics = c("fill", "colour")) +
+  broken_axis_bottom
 
 tmp <- familiarization %>%
   group_by(pid, Advisor) %>%
@@ -430,10 +437,14 @@ df <- familiarization %>%
   transmute(
     pid = factor(pid),
     initialConfidence,
-    finalConfidence,
-    Advisor,
-    initialAnswerCorrect,
-    finalAnswerCorrect
+    finalConfidence = if_else(
+      initialAnswer == finalAnswer,
+      finalConfidence,
+      -finalConfidence
+    ),
+    initialAnswerCorrect = if_else(
+      initialAnswerCorrect, "Correct", "Incorrect"
+    ),
   ) %>%
   pivot_longer(
     cols = c(initialConfidence, finalConfidence),
@@ -441,46 +452,32 @@ df <- familiarization %>%
     names_pattern = "(.+)Confidence",
     values_to = "Confidence"
   ) %>%
-  mutate(
-    Correct = if_else(
-      Decision == "initialConfidence", 
-      initialAnswerCorrect,
-      finalAnswerCorrect
-    ),
-    Correct = factor(Correct),
-    Decision = factor(str_to_sentence(Decision))
-  ) %>%
-  select(-ends_with('AnswerCorrect')) %>%
-  group_by(pid, Advisor, Decision, Correct) %>%
+  group_by(pid, Decision, initialAnswerCorrect) %>%
   summarise(
     Confidence = mean(Confidence), 
     .groups = 'drop'
-  )
+  ) %>% 
+  mutate(across(-Confidence, factor))
 
-aov_acc <- ez::ezANOVA(
+aov_conf <- ez::ezANOVA(
   df, 
   dv = Confidence,
   wid = pid,
-  within = c(Advisor, Decision, Correct)
+  within = c(Decision, initialAnswerCorrect)
 )
 
-tmp <- aov_acc$ANOVA %>%
+mm_conf <- marginalMeans(df, Confidence, pid, "Increase")
+
+message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
+
+s <- summariseANOVA(aov_conf$ANOVA, mm_conf)
+
+tmp <- aov_conf$ANOVA %>%
   nest(d = -Effect) %>%
   mutate(s = map_chr(d, ~ glue(
     "F({.$DFn},{.$DFd})={num2str(.$F, 2)}, p={prop2str(.$p, minPrefix = '<')}"
   )))
 
-# 3-way interaction
-m <- df %>% 
-  group_by(Advisor, Correct, Decision) %>% 
-  summarise(conf = mean(Confidence), .groups = 'drop') %>%
-  pivot_wider(names_from = Decision, values_from = conf) %>%
-  mutate(Difference = Final - Initial) %>%
-  select(-Final, -Initial) %>%
-  pivot_wider(names_from = Correct, values_from = Difference) %>%
-  mutate(Split = `TRUE` - `FALSE`) %>%
-  select(Advisor, Split) %>%
-  mutate(Split = num2str(Split))
 
 r <- familiarization %>% 
   group_by(pid) %>% 
@@ -529,9 +526,12 @@ There is considerable variation between participants both on their baseline conf
 The narrow accuracy range, and its random nature mean there was no evidence of a correlation between participant accuracy and confidence for initial ($\text{BF}_{10}=$ `r bf2str(exp(r_i@bayesFactor$bf))`) or final ($\text{BF}_{10}=$ `r bf2str(exp(r_f@bayesFactor$bf))`), although neither of these correlations indicated good evidence that no correlation existed.
 Variation between individuals' confidence reports is expected [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017].
 
-ANOVA of Time, Advisor, and Correctness of the decision indicated that there was a main effect of Correctness, with participants being more confident on correct vs incorrect decisions (`r tmp$s[[3]]`). 
-This effect showed interactions with Advisor (`r tmp$s[[5]]`) and Time (`r tmp$s[[6]]`), summed up in the three-way Advisor-Correctness-Time interaction (`r tmp$s[[7]]`).
-Confidence increased for correct responses and decreased for incorrect responses, and this confidence change difference was greater for the High accuracy advisor (`r m$Split[2]`) than the Low accuracy advisor (`r m$Split[1]`).
+We ran an ANOVA on confidence by Time (initial estimates versus final decisions) and Correctness of the initial estimate (Correct initial estimates versus Incorrect initial estimates).
+For this analysis confidence was directonally coded so that final decision confidence was negative if the answer side changed between the initial estimate and final decision.
+The analysis indicated that participants were more confident in their initial estimates than their final decisions (`r s$s[1]`).
+This makes sense given that there is more scope for participants to reverse their confidence than to increase it on any given trial given the way the scale works.
+There was also a main effect of Correctness, with participants being more confident overall where their initial estimate was on correct as compared to when it was incorrect (`r s$s[[2]]`). 
+There was an interaction, with participants becoming even less confident between initial estimates and final decisions for trials where the initial estimate was incorrect (`r s$s[3]`).
 This indicates that confidence is behaving as in a sensible manner.
 
 ###### Metacognitive ability
@@ -1517,7 +1517,7 @@ s <- summariseANOVA(aov_conf$ANOVA, mm_conf)
 
 Generally, we expect participants to be more confident on trials on which they are correct compared to trials on which they are incorrect (Figure \@ref(fig:ac-acc-dates-r-performance)B).
 Participants' initial estimates and final decisions were both systematically more confident when the initial estimate was correct as compared to incorrect (`r aov_conf$s[1]`).
-Participants were also more confident on final decisions than on initial estimates (`r aov_conf$s[2]`), and the increase over time only appeared for the trials where the initial estimate was correct (`r aov_conf$s[3]`).
+Participants were less confident on final decisions than on initial estimates (`r aov_conf$s[2]`), and the decrease over time was greatest for the trials where the initial estimate was incorrect (`r aov_conf$s[3]`).
 
 ###### Metacognitive ability
 

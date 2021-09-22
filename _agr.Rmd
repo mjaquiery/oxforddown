@@ -168,7 +168,7 @@ Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded,
 
 ##### Task performance
 
-```{r ac-agr-dots-r-performance, fig.caption="Task performance for the Dots task with dis/agreeing advisors.  A: Response accuracy. Faint lines show individual participant means, for which the violin and box plots show the distributions. The half-width horizontal dashed lines show the level of accuracy which the staircasing procedure targeted, while the full width dashed line indicates chance performance. Dotted violin outlines show the distribution of actual advisor accuracy.  B: Confidence. Faint lines show individual participant means, for which the violin and box plots show the distributions.  C: Influence. Participants' weight on the advice for advisors in the Familiarization stage of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2].", fig.height=7}
+```{r ac-agr-dots-r-performance, fig.caption="Task performance for the Dots task with dis/agreeing advisors.  A: Response accuracy. Faint lines show individual participant means, for which the violin and box plots show the distributions. The half-width horizontal dashed lines show the level of accuracy which the staircasing procedure targeted, while the full width dashed line indicates chance performance. Dotted violin outlines show the distribution of actual advisor accuracy.  B: Confidence. Faint lines show individual participant means, for which the violin and box plots show the distributions. Final confidence is negative where the answer side changes. Theoretical range of confidence scores is initial: [0,1]; final: [-1,1].  C: Influence. Participants' weight on the advice for advisors in the Familiarization stage of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2].", fig.height=7}
 
 gg <- list()
 
@@ -247,12 +247,20 @@ gg$acc <- tmp %>%
   scale_fill_advisor(aesthetics = c("fill", "colour"))
 
 tmp <- familiarization %>%
-  mutate(`Initial estimate accuracy` =
-           if_else(initialAnswerCorrect, 'Initial\ncorrect', 'Initial\nincorrect')) %>%
+  mutate(
+    `Initial estimate accuracy` =
+      if_else(initialAnswerCorrect, 'Initial\ncorrect', 'Initial\nincorrect')
+  ) %>%
   group_by(`Initial estimate accuracy`, pid) %>%
   summarise(
     `Initial estimate` = mean(initialConfidenceScore),
-    `Final decision` = mean(finalConfidenceScore),
+    `Final decision` = mean(
+      if_else(
+        initialAnswer == finalAnswer, 
+        finalConfidenceScore, 
+        -finalConfidenceScore
+      )
+    ),
     .groups = 'drop'
   ) %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`),
@@ -275,7 +283,7 @@ bf <- tmp %>%
 gg$conf <- tmp %>%
   order_factors() %>%
   ggplot(aes(x = `Initial estimate accuracy`, y = Confidence, colour = Response)) +
-  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(-.5, 1), expand = c(0, 0)) +
   scale_x_discrete() +
   coord_cartesian(clip = F) +
   geom_line(aes(group = pid), alpha = .25) +
@@ -293,22 +301,20 @@ gg$conf <- tmp %>%
   labs(x = "") +
   theme(legend.position = 'none', text = element_text(size = 12)) +
   facet_wrap(~response) +
-  scale_fill_decision(aesthetics = c("fill", "colour"))
+  scale_fill_decision(aesthetics = c("fill", "colour")) +
+  broken_axis_bottom
 
 tmp <- familiarization %>%
-  group_by(pid, adviceType) %>%
+  group_by(pid, Advisor) %>%
   select(c(matches('(adviceInfluence)'), group_vars(.))) %>%
   summarise_all(mean) %>%
-  mutate(adviceTypeName = case_when(adviceType == 7 ~ 'High agreement',
-                                    adviceType == 8 ~ 'Low agreement',
-                                    T ~ NA_character_),
-         `Feedback condition` = 'No feedback') %>%
+  mutate(`Feedback condition` = 'No feedback') %>%
   mutate(across(-matches('Influence'), factor)) %>%
   order_factors()
 
 bf <- tmp %>%
-  select(group_vars(.), adviceTypeName, adviceInfluence) %>%
-  pivot_wider(names_from = adviceTypeName, values_from = adviceInfluence) %$%
+  select(group_vars(.), Advisor, adviceInfluence) %>%
+  pivot_wider(names_from = Advisor, values_from = adviceInfluence) %$%
   ttestBF(`High agreement`, `Low agreement`, paired = T) %>%
   .@bayesFactor %>%
   .$bf %>%
@@ -317,16 +323,16 @@ bf <- tmp %>%
 
 dw <- .1
 
-gg$inf <- ggplot(tmp, aes(x = adviceTypeName, y = adviceInfluence,
+gg$inf <- ggplot(tmp, aes(x = Advisor, y = adviceInfluence,
                 colour = `Feedback condition`, fill = `Feedback condition`)) +
   geom_hline(yintercept = 0, colour = 'lightgrey', size = 1) +
   geom_line(aes(group = pid), alpha = .25) +
-  geom_split_violin(aes(x = nudge(adviceTypeName, dw),
-                        group = adviceTypeName), width = .9,
+  geom_split_violin(aes(x = nudge(Advisor, dw),
+                        group = Advisor), width = .9,
                colour = NA) +
   geom_boxplot(outlier.shape = NA, size = 1, width = dw/2,
-               aes(x = nudge(adviceTypeName, dw),
-                   group = adviceTypeName),
+               aes(x = nudge(Advisor, dw),
+                   group = Advisor),
                colour = 'black') +
   geom_segment(x = 1, xend = 2, y = 1, yend = 1, colour = 'black') +
   geom_label(y = 1, x = 1.5, colour = 'black', fill = 'white',
@@ -390,9 +396,14 @@ df <- familiarization %>%
   transmute(
     pid = factor(pid),
     initialConfidence,
-    finalConfidence,
-    initialAnswerCorrect,
-    finalAnswerCorrect
+    finalConfidence = if_else(
+      initialAnswer == finalAnswer,
+      finalConfidence,
+      -finalConfidence
+    ),
+    initialAnswerCorrect = if_else(
+      initialAnswerCorrect, "Correct", "Incorrect"
+    ),
   ) %>%
   pivot_longer(
     cols = c(initialConfidence, finalConfidence),
@@ -400,34 +411,21 @@ df <- familiarization %>%
     names_pattern = "(.+)Confidence",
     values_to = "Confidence"
   ) %>%
-  mutate(
-    Correct = if_else(
-      Decision == "initialConfidence", 
-      initialAnswerCorrect,
-      finalAnswerCorrect
-    ),
-    Correct = factor(
-      if_else(Correct, "Correct", "Incorrect")
-    ),
-    Decision = factor(str_to_sentence(Decision))
-  ) %>%
-  select(-ends_with('AnswerCorrect')) %>%
-  group_by(pid, Decision, Correct) %>%
+  group_by(pid, Decision, initialAnswerCorrect) %>%
   summarise(
     Confidence = mean(Confidence), 
     .groups = 'drop'
-  )
+  ) %>% 
+  mutate(across(-Confidence, factor))
 
-aov_conf <- ezANOVA(
+aov_conf <- ez::ezANOVA(
   df, 
   dv = Confidence,
   wid = pid,
-  within = c(Decision, Correct)
+  within = c(Decision, initialAnswerCorrect)
 )
 
-mm_conf <- df %>%
-  select(pid, Confidence, Decision, Correct) %>%
-  marginalMeans(Confidence, pid, "Increase")
+mm_conf <- marginalMeans(df, Confidence, pid, "Increase")
 
 message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
 
@@ -451,8 +449,8 @@ Basic behavioural performance was similar to that observed with the same Dots ta
 Initial estimate accuracy converged on the target 71%, and participants may have benefited from advice in terms of their final decisions being more accurate than their initial estimates (`r s_acc$s[2]`; Figure \@ref(fig:ac-agr-dots-r-performance)A).
 There was no evidence of a general difference in participants' overall accuracy between advisors (`r s_acc$s[1]`), nor was there evidence of a difference in participants' improvement in accuracy between advisors (`r s_acc$s[3]`).
 
-Figure \@ref(fig:ac-agr-dots-r-performance)B and ANOVA indicated that participants were more confident in their correct answers than their incorrect ones (`r s_conf$s[2]`), and less confident in their final decisions than their initial estimates (`r s_conf$s[1]`).
-These two factors interacted (`r s_conf$s[3]`).
+Figure \@ref(fig:ac-agr-dots-r-performance)B and ANOVA indicated that participants were more confident in their answers when their initial estimate was correct as compared with incorrect (`r s_conf$s[2]`), and less confident in their final decisions than their initial estimates (`r s_conf$s[1]`).
+These two factors interacted, with confidence only decreasing for final decisions in trials where the initial estimate was incorrect (`r s_conf$s[3]`).
 
 Perhaps surprisingly, there was no correlation between initial estimate accuracy and confidence (`r bf2str(exp(conf_r_i@bayesFactor$bf))`), and no evidence for a correlation between final decision accuracy and confidence (`r bf2str(exp(conf_r_f@bayesFactor$bf))`).
 
@@ -1165,8 +1163,8 @@ Participants' accuracy (Figure \@ref(fig:ac-agr-dates-r-performance)A), which wa
 There was no significant difference between advisors (`r s_acc$s[1]`), but the increase in final decision accuracy was greater for the Low agreement advisor than the High agreement advisor (`r s_acc$s[3]`).
 
 As expected, and as shown in Figure \@ref(fig:ac-agr-dates-r-performance)B participants were systematically more confident when their initial estimate was correct as compared to incorrect (`r s_conf$s[1]`).
-Participants were also more confident on final decisions than on initial estimates (`r s_conf$s[2]`). 
-This increase in confidence was greater when the initial estimate was correct as compared to incorrect (`r s_conf$s[3]`).
+Participants were less confident on final decisions than on initial estimates (`r s_conf$s[2]`), as expected given that the scale allows more scope for reducing than increasing confidence between initial estimate and final decision. 
+This decrease in confidence was greater when the initial estimate was incorrect as compared to correct (`r s_conf$s[3]`).
 
 The High agreement advisor was more influential (Figure \@ref(fig:ac-agr-dates-r-performance)C) than the Low agreement advisor overall (`r s_inf$s[2]`), and participants in the No feedback condition were more influenced than participants in the Feedback condition (`r s_inf$s[1]`).
 There was no evidence of an interaction between these differences, however (`r s_inf$s[3]`).

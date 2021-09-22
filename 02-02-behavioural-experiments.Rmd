@@ -2502,24 +2502,25 @@ coefs <- left_join(
 ```
 
 It is quite possible that participants failed to adequately grasp the calibration of the advisors, despite the lengths that we went to in order to highlight the importance of this feature.
-Indeed, a paired T-test of the influence of the advisors in Key trials where they were presented Unambiguously indicated that the High confidence advisor was numerically _more_ influential than the Low confidence advisor, despite that advisor offering less useful advice. 
+Indeed, a paired T-test of the influence of the advisors in Key trials where they were presented Unambiguously indicated that the High confidence advisor was numerically _more_ influential than the Low confidence advisor (`r .T.unamb`). 
 Statistically, there was not enough evidence to conclude whether or not the effect was present or absent.
 
-This suggested that participants were forming a simple attachment to the more confident advisor, perhaps following a heuristic that the more confident advisor would give better advice.
+This suggested that participants were simply adopting a heuristic that more confident advice was more likely to be correct -- entirely ignoring the calibration of the advisors.
 Indeed, linear mixed modelling indicated that, when predicting the influence on Key trials from the advisor, presentation, advisor-by-presentation interaction, and advice confidence (with random intercepts for participant), only advice confidence was a significant predictor ($\beta$=`r coefs$s[4]`).
 The other main predictors were both demonstrably absent ($\beta_{\text{High confidence advisor}}$=`r coefs$s[2]`; $\beta_{\text{Unambiguous presentation}}$=`r coefs$s[3]`), and there was not sufficient evidence to adjudicate on the presence of an interaction ($\beta_{\text{High confidence advisor, Unambiguous presentation}}$=`r coefs$s[5]`).
 
 #### Discussion
 
 We attempted to manipulate participants' ability to use their knowledge of advisors' idiosyncratic confidence expression to perform our Dates estimation task.
-We were unable to demonstrate that participants did so, and it seemed as though participants paid more attention to the advice than its source.
+We were unable to demonstrate that participants did so, and it appeared from our linear modelling that participants paid more attention to the advice than its source.
 The predicted interaction between advisor confidence and advisor presentation (labelled vs. hybrid) was not statistically significant, and indeed trended in the opposite direction to that hypothesised. 
-It appeared as if participants had developed a mild positive association between the more confident advisor and more confident advice, treating that advisor as more influential even when they expressed a moderate level of confidence.
+It appeared from the numerical patterns, where participants were _more_ influenced by moderate confidence advice if it was clearly labelled as coming from the High confidence advisor (despite therefore representing lower subjective confidence), and vice-versa for the Low confidence advisor, that participants had developed a mild positive association between the more confident advisor and more confident advice, treating that advisor as more trustworthy even when they expressed a moderate level of confidence.
 
 There are several features of this experiment that may have led to the underwhelming conclusion. 
 First, the advisors' gravatar images may be harder for participants to differentiate than human faces.
 Second, without offering an incentive beyond the innate appeal of the task, participants may not have been motivated to absorb the complex confidence calibration information presented to them, especially where the time cost to do so is not offset by performance-based payment.
 Third, the somewhat artificial nature of the task may limit participants' interest in the character of the advisors.
+Fourth, it may be quite difficult to overcome the widespread heuristic that higher confidence advice is more likely to be correct [@sollStrategiesRevisingJudgment2009; @moussaidSocialInfluenceCollective2013; @bangDoesInteractionMatter2014; @pulfordPersuasivePowerKnowledge2018; @priceIntuitiveEvaluationLikelihood2004].
 Adding additional information beyond the simple introductory speech bubble may have helped to alleviate this issue.
 
 Whether or not additional appeal and character for the advisors would improve participants' sensitivity to the advisors' use of the confidence scale, these results cast doubt on a simple mechanistic implementation of our model of advice-taking.
