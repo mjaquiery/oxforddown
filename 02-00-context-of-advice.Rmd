@@ -107,6 +107,7 @@ Several features of advice itself have been explored: the confidence of advice, 
 When judges are more confident, they tend to be less influenced by advice, and the expected corollary of this is that when advice is expressed more confidently the advice will be more influential.
 @sollStrategiesRevisingJudgment2009 measured the confidence of advice and saw that higher advice confidence was associated with higher influence of advice.
 @moussaidSocialInfluenceCollective2013 also found that differences in confidence between judges' and advisors' estimates were useful in producing a decision tree determining the extent to which advice was taken.
+More generally, the assumption that more confident advice will be more accurate is known as the 'confidence heuristic', and has been investigated as a phenomenon in its own right [@pulfordPersuasivePowerKnowledge2018; @priceIntuitiveEvaluationLikelihood2004; @bangDoesInteractionMatter2014].
 
 #### Similarity of advice to the initial estimate
 
