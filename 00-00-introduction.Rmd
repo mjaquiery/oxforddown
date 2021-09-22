@@ -155,7 +155,7 @@ To borrow from Galton [-@galtonVoxPopuliWisdom1907]}, consider the task of judgi
 We can model any single guess ($i$) as the true weight ($v$) plus some error ($\epsilon$):
 
 \begin{align}
-i &= v + \epsilon
+i &= v + \epsilon \\
 \epsilon &= \mathcal{N}(\mu=0,\,\sigma^{2})
 (\#eq:estimate)
 \end{align}
@@ -406,7 +406,7 @@ For clarity, two simplifiying assumptions are made in the explanation below.
 Firstly, while it is probable that properties of the advice are used to inform the dimensions of ability, integrity, and benevolence simultaneously, the examples below will deal with ability in isolation.
 Another project could explore in detail how experience of advice on any given trial updates an advisor's position in 3-dimensional trust space in a Bayesian manner according to the relative certainties about each dimension.
 This would capture the task of assigning blame for erroneous advice (e.g. was it unintentionally poor - a failure of ability - or deliberately misleading - a failure of benevolence?).
-Such an undertaking is beyond the scope of this project; in this thesis only cursory attempts are made to manipulate perceptions of dimensions other than ability (e.g. Experiment 5§\@ref(be-db)).
+Such an undertaking is beyond the scope of this project; in this thesis only cursory attempts are made to manipulate perceptions of dimensions other than ability (e.g. Experiment 5§\@ref(be-dba)).
 
 Secondly, it is assumed that advice is judged on its own merit as an estimate rather than on its usefulness as advice.
 The former means that advice is assessed in terms of the optimality of the decision recommended by the advice itself.

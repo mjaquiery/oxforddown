@@ -3,10 +3,10 @@
 # options for knitting a single chapter #
 #########################################
 output:
-  bookdown::html_document2: default
-  bookdown::word_document2: default
   bookdown::pdf_document2:
     template: templates/brief_template.tex
+  bookdown::html_document2: default
+  bookdown::word_document2: default
 documentclass: book
 ---
 
@@ -22,7 +22,7 @@ We argue that participants' performances in advice-taking experiments reflect bo
 Demonstrating the existence of prior expectations is difficult, because they are beyond the bounds of any task, but we aim instead to demonstrate that they are adaptive.
 Using computational agent-based evolutionary simulations, we demonstrate in this chapter that conservatism can emerge within a population even where detrimental advice is rarely experienced, and can even emerge where individuals always interact in good faith.
 
-As discussed in the [previous chapter]}(#chapter-context), conservatism is optimal under some circumstances, and thus we expect that simulated agents allowed to evolve an advice-taking policy in those circumstances will evolve a conservative policy.
+As discussed in the previous chapter§\@ref(#chapter-context), conservatism is optimal under some circumstances, and thus we expect that simulated agents allowed to evolve an advice-taking policy in those circumstances will evolve a conservative policy.
 We explored this tendency as a function of three plausible scenarios.
 The first scenario§\@ref(models-scenario-1) is one in which agents occasionally give deliberately poor advice to their advisee, which represents situations where advisors’ interests may sometimes be contrary to judges’ interests, unbeknownst to the judges.
 In the second scenario§\@ref(models-scenario-2), advice is simply noisier than the judge’s own initial estimate, either because the judge is less competent at the task, less willing to exert the required effort for the task, or because the advice is communicated imperfectly.
@@ -70,7 +70,7 @@ i^a_t = v_t + N(0, s^a)
 
 This structure is the same as in the normative model of advice-taking§\@ref(i-normative) presented in Equation \@ref(eq:estimate).
 The normally distributed error terms cancel out on average over multiple estimates.
-Where $s^a$ and $s^a'$ (an advisor's sensitivity) are equal or unknown (as in these simulations) the normative model indicates that the best strategy is to average these values.
+Where $s^a$ and $s^{a'}$ (an advisor's sensitivity) are equal or unknown (as in these simulations) the normative model indicates that the best strategy is to average these values.
 
 ### Advice 
 

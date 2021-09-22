@@ -56,7 +56,7 @@ In other words, we expect that participants' advice-taking depends upon both the
 
 Early versions of the experiments we conducted used a minimal groups paradigm [@rabbieArousalIngroupoutgroupBias1969; @pinterComparisonMinimalGroup2011] in an attempt to induce an in-group/out-group distinction in participants. 
 We were not able to get this manipulation to work, and resorted to directly cuing participants about the benevolence of advisors. 
-The experiments presented below, Experiments 5§\@ref(be-dba) and 6§\@ref(be-db), are the result of previous experiments exploring how we could represent the manipulation in a way that participants paid attention to and remembered.
+The experiments presented below, Experiments 5§\@ref(be-dba) and 6§\@ref(be-dbc), are the result of previous experiments exploring how we could represent the manipulation in a way that participants paid attention to and remembered.
 
 ### Experiment 5: Benevolence of advisors {#be-dba}
 
