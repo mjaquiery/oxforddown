@@ -2523,27 +2523,42 @@ Third, the somewhat artificial nature of the task may limit participants' intere
 Fourth, it may be quite difficult to overcome the widespread heuristic that higher confidence advice is more likely to be correct [@sollStrategiesRevisingJudgment2009; @moussaidSocialInfluenceCollective2013; @bangDoesInteractionMatter2014; @pulfordPersuasivePowerKnowledge2018; @priceIntuitiveEvaluationLikelihood2004].
 Adding additional information beyond the simple introductory speech bubble may have helped to alleviate this issue.
 
-Whether or not additional appeal and character for the advisors would improve participants' sensitivity to the advisors' use of the confidence scale, these results cast doubt on a simple mechanistic implementation of our model of advice-taking.
+In short, we were either unable to get participants to attend to advisors' confidence calibration or people do not use confidence calibration information about advisors to modulate the influence of their advice.
+Whether or not additional appeal and character for the advisors would improve participants' sensitivity to the advisors' use of the confidence scale, these results cast doubt on a the practical applications of our model of advice-taking.
 
 ## General discussion
 
-The results of the direct benevolence manipulation in Experiment 5 show that people are sensitive to the motivations of their advisors, and exercise appropriate caution where those motivations may mean the advice is misleading.
-They also demonstrate that, even where advice is considered trustworthy, it is discounted when coming from a less trusted advisor.
-Together with existing literature on the effects of advisor expertise, this supports the idea from the models that advice-taking can be flexibly adjusted according to the context.
+Simulations in the previous chapter§\@ref(chapter-advice-taking-context) suggested that egocentric discounting might arise as a rational response to context, and identified some contextual features that would make egocentric discounting rational. 
+The experiments presented in this chapter tested this idea, based on the assumption that priming these reasons should lead to changes in egocentric discounting. 
+Taken together, the results of these 4 experiments provided mixed support for this idea.
+The results of the direct benevolence manipulation in Experiments 5 and 6 show that people are sensitive to the motivations of their advisors, and exercise appropriate caution where those motivations may mean the advice is misleading.
+Experiment 5 also demonstrated that, even where advice is considered trustworthy, it is discounted when coming from a less trusted advisor.
+Together with existing literature on the effects of advisor expertise [@sollStrategiesRevisingJudgment2009; @yanivAdviceTakingDecision2000; @rakoczyYoungChildrenHeed2015; @schultzeInabilityIgnoreUseless2017], this supports the idea from the models that advice-taking can be flexibly adjusted according to the context.
 
 The results of the confidence mapping experiments were less conclusive.
 We were unable to produce a manipulation which was sufficiently clear and strong to produce observable effects.
 It is plausible that people are sensitive to their knowledge of an advisor's confidence mapping, but it is also plausible that this degree of flexibility is beyond most people, and that simple heuristics such as relying on cultural norms about the meanings of metacognitive terms [@roseanoCommunicatingEpistemicStance2016; @dhamiInterpersonalComparisonSubjective2005; but see @wallstenMeasuringVagueMeanings1986] are used instead of complex calculations.
 The lack of flexibility on the timescale of a behavioural experiment does not, of course, negate the possibility of flexibility on the timescale of a human interpersonal relationship (perhaps there are a certain number of people whose confidence mappings we can track, as suggested by Robin Dunbar's Social Brain Hypothesis [@dunbarHowManyFriends2010]^[Note that this hypothesis has been viewed increasingly sceptically in recent years, as neatly covered by @lindenforsDunbarNumberDeconstructed2021]).
-Nor does it negate the possibility of a genetic or cultural evolutionary mechanism baking in advice discounting as a protection against unknown confidence mapping, although it is questionable whether advice has been occurring in human societies for long enough to allow the former to take place.
+Nor does it negate the possibility of a genetic or cultural evolutionary mechanism producing advice discounting as a protection against unknown confidence mapping, although it is questionable whether advice has been occurring in human societies for long enough to allow the former to take place.
 We have a plausible explanation of egocentric which only relies on rational responses to environmental effects.
 These effects are ubiquitous, and thus a ubiquitous egocentric bias prior to engaging with the specifics of a situation makes sense.
 It is entirely plausible that experiments showing egocentric discounting behaviour fail to overcome the hyperpriors held by participants that taking advice is risky for various reasons.
 
-We saw in the previous section that people are sensitive to the quality of advice and advisors, and will curate their information environments based on that sensitivity.
+We saw in the first part of this thesis§\@ref(chapter-advisor-choice) that people are sensitive to the quality of advice and advisors, and will curate their information environments based on that sensitivity.
 We have seen in this section how the properties of the information environment can change people's sensitivity to advice.
+
+\mccorrect{NICK: Maybe add a paragraph here to put the results in the context of key previous findings about ED and possible explanations. Partly we're offering a new perspective -- that ED is a feature not a bug. But our conclusion relates in meaningful ways to past explanations. Epistemic vigilance is an obvious one, but arguably our findings recast "overconfidence" as reasonable confidence, if we assume that it's frequent enough that an advisor will put in less effort, or communicate imperfectly.
+Currently you're not linking back directly to the body of work and set of ideas that provided the original context for this line of work.
+E.g. can we reiterpret some of the key findings from work on ED to your theory here?
+It may be that we don't have an entirely new spin on these findings, but nevertheless recast them in terms of a normatively justified computation.}
+
+Overall, we present a picture of egocentric discounting that portrays it as a feature, not a bug.
+Overall, manipulations that affect the degree to which people take advice have the effects predicted by a normative theory: more advice is taken from advisors who are better at the task [], more confident advice is weighted more highly [] (and people show a positive association between confidence and accuracy []),  
 
 There is one major feature of advice-taking that has received relatively little investigation, yet that would, if real, be entirely inexplicable in terms of evolutionarily optimal hyperpriors.
 This is the finding that people tend to consider all advisory estimates they receive as a single, multifaceted opinion, which is then integrated with their own individual opinion§\@ref(context-number).
 Crucially, this seems to happen no matter how many advisory estimates are supplied [@hutterSeekingAdviceSampling2016; @yonahTheyDonKnow2021].
+Some studies have found the opposite -- rational weighting of advice according to the size of the group that produces it: @parkIntegrationIndividualSocial2017 showed that a Bayesian model that took group size into account outperformed other models of advice-taking, although linear mixed modelling of their behavioural data did not show a group size effect except as an interaction with opinion differences; @martinoSocialInformationIntegrated2017a found that participants' ratings of on-line shopping products were influenced by other users' reviews, although they did not present evidence as to how closely social influence scaled with the number of reviewers.
 A rational approach to egocentric discounting might attempt, as we have above, to explain how it is sensible to afford less weight to another's opinion compared to one's own, but it cannot explain how it is sensible to afford the same weight to one's opinion whether integrating it with the opinions of one advisor or of several advisors.
+At best, we may be able to offer arguments that plead for different interpretations of advice from multiple estimates: many presentations may represent multiple estimates as a single estimate, and ones that do not may impose a cognitive load that leads to participants ignoring some information; or perhaps people sometimes interpret a mixture of answers as representing a general confusion and down-weight the group estimates as if they were advisory estimates given with very low confidence.
+Advice-taking is sensitive to particulars of task, presentation, and context, and the question of the extent to which multiple pieces of advice are weighted individually versus as a single piece of advice is also likely sensitive to those factors.

@@ -42,6 +42,8 @@ I haven't wasted 3 years of my life and Nick's time.
 
 \mccorrect{Group identity processes probably have a lot to do with turning pretty harmless interaction pattern stuff into the famous runaway examples of extremism like Q-Anon etc. But it has been ever thus, cults online are little different to cults offline in that they prey on the vulnerable to offer an insular monoculture where dissent is heresy. (Groupthink)}
 
+\mccorrect{Talk about other decision-making tasks, and the contribution of reasons, e.g. @troucheArgumentsMoreConfidence2014a}
+
 ## Open questions
 
 * People's social networks constrain whom they can receive advice from. Within these constraints, source selection processes operate to evaluate the relative (and absolute?) trustworthiness of each (or the most salient?) members. Is trustworthiness (or at least the ability component) modelled discretely for different domains, or is it unitary?  
