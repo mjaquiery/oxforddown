@@ -27,6 +27,8 @@ library(prettyMD)   # My own formatting library for neatly formatting stats outp
 # for guidance on how to create your own chunk options see
 # https://ulyngs.github.io/blog/posts/2019-02-01-how-to-create-your-own-chunk-options-in-r-markdown/
 
+options(warning.length = 8170)  # show more latex knitting warnings
+
 knitr::knit_hooks$set(vspace_output = function(before, options, envir) {
   if (!before) {
     ## after a chunk has been evaluated
