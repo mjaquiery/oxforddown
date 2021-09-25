@@ -16,12 +16,9 @@ source('scripts_and_filters/general_setup.R')
 # General method {#chapter-behavioural-experiment-method}
 \adjustmtc 
 
-<!-- The behavioural experiments all have similar methodology, so it makes sense to dedicate a chapter to detailing it and then summarise and explain deviances/specifics when reporting each individual experiment.
--->
-
 The behavioural experiments reported in this thesis share a common structure.
 This structure is detailed here to reduce repetition elsewhere in the thesis.
-Individual experiments have truncated methods sections in which the specific deviations from the general method are noted.
+Individual experiments reported in subsequent chapters have truncated methods sections in which the specific deviations from the general method are noted.
 
 ## Behavioural experiments {#gm}
 
@@ -52,7 +49,7 @@ Participants are thus fully aware of and consenting to the process of screening 
 
 Demographic information on participants, such as age and gender, was not collected.
 While there is a robust case for collecting these data and conducting sex-disaggregated analyses [@criadoperezInvisibleWomenExposing2019], initial concerns over General Data Protection Regulation resulted in a cautious approach to the collection of data concerning protected characteristics of participants.
-\mccorrect{!TODO[move to discussion]}Gender differences, whether due to socialisation, biological factors, or their interactions, may well alter advice-taking and expressed confidence in decisions.
+Gender differences, whether due to socialisation, biological factors, or their interactions, may well alter advice-taking and expressed confidence in decisions.
 I suspect, although I can offer no evidence, that gender differences in the results presented in this thesis will at most show overlapping distributions.
 I do not think it highly plausible that different strategies are wholly the preserve of any particular gender, or that egocentric discounting is markedly stronger in any particular gender.
 
@@ -93,11 +90,11 @@ knitr::include_graphics("figures/methods/dots-structure.jpg")
 
 #### Perceptual decision (Dots task) {#m-p-dots}
 
-The Dots task is a two-alternative forced choice task that has been used in various forms for many experiments in our lab \mccorrect{QUESTION: Nick, can you give me some of your key citations for this, please? It's surprisingly hard to find this kind of thing by searching because of the plethora of RDM studies, etc.} and beyond [e.g. @rouaultFormingGlobalEstimates2019].
+The Dots task is a two-alternative forced choice task that has been used in various forms for many experiments in our lab [@steinhauserDecisionProcessesHuman2010; @boldtSharedNeuralMarkers2015a; @charlesDynamicSourcesEvidence2019; @carlebachSubjectiveConfidenceActs2020; @pescetelliConfidenceAdviceSeeking2021; @pescetelliRoleDecisionConfidence2021] and beyond [@rouaultFormingGlobalEstimates2019; @rouaultPsychiatricSymptomDimensions2018; @flemingDomainspecificImpairmentMetacognitive2014].
 This task has several key features that make it appealing for studying decision-making and advice.
 Firstly, stimuli are only presented very briefly, meaning that many trials can be performed in a relatively short experimental session.
-Secondly, the difficulty of the task can be titrated to bring all participants to a desired level of accuracy, and this process can be done continuallly and unobtrusively throughout the experiment.
-Thirdly, there is a good level of variation in the difficulty of individual tasks due to the specifics of the random patterns generated, meaning that the task produces an array of confidence judgements while controlling overall performance.
+Secondly, the difficulty of the task can be titrated to bring all participants to a desired level of accuracy, and this process can be done continually and unobtrusively throughout the experiment.
+Thirdly, there is a good level of variation in the difficulty of individual trials due to the specifics of the random patterns generated, meaning that the task produces an array of confidence judgements while controlling overall performance.
 Fourthly, the variation in subjective experience of the difficulty of objectively similar trials means that advice is plausible: someone else really could have seen the presentation more clearly than the participant.
 Lastly, the task is neutrally-valenced and unlikely to provoke strong associations in participants that might alter their processing of information.
 
@@ -278,6 +275,11 @@ A new date range of 1900-2000 was chosen, and further events were added by revis
 The new list of questions performed better during piloting.
 Questions where respondents' answers were particularly accurate or inaccurate were removed, leaving a final list of around 80 events.
 
+##### Verification of the Dates task
+
+We ran a study with the Dates task that aimed to replicate effects previously observed in the Dots task, as a check on likely data quality and for the comparability of results across methods (Appendix \@ref(appendix-2)).
+The results indicated that the results were similar to those found by @pescetelliRoleDecisionConfidence2021 for the feedback condition, in which participants were more influenced by advice from accurate comared to agreeing advisors, but not for the no feedback condition, in which participants were equally influenced by advice from both advisors.
+
 ##### Specific limitations of the Dates task
 
 There are several specific limitations of the Dates task.
@@ -340,7 +342,7 @@ The relationship between preference and pick rate is non-linear and idiosyncrati
 
 #### Weight on Advice {#m-analysis-dv-woa}
 
-Weight on Advice, and its compliment Advice Taking, are commonly used to quantify the relative contributions of advice and initial estimates in making final decisions.
+Weight on Advice, and its complement Advice Taking, are commonly used to quantify the relative contributions of advice and initial estimates in making final decisions.
 It is obtained by dividing the amount an initial estimate was updated by the amount the advisor recommended adjusting the initial estimate.
 It thus expresses the amount the estimate changed as a proportion of the advised change.
 
@@ -460,47 +462,7 @@ The data collected during these runs are available alongside the data collected 
 These participants were paid on an ad hoc basis depending upon the time taken before the errors emerged and the detail of the error reports they submitted on the Prolific participant recruitment platform.
 For details on what went wrong with the experiments in which bugs were found, see the description column of the data files in the `esmData::` R package.
 While not useful for the hypotheses of the experiments for which the data were collected, some excluded data can be used for other purposes such as analysing responses to advice.
-
-\mccorrect{TODO: Put in appendix or (NICK) cut.}
-
-#### Experiment 0
-This branch of experiments was the core of the Dates task. 
-As such, most experimentation and piloting happened on this branch, meaning that there were many versions of the study where data were collected for which analysis is not included here. 
-
-#### Experiment 1A
-The earliest versions contained a bug where advisors instructed to agree with a participant instead provided advice identifying the correct answer.
-Other versions had a bug in the staircasing code used to titrate the difficulty of the task was converging on too high a value (74% initial estimate accuracy as opposed to 71%).
-Once the staircasing bug was fixed, two more experiments were run, one with 60 practice trials in which participants did not quite reach the desired accuracy before the beginning of the main experiment, and one with 120 practice trials which constitutes the data analysed below.
-
-#### Experiments 1B and 2B
-Early versions included a bug which prevented feedback from being shown during the familiarisation phase even to participants in the Feedback condition.
-These participants could theoretically be included in the No feedback condition regardless of their condition label in the data, but this is not done here.
-
-#### Experiment 3A
-
-Pilot data were collected to ensure the study functioned properly, and so the data are not analysed with regard to the hypotheses. 
-The v1 Mixed design was conducted and run as a proper experiment in which participants learned about both advisors simultaneously (preregistered at https://osf.io/5z2fp), but there were no effects in the data. 
-
-#### Experiment 3B
-
-The first version included a bug in which the advisor choice options were not recorded, making it difficult or impossible to work out which trials included a choice of advisor. 
-Data for these participants could be included in a study that was agnostic about advisor choice.
-
-#### Experiment 4A
-
-The first version had a bug which meant that the advisors were identical in the familiarisation phase.
-Both the first and second versions had a bug in which advisors who were supposed to agree with the participant's initial estimate gave the correct answer rather than agreeing.
-These participants' data could be included in an analysis which used a participant's actual experience of advice to predict their advice-taking and source selection behaviour, provided appropriate care was taken to reconstruct the advice data from the raw values instead of relying on the reported summaries.
-
-#### Experiment 5
-
-Several versions of this study were run in the course of developing the manipulation.
-The initial version had a bug that prevented the groups from being visually distinct. 
-Later versions introduced a clearer manipulation, equivalent rather than genuinely misleading advice for the Sometimes misleading advisor, and rating of advice deceptiveness, respectively.
-
-#### Experiment 6
-
-Two short pilot versions of this experiment were run, and participants' data were not analysed due to bugs in the experiment code.
+A breakdown of unanalysed data by experiment is provided as Appendix 1§\@ref(appendix-1).
 
 ## Open science approach {#open-science}
 

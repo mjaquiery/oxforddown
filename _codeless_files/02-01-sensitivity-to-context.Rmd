@@ -54,7 +54,7 @@ i^a_t = v_t + N(0, s^a)
 (\#eq:models-initial-estimate)
 \end{align}
 
-This structure is the same as in the normative model of advice-taking§\@ref(i-normative) presented in Equation \@ref(eq:estimate).
+This structure is the same as in the normative model of advice-taking§\@ref(i-normative) presented in Equation \ref{eq:estimate}.
 The normally distributed error terms cancel out on average over multiple estimates.
 Where $s^a$ and $s^{a'}$ (an advisor's sensitivity) are equal or unknown (as in these simulations) the normative model indicates that the best strategy is to average these values.
 
@@ -237,7 +237,7 @@ f^a_t = i^a_t \cdot w^a + r^a_t \cdot (1 - w^a)
 (\#eq:models-scenario-3-final-decision)
 \end{align}
 
-Crucially, because the confidence coefficient can differ between advisor ($c^{a'}$ in Equation \@ref(eq:models-scenario-3-advice)) and judge ($c^a$ in Equation \@ref(eq:models-scenario-3-receive)), some agents will under- or over-estimate their advisor's actual confidence.
+Crucially, because the confidence coefficient can differ between advisor ($c^{a'}$ in Equation \ref{eq:models-scenario-3-advice}) and judge ($c^a$ in Equation \ref{eq:models-scenario-3-receive}), some agents will under- or over-estimate their advisor's actual confidence.
 
 This process amounts to the outgoing advice being translated into the advising agent's confidence language, and incoming advice being translated into the advised agent's confidence language.
 Where these languages are the same, the resulting advice is understood equivalently by both agents, but where there are differences the advice will be of greater or lesser magnitude compared to the initial estimate.

@@ -16,18 +16,7 @@ params:
   corrections: true 
 ---
 
-```{r setup 01-04, echo = F, include = F}
-source('scripts_and_filters/general_setup.R')
-library(adviseR)
-library(broom)
-library(ggtext)
-library(ggpp)
-library(igraph)
-library(BayesFactor)
-library(magrittr)
-library(parallel)
-library(patchwork)
-library(withr)
+```{r setup-01-03, echo = F, include = F}
 ```
 
 # Network effects of advisor choice {#chapter-network-effects}
@@ -137,441 +126,21 @@ The estimate-advice-decision-update cycle is repeated thousands of times.
 The models illustrate the dynamics of advice interactions: how prior expectations change over time and whether and how polarisation or consensuses emerge; and how agents' trust in one another changes as they gain experience with one another.
 
 ```{r nw-m-run-fitting, include = F}
-#' Note:
-#' Each participant takes around 30 minutes to perform parameter estimation for,
-#' including 9 shuffles and splitting where necessary. With ~ 600 participants
-#' this equates to about 300h of computing time. So don't rerun this (at least
-#' not on all participants) without a good reason for doing so.
-
-t1 <- Sys.time()
-# !TODO[Change this to link to Zenodo version when uploaded]
-fName <- "cache/thesis-parameter-estimation.rda"
-fURL <- "https://sandbox.zenodo.org/record/915958/files/thesis-parameter-estimation.rda?download=1"
-can_download_pe <- 
-  tryCatch(attr(curlGetHeaders(fURL, timeout = 5), 'status') == 200)
-must_rerun_pe <- 
-  ESM.recalculate >= 3 || 
-  (!file.exists(fName) && !can_download_pe)
-
-if (must_rerun_pe) {
-  source("https://raw.githubusercontent.com/oxacclab/arc_thesis-parameter-estimation/master/parameterRecovery.R")
-  parameterRecovery(
-    savePath = fName,
-    nShuffles = 9,
-    includeSplits = TRUE,
-    fixedParameters = c(NA, NA),
-    customFilter = \(x) x,
-    nCores = parallel::detectCores(),
-    installPackages = FALSE,
-    verbosity = 2
-  )
-} else {
-  if (!file.exists(fName)) {
-    curl::curl_download(fURL, fName)
-  }
-}
-
-load(fName)
-
-print("Parameter fit data ready.")
-Sys.time() - t1
 ```
 
 ```{r nw-m-run-basic, include = F}
-
-#' Note:
-#' these blocks which run models take 5-10 minutes/model to run. For 40 models,
-#' including save and load time, this works out at about 5 hours or so.
-#' Don't run the original unless you're _sure_ you want this.
-cacheRoot <- 'cache/network-models'
-can_download_cache <- 
-  tryCatch(
-    {
-      .f <- \(x) attr(curlGetHeaders(x, timeout = 5), 'status') == 200
-      all(
-        .f('https://sandbox.zenodo.org/record/882215/files/network-models-emp.rda?download=1'),
-        .f('https://sandbox.zenodo.org/record/882215/files/network-models.rda?download=1')
-      )
-    }, 
-    error = \(e) F
-  )
-  
-must_rerun_models <- 
-  ESM.recalculate >= 2 ||
-  (!length(list.files(paste0(cacheRoot, '/'), pattern = '.rda')) &&
-     !file.exists(paste0(cacheRoot, '.rda')) && !can_download_cache)
-must_rerun_models.emp <- 
-  ESM.recalculate >= 2 ||
-  (!length(list.files(paste0(cacheRoot, '/emp/'), pattern = '.rda')) &&
-     !file.exists(paste0(cacheRoot, '-emp.rda')) && !can_download_cache)
-can_use_cache <- 
-  !ESM.recalculate &&
-  (file.exists(paste0(cacheRoot, '.rda')) || can_download_cache) &&
-  !must_rerun_models
-can_use_cache.emp <- 
-  !ESM.recalculate &&
-  (file.exists(paste0(cacheRoot, '-emp.rda')) || can_download_cache) &&
-  !must_rerun_models.emp
-
-n_reps <- 5
-nD <- 2000
-nBI <- 3000
-withr::with_seed(
-  20210507,
-  seeds <- c(20210507, floor(runif(n_reps - 1) * 1e8))
-)
-parameters <- tidyr::crossing(
-  bias_volatility_mean = .01,
-  bias_volatility_sd = .005,
-  n_agents = 100,
-  truth_sd = .5,
-  bias_sd = 1,
-  sensitivity_mean = 3,
-  sensitivity_sd = .5,
-  random_seed = seeds,
-  starting_graph = c(function(x) {
-    m <- matrix(runif(nrow(x) ^ 2, .5), nrow(x), nrow(x))
-    diag(m) <- 0
-    m
-  }),
-  confidence_weighted = F,
-  tibble(
-    n_decision = c(nD, nD + nBI),
-    decision_flags = map(
-      n_decision, 
-      ~ if (. > nD) {c(rep(1, nBI), rep(3, . - nBI))} else {rep(3, .)}
-    )
-  ),
-  tidyr::crossing(
-    tibble(
-      trust_volatility_mean = .01145, # estimated from our empirical data
-      trust_volatility_sd = .05473
-    ),
-    tibble(
-      weighted_sampling_mean = c(0, 2.18, 2.18),
-      weighted_sampling_sd = c(0, 0, 18.9)
-    )
-  )
-)
-
-summary_fun <- function(m) {
-  .cc <- function(x, ...) adviseR::.cluster_count(x, k = 1:2, ...)
-  # Calculate group ratios
-  m$parameters$group_ratio_original <-
-    adviseR::groupRatio(m$model$graphs[[length(m$model$graphs)]])
-  m$parameters$group_ratio_empirical <-
-    adviseR::groupRatio(m$model$graphs[[length(m$model$graphs)]], F)
-  
-  lastGen <- 
-    m$model$agents[m$model$agents$decision == max(m$model$agents$decision), ]
-  
-  # Record mean final bias to determine which way the population is going
-  m$parameters$mean_final_bias <- mean(
-    m$model$agents$bias[m$model$agents$decision == max(m$model$agents$decision)]
-  )
-  
-  # Calculate proportion of extremes
-  x <- lastGen$bias
-  m$parameters$n_lt_20 <- mean(x < .2)
-  m$parameters$n_gt_80 <- mean(x > .8)
-  m$parameters$n_mid <- mean(x >= .2 & x <= .8)
-  
-  # Calculate the bias magnitude
-  m$parameters$meanBiasMagnitude <- mean(abs(lastGen$bias - .5)) 
-  
-  # Calculate the compression stats
-  m$parameters$cluster_count <- .cc(
-    m$model$graphs[[length(m$model$graphs)]]
-  )
-  # Save the summary stuff for the first example of each model
-  library(tidyverse)
-  m$model$agents <- m$model$agents %>%
-    nest(d = -decision) %>%
-    mutate(
-      cluster_count = map_int(
-        decision,
-        function(i) {
-          g <- m$model$graphs[[i]]
-          if (all(is.na(g)))
-            NA_integer_
-          else
-            .cc(g)
-        }
-      )
-    ) %>%
-    unnest(cols = d)
-  
-  m
-}
-
-nCores <- 3
-if (must_rerun_models) {
-  unlink(list.files(paste0(cacheRoot, '/'), pattern = '.rda'))
-  for (i in 1:ceiling(nrow(parameters) / nCores)) {
-    n <- (i - 1) * nCores + 1
-    n <- c(n, min(n + nCores - 1, nrow(parameters)))
-    fName <- glue('{cacheRoot}/models_{n[1]}-{n[2]}.rda')
-    if ((is.null(getOption('ESM.recalculate')) || getOption('ESM.recalculate') < 2) 
-        && file.exists(fName)) {
-      next()
-    }
-    
-    t1 <- Sys.time()
-    models <- runSimulations(
-      parameters[n[1]:n[2], ], 
-      cores = nCores,
-      summaryFun = summary_fun
-    )
-    save(models, file = fName)
-    print(glue('Completed run {i} ({n[1]}-{n[2]}).'))
-    print(Sys.time() - t1)
-  }
-}
 ```
 
 ```{r nw-m-load-basic, include = F}
-t1 <- Sys.time()
-fName <- paste0(cacheRoot, '.rda')
-if (can_use_cache) {
-  if (!file.exists(fName)) {
-    # Download cached data
-    curl::curl_download(
-      'https://sandbox.zenodo.org/record/916242/files/network-models.rda?download=1',
-      fName
-    )
-  }
-  load(fName)
-} else {
-  # Gather data and bind into an analysable data frame
-  agents <- NULL
-  graphs <- list()
-  fList <- list.files('cache/network-models/', pattern = '.rda', full.names = T)
-  i <- 1
-  for (f in fList) {
-    load(f)
-    for (m in models) {
-      graphs[[i]] <- list()
-      for (d in 1:m$parameters$n_decisions) {
-        if ((d %% 100 == 1) | d == m$parameters$n_decisions) {
-          graphs[[i]][[d]] <- m$model$graphs[[d]]
-        }
-      }
-      
-      m$parameters$model_num <- i
-      i <- i + 1
-      m$parameters$starting_graph <- NULL
-      m$parameters$truth_fun <- NULL
-      m$parameters$decision_flags <- NULL
-      agents <- 
-        bind_rows(
-          agents, 
-          m$model$agents %>% 
-            filter(decision %% 100 == 1 | decision == max(decision)) %>%
-            rename(agt_cluster_count = cluster_count) %>%
-            left_join(as_tibble(m$parameters), by = character())
-        )
-    }
-  }
-  rm(m, models)
-  save(agents, graphs, file = fName)
-}
-
-agents <- agents %>% 
-  mutate(
-    family = glue(
-      'burnIn={n_decisions > nD}|ws={weighted_sampling}'
-    )
-  )
-
-Sys.time() - t1
 ```
 
 ```{r nw-m-run-empirical, include = F}
-
-if (must_rerun_models.emp) {
-  load('cache/thesis-parameter-estimation.rda')
-  
-  # Fetch the unique parameter combinations for the models we just ran
-  parameters.emp <- agents %>%
-    select(
-      n_agents:confidence_weighted,
-      -starts_with('trust_volatility'),
-      -starts_with('weighted_sampling'),
-      -starting_graph_type
-    ) %>%
-    unique() %>%
-    rowid_to_column() %>%
-    nest(d = -rowid) %>%
-    mutate(
-      model = map(d, function(.) {
-        withr::with_seed(
-          .$.random_seed_agents,
-          do.call(adviseR:::makeAgents, select(
-            ., 
-            -bias_update_slope, -starts_with('feedback'), 
-            -contains('random_seed'), -truth_sd, -confidence_weighted
-          ))
-        )
-      })
-    ) %>%
-    # Substitute trust_volatility and weighted_sampling coefficients from estimates
-    mutate(
-      model = map2(model, d, function(.x, .y) {
-        p <- withr::with_seed(
-          .y$.random_seed_agents,
-          slice_sample(recovered_parameters, n = .y$n_agents, replace = T)
-        )
-        .x$agents <- .x$agents %>%
-          mutate(
-            trust_volatility = rep(p$tu_end, .y$n_decisions),
-            weighted_sampling = rep(p$ws_end, .y$n_decisions)
-          )
-        .x
-      })
-    ) %>% 
-    unnest(cols = d) %>%
-    mutate(
-      decision_flags = map(
-        n_decisions,
-        function(.) {
-          if (. > nD) c(rep(1, nBI), rep(3, . - nBI)) else rep(3, .)
-        }
-      ),
-      starting_graph = parameters$starting_graph[1],
-      model = map2(model, n_agents, function(.x, .y) {
-        g <- parameters$starting_graph[[1]](tibble(x = 1:.y))
-        .x$graphs <- list(g)
-        .x
-      })
-    ) %>%
-    select(-rowid)
-  
-  nCores <- 3
-
-  unlink(list.files(paste0(cacheRoot, '/emp/'), pattern = '.rda'))
-  for (i in 1:ceiling(nrow(parameters.emp) / nCores)) {
-    n <- (i - 1) * nCores + 1
-    n <- c(n, min(n + nCores - 1, nrow(parameters.emp)))
-    fName <- glue('{cacheRoot}/emp/models_{n[1]}-{n[2]}.rda')
-    if ((is.null(getOption('ESM.recalculate')) || getOption('ESM.recalculate') < 2) 
-        && file.exists(fName)) {
-      next()
-    }
-    
-    t1 <- Sys.time()
-    models <- runSimulations(
-      parameters.emp[n[1]:n[2], ], 
-      cores = nCores,
-      summaryFun = summary_fun
-    )
-    save(models, file = fName)
-    print(glue('Completed run {i} ({n[1]}-{n[2]}).'))
-    print(Sys.time() - t1)
-  }
-}
 ```
 
 ```{r nw-m-load-empirical, include = F}
-t1 <- Sys.time()
-fName <- paste0(cacheRoot, '-emp.rda')
-if (can_use_cache.emp) {
-  if (!file.exists(fName)) {
-    # Download cached data
-    curl::curl_download(
-      'https://sandbox.zenodo.org/record/916242/files/network-models-emp.rda?download=1',
-      fName
-    )
-  }
-  load(fName)
-} else {
-  # Gather data and bind into an analysable data frame
-  agents.emp <- NULL
-  graphs.emp <- list()
-  fList <- list.files('cache/network-models/emp/', pattern = '.rda', full.names = T)
-  i <- 1
-  for (f in fList) {
-    load(f)
-    for (m in models) {
-      graphs.emp[[i]] <- list()
-      for (d in 1:m$parameters$n_decisions) {
-        if ((d %% 100 == 1) | d == m$parameters$n_decisions) {
-          graphs.emp[[i]][[d]] <- m$model$graphs[[d]]
-        }
-      }
-      
-      m$parameters$model_num <- i
-      i <- i + 1
-      m$parameters$starting_graph <- NULL
-      m$parameters$truth_fun <- NULL
-      m$parameters$decision_flags <- NULL
-      agents.emp <- 
-        bind_rows(
-          agents.emp, 
-          m$model$agents %>% 
-            filter(decision %% 100 == 1 | decision == max(decision)) %>%
-            rename(agt_cluster_count = cluster_count) %>%
-            left_join(as_tibble(m$parameters), by = character())
-        )
-    }
-  }
-  rm(m, models)
-  save(agents.emp, graphs.emp, file = fName)
-}
-Sys.time() - t1
 ```
 
 ```{r nw-m-bind, include = F}
-agents.all <- bind_rows(
-  agents, 
-  agents.emp %>% mutate(model_num = model_num + max(agents$model_num))
-) %>%
-  mutate(
-    burnIn = n_decisions > nD,
-    trust_weights = if_else(n_decisions > nD, "Evolved", "Random"),
-    trust_weights = factor(trust_weights, levels = c("Random", "Evolved")),
-    ws_agent = weighted_sampling,
-    weighted_sampling = case_when(
-      model_num > max(agents$model_num) ~ "Empirical",
-      weighted_sampling_mean == 0 & weighted_sampling_sd == 0 ~ "Baseline",
-      weighted_sampling_sd == 0 ~ "Homogenous",
-      T ~ "Heterogeneous"
-    ),
-    weighted_sampling = factor(
-      weighted_sampling, 
-      levels = c("Baseline", "Homogenous", "Heterogeneous", "Empirical")
-    ),
-    family = glue('{burnIn}|{weighted_sampling}')
-  ) %>%
-  nest(d = -c(model_num, id)) %>%
-  mutate(
-    starting_bias = map_dbl(d, ~ .$bias[.$decision == 1]),
-    d = map(d, ~ mutate(
-      ., 
-      step = decision, 
-      decision = ifelse(burnIn, step - nBI, step)
-    ))
-  ) %>%
-  unnest(cols = d)
-  
-graphs.all <- c(graphs, graphs.emp)
-
-models.all <- agents.all %>% 
-  group_by(model_num) %>%
-  summarise(
-    across(c(weighted_sampling, n_agents:trust_weights), unique), 
-    .groups = 'drop'
-  ) %>%
-  select(
-    model_num,
-    weighted_sampling,
-    trust_weights,
-    n_agents:starting_graph_type,
-    everything(),
-    -n_decisions, 
-    -weighted_sampling_mean, 
-    -weighted_sampling_sd,
-    -starts_with('trust_volatility')
-  )
 ```
 
 ## Method 
@@ -608,21 +177,6 @@ Each agent has the properties listed in Table \@ref(tab:nw-m-agent-properties-ta
 An agent's values for each of these properties are created by drawing values from normal distributions defined by parameters in the model settings (Table \@ref(tab:nw-m-model-properties-table)).
 
 ```{r nw-m-agent-properties}
-
-tribble(
-  ~ `Property`, ~ `Description`, ~ `Updates each step`,
-  "$s^a$", "Accuracy of agent's perceptions", "No",
-  "$c^a$", "Agent's subjective confidence scaling", "No",
-  "$\\tau^a$", "Size of agent's trust updates", "No",
-  "$\\lambda^a$", "Size of agent's bias updates", "No",
-  "$\\text{w}^a$", "Extent of agent's preference for trusted advisors", "No",
-  "$b^a_t$", "Agent's prior expectation about the task answer", "Yes"
-) %>%
-  kable(
-    caption = "\\label{tab:nw-m-agent-properties-table}Agent properties",
-    escape = F
-  )
-
 ```
 
 Additionally, each agent has a 'trust' in each other agent: an estimate of that agent's reliability ranging from being convinced that the other agent is always correct to being convinced that the other agent is always wrong.
@@ -729,37 +283,6 @@ When its value is large (either negative or positive), an agent is much more con
 When its value is low, the agent's trust in potential advisors exerts much less influence on which potential advisor is selected.
 
 ```{r nw-m-sigmoid, fig.caption="Weighted selection parameter.  Example values of weighted selection are shown. For postive values of w, as relative trust increases, the selection weight also increases. Correspondingly, for negative values of w the selection weight decreases as trust increases. Compare the intercepts with the dashed lines: all seleciton weights are 0.5 where relative trust is zero, equating to random picking between equivalently-weighted advisors. Where w is 0 (green line), relative trust differences make no difference to selection weighting. Where it is large (purple line), on the other hand, relatively small differences in relative trust translate into much greater selection weighting.  The dotted line and shaded area represent the sigmoids calculated using the mean empirical value and its 95\\% confidence limits."}
-
-emp <- mean_cl_normal(recovered_parameters$ws_end) %>% 
-  tidyr::crossing(x = seq(-1.5, 1.5, length.out = 5000)) %>%
-  mutate(
-    y = adviseR:::sigmoid(x, y),
-    ymin = adviseR:::sigmoid(x, ymin),
-    ymax = adviseR:::sigmoid(x, ymax)
-  )
-
-tidyr::crossing(
-  x = seq(-1.5, 1.5, length.out = 5000),
-  w = c(-5, -2.5, 0, 5, 50)
-) %>%
-  mutate(
-    y = adviseR:::sigmoid(x, w),
-    w = factor(w)
-  ) %>%
-  ggplot(aes(x = x, y = y, colour = w)) +
-  geom_vline(xintercept = 0, linetype = "dashed") +
-  geom_vline(xintercept = 0.25, linetype = "dashed") +
-  geom_ribbon(
-    aes(ymin = ymin, ymax = ymax), data = emp, 
-    fill = "black", colour = NA, alpha = .1
-  ) + 
-  geom_line(size = 1, data = emp, colour = "black", linetype = "dotted") +
-  geom_line(size = 1) +
-  labs(
-    x = "Relative trust",
-    y = "Selection weight"
-  )
-
 ```
 
 The identity of advisor $^{a,a'}_t$ is determined by sampling at random from the advisors, weighted by the probability weights assigned.
@@ -893,30 +416,6 @@ Beyond the critical parameters of interest -- weighted selection and trust volat
 These can be broadly divided into parameters which govern the distributions from which the agents' parameters are drawn, and parameters which define the operation of the model.
 
 ```{r  nw-m-model-properties}
-
-tribble(
-  ~ `Property`, ~ `Description`, ~ `Type`,
-  "\\texttt{n\\_agents}", "Number of agents to simulate", "model",
-  "\\texttt{n\\_steps}", "Number of decisions to simulate", "model",
-  "\\texttt{decision\\_flags}", "Binary flags indicating whether trust and/or bias update at each step", "model",
-  "\\texttt{feedback\\_probability}", "Probability feedback is provided each step", "model",
-  "\\texttt{feedback\\_proportion}", "Proportion of the population receiving feedback when provided", "model",
-  "\\texttt{random\\_seed}", "Seed used for the pseudorandom number generator to allow repetition of runs", "model",
-  "\\texttt{truth\\_sd}", "Standard deviation for true world values", "model",
-  "\\texttt{confidence\\_weighted}", "Whether agents use their own confidence to modify their trust updates", "model",
-  "$B^\\mu, B^\\sigma$", "Mean, standard deviation of distribution of agents' biases", "agents",
-  "$S^\\mu, S^\\sigma$", "Mean, standard deviation of distribution of agents' sensitivities", "agents",
-  "$T^\\mu, T^\\sigma$", "Mean, standard deviation of distribution of agents' trust volatilities", "agents",
-  "$\\Lambda ^\\mu, \\Lambda ^\\sigma$", "Mean, standard deviation of distribution of agents' bias volatilities", "agents",
-  "$C^\\mu, C^\\sigma$", "Mean, standard deviation of distribution of agents' confidence scaling", "agents",
-  "$W^\\mu, W^\\sigma$", "Mean, standard deviation of distribution of agents' trusted advisor preference", "agents"
-) %>%
-  mutate(across(everything(), ~ str_wrap(., 40, indent = 2) %>% linebreak("l"))) %>%
-  kable(
-    caption = "\\label{tab:nw-m-model-properties-table}Model properties",
-    escape = F
-  )
-
 ```
 
 These parameters can be seen in full by inspecting the parameters for the [`runSimulation`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L1) function.
@@ -1011,157 +510,14 @@ Finally, the error for coefficients fitted to the participants' data were compar
 Error values for the shuffled data tended to be higher than values for the original data, suggesting that participants' behaviour shared some features with the model's expectations.
 
 ```{r nw-r-shuffle-positions, fig.caption="Real vs shuffled data fitting error.  Each participant's data were shuffled such that the advisor agreement value for each trial was no longer systematically tied to the trial on which it actually occurred. This process was repeated 9 times, and then joined to the real data. A joint error score was created by summing standardized scores for trust volatility error and weighted selection error. The plot shows the distribution of position of the real data within the combined dataset, with lower numbers indicating lower combined error. For many participants, especially those encountering advisors with particularly high or low agreement rates, this shuffling effect may be quite small, meaning that the difference between shuffled and unshuffled data is less pronounced and that therefore the chance of a better fit to shuffled data is higher."}
-
-positions <- bind_rows(
-  recovered_parameters %>% 
-    mutate(source = "real") %>% 
-    select(uid, source, ends_with("error")),
-  shuffles %>% 
-    mutate(source = "shuffle") %>%
-    select(uid, source, ends_with("error"))
-) %>%
-  nest(d = -uid) %>%
-  mutate(
-    Rank = map_dbl(
-      d,
-      ~ mutate(., err = scale(ws_error) + scale(tu_error)) %>%
-        arrange(err) %>%
-        rowid_to_column("rank") %>%
-        filter(source == "real") %>% 
-        pull(rank) %>%
-        .[1]
-    ),
-    n = map_int(d, nrow),
-    Position = Rank / n
-  ) %>%
-  select(-d)
-
-positions %>%
-  filter(n == 10) %>%
-  ggplot(aes(x = Position)) +
-  geom_histogram(binwidth = .1) +
-  scale_y_continuous(limits = c(0, nrow(filter(positions, n == 10)))) +
-  labs(y = "Count")
-  
 ```
 
 ### Participants' coefficients
 
-```{r nw-r-pe-hist, fig.caption="Histograms of recovered parameters."} 
-
-recovered_parameters %>%
-  select(uid, `Weighted selection` = ws_end, `Trust volatility` = tu_end) %>%
-  pivot_longer(-uid, values_to = "Coefficient") %>%
-  ggplot(aes(x = Coefficient)) +
-  geom_histogram(bins = 200) +
-  facet_wrap(~name, scales = "free_x")
-
-.T.tu <- md.ttest(
-  recovered_parameters$tu_end,
-  mu = 0,
-  labels = "M~TrustVolatility~"
-)
-.T.ws <- md.ttest(
-  recovered_parameters$ws_end,
-  mu = 0,
-  labels = "M~WeightedSelection~"
-)
-
+```{r nw-r-pe-hist, fig.caption="Histograms of recovered parameters."}
 ```
 
-```{r nw-r-pe-cor, fig.caption="Correlation of recovered parameters.  Outliers with extreme trust volatility values (|z| > 5) have been dropped, and are shown on the inset plot for context. Each point is a participant, and the solid blue line shows the overall relationship (with 95\\% confidence intervals shaded in grey). The formula for the line is given in the top-left. Dashed line indicates a 1:1 correlation."} 
-
-tmp.full <- recovered_parameters %>%
-  select(uid, ends_with("_end")) %>%
-  mutate(
-    `z(Weighted selection)` = scale(ws_end), 
-    `z(Trust volatility)` = scale(tu_end)
-  )
-
-tmp <- tmp.full %>%
-  filter(`z(Trust volatility)` > -5 & `z(Trust volatility)` < 2) 
-
-x <- lm(`z(Weighted selection)` ~ `z(Trust volatility)`, data = tmp)
-r <- glue(
-  "y = {a}{round(d$estimate[2], 2)}{a}x + {b}{round(d$estimate[1], 2)}{b}",
-  "; adj R^2 = {round(g$adj.r.squared, 3)}",
-  d = tidy(x),
-  g = glance(x),
-  a = ifelse(d$p.value[2] < .05, '**', ''),
-  b = ifelse(d$p.value[1] < .05, '**', '')
-)
-
-x.full <- lm(`z(Weighted selection)` ~ `z(Trust volatility)`, data = tmp.full)
-r.full <- glue(
-  "y = {a}{round(d$estimate[2], 2)}{a}x + {b}{round(d$estimate[1], 2)}{b}",
-  "; adj R^2 = {round(g$adj.r.squared, 3)}",
-  d = tidy(x.full),
-  g = glance(x.full),
-  a = ifelse(d$p.value[2] < .05, '**', ''),
-  b = ifelse(d$p.value[1] < .05, '**', '')
-)
-
-full <- tmp.full %>%
-  ggplot(aes(y = `z(Trust volatility)`, x = `z(Weighted selection)`)) +
-  geom_rect(
-    fill = "grey95", colour = NA, 
-    xmin = -Inf, ymin = -Inf, xmax = Inf, ymax = -5
-  ) +
-  geom_rect(
-    fill = "grey95", colour = NA, 
-    xmin = -Inf, ymin = 2, xmax = Inf, ymax = Inf
-  ) +
-  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
-  geom_smooth(method = 'lm', formula = y ~ x) +
-  geom_point(alpha = .1) +
-  geom_point(
-    colour = "red", 
-    data = filter(tmp.full, `z(Trust volatility)` < -5 | `z(Trust volatility)` > 2)
-  ) +
-  annotate(
-    geom = 'richtext', 
-    label = r.full, 
-    y = 10, 
-    x = mean(range(tmp.full$`z(Weighted selection)`)),
-    vjust = .5, 
-    hjust = .5,
-    fill = NA
-  ) +
-  theme(
-    text = element_blank(), 
-    axis.line = element_blank(),
-    axis.ticks = element_blank(),
-    plot.background = element_rect(
-      colour = "black", size = 1
-    )
-  )
-
-tmp %>%
-  ggplot(aes(y = `z(Trust volatility)`, x = `z(Weighted selection)`)) +
-  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
-  geom_smooth(method = 'lm', formula = y ~ x) +
-  geom_point(alpha = .1) +
-  annotate(
-    geom = 'richtext', 
-    label = r, 
-    y = max(tmp$`z(Trust volatility)`), 
-    x = min(tmp$`z(Weighted selection)`),
-    vjust = 1, 
-    hjust = 0,
-    fill = NA
-  ) +
-  coord_fixed() +
-  scale_y_continuous(limits = c(-5, 2)) +
-  annotate(
-    geom = 'plot', 
-    label = full, 
-    x = 2.5, 
-    y = -5, 
-    vjust = 0, 
-    hjust = .5, 
-    vp.height = .5
-  )
-
+```{r nw-r-pe-cor, fig.caption="Correlation of recovered parameters.  Outliers with extreme trust volatility values (|z| > 5) have been dropped, and are shown on the inset plot for context. Each point is a participant, and the solid blue line shows the overall relationship (with 95\\% confidence intervals shaded in grey). The formula for the line is given in the top-left. Dashed line indicates a 1:1 correlation."}
 ```
 
 The mathematical model was fit to participant each participant's data using a gradient descent algorithm.
@@ -1178,72 +534,7 @@ There was no significant correlation between trust volatility and weighted selec
 
 #### Stability of coefficients
 
-```{r nw-r-stability} 
-#' Several participants did two lots of the main experiment with different pairs
-#' of advisors (who had the same properties). We fit parameters to each of these
-#' advisor pairs separately, so we can now compare the similarity of the 
-#' coefficients we estimated within vs between participants.
-#' If the parameters represent stable features of a participant, we would expect
-#' that they are more similar within participants than between participants.
-
-seed <- 20200914
-
-tmp <- splits %>%
-  mutate(
-    ids = map(
-      uid, 
-      ~ {
-        s <- str_match(., "^(.+?) (p[0-9]+)_([0-9]+)$")
-        tibble(study = s[,2], participant = s[,3], split = s[,4])
-      }
-    )
-  ) %>%
-  unnest(ids) %>%
-  select(study, participant, split, ws_end, tu_end)
-
-tmp <- tmp %>%
-  pivot_longer(ends_with("end"), names_to = "dimension", values_to = "coefficient") %>%
-  pivot_wider(names_from = split, values_from = coefficient, names_prefix = "split")
-
-tmp <- bind_rows(
-  mutate(tmp, source = "real"),
-  with_seed(
-    seed,
-    tmp %>% 
-      nest(d = -c(study, dimension)) %>%
-      mutate(d = map(d, ~ mutate(., split2 = sample(split2)))) %>%
-      unnest(d) %>%
-      mutate(source = "shuffled")
-  )
-) %>%
-  mutate(difference = abs(split1 - split2)) %>%
-  select(-starts_with("split"))
-
-# tmp %>% 
-#   ggplot(aes(x = source, y = difference)) +
-#   geom_violin() +
-#   facet_wrap(~ paste(dimension, study), scales = "free")
-
-.T.tu_split <- tmp %>%
-  filter(dimension == "tu_end") %>%
-  pivot_wider(names_from = source, values_from = difference) %$%
-  md.ttest(
-    real, 
-    shuffled,
-    labels = c("M~Difference|real~", "M~Difference|shuffled~"),
-    paired = T
-  )
-  
-.T.ws_split <- tmp %>%
-  filter(dimension == "ws_end") %>%
-  pivot_wider(names_from = source, values_from = difference) %$%
-  md.ttest(
-    real, 
-    shuffled,
-    labels = c("M~Difference|real~", "M~Difference|shuffled~"),
-    paired = T
-  )
-
+```{r nw-r-stability}
 ```
 
 Several participants performed experiments that had two core sections. 
@@ -1258,117 +549,17 @@ The results provided strong evidence that the differences were indistinguishable
 ### Validity of the model
 
 ```{r nw-r-bias-evolution, fig.caption="Bias evolution within each model.  Each plot shows a model run with a different combination of starting trust weights and weighted selection values. Each line shows the bias of a single agent, coloured according to whether the agent's starting bias was more or less than 0.5. In the Evolved weights graphs the evolution period prior to biases being allowed to shift is truncated (and marked with grey shading)."}
-# Plot bias evolution
-agents.all %>%
-  filter(decision > -100, random_seed == min(random_seed)) %>%
-  ggplot(aes(x = decision, y = bias, colour = starting_bias < .5, group = id)) +
-  geom_rect(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf, fill = 'grey95', colour = NA) +
-  geom_line(alpha = .2) +
-  scale_y_continuous(limits = 0:1, breaks = c(0, .5, 1)) +
-  facet_grid(weighted_sampling ~ trust_weights) +
-  theme(aspect.ratio = 1/3, strip.text.y = element_text(angle = 0))
-
 ```
 
 
 ```{r nw-r-weight-by-bias-evolution, fig.caption="Shared bias-weight correlation evolution for each model.  Each plot shows a model run with a different combination of starting trust weights and weighted selection values. Each graph shows the mean correlation between shared weight between agents and trust weights at each decision."}
-# Plot the correlation between shared bias and weight over time
-agents.all %>%
-  filter(random_seed == min(random_seed)) %>%
-  nest(d = -c(trust_weights, weighted_sampling, model_num, burnIn, random_seed)) %>%
-  mutate(cors = map(
-    model_num, 
-    function(.x) {
-      gs <- graphs.all[[.x]]
-      m <- list(
-        model = list(graphs = gs), 
-        parameters = list(n_decisions = length(gs))
-      )
-      adviseR:::.biasCorrelation(m)
-    }
-  )) %>%
-  unnest(cols = cors) %>%
-  mutate(decision = ifelse(burnIn, decision - nBI, decision)) %>%
-  ggplot(aes(x = decision)) +
-  geom_rect(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf, fill = 'grey95') +
-  geom_hline(yintercept = 0, linetype = 'dashed') +
-  geom_errorbar(aes(ymin = ciL, ymax = ciH)) +
-  geom_path(aes(y = r)) +
-  scale_y_continuous(limits = c(NA, 1), breaks = c(0, .5, 1)) +
-  facet_grid(weighted_sampling ~ trust_weights, scales = "free_x") +
-  theme(
-    aspect.ratio = 1/3, 
-    strip.text.y = element_text(angle = 0),
-    axis.text.x = element_text(angle = 270, vjust = .2, hjust = 0)
-  )
-
 ```
 
 ```{r nw-r-weight-distribution, fig.caption="Distribution of final weights for each model.  Each plot shows a model run with a different combination of starting trust weights and weighted selection values."}
-# Plot final weights
-agents.all %>%
-  nest(d = -c(trust_weights, weighted_sampling, random_seed, model_num)) %>%
-  filter(random_seed == min(random_seed)) %>%
-  mutate(d = map_int(d, ~ max(.$step))) %>%
-  mutate(weights = map2(
-    model_num, 
-    d, 
-    function(.x, .y) {
-      w <- graphs.all[[.x]][[.y]] %>% as_adjacency_matrix(attr = 'weight')
-      tibble(id = rep(1:nrow(w)), weight = map(id, ~ as.numeric(w[., -.]))) %>%
-        unnest(cols = weight)
-    }
-  )) %>%
-  # filter(model_num == 74) %>%
-  unnest(cols = weights) %>%
-  ggplot(aes(x = weight)) +
-  geom_histogram(binwidth = .01) +
-  scale_x_continuous(breaks = c(0, .5, 1)) +
-  facet_grid(weighted_sampling ~ trust_weights) +
-  theme(aspect.ratio = 1/3, strip.text.y = element_text(angle = 0))
-
 ```
 
 
 ```{r nw-r-all-models-summary, fig.caption="Model final decision group ratio and mean final bias magnitude.  Each of the trust weights and weighted selection sampling combinations in the figures above was run multiple times with different random seeds. Each of these runs is represented by a single line. Some models have no group ratio because there is only one group at the final decision (because there is a consensus wherein all agents have the same direction of bias), which means that the ratio of weights is undefined and consequently the line is broken.", warning=FALSE}
-# warning=FALSE here because some values of group_ratio_empirical are undefined
-ggs <- list()
-
-ggs[[1]] <- models.all %>%
-  ggplot(aes(
-    x = weighted_sampling, 
-    y = group_ratio_empirical, 
-    group = paste(random_seed, trust_weights),
-    colour = trust_weights
-  )) +
-  geom_line(alpha = .5) +
-  geom_point(alpha = .25) +
-  scale_y_continuous(
-    limits = c(1, ceiling(max(models.all$group_ratio_empirical) / 10) * 10)
-  ) +
-  labs(y = "Group ratio") +
-  theme(
-    axis.text.x = element_blank(),
-    axis.title.x = element_blank(),
-    axis.ticks.x = element_blank(),
-    axis.line.x = element_blank()
-  )
-
-ggs[[2]] <- models.all %>%
-  ggplot(aes(
-    x = weighted_sampling, 
-    y = meanBiasMagnitude, 
-    group = paste(random_seed, trust_weights),
-    colour = trust_weights
-  )) +
-  geom_line(alpha = .5) +
-  geom_point(alpha = .25) +
-  scale_y_continuous(limits = c(0, .5)) +
-  labs(y = "Bias magnitude") +
-  theme(legend.position = 'none')
-
-ggs[[1]] / ggs[[2]]
-
 ```
 
 A first set of simulations aimed to evaluate basic network behaviours in terms of trust formation. 

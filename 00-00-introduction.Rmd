@@ -12,21 +12,23 @@ bibliography-heading-in-pdf: Works Cited
 documentclass: book
 ---
 
-<!-- # (PART) Introduction {-} -->
-
 # Introduction {#chapter-introduction}
 
 \adjustmtc 
 
 \mccorrect{!TODO[Style notes]}: 
 
-* Graphs:  
+* Graphs and stats:  
     * Continuous axes which show theoretical limits should have small expand, axes which do not show those limits should have arrowheads from broken_axis_*  
+    * Fix p =< 
+    * Check spaces around = 
 * Terminology:  
     * Participants are human individuals.  
     * Agents are simulated individuals.  
     * Judge and advisor are roles, that can be played by either participants or agents.
+* Headings should all be Sentence case.
 * ctrl-shift-f:
+  * we -> I (when talking about thesis rather than experiment or example)
   * online -> on-line
   * offline -> off-line
   * adviser -> advisor
@@ -34,14 +36,20 @@ documentclass: book
   * advice taking -> advice-taking
   * source ?selection -> advice-seeking (except in literature on selective exposure)
   * advisor-choice -> advisor choice
+  * advisor selection -> advisor choice
   * under ?weighting -> under-weighting
   * over ?weighting -> over-weighting
   * time ?scales -> time-scales
   * operationalization -> operationalisation
   * polarization -> polarisation
+  * vs -> versus
+  * set-up -> setup
   
+  * mccorrect -> resolve issues
   
-  
+\mccorrect{TODO: Check R output messages, warnings, errors}
+
+\mccorrect{Search final output for ()}
     
 \mccorrect{TODO: acknowledgements, dedication (MAF)}
 

@@ -1,5 +1,5 @@
 
-## Effects of accuracy vs. agreement (Date estimation) {#ac-ava}
+## Effects of accuracy vs. agreement {#ac-ava}
 
 The High versus Low agreement advisor experiment showed that participants tended to prefer to receive agreeing advice when they did not receive feedback.
 The advisors did not differ in their accuracy (by design), which meant that participants could not increase their performance by selecting one advisor over another. 
@@ -60,21 +60,19 @@ tmp <- trials %>%
   unique()
 ```
 
-`r length(unique(trials$pid))` participants each completed `r sum(tmp$n)` trials over `r nrow(tmp)` blocks of a perceptual decision-making task.
-Each trial consisted of three phases: participants gave an initial estimate (with confidence) of which of two briefly presented boxes contained more dots; received advice on their decision from an advisor; and made a final decision (again, with confidence).
-
-Participants started with `r sum(tmp$typeName == "catch")` blocks of `r tmp %>% filter(typeName == "catch") %>% mutate(n = n - (n %% 4)) %>% .$n %>% unique()` trials that contained no advice to allow them to familiarise themselves with the task; to allow the staircasing process to titrate the difficulty to their ability in order to maintain approximately 71% initial estimate accuracy; and to allow estimating of participants' idiosyncratic confidence reporting style.
+`r length(unique(trials$pid))` participants each completed `r sum(tmp$n)` trials over `r nrow(tmp)` blocks of the Dots task.
+Participants started with `r sum(tmp$typeName == "catch")` blocks of `r tmp %>% filter(typeName == "catch") %>% mutate(n = n - (n %% 4)) %>% .$n %>% unique()` trials that contained no advice.
 The first three trials were introductory trials that explained the task.
 All trials in this section included feedback indicating whether or not the participant's response was correct.
 
-Participants then did `r tmp %>% filter(typeName == "force" & practice) %>% .$n %>% sum()` trials with a practice advisor to get used to receiving advice.
-They were informed that they would "get **advice** from advisors to help you make your decision", and that "advice is not always correct, but it is supposed to help you perform better on the task."
+Participants then did `r tmp %>% filter(typeName == "force" & practice) %>% .$n %>% sum()` trials with a practice advisor.
+They were informed that they would "get **advice** from advisors to help you make your decision [original emphasis]", and that "advice is not always correct, but it is supposed to help you perform better on the task."
 
 ```{r ac-ava-dots-m-structure-main}
 tmp <- tmp %>% filter(!practice)
 ```
 
-Participants then performed `r nrow(tmp) / sum(tmp$typeName == "choice")` blocks of trails that made up the core experiment.
+Participants then performed `r nrow(tmp) / sum(tmp$typeName == "choice")` blocks of trials that made up the core experiment.
 There were `r sum(tmp$typeName == "force") / sum(tmp$typeName == "choice")` familiarisation blocks of `r tmp %>% filter(typeName == "force") %>% .$n %>% unique()` trials, with participants seeing one of the two advisors for an entire block in random order.
 The familiarisation block was followed with a test block of `r tmp %>% filter(typeName == "choice") %>% .$n %>% unique()` trials in which participants could choose between the advisors they encountered in the familiarisation blocks.
 
@@ -467,15 +465,11 @@ conf_r_f <- correlationBF(r$finalAccuracy, r$finalConfidence, paired = T)
 
 ```
 
-Basic behavioural performance was similar to that observed with the same Dots task in Experiments 1A§\@ref(fig:ac-acc-dots-r-performance) and 2A§\@ref(fig:ac-agr-dots-r-performance). 
+Basic behavioural performance was similar to that observed with the same Dots task in Experiments 1A§\@ref(ac-acc-dots-r-performance) and 2A§\@ref(ac-agr-dots-r-performance). 
 Initial estimate accuracy converged on the target 71%, and, as shown in Figure \@ref(fig:ac-ava-dots-r-performance)A, participants benefited from advice in terms of their final decisions being more accurate than their initial estimates (ANOVA main effect of Time: `r s_acc$s[2]`), especially following advice from the High accuracy advisor (interaction of Time and Advisor: `r s_acc$s[3]`).
 There was no main effect of Advisor (`r s_acc$s[1]`).
 
 Figure \@ref(fig:ac-ava-dots-r-performance)B and ANOVA indicated that participants were more confident in their correct answers than their incorrect ones (`r s_conf$s[2]`), and less confident in their final decisions than their initial estimates (`r s_conf$s[1]`), and that these two factors interacted (`r s_conf$s[3]`).
-
-The advisor also mattered; confidence decreased for incorrect answers and increased for correct answers with the High accuracy advisor, and increased regardless of correctness following advice from the High agreement advisor.
-This indicates that in general the confidence changed in the direction of the advice (because only the High accuracy advisor disagreed frequently, and then only on trials where the participant's initial estimate was incorrect), meaning the High accuracy advisor was more influential (Figure \@ref(fig:ac-agr-dots-r-performance)C).
-
 There was no evidence of a correlation between initial estimate accuracy and confidence (`r bf2str(exp(conf_r_i@bayesFactor$bf))`), and no evidence for a correlation between final decision accuracy and confidence (`r bf2str(exp(conf_r_f@bayesFactor$bf))`).
 
 ##### Advisor performance
@@ -757,8 +751,11 @@ It is not clear whether some participants were aware of the accuracy difference 
 It is possible that, as suggested by @pescetelliRoleDecisionConfidence2021, participants were able to use a combination of their subjective confidence and advice agreement to determine advisors' accuracy. 
 This is explored more in Experiment 4A§\@ref(ac-cca-dots).
 
+The preferences for advisors in the previous Dots task experiments, Experiment 1A§\@ref(ac-acc-dots-r-h) and Experiment 2A§\@ref(ac-agr-dots-r-h), showed clustering of preferences around the midpoint; participants generally had mild preferences.
+In contrast, in the present experiment, there was a wide range of preference strengths, but these were distributed evenly between the two advisors.
+It seems probable that participants in the current experiment were sensitive to differences between the advisors, but that their response to these differences was not uniform.
+
 The next experiment explores the contrasted High agreement and High accuracy advisors in the Dates task.
-\mccorrect{QUESTION: Did Niccolo do an agreement vs accuracy experiment? Was the feedback/no feedback between or within participants. He might have found something by using within participants feedback so they could have figured out what was coming...}
 
 ### Experiment 3B: Accuracy vs. agreement effects in the Dates Task {#ac-ava-dates}
 
@@ -968,9 +965,7 @@ for (E in c(.GlobalEnv, .prevStudy)) {
 
 ```
 
-```{r ac-ava-dates-r-performance, fig.caption="Task performance for the Dates task with accurate vs agreeing advisors.  A: Response error.  Faint lines show individual participant mean error (the absolute difference between the participant's response and the correct answer), for which the violin and box plots show the distributions. The dashed line indicates chance performance. Dotted violin outlines show the distribution of participant means on the original study which this is a replication. The dependent variable here is error, the distance between the correct answer and the participant's answer, and consequently lower values represent better performance. The theoretical limit for error is around 100.  B: Error by marker width.  Faint lines show individual participant mean error (distance from the centre of the participant's marker to the correct answer) for each width of marker used, and box plots show the distributions. Some participants did not use all markers, and thus not all lines connect to each point on the horizontal axis. The dashed box plots show the distributions of participant means in the original experiment of which this is a replication. The faint black points indicate outliers.  Grey bars show half of the marker width: mean error scores within this range mean the marker covers the correct answer.", fig.height=7}
-
-gg <- list()
+```{r ac-ava-dates-r-performance-acc, fig.caption="Response error for the Dates task with accurate vs agreeing advisors.  Faint lines show individual participant mean error (the absolute difference between the participant's response and the correct answer), for which the violin and box plots show the distributions. The dashed line indicates chance performance. Dotted violin outlines show the distribution of participant means on the original study which this is a replication. The dependent variable here is error, the distance between the correct answer and the participant's answer, and consequently lower values represent better performance. The theoretical limit for error is around 100."}
 
 # Task performance figure
 dw <- .2
@@ -986,9 +981,6 @@ for (E in c(.GlobalEnv, .prevStudy))
   ) %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`), 
                names_to = 'Response', values_to = 'Error') %>%
-  mutate(advisor = Advisor,
-         Advisor = factor(paste0(Advisor, '\n'))) %>%
-  mutate(Response = factor(Response)) %>%
   order_factors()
 
 bf <- tmp %>% 
@@ -1000,28 +992,32 @@ bf <- tmp %>%
          bf = map_chr(bf, ~ .@bayesFactor %>% .$bf %>% exp() %>% bf2str())) %>%
   select(-d)
 
-gg$acc <- tmp %>%
-  ggplot(aes(x = Response, y = Error, colour = advisor)) +
+tmp %>%
+  ggplot(aes(x = Response, y = Error, colour = Advisor)) +
   scale_y_continuous(limits = c(0, 50), expand = c(0, 0)) +
   scale_x_discrete() +
   coord_cartesian(clip = F) +
   geom_line(aes(group = pid), alpha = .25) +
   geom_split_violin(aes(x = nudge(Response, dw), 
-                        group = Response, fill = advisor), 
+                        group = Response, fill = Advisor), 
                     width = .9, colour = NA) +
   geom_split_violin(aes(x = nudge(Response, dw), group = Response), 
                     fill = NA, width = .9, colour = 'black', linetype = 'dashed', 
                     data = .prevStudy$tmp) +
   geom_boxplot(aes(x = nudge(Response, dw), group = Response),
                outlier.shape = NA, size = 1, width = dw/2, colour = 'black') +
-  geom_segment(x = 1 - dw, xend = 2 + dw, y = 50, yend = 50, 
+  geom_segment(x = 1 - dw, xend = 2 + dw, y = 48, yend = 48, 
                colour = 'black') +
   geom_label(aes(label = paste0('BF = ', bf)), 
-             x = 1.5, y = 50, colour = 'black', data = bf) +
+             x = 1.5, y = 48, colour = 'black', data = bf) +
   facet_wrap(~Advisor) +
   labs(y = 'Mean error') +
   broken_axis_top +
   scale_fill_advisor(aesthetics = c("fill", "colour"))
+
+```
+
+```{r ac-ava-dates-r-performance-conf, fig.caption="Error by marker width for the Dates task with accurate vs agreeing advisors.  Faint lines show individual participant mean error (distance from the centre of the participant's marker to the correct answer) for each width of marker used, and box plots show the distributions. Some participants did not use all markers, and thus not all lines connect to each point on the horizontal axis. The dashed box plots show the distributions of participant means in the original experiment of which this is a replication. The faint black points indicate outliers. Grey bars show half of the marker width: mean error scores within this range mean the marker covers the correct answer."}
 
 # Confidence
 dw <- .4
@@ -1039,47 +1035,45 @@ for (E in c(.GlobalEnv, .prevStudy))
                names_pattern = '(\\w+) (\\w+)') %>%
   group_by(pid, Response, width) %>%
   summarise(Error = mean(error), .groups = 'drop') %>%
-  mutate(response = paste0(Response, '\n'),
-         response = factor(response),
-         Response = factor(Response),
-         `Marker width` = factor(width)) %>%
+  mutate(`Marker width` = factor(width)) %>%
   order_factors() 
 
 # BFs for comparisons
 comps <- list(c(7,13), c(13,21), c(7,21))
 bf <- NULL
 for (comp in comps) {
-  for (r in unique(tmp$response)) {
+  for (r in unique(tmp$Response)) {
     x <- tmp %>% 
       select(-`Marker width`) %>% 
-      filter(width %in% comp, response == r) %>%
+      filter(width %in% comp, Response == r) %>%
       pivot_wider(names_from = width, values_from = Error) %>%
       filter(across(where(is.numeric), ~!is.na(.x)))
     
-    names(x)[4:5] <- c('x', 'y')
+    names(x)[3:4] <- c('x', 'y')
     b <- ttestBF(x = x$x, y = x$y, paired = T) %>% 
       .@bayesFactor %>% .$bf %>% exp()
     
     bf <- bind_rows(
       bf, 
-      tibble(x = comp[1], xend = comp[2], bf = b, response = r)
+      tibble(x = comp[1], xend = comp[2], bf = b, Response = r)
     )
   }
 }
 bf <- bf %>% 
-  mutate(across(.cols = c(x, xend), ~factor(., levels = levels(tmp$`Marker width`))),
-         y = case_when(x == 7 & xend == 13 ~ 45,
-                       x == 13 ~ 52,
-                       x == 7 & xend == 21 ~ 60),
-         y = y,
-         mid = (as.numeric(x) + as.numeric(xend))/2,
-         response = factor(response, levels = levels(tmp$response)))
+  mutate(
+    across(.cols = c(x, xend), ~factor(., levels = levels(tmp$`Marker width`))),
+    y = case_when(x == 7 & xend == 13 ~ 48,
+                  x == 13 ~ 52,
+                  x == 7 & xend == 21 ~ 58),
+    y = y,
+    mid = (as.numeric(x) + as.numeric(xend))/2
+  )
 
 m <- tmp %>% 
   select(`Marker width`, width) %>%
   unique()
 
-gg$conf <- tmp %>%
+tmp %>%
   ggplot(aes(x = `Marker width`, y = Error, colour = Response)) +
   scale_y_continuous(limits = c(0, 60), expand = c(0, 0)) +
   scale_x_discrete() +
@@ -1092,20 +1086,16 @@ gg$conf <- tmp %>%
                linetype = 'solid', width = dw/2, colour = 'grey', 
                data = .prevStudy$tmp) +
   geom_boxplot(aes(group = `Marker width`), size = 1, outlier.alpha = .2,
-               width = dw/2, colour = 'black') +
+               width = dw/2) +
   geom_line(aes(group = pid), alpha = .25) +
   # BF labels
   geom_segment(aes(x = x, xend = xend, y = y, yend = y),
                colour = 'black', data = bf) +
   geom_label(aes(x = mid, y = y, label = paste0('BF = ', bf2str(bf))),
              colour = 'black', data = bf) +
-  facet_wrap(~response) +
+  facet_wrap(~Response) +
   broken_axis_top +
   scale_fill_decision(aesthetics = c("fill", "colour"))
-
-# Patchwork plots together
-(gg$acc / gg$conf) +
-  plot_annotation(tag_levels = 'A')
 
 ```
 
@@ -1140,15 +1130,15 @@ s_acc <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 
 ```
 
-Participants generally improve their response accuracy following advice; they had lower error on final decisions than on their initial estimates (`r s_acc$s[1]`).
+Participants generally improved their response accuracy following advice; they had lower error on final decisions than on their initial estimates (`r s_acc$s[1]`).
 They also had lower error on their answers with the High accuracy advisor (`r s_acc$s[2]`).
-As expected, there was an interaction: participants reduced their error much more following advice from the High accuracy advisor (`r s_acc$s[3]`; Figure \@ref(fig:ac-ava-dates-r-performance)). 
+As expected, there was an interaction: participants reduced their error much more following advice from the High accuracy advisor (`r s_acc$s[3]`; Figure \@ref(fig:ac-ava-dates-r-performance-acc)). 
 
 Generally, we expect participants to be more confident on trials on which they are correct compared to trials on which they are incorrect.
 Confidence can be measured by the width of the marker selected by the participant.
 Where participants are more confident in their response, they can maximise the points they receive by selecting a thinner marker. 
 Where participants are unsure, they can maximise their chance of getting the answer correct by selecting a wider marker.
-Participants' error was lower for each marker width in final decisions than initial estimates (Figure \@ref(fig:ac-ava-dates-r-confidence)). 
+Participants' error was lower for each marker width in final decisions than initial estimates (Figure \@ref(fig:ac-ava-dates-r-performance-conf)). 
 For both initial estimates and final decisions, error was higher for wider markers than for narrower ones.
 
 ##### Advisor performance
@@ -1266,17 +1256,11 @@ ggplot(tmp, aes(x = feedbackCondition, y = pChooseAcc)) +
 
 ```
 
-Consistent with the result from the Dots task (Experiment 3A§\@ref(ac-ava-dots)), in the No feedback condition participants' preferences for receiving advice from the High accuracy advisor were not different from chance (`r cat(.T.Nfb)`) on average, and varied widely across individual participants: participant preferences in the No feedback condition were almost perfectly evenly distributed, both in terms of which advisor was preferred and the strength of that preference, in both the original study and the replication (Figure \@ref(fig:ac-ava-dates-r-graph)).
+Consistent with the result from the Dots task (Experiment 3A§\@ref(ac-ava-dots)), in the No feedback condition participants' preferences for receiving advice from the High accuracy advisor were not different from chance (`r .T.Nfb`) on average, and varied widely across individual participants: participant preferences in the No feedback condition were almost perfectly evenly distributed, both in terms of which advisor was preferred and the strength of that preference, in both the original study and the replication (Figure \@ref(fig:ac-ava-dates-r-graph)).
 
-In the Feedback condition, in contrast, the mean of the participants' selection rates clearly favoured the High accuracy advisor (`r cat(.T.fb)`).
+In the Feedback condition, in contrast, the mean of the participants' selection rates clearly favoured the High accuracy advisor (`r .T.fb`).
 This is consistent with a strategy which attempts to maximise the accuracy of final decisions. 
-This qualitative difference from the No feedback condition also translated into a statistical difference: the two preference distributions were clearly different from one another (`r cat(.T.Int)`).
-
-It was discovered after the completion of experiments that the advisor position (whether the advisor appears on the top or bottom of the advisor choice panel) was not counterbalanced between advisors.
-It had been decided during development of the tests to keep the advisors in the same position for every trial so that participants did not get mixed up between them.
-Together, this meant that the High accuracy advisor always appeared at the top and the Low accuracy advisor always appeared at the bottom, for every trial for every participant.
-We are thus unable to confirm that pick rate differences, or the absence of those differences, are caused by participants' preferences for the advice the advisor would provide or the position the advisor was in on the screen.
-Furthermore, it is possible that any genuine preference for one advisor over the other was _induced_ by the position, rather than independent of it [@zajkowskiCrossDomainEffectsChoiceInduced2021].
+This qualitative difference from the No feedback condition also translated into a statistical difference: the two preference distributions were clearly different from one another (`r .T.Int`).
 
 ##### Advisor influence
 
@@ -1390,8 +1374,8 @@ The Dates task distribution is more in keeping with previous experiments: the ex
 In the Feedback condition where systematic differences are seen, we still see the entire range of preference directions and strengths, as we did before, although the clustering towards the High accuracy advisor is much more pronounced than in previous experiments. 
 This clustering of the distribution suggests that the manipulation worked more effectively in this experiment, perhaps because of the use of the continuous Dates task: participants may have experienced the visual depiction of a distance between their estimate and the advice as a stronger signal than binary agreement or disagreement.
 
-The results of the source selection behaviour in this experiment conceptually replicate the advisor influence results in the previous study (§\@ref(chapter-advice-taking)), and the influence results in the Dates task similarly replicate those findings. 
-While this study was not set up to examine influence rigorously, the inclusion of trials where the advisors offered equivalent advice allowed us to explore advisor influence without the confound of the advice itself. 
+The results of the source selection behaviour in this experiment conceptually replicate the advisor influence results in Experiment 0 (Appendix 2§\@ref(appendix-2)), and the influence results in the Dates task similarly replicate those findings. 
+While this study was not set up to examine influence rigorously, the inclusion of trials where the advisors offered equivalent advice allowed us to explore advisor influence without the confound of differences in the nature of the advice itself. 
 We found, in two preregistered studies, that participants in the Feedback condition discriminated between their advisors, being more influenced by the accurate rather than agreeing advice. 
 Contrary to our hypothesis, however, we found that participants in the No feedback condition either did not discriminate (original) or did not provide evidence of discrimination (replication). 
 

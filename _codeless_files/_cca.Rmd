@@ -30,7 +30,7 @@ The advisers were balanced for both overall agreement with the judge and objecti
 This was achieved by varying the agreement rates for the advisors contingent on the confidence of the judge's initial estimate. 
 The Bias-sharing advisor would agree more frequently when the participant expressed high confidence in their initial estimate and less frequently when the participant expressed low confidence in their initial estimate.
 The Anti-bias advisor did the opposite.
-Crucially, advisors performed identically on the largest minority of trials (when judges were moderately confident in their initial estimates), allowing the advisors to be compared directly on these trials [@pescetelliRoleDecisionConfidence2021].
+Crucially, the advisors were matched in agreement when participants were moderately confident in their initial estimates, allowing the advisors to be compared directly on these trials [@pescetelliRoleDecisionConfidence2021].
 We place participants in a similar paradigm in which they are given a choice between advisers, and hypothesise that they will more frequently seek advice from the _Bias Sharing_ advisor than from the _Anti Bias_ advisor.
 We predict that, given a choice, judges will prefer to receive advice from a _Bias Sharing_ advisor over receiving advice from an advisor who does not share the judge’s bias.
 
@@ -55,7 +55,7 @@ The basic trial experience was the same: participants saw two boxes of dots flas
 Participants then received advice and provided a final decision.
 On some trials participants were able to choose which of their advisors would provide the advice (Figure \@ref(fig:ac-ex1-paradigm)).
 
-```{r ac-ex1-paradigm, fig.align='center', fig.caption="Experiment 1 procedure.  The task began with a blank screen containing only a fixation cross and progress bar. Momentarily prior to the onset of the stimuli the fixation cross flickered. The stimuli, two rectangles containing approximately 200 dots each, appeared for 0.16s, one on either side of the fixation cross. Once the stimuli disappeared, a response-collection screen appeared and prompted the participant to indicate their initial estimate and its confidence by selecting a point within one of two regions. The left region indicated a decision that the target was on the left, and increasingly-leftwards points within that region indicated increasing confidence in that decision. The right region indicated a decision that the target was on the right, and increasingly-rightwards points within that region indicated increasing confidence in that decision.  Next, the participant was presented with a choice screen. The choice screen displayed two images, one at the top of the screen and one at the bottom. The images were one of the following: an advisor portrait, a silhouette, or a red cross. The red cross was not selectable, forcing participants to choose the other option. The silhouette offered no advice, and was only ever offered as a forced choice. Selecting an advisor image provided the participant with the opinion of that advisor on the trial.  Having heard the advice, the participant was again presented with the response-collection screen, with a yellow indicator marking their original response. A second (final) judgement was collected using this screen (except on catch trials), and the trial concluded.", out.width="100%"}
+```{r ac-ex1-paradigm, fig.align='center', fig.caption="Experiment 1 procedure.  The task began with a blank screen containing only a fixation cross and progress bar. Momentarily prior to the onset of the stimuli the fixation cross flickered. The stimuli, two rectangles containing approximately 200 dots each, appeared for 0.16s, one on either side of the fixation cross. Once the stimuli disappeared, a response-collection screen appeared and prompted the participant to indicate their initial estimate and its confidence by selecting a point within one of two regions. Next, the participant was presented with a choice screen. The choice screen displayed two images, one at the top of the screen and one at the bottom. The images were one of the following: an advisor portrait, a silhouette, or a red cross. The red cross was not selectable, forcing participants to choose the other option. The silhouette offered no advice, and was only ever offered as a forced choice. Selecting an advisor image provided the participant with the opinion of that advisor on the trial.  Having heard the advice, the participant was again presented with the response-collection screen, with a yellow indicator marking their original response. A second (final) judgement was collected using this screen (except on catch trials), and the trial concluded.", out.width="100%"}
 ```
 
 Overall, `r nrow(exclusions) + 1` participants were recruited from the University of Oxford participant recruitment platforms took part in the experiment and attended experimental sessions.
@@ -71,6 +71,14 @@ The questions asked for the judge’s assessment of the advisor’s likeability,
 The questions presented before the first experimental block were worded prospectively (e.g.
 ‘How much are you going to like this person?’ as opposed to ‘How much do you like this person?’).
 Answers were provided by moving a sliding scale below the advisor’s portrait towards the right for more favourable responses (marked ‘extremely’) or towards the left for less favourable responses (marked ‘not at all’).
+
+The blocks contained a mixture of choice, forced, and catch trials.
+On choice trials, participants had a choice between the two advisors giving advice on that block, and were able to select whichever they preferred by clicking the advisor's portrait. 
+The relative frequency of selection on these trials provided our dependent variable of advisor choice.
+On forced trials, participants were faced with the advisor selection screen, but only one option was available. 
+Participants could only continue when they selected the available portrait. 
+These trials were included to allow measuring of the influence of advice without the confound of having just chosen the advisor over another advisor.
+Catch trials were included to encourage participants to respond accurately in their initial estimates: on these trials they were forced to select a blank advisor portrait and received no advice; their initial estimate became their final decision automatically.
 
 ```{r ac-ex1-questionnaire, fig.align='center', fig.caption="Experiment 1 advisor questionnaire.  Participants rated advisors on a number of different dimensions.", out.width="100%"}
 ```
@@ -124,7 +132,7 @@ The advisors agreed with the participants' initial estimates at close to target 
 
 We hypothesised that the participants would display different pick rates for the Bias Sharing advisor versus the Anti Bias advisor.
 This hypothesis was evaluated by calculating the proportion of choice trials on which each participant picked the Bias Sharing advisor, and then testing these values as a one-sample t-test against the null hypothesis that the pick rates would be 0.5.
-No support was found for this hypothesis (`r cat(md.ttest(bs_pick$pPickBS, mu = .5, labels = "M~P(BiasSharing)~"))`; Figure \@ref(fig:ac-ex1-r-selection)), although the Bayesian test indicated that the data were not sufficient to conclude that no effect was present.
+No support was found for this hypothesis (`r .T`; Figure \@ref(fig:ac-ex1-r-selection)), although the Bayesian test indicated that the data were not sufficient to conclude that no effect was present.
 There was considerable variability across participants in the overall pick rate for the Bias Sharing advisor (range = [`r range(bs_pick$pPickBS) %>% num2str(isProportion = T) %>% paste(collapse = ", ")`]).
 
 Unlike in other experiments, there was no systematic effect of the position of the advisors on the screen (`r .T.first`).
@@ -137,7 +145,7 @@ This placement is random, and has no relationship to the identity of the advisor
 
 The advisers differed in their advice-giving as a function of the judge’s initial confidence.
 In trials where the judge’s initial estimate was made with medium confidence, however, the advisers were equal on judge confidence and agreement rate.
-Comparing selection rates for these trials alone revealed a clear preference for the Bias Sharing advisor (`r cat(md.ttest(pick %>% filter(confidenceCategory == "Medium") %>% pull(pPickBS), mu = .5, labels = "M~P(BiasSharing)~"))`; Figure \@ref(fig:ac-ex1-selection) "Medium" confidence category), although the Bayesian analysis again indicated an insensitive result, albeit in the hypothesised direction.
+Comparing selection rates for these trials alone revealed a clear preference for the Bias Sharing advisor (`r .T.med`; Figure \@ref(fig:ac-ex1-r-selection) "Medium" confidence category), although the Bayesian analysis again indicated an insensitive result, albeit in the hypothesised direction.
 
 ##### \OpenScience{prereg} Advisor influence {#ex1-influence}
 
@@ -164,7 +172,7 @@ The agree-in-confidence and agree-in-uncertainty advisers differed by design in 
 To control for the effects of initial confidence on influence, the above analysis was repeated using only those trials on which the initial estimate was correct and given with medium confidence.
 In a deviation from preregistration, this analysis was constrained to only forced trials because some participants had missing data for some advisor-trial type-agreement contingencies in the Medium confidence trials.
 
-The results were qualitatively identical to those for the trials at all confidence levels: a main effect of agreement (raw influence: `r aov_inf_m$s[2]`; capped influence: `r s_inf_cap_m$s[2]`); and no significant effect of advisor (raw influence: `r s_inf_m$s[1]`; capped influence: `r s_inf_cap_m$s[1]`) or interaction (raw influence: `r s_inf_m$s[3]`; capped influence: `r s_inf_cap_m$s[3]`).
+The results were qualitatively identical to those for the trials at all confidence levels: a main effect of agreement (raw influence: `r s_inf_m$s[2]`; capped influence: `r s_inf_cap_m$s[2]`); and no significant effect of advisor (raw influence: `r s_inf_m$s[1]`; capped influence: `r s_inf_cap_m$s[1]`) or interaction (raw influence: `r s_inf_m$s[3]`; capped influence: `r s_inf_cap_m$s[3]`).
 
 ##### \OpenScience{prereg} Sensitivity to the manipulation
 
@@ -173,50 +181,19 @@ The results were qualitatively identical to those for the trials at all confiden
 
 Finally, we planned to investigate the hypothesis that participants’ choice of advisor would be sensitive to the differential agreement strategies of the advisers, e.g. participants might preferentially select the advisor with the greater likelihood of agreement given their initial confidence.
 This was investigated by testing the participants’ mean Bias-sharing advisor pick rate in high- versus low-confidence trials.
-Pick rates did not differ (`r cat(md.ttest(tmp$High, tmp$Low, paired = T, labels = c('M~High confidence~', 'M~Low confidence~')))`); Figure \@ref(fig:ex1-selection)).
+Pick rates did not differ (`r .T.byConf`).
 
 ##### Follow-up tests
 
-###### Effect of initial agreement
-
-This experiment was run in the lab, and was longer than the online experiments to help justify participants' travelling time.
-This meant that the experiment contained multiple blocks, and consequently that we could explore the effects of early experience of advice on subsequent advisor preferences.
-We hypothesised that one reason we found no weak evidence for different pick rates for different advisors was that initial exposure to the advisers may have overshadowed information in subsequent blocks.
-To investigate this possibility, we examined the effect that agreement in the first experimental block had upon choices throughout the rest of the experiment (Figure \@ref(fig:ex1-initial-agreement)).
-A simple regression (Table \@ref(tab:ex1-initial-agreement-t)) indicated that the extent to which the Bias-sharing advisor agreed with the participant more frequently than the Anti-bias advisor in the first experimental block (Block 3) was a significant predictor of the preference for picking the Bias-sharing advisor in subsequent blocks.
-
-```{r ex1-initial-agr}
+```{r ex1-follow-up}
 ```
 
-
-```{r ex1-initial-agreement, fig.align='center', fig.caption="Initial agreement and subsequent preference.  figure shows the relationship between the agreement rate of the Bias Sharing advisor in the first experimental block (relative to the Anti Bias advisor) and the proportion of the time the participant picked the Bias Sharing advisor in later blocks. The dashed line shows the best-fit regression line, with shaded 99\\% confidence intervals."}
-```
-
-###### Subjective assessment and choice of advisors
-
-Participants were asked to complete short questionnaires at several points in the experiment.
-These questionnaires collected ratings on a 100 point scale for each advisor across four dimensions: three loosely inspired by @mayerIntegrativeModelOrganizational1995 accuracy, likeability, and influence; along with a general trustworthiness dimension. 
-We did not observe significant differences in subjective ratings of the advisors at any time point.
-While overall differences might not show up, it is plausible that participants who had stronger preferences for one or other advisor would pick that advisor more frequently.
-We tested this using linear regression to predict the extent to which participants picked the Bias-sharing advisor from the differences in subjective advisor ratings.
-The questionnaire answers did not evolve systematically over the duration of the experiment, so the analysis was conducted on the final (post-experiment) answers.
-
-This analysis (Figure \@ref(fig:ex1-questionnaire-choice)) indicated that the association between subjective ratings and behavioural performance was present for the questionnaire dimensions of accuracy and trustworthiness, but not for influence or likeability.
-
-```{r ex1-questionnaire-choice, fig.caption="Behavioural and self-report consistency.  Relationship between questionnaire response scores on each item for the Bias-sharing advisor minus scores for the Anti-bias advisor and overall pick rate for the Bias-sharing advisor. Lines show best-fit linear model and shaded areas give 95\\% confidence intervals for the parameters. The theoretical limits on the horizontal axis are [-100, 100]."}
-```
-
-```{r}
-
-r <- cor.test(Q_diffs$Accurate, Q_diffs$Trustworthy, paired = T) %>% tidy()
-
-```
-
-There was a strong correlation between trustworthiness and accuracy ($r$=`r prop2str(r$estimate)`, p=`r prop2str(r$p.value)`), and thus it was probable that the variance in the questionnaire responses explained by advisor preference was principally driven by this shared component.
-This was borne out by nested multiple regression Table \@ref(tab:ex1-questionnaires-additive-variance-explained-t), which demonstrated that a model using accuracy to predict advisor preference was not significantly improved by including trustworthiness.
-
-```{r ex1-questionnaires-additive-variance-explained-r}
-```
+Given the weak effects of advisor profile differences on advisor choice, we ran two follow-up analyses on pick rates. 
+A first analysis showed that the participants' experiences of advisor agreement in the first block was correlated with the pick rate in later blocks.
+This suggested that initial exposure to the advisers may have overshadowed information in subsequent blocks.
+A second analysis showed that participants' answers on the questionnaire measure correlated with their pick preference strength for the questions on asking about how accurate (`r eqs %>% filter(Dimension == "Accurate") %>% pull(s)`), and trustworthy (`r eqs %>% filter(Dimension == "Trustworthy") %>% pull(s)`) advisors were.
+The higher a participant rated one advisor as compared to the other on the questionnaire scale, the heavier that participant's preference tended to be for picking the higher rated advisor.
+The same was not true for the questions asking how likeable (`r eqs %>% filter(Dimension == "Likeable") %>% pull(s)`) and influential (`r eqs %>% filter(Dimension == "Influential") %>% pull(s)`) advisors were.
 
 #### Discussion
 
@@ -254,23 +231,25 @@ A snapshot of the state of the code for running the experiment at the time the e
 ```{r ac-cca-dots-m-structure}
 ```
 
-`r length(unique(trials$pid))` participants each completed `r sum(tmp$n)` trials over `r nrow(tmp)` blocks of a perceptual decision-making task.
-Each trial consisted of three phases: participants gave an initial estimate (with confidence) of which of two briefly presented boxes contained more dots; received advice on their decision from an advisor; and made a final decision (again, with confidence).
-
-Participants started with `r sum(tmp$typeName == "catch")` blocks of `r tmp %>% filter(typeName == "catch") %>% mutate(n = n - (n %% 4)) %>% .$n %>% unique()` trials that contained no advice to allow them to familiarise themselves with the task; to allow the staircasing process to titrate the difficulty to their ability in order to maintain approximately 71% initial estimate accuracy; and to allow estimating of participants' idiosyncratic confidence reporting style.
+`r length(unique(trials$pid))` participants each completed `r sum(tmp$n)` trials over `r nrow(tmp)` blocks of the Dots task.
+Participants started with `r sum(tmp$typeName == "catch")` blocks of `r tmp %>% filter(typeName == "catch") %>% mutate(n = n - (n %% 4)) %>% .$n %>% unique()` trials that contained no advice.
 The first three trials were introductory trials that explained the task.
 All trials in this section included feedback indicating whether or not the participant's response was correct.
 
-Participants then did `r tmp %>% filter(typeName == "force" & practice) %>% .$n %>% sum()` trials with a practice advisor to get used to receiving advice.
-They were informed that they would "get **advice** from an advisor to help you make your decision", and that "advice is not always correct, but it is there to help you: if you use the advice you will perform better on the task."
+Participants then did `r tmp %>% filter(typeName == "force" & practice) %>% .$n %>% sum()` trials with a practice advisor.
+They were informed that they would "get **advice** from an advisor to help you make your decision [original emphasis]", and that "advice is not always correct, but it is there to help you: if you use the advice you will perform better on the task."
 
 ```{r ac-cca-dots-m-structure-main}
 ```
 
 Participants then performed `r sum(tmp$typeName == "choice")` sets of `r nrow(tmp) / sum(tmp$typeName == "choice")` blocks each.
-These sets consisted of `r sum(tmp$typeName == "force") / sum(tmp$typeName == "choice")` familiarisation block of `r tmp %>% filter(typeName == "force") %>% .$n %>% unique()` trials in which participants were assigned one of two advisors.
-The familiarisation block was followed with a test block of `r tmp %>% filter(typeName == "choice") %>% .$n %>% unique()` trials in which participants could choose between the advisors they encountered in the familiarisation block.
+These sets consisted of `r sum(tmp$typeName == "force") / sum(tmp$typeName == "choice")` familiarisation block of `r tmp %>% filter(typeName == "force") %>% .$n %>% unique()` trials in which participants were assigned one of two advisors on each trial.
+The familiarisation block was followed with a test block of `r tmp %>% filter(typeName == "choice") %>% .$n %>% unique()` trials in which participants could choose between the two advisors they encountered throughout the familiarisation block.
 The participants saw different pairs of advisors in each set, with each pair consisting of one advisor with each of the advice profiles.
+
+Compared to the lab version of this experiment§\@ref(ac-cca-lab-m), the design was somewhat simplified.
+The forced and choice trials were grouped into discrete blocks, so participants had all the forced trials for a pair of advisors first, and then all the choice trials for those advisors.
+Secondly, the advisors' biases were more extreme, as shown in Table \@ref(tab:ac-cca-dots-profiles).
 
 ##### Advice profiles
 
@@ -288,37 +267,37 @@ The Anti-bias advisor agrees more frequently with participants when their initia
 ```{r ac-cca-dots-r-clean}
 ```
 
-In line with the pre-registration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or finish the experiment after `r preRegParticipants` participants have already submitted data which passed the other exclusion tests. 
+In line with the pre-registration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or finished the experiment after `r preRegParticipants` participants had already submitted data which passed the other exclusion tests. 
 Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-cca-dots-exclusions).
 
 ##### Task performance
 
-```{r ac-cca-dots-r-performance, fig.caption="Task performance for the Dots task with confidence-contingent advisors.  A: Response accuracy. Faint lines show individual participant means, for which the violin and box plots show the distributions. The half-width horizontal dashed lines show the level of accuracy which the staircasing procedure targeted, while the full width dashed line indicates chance performance. Dotted violin outlines show the distribution of actual advisor accuracy.  B: Confidence. Faint lines show individual participant means, for which the violin and box plots show the distributions. Final confidence is negative where the answer side changes. Theoretical range of confidence scores is initial: [0,1]; final: [-1,1].  C: Influence. Participants' weight on the advice for advisors in the Familiarization stage of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2].", fig.height=7}
+```{r ac-cca-dots-r-performance-acc, fig.caption="Response accuracy for the Dots task with confidence-contingent advisors.  Faint lines show individual participant means, for which the violin and box plots show the distributions. The half-width horizontal dashed lines show the level of accuracy which the staircasing procedure targeted, while the full width dashed line indicates chance performance. Dotted violin outlines show the distribution of actual advisor accuracy."}
+```
+
+```{r ac-cca-dots-r-performance-conf, fig.caption="Confidence for the Dots task with confidence-contingent advisors.  Faint lines show individual participant means, for which the violin and box plots show the distributions. Final confidence is negative where the answer side changes. Theoretical range of confidence scores is initial: [0,1]; final: [-1,1]."}
 ```
 
 ```{r ac-cca-dots-r-performance-aov}
 ```
 
-Basic behavioural performance was similar to that observed with the same Dots task in Experiments 1A§\@ref(fig:ac-acc-dots-r-performance) and 2A§\@ref(fig:ac-agr-dots-r-performance). 
-Initial estimate accuracy converged on the target 71%, and, as shown in Figure \@ref(fig:ac-cca-dots-r-performance)A, participants benefited from advice in terms of their final decisions being more accurate than their initial estimates (ANOVA main effect of Time: `r s_acc$s[2]`), predominantly driven by following advice from the Anti-bias advisor (interaction of Time and Advisor: `r s_acc$s[3]`).
+Basic behavioural performance was similar to that observed with the same Dots task in Experiments 1A§\@ref(ac-acc-dots-r-performance) and 2A§\@ref(ac-agr-dots-r-performance). 
+Initial estimate accuracy converged on the target 71%, and, as shown in Figure \@ref(fig:ac-cca-dots-r-performance-acc), participants benefited from advice in terms of their final decisions being more accurate than their initial estimates (ANOVA main effect of Time: `r s_acc$s[2]`), predominantly driven by following advice from the Anti-bias advisor (interaction of Time and Advisor: `r s_acc$s[3]`).
 There was no main effect of Advisor (`r s_acc$s[1]`).
 
-Figure \@ref(fig:ac-cca-dots-r-performance)B and ANOVA indicated that participants were more confident in their answers when they were correct compared to incorrect (`r s_conf$s[2]`), that participants were less confidence in their final decisions than their initial estimates (`r s_conf$s[1]`), and that this decrease was larger for trials where the initial estimate was incorrect (`r s_conf$s[3]`).
-
-Figure \@ref(fig:ac-cca-dots-r-performance)C shows that there was evidence of equivalence in the influence of the two advisors.
-There was no evidence of a correlation between initial estimate accuracy and confidence (`r bf2str(exp(conf_r_i@bayesFactor$bf))`), and no evidence for a correlation between final decision accuracy and confidence (`r bf2str(exp(conf_r_f@bayesFactor$bf))`).
+Figure \@ref(fig:ac-cca-dots-r-performance-conf) and ANOVA indicated that participants were more confident in their answers when they were correct compared to incorrect (`r s_conf$s[2]`), that participants were less confident in their final decisions than their initial estimates (`r s_conf$s[1]`), and that this decrease was larger for trials where the initial estimate was incorrect (`r s_conf$s[3]`).
 
 ##### Advisor performance
 
-The advice is generated probabilistically from the rules described previously in Table \@ref(tab:ac-cca-dots-m-profiles).
+The advice is generated probabilistically from the rules described previously in Table \@ref(tab:ac-cca-dots-profiles).
 It is thus important to get a sense of the actual advice experienced by the participants.
 
 ```{r ac-cca-r-advice}
 ```
 
 Table \@ref(tab:ac-cca-r-advice-t) shows that advisors agreed with the participants' initial estimates at close to target rates in all confidence categories. 
-There was a larger than expected difference in agreement on correct answers overall, but this was not a significant difference (`r cat(md.ttest(pull(agr, 3), pull(agr, 4), paired = T, labels = glue("M~{names(agr)[3:4]}~")))`).
-The advisors were also further apart in terms of overall accuracy than desired, because of the different agreement rates for correct answers, although once again this difference was not significant (`r cat(md.ttest(pull(acc, 3), pull(acc, 4), paired = T, labels = glue("M~{names(acc)[3:4]}~")))`).
+There was a larger than expected difference in agreement on correct answers overall, but this was not a significant difference (`r .T.agr`).
+The advisors were also further apart in terms of overall accuracy than desired, because of the different agreement rates for correct answers, although once again this difference was not significant (`r .T.acc`).
 
 ##### \OpenScience{prereg} Hypothesis test {#ac-cca-dots-r-h}
 
@@ -328,7 +307,7 @@ The advisors were also further apart in terms of overall accuracy than desired, 
 There was a strong tendency for participants to express no, or slight preferences between advisors (`r .T`).
 Intriguingly, almost all participants who expressed a stronger preference expressed it towards the Anti-bias advisor: in the direction counter to that hypothesised (Figure \@ref(fig:ac-cca-dots-r-graph)).  
 
-In the Medium confidence trials, where the Lab experiment showed a glimmer of a difference, there was evidence against the existence of a difference (`r cat(.T_med)`).
+In the Medium confidence trials, where the Lab experiment showed a glimmer of a difference, there was evidence against the existence of a difference (`r .T_med`).
 
 In this experiment we saw an extremely strong effect of picking the advisor in the first position on the screen (`r .T.first`), an effect that we would hope would be random and even out across participants. 
 In this experiment, as a function of chance, the Bias-sharing advisor appeared in the favoured top position more frequently than we would expect (`r .T.pos`).
@@ -359,5 +338,5 @@ Looking just at the medium confidence trials, where the advisors were exactly eq
 
 The data from these studies were not conclusive against the existence of this effect, especially when integrated with the findings of @pescetelliRoleDecisionConfidence2021. 
 It is plausible, for instance, that metacognitive moderation does happen in advice evaluation, but that these effects are more subtle than the broader effects of accuracy and agreement, and that the studies here were too underpowered to detect these effects.
-It seems unlikely that metacognitive moderation effects would exist in the advisor evaluation domain (as showing in @pescetelliRoleDecisionConfidence2021) but not in the advisor choice domain, given the rough parity demonstrated between these domains across the dimensions of accuracy and agreement in previous experiments.
+It seems unlikely that metacognitive moderation effects would exist in the advisor evaluation domain (as shown in @pescetelliRoleDecisionConfidence2021) but not in the advisor choice domain, given the rough parity demonstrated between these domains across the dimensions of accuracy and agreement in previous experiments.
 

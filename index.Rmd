@@ -166,7 +166,7 @@ documentclass: book
 always_allow_html: true #this allows html stuff in word (.docx) output
 ---
 
-```{r install packages, echo = F, include = F}
+```{r setup-main, echo = F, include = F}
 # When knitting, do the whole shebang
 options(
   # Setting ESM.recalculate to T or a positive integer will recreate cached 
@@ -185,13 +185,9 @@ if (!dir.exists('cache')) {
 source('scripts_and_filters/install_packages_if_missing.R')
 ```
 
-```{r create_chunk_options, include=FALSE, eval=knitr::is_latex_output()}
+```{r create-chunk-options, include=FALSE, eval=knitr::is_latex_output()}
 # source('scripts_and_filters/create_chunk_options.R')
 source('scripts_and_filters/wrap_lines.R')
-```
-
-```{r general setup, include=FALSE}
-# source('scripts_and_filters/general_setup.R')
 ```
 
 <!--

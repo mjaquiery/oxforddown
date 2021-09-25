@@ -398,7 +398,7 @@ A linear mixed model was used to better understand the significance of the relat
 Random intercepts were included for participant.
 A similar Bayesian model was included to produce Bayes factors.
 
-The overall pattern showed both advisors were responded to similarly to the Sometimes deceptive advisor in Experiment 5 (Figure \@ref(be-dba-r-overall)).
+The overall pattern showed both advisors were responded to similarly to the Sometimes deceptive advisor in Experiment 5 (Figure \@ref(fig:be-dba-r-overall)).
 For advice rated as Honest from the Honest group of advisors, the distance between the initial estimate and the advice was hugely influential, with an increase in distance leading to an approximately equal increase in influence ($\beta$=`r coefs$s[3]`).
 This pattern was neither clearly different nor clearly the same for advice rated as Honest from the Deceptive group of advisors ($\beta$=`r coefs$s[6]`).
 
@@ -407,7 +407,7 @@ Advice rated as Possibly Deceptive did not show this pattern, but neither was it
 The relationship of advice rated as Possibly Deceptive to distance was, however, different between advisor groups, with the Possibly Deceptive advice being considered more trustworthy as it got more distant when it came from the Deceptive group of advisors ($\beta$=`r coefs$s[11]`).
 This surprising result may be due to participants applying different criteria to judging the deceptiveness of advice according to the advisors giving it.
 
-More clearly visible in Figure \@ref(be-dbc-r-overall) than Figure \@ref(bd-dba-r-overall), but present in both, is the tendency for participants to rate advice as Deceptive more frequently as it is further away from their initial estimates.
+More clearly visible in Figure \@ref(fig:be-dbc-r-overall) than Figure \@ref(fig:be-dba-r-overall), but present in both, is the tendency for participants to rate advice as Deceptive more frequently as it is further away from their initial estimates.
 Notably, this appears more common for the Sometimes deceptive advisor and the Deceptive group of advisors.
 For the Always honest advisor and the Honest group of advisors, even advice that is far away from the participant's initial estimate is often rated as and treated as honest.
 
@@ -675,7 +675,7 @@ The advisor's advice during the Familiarization phase was choreographed to provi
 Each advisor offered three estimates in each of their three confidence zones.
 All of the high-confidence advice was correct, two of the medium-confidence, and one of the low-confidence.
 
-During the Test phase, advisors provided advice while either labelled unambiguously, as they had been during the Familiarization phase, with their avatar and advisor number, or ambiguously, with a hybrid avatar and question marks instead of the advisor number (Figure \@ref(fig:be-ck-m-hybrid)).
+During the Test phase, advisors provided advice while either labelled unambiguously, as they had been during the Familiarization phase, with their avatar and advisor number, or ambiguously, with a hybrid avatar and question marks instead of the advisor number.
 Each advisor offered 7 pieces of advice while labelled unambiguously, and 7 while labelled ambiguously. 
 Each of these sets of 7 advice had the following structure: three trials in the third of the confidence scale unique to the advisor that were correct, two trials in the ambiguous third of the confidence scale where the advisor agreed with the participant's initial estimate, and two trials in the ambiguous third where the advisor disagreed with the participant's initial estimate. 
 

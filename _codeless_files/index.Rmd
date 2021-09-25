@@ -166,13 +166,10 @@ documentclass: book
 always_allow_html: true #this allows html stuff in word (.docx) output
 ---
 
-```{r install packages, echo = F, include = F}
+```{r setup-main, echo = F, include = F}
 ```
 
-```{r create_chunk_options, include=FALSE, eval=knitr::is_latex_output()}
-```
-
-```{r general setup, include=FALSE}
+```{r create-chunk-options, include=FALSE, eval=knitr::is_latex_output()}
 ```
 
 <!--

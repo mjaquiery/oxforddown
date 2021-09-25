@@ -16,16 +16,7 @@ params:
   corrections: true 
 ---
 
-```{r setup 01-03, echo = F, include = F}
-library(BayesFactor)
-library(magrittr)
-library(see)
-library(ggridges)
-library(ggpmisc)
-library(ggtext)
-library(broom)
-library(patchwork)
-library(ez)
+```{r setup-01-02, echo = F, include = F}
 ```
 
 # Psychology of source selection {#chapter-advisor-choice}
@@ -52,7 +43,7 @@ While it is not impossible that a preference for agreement which makes sense fro
 ### Similar work
 
 The source selection literature is largely from the domains of social and personality, in which the constructs that produce the phenomena are attitudes and self-concepts. 
-This work is grounded in the cognitive psychology domain, and consequently uses a model of advisor evaluation (Advisor Evaluation without Feedback§\@ref(advisor-evaluation-without-feedback)) that posits measurable variables and mathematically-describable processes.
+The present work is grounded in the cognitive psychology domain, and consequently uses a model of advisor evaluation (Advisor Evaluation without Feedback§\@ref(advisor-evaluation-without-feedback)) that posits measurable variables and mathematically-describable processes.
 This model is based on a similar model from @pescetelliRoleDecisionConfidence2021.
 It takes as a starting point the observation that, given objective feedback, people can use that feedback to learn about the trustworthiness of advisors [@yanivAdviceTakingDecision2000; @pescetelliRoleDecisionConfidence2021; @behrensAssociativeLearningSocial2008].
 The extent to which advice is taken (§\@ref(m-analysis-dv-woa)) is commonly used as a measure of a participant's trust in an advisor, on the argument that the participant seeks to maximise task performance and task performance is maximised by taking more advice from more trustworthy advisors.
@@ -117,11 +108,11 @@ If the effects seen by @pescetelliRoleDecisionConfidence2021 in the domain of ad
 
 The preferences for advisors were broadly consistent with the pattern expected from previous work on advisor influence [@pescetelliRoleDecisionConfidence2021].
 Experiments 1B and 3B showed that, where objective feedback could be used to calculate advisor performance, participants showed a systematic preference for picking the advisor who would provide the most accurate advice.
-Experiments 1A showed that this preference endured even when feedback was removed, although the result was not replicated in Experiment 1B.
+Experiment 1A showed that this preference endured even when feedback was removed, although the result was not replicated in Experiment 1B.
 
-Experiments 2A and 2B showed that participants who did not receive feedback systematically preferred High agreement advisors over Low agreement advisors.
+Experiments 2A and 2B showed that participants who did not receive feedback systematically preferred to choose to get advice from High agreement advisors over Low agreement advisors.
 Experiments 3A and 3B indicated that this preference for agreement in the absence of feedback did not extend to a preference for agreement over accuracy.
-These results are consistent with an account of advisor trust updating which uses agreement as a proxy for advisor accuracy when more reliable information is not available, although some additional mechanism is required to explain how accuracy can with agreement in the absence of feedback.
+These results are consistent with an account of advisor trust updating which uses agreement as a proxy for advisor accuracy when more reliable information is not available, although some additional mechanism is required to explain how accuracy can dissociate from agreement in the absence of feedback.
 @pescetelliRoleDecisionConfidence2021 offer confidence as an additional mechanism, but attempts to replicate their advisor influence experiment in the domain of advisor choice (Experiments 4A and the Lab experiment) did not provide empirical support for this.
 
 #### Accuracy of advice
@@ -148,7 +139,7 @@ Where a judge is very unsure of the accuracy of their own opinion, however, neit
 
 Assuming that trust in an advisor translates directly into a preference for hearing advice from that advisor, this theory accounts for some, but not all of our experimental results.
 It provides a straightforward account of the results of Experiment 2A§\@ref(ac-agr-dots-r-h) and 2B§\@ref(ac-agr-dates-r-h), where participants who did not receive feedback preferred to hear advice from the advisor more likely to agree with them (while overall advisor accuracy was held constant).
-It can also explain of the results of Experiment 1A§\@ref(ac-acc-dots-r-h), because the probability that two independent binary judgements agree is related to the probabilities that they are greater than chance [@sollStrategiesRevisingJudgment2009].
+It can also explain the results of Experiment 1A§\@ref(ac-acc-dots-r-h), because the probability that two independent binary judgements agree is related to the probabilities that they are greater than chance [@sollStrategiesRevisingJudgment2009].
 Given participants were above chance in their perceptual decisions, the more accurate advisor would agree more, as indicated in Table \@ref(tab:ac-acc-dots-m-profiles).
 Furthermore, if agreement is weighted by confidence, this discrepancy would be greater where the weighting is higher to the extent that participants were well calibrated in their confidence: where they were most confident they were most likely to be correct, and so they were proportionally more likely to be agreed with by the more accurate advisor.
 
@@ -181,7 +172,7 @@ Whether there is any dominant mechanism in play that accounts for a sizeable amo
 
 The experiments produced a range of results, from clear evidence of systematic preferences to clear evidence of the lack of any such systematicity in preferences.
 Interestingly, participants displayed a range of preference patterns. 
-Most participants in most conditions in most studies demonstrated fairly balanced picking behaviour; perhaps motivated by a sense of fairness or novelty, or perhaps as a result of random selection or attention to other factors such as the position of the advisor on the screen. 
+Most participants in most conditions in most studies demonstrated fairly balanced picking behaviour; perhaps motivated by a sense of fairness or novelty, or perhaps as a result of random selection or the influence of other factors such as the position of the advisor on the screen. 
 Where effects appear in the data, they show up as a fat tail on a skewed distribution: a sizeable minority select a given advisor on most trials, and almost no one selects the other advisor on most of the trials.
 
 The advisor preference distributions differ somewhat between tasks.
@@ -235,5 +226,7 @@ In some particular cases, for example working with a colleague at a job that req
 #### Conclusion
 
 These experiments paint a rather equivocal picture, without being able to offer the kind of strong evidence we would like concerning the validity of the @pescetelliRoleDecisionConfidence2021 theory of confidence-weighted advice evaluation.
+Despite the equivocal picture, we do find that people are selective in who they ask for advice, and that selections are dominated by accuracy where there’s a reliable cue, and by agreement when there is not.
 One major observation revealed in the experiments was the extent to which participants exhibited a wide range of preference strengths and directions, particularly where systematic effects of advisor preference were absent.
-In the following chapter§\@ref(chapter-network-effects) we use agent-based computational modelling to investigate the role of this kind of heterogeneity in the formation of echo chambers in information exchange networks.
+In the following chapter§\@ref(chapter-network-effects) we use agent-based computational modelling to investigate the consequences of agreement as a driver of advisor choice in the formation of echo chambers in information exchange networks.
+The simulations also explore the role of the kind of heterogeneity revealed in the experiments in this chapter.
