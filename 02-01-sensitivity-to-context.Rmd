@@ -19,10 +19,10 @@ source('scripts_and_filters/general_setup.R')
 
 Advice-taking is often overly-conservative as compared to the normative level of advice-taking for a given experimental design.
 We argue that participants' performances in advice-taking experiments reflect both the specifics of the experimental design and prior expectations about advice-taking situations.
-Demonstrating the existence of prior expectations is difficult, because they are beyond the bounds of any task, but we aim instead to demonstrate that they are adaptive.
+Demonstrating the existence of prior expectations is difficult, because they are beyond the bounds of any task, but we aim instead to demonstrate that they are adaptive in terms of fitness as revealed by evolutionary pressure.
 Using computational agent-based evolutionary simulations, we demonstrate in this chapter that conservatism can emerge within a population even where detrimental advice is rarely experienced, and can even emerge where individuals always interact in good faith.
 
-As discussed in the previous chapter§\@ref(#chapter-context), conservatism is optimal under some circumstances, and thus we expect that simulated agents allowed to evolve an advice-taking policy in those circumstances will evolve a conservative policy.
+As discussed in the previous chapter§\@ref(chapter-context), conservatism is optimal under some circumstances, and thus we expect that simulated agents allowed to evolve an advice-taking policy in those circumstances will evolve a conservative policy.
 We explored this tendency as a function of three plausible scenarios.
 The first scenario§\@ref(models-scenario-1) is one in which agents occasionally give deliberately poor advice to their advisee, which represents situations where advisors’ interests may sometimes be contrary to judges’ interests, unbeknownst to the judges.
 In the second scenario§\@ref(models-scenario-2), advice is simply noisier than the judge’s own initial estimate, either because the judge is less competent at the task, less willing to exert the required effort for the task, or because the advice is communicated imperfectly.
@@ -75,7 +75,7 @@ Where $s^a$ and $s^{a'}$ (an advisor's sensitivity) are equal or unknown (as in 
 ### Advice 
 
 Each agent receives advice from another agent which it combines with its initial estimate to reach a final decision.
-Each agents is reciprocally connected to 10 other agents at random when they are spawned, and on each decision they receive advice from one of their connections at random.^[A small number of connections allows agents to sample multiple pieces of advice form the same advisors over their lifetime. The agents do not update during their lifetime, so more realistic connectivity structures are not needed in these simulations.]
+Each agent is reciprocally connected to 10 other agents at random when they are spawned, and on each decision they receive advice from one of their connections at random.^[A small number of connections allows agents to sample multiple pieces of advice from the same advisors over their lifetime. The agents do not update during their lifetime, so more realistic connectivity structures are not needed in these simulations.]
 The advice has a probability of being mutated in some fashion.
 The mutation depends upon the scenario and is described separately for each.
 
@@ -292,7 +292,7 @@ Where these languages are the same, the resulting advice is understood equivalen
 ### Results
 
 Egocentric discounting again emerges in the condition where agents can have different confidence factors (Figure \@ref(fig:ed-plot), bottom).
-The adaptiveness of egocentric discounting in this scenario arises because advice from a mismatched partner (e.g. one inflating their confidence and another not, or vice-versa) requires a different interpretation than advice from a matched partner.
+The adaptiveness of egocentric discounting in this scenario arises because advice from a mismatched partner (e.g. one inflating their confidence and another not) requires a different interpretation than advice from a matched partner.
 The application of an inappropriate interpretation results in misleading advice, so there is a pressure for a middle-of-the-road strategy whereby advice is counted, but not too much.
 
 ### Discussion
@@ -315,7 +315,7 @@ The voluminous experiments in advice taking discussed in the introduction to thi
 All advice-taking experiments occur in a context that differs from a hypothetical average advice-taking context, but some experiments specifically manipulate the context as part of their investigation.
 In the clearest example of this, @sollJudgmentalAggregationStrategies2011 generated advice so that participants would either be better, the same as, or worse than advisors at a task where they had to estimate basketball teams' points-per-game from other team statistics.
 The participants paired with advisors who were better than they were had lower average self-weights in their final decisions, indicating that they were more influenced by the advice.
-Those participants who were paired with advisors whose competence matched their own still placed more weight on their own initial estimates, but not so much as the participants paired with more accurate advisors.
+Those participants paired with advisors more accurate than they were still placed more weight on their own initial estimates, but not so much as the participants who were paired with advisors whose competence matched their own.
 The participants paired with advisors less accurate than themselves took the least advice.
 This response to a context that mimics the manipulation in scenario 2§\@ref(models-scenario-2) (the relative accuracy of advisor and judge) indicates that, unlike the fixed agents in our model, people can flexibly adapt to different contexts.
 In the next chapter I present new behavioural experiments which suggest that people can indeed modulate their advice-taking to the specifics of the context in which they are in, and show that this happens rapidly.
