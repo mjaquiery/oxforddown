@@ -40,10 +40,23 @@ documentclass: book
   * under ?weighting -> under-weighting
   * over ?weighting -> over-weighting
   * time ?scales -> time-scales
+  * like ?minded -> like-minded
   * operationalization -> operationalisation
+  * randomization -> randomisation
   * polarization -> polarisation
+  * hyper ?prior -> hyper-prior
+  * left ?hand -> left-hand
+  * right ?hand -> right-hand
   * vs -> versus
   * set-up -> setup
+  * \\@ref\(# -> \@ref(
+  * Capitalization:
+    * Advisor names:
+      * 
+    * Trial types:
+      * Test (block|trial)
+      * Familiarisation (block|trial)
+      * Key (block|trial)
   
   * mccorrect -> resolve issues
   
