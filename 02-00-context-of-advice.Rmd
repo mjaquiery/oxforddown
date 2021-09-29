@@ -13,17 +13,8 @@ params:
   corrections: true 
 ---
 
-<!-- # (PART) Context of advice {-} -->
-\minitoc <!-- this will include a mini table of contents-->
-
-# Context of Advice {#chapter-context}
+# Context of advice {#chapter-context}
 \adjustmtc 
-
-<!-- here we present all that mathematical optimum stuff where Soll and Larrik cover the boundary conditions under which averaging is an optimum strategy vs when it is disadvantagenous. 
-
-We also discuss the general tendency to view egocentric discounting as a deviation from a normative strategy. Note that although discounting is mathematically perculiar, it is almost universally perceived as common sense by laypeople. 
-
-We introduce the idea of sensitivity to context, initially in terms of adaptive behaviour (flexbile response to dynamic environment), but also in terms of evolutionary adapatation as a lead-in for the evolutionary modelling and then behavioural experiments. -->
 
 ## Egocentric discounting
 
@@ -204,7 +195,7 @@ It seems intuitive that advice will be weighted more highly when coming from peo
 
 Some experimenters have examined advice weighting for non-human advisors.
 In a stock-market forecasting task, @onkalRelativeInfluenceAdvice2009 found that judges placed less weight on (identical) advice when it was labelled as coming from a statistical model versus a human expert forecaster.
-In their study on overweighting, @schultzeInabilityIgnoreUseless2017 provided participants with advice labelled as coming from a random number generator and noted that its estimates were still assigned some weight by judges.
+In their study on over-weighting, @schultzeInabilityIgnoreUseless2017 provided participants with advice labelled as coming from a random number generator and noted that its estimates were still assigned some weight by judges.
 The influence of this randomly-generated advice was roughly equivalent to that of human advisors not labelled as having high expertise.
 
 #### Advisor conflict of interest
@@ -293,7 +284,7 @@ Naïve realism once again fails to provide a compelling explanation why the fina
 
 ### Responsibility / feeling of deserving outcomes
 
-Some advice taking may be explicable on the basis of responsibility sharing.
+Some advice-taking may be explicable on the basis of responsibility sharing.
 @harveyTakingAdviceAccepting1997, @mahmoodiEqualityBiasImpairs2015, and @ronayneIgnoringGoodAdvice2018 have all suggested that taking advice can transfer some of the responsibility for the outcome of a decision onto the advisor.
 Where uncertainty is high, or where rewards are shared, this can be particularly useful.
 
@@ -317,7 +308,7 @@ As an anecdotal starting point, I note that if one tells anyone who is not an ad
 The approach taken here works to codify this intuition as a set of hyper-priors: expectations about the relative utility of advice as compared to one's own opinion.
 I argue that the normative model of advice-taking, and the pared-down experimental design with which is it entwined, seek to take the situation out of the evolutionary history of advice, but cannot take the evolutionary history of advice out of the situation.
 
-According to this hypothesis, the hyperpriors on advice-taking are a consequence of the many opportunities for deception and misunderstanding which apply to advice but not to one's own opinion.
+According to this hypothesis, the hyper-priors on advice-taking are a consequence of the many opportunities for deception and misunderstanding which apply to advice but not to one's own opinion.
 The most obvious of these is the opportunity for deception.
 As @troucheVigilantConservatismEvaluating2018 point out, advisors do not always have the judge's best interests at heart when supplying advice. 
 Consider, for example, a situation where one coworker, Sally, asks another, Hanan, whether it is a good idea to apply for a promotion.
@@ -339,12 +330,12 @@ If Sally does not adjust for the fact that Hanan is always more confident about 
 ### Compatability with existing explanations
 
 As noted by @troucheVigilantConservatismEvaluating2018, ultimate explanations of the kind offered here do not invalidate proximal explanations of the kind offered in the middle of this chapter§\@ref(coa-ex).
-My view is most consistent with a Bayesian integration view in which advice is weighted by a range of features of advice, advisor, and context, with the further proviso that there are hyperpriors which govern the default level of discounting.
+My view is most consistent with a Bayesian integration view in which advice is weighted by a range of features of advice, advisor, and context, with the further proviso that there are hyper-priors which govern the default level of discounting.
 I am thus content to observe the contest to provide proximal explanations for changes in the level of egocentric discounting, and only baulk at claims that egocentric discounting is 'irrational'.
 I suggest that, once egocentric discounting as a default is accepted, the adjustments in the level of discounting are almost all transparently rational.
 
 ### Evidence
 
-In the chapters that follow, I present evidence from computational agent-based evolutionary simulations and online human behavioural experiments to illustrate the plausibility of the claims made above. 
+In the chapters that follow, I present evidence from computational agent-based evolutionary simulations and on-line human behavioural experiments to illustrate the plausibility of the claims made above. 
 The evolutionary simulations demonstrate that an array of plausible factors affecting the relative utility of advice can create an environment in which egocentric discounting is adaptive, and the behavioural experiments demonstrate that some of these factors can be responded to by individual humans by adjustments in behaviour.
 I note that only the first of these is necessary for illustrating the plausibility of the theory: the behavioural adjustments serve more to support the extension of the argument, that changes in the level of discounting are rational adjustments.

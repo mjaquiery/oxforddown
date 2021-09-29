@@ -19,20 +19,20 @@ library(lmerTest)
 # Behavioural responses to advice contexts {#chapter-context-benevolence}
 \adjustmtc 
 
-We suggest that the long-standing view that egocentric discounting reflects sub-optimal information processing is a consequence of taking a narrow view of the problem being solved.
+I suggest that the long-standing view that egocentric discounting reflects sub-optimal information processing is a consequence of taking a narrow view of the problem being solved.
 While it is indeed demonstrable that people in Judge-Advisor System experiments would perform better and earn more reward if they took more advice [@sollStrategiesRevisingJudgment2009], the people who participate in those experiments also have to function in the real world where being too trusting can produce very negative outcomes.
 Furthermore, advice-taking and decision-making are, like the behaviour of other organisms, ultimately mechanisms for the more efficient propagation of genes.
 While participants in a Judge-Advisor System are working out how to best weigh their own experience with another opinion, the challenge faced by the genes in their cells is to somehow navigate a complex, often-unreliable, and frequently-changing world in order to produce more copies of themselves.
-We suggest that egocentric discounting may result from genetic and cultural evolution favouring the default assumption that an individual's own information is a more reliable basis for decision-making for that individual than another individual's information.
+I suggest that egocentric discounting may result from genetic and cultural evolution favouring the default assumption that an individual's own information is a more reliable basis for decision-making for that individual than another individual's information.
 
-The evolutionary models offered a proof-of-concept illustration that hyperpriors may evolve under a variety of contextual features that are almost always at least partially true of advice-taking situations.
-Hyperpriors are expectations that are not changed as a function of experience within the scope of a given scenario, and help form the context within which a scenario occurs, similar to a frame of reference in physics.
+The evolutionary models offered a proof-of-concept illustration that hyper-priors may evolve under a variety of contextual features that are almost always at least partially true of advice-taking situations.
+Hyper-priors are expectations that are not changed as a function of experience within the scope of a given scenario, and help form the context within which a scenario occurs, similar to a frame of reference in physics.
 In advice-taking contexts, a judge's view of their advisor's benevolence may fluctuate over the course of a few back-to-back exchanges, whereas their view of the general benevolence of people as a whole is unlikely to change in a meaningful way in that time. 
-The latter, therefore, is a hyperprior because it contributes to the advice-taking behaviour without being altered by the situation.
+The latter, therefore, is a hyper-prior because it contributes to the advice-taking behaviour without being altered by the situation.
 
-Hyperpriors are so termed to distinguish them from priors: expectations that are updated following evidence.
+Hyper-priors are so termed to distinguish them from priors: expectations that are updated following evidence.
 In a chaotic world dominated by complex phenomena emerging from the interaction of agents with sophisticated mental processes, sometimes the best genetic strategy is to hedge your bets by building a phenotype that can respond flexibly to different contexts.
-It may well be, therefore, that people not only have hyperpriors concerning the likely value of advice, but also priors that can respond to different contexts and to changes in context.
+It may well be, therefore, that people not only have hyper-priors concerning the likely value of advice, but also priors that can respond to different contexts and to changes in context.
 In this chapter, we explore the flexibility of egocentric discounting in the contexts presented in the previous chapter§\@ref(chapter-advice-taking-context).
 We present three experiments that examine how advice-taking changes according to the benevolence and the identifiability of advisors.
 We also include a brief discussion of the literature on advisor expertise.
@@ -56,7 +56,7 @@ Early versions of the experiments we conducted used a minimal groups paradigm [@
 We were not able to get this manipulation to produce difference perceptions of the advisors, as measured by participants' questionnaire responses, and so we resorted to directly cuing participants about the benevolence of advisors. 
 The experiments presented below, Experiments 5§\@ref(be-dba) and 6§\@ref(be-dbc), are the result of previous experiments exploring how we could represent the manipulation in a way that participants paid attention to and remembered.
 
-### Experiment 5: Benevolence of advisors {#be-dba}
+### Experiment 5: benevolence of advisors {#be-dba}
 
 ```{r be-dba-load, include = F}
 
@@ -285,7 +285,7 @@ for (E in c(.GlobalEnv, .prevStudy)) {
     ) %>%
     order_factors()
   
-  E$Familiarization <- tmp
+  E$Familiarisation <- tmp
 }
 
 ```
@@ -299,7 +299,7 @@ dw <- .2
 
 ## Accuracy
 for (E in c(.GlobalEnv, .prevStudy))
-  E$tmp <- E$Familiarization %>% 
+  E$tmp <- E$Familiarisation %>% 
   group_by(Advisor, pid) %>%
   summarise(
     `Initial estimate` = mean(responseError),
@@ -353,7 +353,7 @@ gg$acc
 ```{r be-dba-r-aov}
 
 ## Accuracy
-tmp <- Familiarization %>%
+tmp <- Familiarisation %>%
   mutate(Initial = responseError, Final = responseErrorFinal) %>%
   pivot_longer(c(Initial, Final), names_to = "Decision", values_to = "Error") %>%
   select(pid, Error, Decision, Advisor) %>%
@@ -387,7 +387,7 @@ Participants only had one marker they could place, and separate confidence judge
 
 ```{r be-dba-r-advisor-performance}
 
-tmp <- Familiarization %>%
+tmp <- Familiarisation %>%
   group_by(pid, Advisor) %>%
   summarise(
     Error = mean(advisor0Error),
@@ -429,7 +429,7 @@ axes <- tidyr::crossing(
 )
 
 suppressWarnings(
-  Familiarization %>%
+  Familiarisation %>%
     mutate(
       Rating = Rating,
       Rating = fct_rev(Rating)
@@ -463,7 +463,7 @@ suppressWarnings(
 )
 
 ## Stats
-tmp <- table(Familiarization$Advisor, Familiarization$Rating) 
+tmp <- table(Familiarisation$Advisor, Familiarisation$Rating) 
 
 chi <- chisq.test(tmp)
 bf <- contingencyTableBF(
@@ -488,7 +488,7 @@ This indicates that participants understood the task and that the manipulation w
 ```{r be-dba-r-advice, results='asis'}
 
 ## Actual test
-x <- Familiarization %>% 
+x <- Familiarisation %>% 
   select(
     pid, 
     advisor0WOA,
@@ -523,7 +523,7 @@ This meant that the statistical tests preregistered for this hypothesis were bro
 Using a more complete test, such as 2x3 ANOVA, would have suffered greatly from missing values.
 
 To explore the effect of advice, a 1x3 ANOVA was run on weight on advice across ratings. 
-In all, `r length(unique(x$pid))`/`r length(unique(Familiarization$pid))` (`r num2str(length(unique(x$pid)) / length(unique(Familiarization$pid)) * 100)`%) participants had at least one trial rated with each of the three ratings.
+In all, `r length(unique(x$pid))`/`r length(unique(Familiarisation$pid))` (`r num2str(length(unique(x$pid)) / length(unique(Familiarisation$pid)) * 100)`%) participants had at least one trial rated with each of the three ratings.
 The weight on advice differed according to the rating assigned the advice (`r s_advice$s[1]`; Mauchly's test for Sphericity W=`r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][2][[1]])`, p=`r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][3][[1]])`).
 As expected, participants were more influenced by advice they rated as Honest compared to advice they rated as Deceptive.
 
@@ -531,7 +531,7 @@ As expected, participants were more influenced by advice they rated as Honest co
 
 ```{r be-dba-r-advisor, fig.caption="Weight on Advice in Experiment 5.  Shows the weight of the advice of the advisors. Only trials where the participant rated the advice as Honest are included. The shaded area and boxplots indicate the distribution of the individual participants' mean weight on advice. Individual means for each participant are shown with lines in the centre of the graph. The dashed outline shows the distribution of participant means in the original study of which this is a replication."}
 for (E in c(.GlobalEnv, .prevStudy)) {
-  E$tmp <- E$Familiarization %>% 
+  E$tmp <- E$Familiarisation %>% 
     filter(Rating == "Honest") %>%
     group_by(pid, Advisor) %>%
     summarise(WOA = mean(advisor0WOA), .groups = "drop") %>%
@@ -597,7 +597,7 @@ tmp %>%
 ```
 
 To distinguish the effects of the advisor from the effects of the advice, we compared weight on advice for only those trials where the participant rated the advice as Honest. 
-This approach has the limitation that `r lost` (`r num2str(lost / length(unique(Familiarization$pid)) * 100)`%) participants had to be dropped due to never rating advice from the Sometimes deceptive advisor as Honest.
+This approach has the limitation that `r lost` (`r num2str(lost / length(unique(Familiarisation$pid)) * 100)`%) participants had to be dropped due to never rating advice from the Sometimes deceptive advisor as Honest.
 
 Comparing the two (Figure \@ref(fig:be-dba-r-advisor)) showed that participants placed more weight on the Honest advice from the Always honest advisor (`r .T`).
 
@@ -605,7 +605,7 @@ Comparing the two (Figure \@ref(fig:be-dba-r-advisor)) showed that participants 
 
 ```{r be-dba-r-overall, fig.caption="Advice response in Experiment 5.  Each point is a single trial, coloured according to the rating given to the advice by the participant. Coloured lines give the best fit linear regression for dots of that colour. The horizontal axis gives the distance between the centre of the participant's initial estimate marker and the centre of the advisor's advice marker, and the vertical axis gives the distance the participant's final decision had moved in the direction of the advisor's advice. Points that lie on the dashed line indicate that the participant moved their marker all the way to the advisor's marker, thus wholly adopting the advisory estimate as their final decision."} 
 
-tmp <- Familiarization %>%
+tmp <- Familiarisation %>%
   mutate(
     Distance = abs(responseCentre - advisor0adviceCentre),
     pid = factor(pid)
@@ -729,7 +729,7 @@ Where they believed the advisor was not trustworthy, they were more likely to la
 Going beyond the obvious, we also saw that participants were more sceptical of advice from the less trustworthy advisor _even when they believed the advice was well-meaning_.
 
 These observations complement the evolutionary simulations and the benevolence component of the three-factor model of trust described by @mayerIntegrativeModelOrganizational1995.
-Nevertheless, we have demonstrated sensitivity to context, but not universal discounting due to hyperpriors.
+Nevertheless, we have demonstrated sensitivity to context, but not universal discounting due to hyper-priors.
 It remains a matter of speculation that people exercise epistemic hygiene by ensuring that information comes from trusted sources before integrating it, and that no source is as trusted as one's own mind.
 This result is in keeping with evidence from experiments where initial estimates are labelled as advice (and vice-versa).
 @sollJudgmentalAggregationStrategies2011 collected initial estimates from participants and then presented those estimates back to participants along with advice so participants could provide final decisions in a classic Judge-Advisor System.
@@ -745,11 +745,11 @@ As with other Dates task studies, data collection stopped when the Bayes Factor 
 This, combined with the low trial count for each participant, meant that there were interesting follow-up questions that the data were unable to address.
 In keeping with the open science approach, we suggest that future investigations exploring those questions take them as preregistered hypotheses.
 
-The Dates task is one that participants find challenging, leading to generally high levels of advice taking in the absence of other effects [@ginoEffectsTaskDifficulty2007; @yonahTheyDonKnow2021].
+The Dates task is one that participants find challenging, leading to generally high levels of advice-taking in the absence of other effects [@ginoEffectsTaskDifficulty2007; @yonahTheyDonKnow2021].
 This means that the Honest advisor seemed to be entirely trusted.
 As discussed in the introduction to this section§\@ref(chapter-context), however, even greatly trusted advisors' advice is usually subject to some egocentric discounting.
 
-### Experiment 6: Benevolence of the advisor population {#be-dbc}
+### Experiment 6: benevolence of the advisor population {#be-dbc}
 
 ```{r be-dbc-load, include = F}
 
@@ -950,7 +950,7 @@ tmp <- AdvisedTrial %>%
   ) %>%
   order_factors()
 
-Familiarization <- tmp
+Familiarisation <- tmp
 
 ```
 
@@ -962,7 +962,7 @@ gg <- list()
 dw <- .2
 
 ## Accuracy
-tmp <- Familiarization %>% 
+tmp <- Familiarisation %>% 
   group_by(Advisor, pid) %>%
   summarise(
     `Initial estimate` = mean(responseError),
@@ -1013,7 +1013,7 @@ gg$acc
 ```{r be-dbc-r-aov}
 
 ## Accuracy
-tmp <- Familiarization %>%
+tmp <- Familiarisation %>%
   mutate(Initial = responseError, Final = responseErrorFinal) %>%
   pivot_longer(c(Initial, Final), names_to = "Decision", values_to = "Error") %>%
   select(pid, Error, Decision, Advisor) %>%
@@ -1047,7 +1047,7 @@ Participants only had one marker they could place, and separate confidence judge
 
 ```{r be-dbc-r-advisor-performance}
 
-tmp <- Familiarization %>%
+tmp <- Familiarisation %>%
   group_by(pid, Advisor) %>%
   summarise(
     Error = mean(advisor0Error),
@@ -1088,7 +1088,7 @@ axes <- tidyr::crossing(
 )
 
 suppressWarnings(
-  Familiarization %>%
+  Familiarisation %>%
     mutate(
       Rating = Rating,
       Rating = fct_rev(Rating)
@@ -1122,7 +1122,7 @@ suppressWarnings(
 )
 
 ## Stats
-tmp <- table(Familiarization$Advisor, Familiarization$Rating) 
+tmp <- table(Familiarisation$Advisor, Familiarisation$Rating) 
 
 chi <- chisq.test(tmp)
 bf <- contingencyTableBF(
@@ -1146,7 +1146,7 @@ This indicates that participants understood the task and that the manipulation w
 ```{r be-dbc-r-advice, results='asis'}
 
 ## Actual test
-x <- Familiarization %>% 
+x <- Familiarisation %>% 
   select(
     pid, 
     advisor0WOA,
@@ -1181,7 +1181,7 @@ This meant that the statistical tests preregistered for this hypothesis were bro
 Using a more complete test, such as 2x3 ANOVA, would have suffered greatly from missing values.
 
 To explore the effect of advice, a 1x3 ANOVA was run on weight on advice across ratings. 
-In all, `r length(unique(x$pid))`/`r length(unique(Familiarization$pid))` (`r num2str(length(unique(x$pid)) / length(unique(Familiarization$pid)) * 100)`%) participants had at least one trial rated with each of the three ratings.
+In all, `r length(unique(x$pid))`/`r length(unique(Familiarisation$pid))` (`r num2str(length(unique(x$pid)) / length(unique(Familiarisation$pid)) * 100)`%) participants had at least one trial rated with each of the three ratings.
 The weight on advice differed according to the rating assigned the advice (`r s_advice$s[1]`; Mauchly's test for Sphericity W=`r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][2][[1]])`, p=`r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][3][[1]])`).
 As expected, participants were more influenced by advice they rated as Honest compared to advice they rated as Deceptive.
 
@@ -1189,7 +1189,7 @@ As expected, participants were more influenced by advice they rated as Honest co
 
 ```{r be-dbc-r-advisor, fig.caption="Weight on Advice in Experiment 6.  Shows the weight of the advice of the advisors. Only trials where the participant rated the advice as Honest are included. The shaded area and boxplots indicate the distribution of the individual participants' mean weight on advice. Individual means for each participant are shown with lines in the centre of the graph."}
 
-tmp <- Familiarization %>% 
+tmp <- Familiarisation %>% 
   filter(Rating == "Honest") %>%
   group_by(pid, Advisor) %>%
   summarise(WOA = mean(advisor0WOA), .groups = "drop") %>%
@@ -1248,7 +1248,7 @@ tmp %>%
 ```
 
 To distinguish the effects of the advisor from the effects of the advice, we compared weight on advice for only those trials where the participant rated the advice as Honest. 
-This approach has the limitation that `r lost` (`r num2str(lost / length(unique(Familiarization$pid)) * 100)`%) participants had to be dropped due to never rating advice from the Sometimes deceptive advisor as Honest.
+This approach has the limitation that `r lost` (`r num2str(lost / length(unique(Familiarisation$pid)) * 100)`%) participants had to be dropped due to never rating advice from the Sometimes deceptive advisor as Honest.
 
 Comparing the two (Figure \@ref(fig:be-dbc-r-advisor)) showed that participants placed more weight on the Honest advice from advisors in the Honest group (`r .T`), although the Bayes factor was not above our threshold of 3.
 
@@ -1256,7 +1256,7 @@ Comparing the two (Figure \@ref(fig:be-dbc-r-advisor)) showed that participants 
 
 ```{r be-dbc-r-overall, fig.caption="Advice response in Experiment 6.  Each point is a single trial, coloured according to the rating given to the advice by the participant. Coloured lines give the best fit linear regression for dots of that colour. The horizontal axis gives the distance between the centre of the participant's initial estimate marker and the centre of the advisor's advice marker, and the vertical axis gives the distance the participant's final decision had moved in the direction of the advisor's advice. Points that lie on the dashed line indicate that the participant moved their marker all the way to the advisor's marker, thus wholly adopting the advisory estimate as their final decision."} 
 
-tmp <- Familiarization %>%
+tmp <- Familiarisation %>%
   mutate(
     Distance = abs(responseCentre - advisor0adviceCentre),
     pid = factor(pid)
@@ -1375,7 +1375,7 @@ Put simply, they are more on their guard for bad advice, but once they accept ad
 
 This differs somewhat from the effect of building a relationship with a single advisor. 
 In this case, while advice is judged similarly warily when it might be deceptive, even advice judged as Honest is accepted much more hesitantly.
-Both ignoring advice more frequently and accepting advice more tentatively appear the same when the advice taking is represented using an average over multiple trials.
+Both ignoring advice more frequently and accepting advice more tentatively appear the same when the advice-taking is represented using an average over multiple trials.
 Overall, the results of Experiments 5 and 6 illustrate that people respond flexibly to changes in the likely benevolence of advice, and that this can affect their relationships with individual advisors.
 
 ## Noise in the advice
@@ -1397,7 +1397,7 @@ Judges have to live with the consequences of their decisions, whereas advisors d
 ## Confidence mapping
 
 The third scenario§\@ref(models-scenario-3) explored in the evolutionary models assigned each agent a confidence mapping, and demonstrated that discounting emerged as an appropriate response where the advisor's confidence mapping was unknown.
-The key difficulty in conducting behavioural experiments to test the effects of known vs unknown confidence mapping is finding a manipulation of confidence mapping knowledge which is not confounded by familiarity with an advisor or the amount of information provided by an advisor.
+The key difficulty in conducting behavioural experiments to test the effects of known versus unknown confidence mapping is finding a manipulation of confidence mapping knowledge which is not confounded by familiarity with an advisor or the amount of information provided by an advisor.
 
 We attempted to investigate this in two ways. 
 Firstly, we performed an experiment where participants received advice over blocks of trials from either the same advisor on each trial or a different advisor on each trial (Experiment 7§\@ref(be-ce)).
@@ -1407,7 +1407,7 @@ Secondly, we familiarised participants with two advisors who differed in their u
 To look ahead briefly, neither experiment provided evidence consistent with the hypothesis that familiarity with an advisor's confidence calibration leads to greater trust in that advisor's advice.
 We suggest that this may be a failure in experimental design rather than reliable evidence of the absence of this feature of advice-taking behaviour.
 
-### Experiment 7: Individuality as a cue to confidence {#be-ce}
+### Experiment 7: individuality as a cue to confidence {#be-ce}
 
 The expression of confidence is highly idiosyncratic [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017].
 Given this, we hypothesised that the same advice may be treated differently depending upon whether or not it was labelled as coming from repeated interactions with a single individual or from a series of one-off interactions with different individuals.
@@ -1589,7 +1589,7 @@ tmp <- AdvisedTrial %>%
   ) %>%
   order_factors()
 
-Familiarization <- tmp %>% filter(feedback)
+Familiarisation <- tmp %>% filter(feedback)
 Test <- tmp %>% filter(!feedback)
 
 ```
@@ -1600,7 +1600,7 @@ Test <- tmp %>% filter(!feedback)
 dw <- .2
 
 # Accuracy
-acc <- Familiarization %>% 
+acc <- Familiarisation %>% 
   group_by(Advisor, pid) %>%
   summarise(
     `Initial estimate` = mean(responseAnswerSideCorrect),
@@ -1611,7 +1611,7 @@ acc <- Familiarization %>%
                names_to = 'Response', values_to = 'Accuracy') %>%
   mutate(Advisor = factor(paste0(Advisor, '\n')))
 
-adv <- Familiarization %>%
+adv <- Familiarisation %>%
   group_by(Advisor, pid) %>%
   summarise(
     Response = 'Advice',
@@ -1656,12 +1656,12 @@ acc %>%
 
 ```
 
-```{r be-ce-r-performance-conf, fig.caption="Influence for Experiment 7. Participants' weight on the advice for advisors in the Familiarization and Test stages of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2]."}
+```{r be-ce-r-performance-inf, fig.caption="Influence for Experiment 7. Participants' weight on the advice for advisors in the Familiarisation and Test stages of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2]."}
 
 # Influence
 
 adv_inf <- bind_rows(
-  mutate(Familiarization, Type = "Familiarization"), 
+  mutate(Familiarisation, Type = "Familiarisation"), 
   mutate(Test, Type = "Test")
 ) %>%
   group_by(pid, Advisor, Type) %>%
@@ -1760,27 +1760,27 @@ s_inf <- summariseANOVA(inf_aov$ANOVA, mm_inf)
 
 ```
 
-We present an overview of participants' performance in the task in Figures \@ref(fig:be-ce-r-performance-acc) and \@ref(fig:be-ce-r-performance-conf) and detail some key features using statistical tests. 
+We present an overview of participants' performance in the task in Figures \@ref(fig:be-ce-r-performance-acc) and \@ref(fig:be-ce-r-performance-inf) and detail some key features using statistical tests. 
 The key analysis of our hypothesis, exploring the effect of advisor presentation, is presented below§\@ref(be-ce-r-h).
 
 A first analysis assessed differences participants' accuracy, using a within-participant ANOVA with factors of answer (initial estimate versus final decision) and advisor (Consistent individual versus Group member).
-Accuracy during the Familiarization trials (Figure \@ref(fig:be-ce-r-performance-acc)) was higher for final decisions than for initial estimates (`r s_acc$s[2]`), so participants' accuracy improved after advice.
+Accuracy during the Familiarisation trials (Figure \@ref(fig:be-ce-r-performance-acc)) was higher for final decisions than for initial estimates (`r s_acc$s[2]`), so participants' accuracy improved after advice.
 Accuracy was also higher for the Consistent individual advisor than for the Group members (`r s_acc$s[1]`).
 There was no significant effect of advisor presentation on improvement (`r s_acc$s[3]`).
 This peculiar pattern was driven by a significant difference in participants' accuracy rates between advisors on their initial decisions, i.e. before they had seen advice (`r s_acc_initial`). 
 It is not clear why this occurred; it was likely the result of random chance.
 
-A second ANOVA was run to explore the effects of advisor influence, using factors of advisor (Consistent individual versus Group member) and stage (Familiarization versus Test). 
-The influence of advisors might differ according to whether participants had learned become familiar with them, hence separating out the initial Familiarization trials (that contained feedback) from the later Test trials (that did not) might provide some evidence of learning.
+A second ANOVA was run to explore the effects of advisor influence, using factors of advisor (Consistent individual versus Group member) and stage (Familiarisation versus Test). 
+The influence of advisors might differ according to whether participants had learned become familiar with them, hence separating out the initial Familiarisation trials (that contained feedback) from the later Test trials (that did not) might provide some evidence of learning.
 No significant effects were found for influence (Figure \@ref(fig:be-ce-r-performance-conf)).
-Neither the advisor presentation (`r s_inf$s[1]`), nor whether the trial was in the Familiarization stage (with feedback) or the test stage (without feedback) appeared to be systematically linked to the influence of the advice (`r s_inf$s[2]`). 
+Neither the advisor presentation (`r s_inf$s[1]`), nor whether the trial was in the Familiarisation stage (with feedback) or the test stage (without feedback) appeared to be systematically linked to the influence of the advice (`r s_inf$s[2]`). 
 There was also no indication that the influence of the advisors' advice changed differently between stages (`r s_inf$s[3]`).
 
 ##### Advisor performance
 
 ```{r be-ce-r-advice}
 
-tmp <- Familiarization %>% 
+tmp <- Familiarisation %>% 
   group_by(pid, Advisor) %>%
   summarise(
     `Agreement rate` = mean(advisor0adviceSide == responseAnswerSide), 
@@ -1795,7 +1795,7 @@ tmp <- Familiarization %>%
   labels = c("M~ConsistentIndividual~", "M~GroupMember~")
 )
 
-tmp <- Familiarization %>% 
+tmp <- Familiarisation %>% 
   group_by(pid, Advisor) %>%
   summarise(Accuracy = mean(advisor0adviceSideCorrect), .groups = 'drop') %>%
   pivot_wider(names_from = Advisor, values_from = Accuracy)
@@ -1812,7 +1812,7 @@ tmp <- Familiarization %>%
 The advice is generated probabilistically using the same rules for both advisor presentations.
 The advisors' advice is not dependent on the participants' initial estimates, but it is useful nevertheless to compare the advisors' agreement and accuracy rates.
 The advisors were demonstrably similar in their overall agreement rates (`r .T.agr`), but not so in their accuracy rates (`r .T.acc`).
-They were not demonstrably _different_ in their accuracy rates, however, so the randomization worked sufficiently well to allow the results to be interpreted.
+They were not demonstrably _different_ in their accuracy rates, however, so the randomisation worked sufficiently well to allow the results to be interpreted.
 
 ##### Effect of advisor presentation {#be-ce-r-h}
 
@@ -1834,7 +1834,7 @@ tmp <- adv_inf %>%
 ```
 
 The hypothesis for this study was that, in the key Test trials where participants did not receive feedback, the advisor presented as a consistent individual would be more influential than the advisor presented as different members of a group on each trial.
-As illustrated in the righthand panel of Figure \@ref(fig:be-ce-r-performance)C, influence was equivalent between the advisor presentations on the Test trials (`r .T`).
+As illustrated in the right-hand panel of Figure \@ref(fig:be-ce-r-performance-inf), influence was equivalent between the advisor presentations on the Test trials (`r .T`).
 From this we can conclude that the manipulation was not effective in differentiating the advisors or that such differences as were produced do not affect the influence of advice.
 
 #### Discussion
@@ -1849,14 +1849,14 @@ The manipulation may not have been strong enough because participants may have p
 Participants may also have learned about the calibration distributions just the same for individual and group advisors: statistically the experience is the same and some research has suggested that statistical mechanisms such as associative learning may be sufficient to explain social learning phenomena [@behrensAssociativeLearningSocial2008; @feldmanhallViewingAdaptiveSocial2019].
 It is also possible, though we suspect less likely given prior evidence of sensitivity to calibration [@pescetelliRoleDecisionConfidence2021], that the participants were simply unable to distinguish the advisors even in principle, or that any distinction they did make failed to translate into differential influence.
 
-### Experiment 8: Identifiability of advice {#be-ck}
+### Experiment 8: identifiability of advice {#be-ck}
 
 The results of Experiment 7 were not promising.
 Consequently, we used a different manipulation in an attempt to place the calibration of the advice in the forefront of participants' experience.
 To this end, we familiarised participants with two advisors whose accuracy, probability of agreement, and confidence calibration were identical, but whose use of the confidence scale differed. 
 A Low confidence advisor used the bottom two-thirds of the confidence scale, while a High confidence advisor used the top two-thirds. 
 
-On key trials, participants frequently saw advice where the confidence lay in the middle third of the scale.
+On Key trials, participants frequently saw advice where the confidence lay in the middle third of the scale.
 On some of these trials, the advice was labelled as coming from a specific advisor.
 If the advice came from the Low confidence advisor it would represent high confidence advice, and imply a high probability that it was correct.
 If the advice came from the High confidence advisor, it would represent low confidence advice, and imply a low probability that it was correct.
@@ -1927,12 +1927,12 @@ knitr::include_graphics("figures/scorecard.png")
 
 Participants then performed `r sum(tmp$type == "core")` blocks of trials that constituted the main experiment.
 In the first `r tmp %>% filter(feedback == 1) %>% pull(block) %>% unique() %>% length()` blocks participants were familiarised with their advisors over `r tmp %>% filter(feedback == 1) %>% filter(block == min(block)) %>% pull(n) %>% ceiling() %>% sum()` trials each (`r tmp %>% filter(feedback == 1) %>% filter(block == min(block), type == "atn_check") %>% pull(n) %>% ceiling()` of which was an attention check).
-The order in which participants encountered the advisors was counterbalanced, and participants received feedback during these Familiarization trials.
+The order in which participants encountered the advisors was counterbalanced, and participants received feedback during these Familiarisation trials.
 
 Finally, participants performed `r tmp %>% filter(feedback == 0) %>% pull(block) %>% unique() %>% length()` block of `r tmp %>% filter(feedback == 0) %>% pull(n) %>% ceiling()` Test trials that did not include feedback about the correct answer.
 Before this block, participants were reminded again about their advisors, and shown the introduction screen with the scorecards for each advisor again.
 The scorecards were shown individually, and then displayed on the same screen next to one another, and the participants invited to "compare them with one another".
-During these Test trials, advice was sometimes labelled as coming from a specific one of the advisors encountered during the Familiarization trials, and sometimes the advice was labelled as coming from an unspecified one of those advisors.
+During these Test trials, advice was sometimes labelled as coming from a specific one of the advisors encountered during the Familiarisation trials, and sometimes the advice was labelled as coming from an unspecified one of those advisors.
 
 ##### Advice profiles
 
@@ -1966,18 +1966,18 @@ ggplot(tmp, aes(x = advisor, ymin = confMin, ymax = confMax, fill = `Confidence 
 ```
 
 There are two advisors in this experiment, a High confidence advisor and a Low confidence advisor.
-Before the Familiarization block with each advisor, the advisors introduced themselves with a statement about their advice-giving style. 
+Before the Familiarisation block with each advisor, the advisors introduced themselves with a statement about their advice-giving style. 
 The High confidence advisor stated "I'm confident and outgoing. I tend to make up my mind and stick to it."
 The Low confidence advisor stated "I'm cautious and careful. I try to keep an open mind even when I've made my choice."
 
 The Advice profiles (Figure \@ref(fig:be-ck-advice-profiles)) for the two advisors were balanced in terms of the information provided by each advisor: both advisors had a subjectively high confidence at which they were 100% accurate, a medium confidence range within which they were 66% accurate, and a low accuracy range in which they were 33% accurate. 
 Crucially, these ranges span different parts of the confidence scale; the Low confidence advisor never expressed confidence above 66%, and the High confidence advisor never expressed confidence below 33%.
 
-The advisor's advice during the Familiarization phase was choreographed to provide all participants with an exact insight into the underlying calibration.
+The advisor's advice during the Familiarisation phase was choreographed to provide all participants with an exact insight into the underlying calibration.
 Each advisor offered three estimates in each of their three confidence zones.
 All of the high-confidence advice was correct, two of the medium-confidence, and one of the low-confidence.
 
-During the Test phase, advisors provided advice while either labelled unambiguously, as they had been during the Familiarization phase, with their avatar and advisor number, or ambiguously, with a hybrid avatar and question marks instead of the advisor number.
+During the Test phase, advisors provided advice while either labelled unambiguously, as they had been during the Familiarisation phase, with their avatar and advisor number, or ambiguously, with a hybrid avatar and question marks instead of the advisor number.
 Each advisor offered 7 pieces of advice while labelled unambiguously, and 7 while labelled ambiguously. 
 Each of these sets of 7 advice had the following structure: three trials in the third of the confidence scale unique to the advisor that were correct, two trials in the ambiguous third of the confidence scale where the advisor agreed with the participant's initial estimate, and two trials in the ambiguous third where the advisor disagreed with the participant's initial estimate. 
 
@@ -2101,7 +2101,7 @@ tmp <- AdvisedTrial %>%
   ) %>%
   order_factors()
 
-Familiarization <- tmp %>% filter(feedback)
+Familiarisation <- tmp %>% filter(feedback)
 Test <- tmp %>% filter(!feedback)
 Key <- Test %>% filter(KeyTrial)
 
@@ -2113,7 +2113,7 @@ Key <- Test %>% filter(KeyTrial)
 dw <- .2
 
 # Accuracy
-acc <- Familiarization %>% 
+acc <- Familiarisation %>% 
   group_by(Advisor, pid) %>%
   summarise(
     `Initial estimate` = mean(responseAnswerSideCorrect),
@@ -2124,7 +2124,7 @@ acc <- Familiarization %>%
                names_to = 'Response', values_to = 'Accuracy') %>%
   mutate(Advisor = factor(paste0(Advisor, '\n')))
 
-adv <- Familiarization %>%
+adv <- Familiarisation %>%
   group_by(Advisor, pid) %>%
   summarise(
     Response = 'Advice',
@@ -2174,7 +2174,7 @@ acc %>%
 ```{r be-ck-r-performance-conf, fig.caption="Confidence for Experiment 8. Faint lines show individual participant means, for which the violin and box plots show the distributions. Final confidence is negative where the answer side changes. Theoretical range of confidence scores is initial: [0,1]; final: [-1,1]."}
 
 # Confidence
-conf <- Familiarization %>% 
+conf <- Familiarisation %>% 
   mutate(
     `Initial estimate accuracy` = 
       if_else(responseAnswerSideCorrect, 'Correct', 'Incorrect'),
@@ -2274,20 +2274,20 @@ s_conf <- summariseANOVA(aov_conf$ANOVA, mm_conf)
 ```
 
 We first characterise the participants' performance on the task. 
-We investigated participant accuracy in the Familiarization trials using a 2x2 ANOVA with within-participant factors of answer time (initial estimates versus final decisions) and advisor (High confidence versus Low confidence).
-Participants increased their accuracy (Figure \@ref(fig:be-ck-r-performance)A) from initial estimate to final decision (`r s_acc$s[2]`). 
+We investigated participant accuracy in the Familiarisation trials using a 2x2 ANOVA with within-participant factors of answer time (initial estimates versus final decisions) and advisor (High confidence versus Low confidence).
+Participants increased their accuracy (Figure \@ref(fig:be-ck-r-performance-acc)) from initial estimate to final decision (`r s_acc$s[2]`). 
 There was no evidence of a difference between the advisors in either overall accuracy (`r s_acc$s[1]`) or in the increase in accuracy following advice (`r s_acc$s[3]`).
 
-We also investigated the participants' confidence on Familiarization trials using a 2x2 ANOVA with factors of answer time (initial estimates versus final decisions) and initial estimate correctness (initial estimate was correct versus initial estimate was incorrect).
+We also investigated the participants' confidence on Familiarisation trials using a 2x2 ANOVA with factors of answer time (initial estimates versus final decisions) and initial estimate correctness (initial estimate was correct versus initial estimate was incorrect).
 This analysis allows us to get a sense of whether their confidence changes systematically after encountering advice and whether it does so more when their initial decision was correct.
-Participants were more confident (Figure \@ref(fig:be-ck-r-performance)B) in their responses when their initial estimate was correct (`r s_conf$s[1]`).
+Participants were more confident (Figure \@ref(fig:be-ck-r-performance-conf)) in their responses when their initial estimate was correct (`r s_conf$s[1]`).
 They were systematically less confident on final decisions compared to initial estimates (`r s_conf$s[2]`), and that confidence decrease was larger when the initial estimate was incorrect (`r s_conf$s[3]`). 
 This indicates that participants were adjusting their confidence in a rational manner.
 There is always more scope for adjusting confidence downwards than upwards (because of the nature of the reporting scale), so it is not strange to see that the average confidence scores are lower for the final decisions than for the initial estimates.
 
 ##### Effect of advisor presentation
 
-```{r be-ck-r-key-trials, fig.caption="Key trials in Experiment 8.  Each point represents a single trial for a single participant. The outlines show the overall distribution of trials. Trials were matched for agreement and confidence across advisor presentation and advisor identity. The Flavour trials were included to avoid the feeling of the task changing dramatically from the Familiarization blocks to the Test block. The Key trials occur where advice could potentially come from either advisor. If the advice came from the High confidence advisor it represented a low confidence response; it if came from the Low confidence advisor it represented a high confidence response. If the advisor came from an ambigous (hybrid) source, the participant would not know whether it represented a high or low confidence response."}
+```{r be-ck-r-key-trials, fig.caption="Key trials in Experiment 8.  Each point represents a single trial for a single participant. The outlines show the overall distribution of trials. Trials were matched for agreement and confidence across advisor presentation and advisor identity. The Flavour trials were included to avoid the feeling of the task changing dramatically from the Familiarisation blocks to the Test block. The Key trials occur where advice could potentially come from either advisor. If the advice came from the High confidence advisor it represented a low confidence response; it if came from the Low confidence advisor it represented a high confidence response. If the advisor came from an ambigous (hybrid) source, the participant would not know whether it represented a high or low confidence response."}
 
 Test %>%
   filter(!feedback) %>%
@@ -2382,13 +2382,13 @@ s_inf <- summariseANOVA(inf_aov$ANOVA, mm_inf)
 The main hypothesis in this experiment is that advice will be treated differently if it comes from an identifiable as opposed to an ambiguous source.
 We thus expect that the High confidence advisor's advice will be more influential when the source is ambiguous, because when participants know that the advice comes from the High confidence advisor, they should also know that the confidence score represents that advisor's low confidence advice (which is less likely to be correct).
 The opposite prediction is made for the Low confidence advisor.
-These predictions are assessed on key trials.
+These predictions are assessed on Key trials.
 Key trials occur in that band of confidence where the advice could have come from either advisor (Figure \@ref(fig:be-ck-r-key-trials)).
 Where advice is given with very high objective confidence it is not likely to come from the Low confidence advisor; likewise, where advice is given with very low objective confidence it is not likely to come from the High confidence advisor. 
 It is only in that region where the advisors' use of the confidence scale overlaps that the Hybrid presentation is genuinely ambiguous.
 
 Our predictions were not borne out in the data. 
-A 2x2 ANOVA of influence scores with factors of Advisor type (High vs. Low confidence) by presentation (Unambiguous vs. Hybrid) indicated no significant effects.
+A 2x2 ANOVA of influence scores with factors of Advisor type (High versus Low confidence) by presentation (Unambiguous versus Hybrid) indicated no significant effects.
 Furthermore, the numerical direction of effects was against our prediction.
 As expected, there was no main effect to indicate that Hybrid presentation would be more or less influential than Unambiguous presentation (`r s_inf$s[1]`), and no main effect of advisor to indicate that, absent Unambiguous presentation, one advisor was more influential than the other (`r s_inf$s[2]`).
 However, contrary to predictions, the interaction is not significant (`r s_inf$s[3]`), and in fact goes in the opposite direction numerically to the one we would expect.
@@ -2489,7 +2489,7 @@ The other main predictors were both demonstrably absent ($\beta_{\text{High conf
 
 We attempted to manipulate participants' ability to use their knowledge of advisors' idiosyncratic confidence expression to perform our Dates estimation task.
 We were unable to demonstrate that participants did so, and it appeared from our linear modelling that participants paid more attention to the advice than its source.
-The predicted interaction between advisor confidence and advisor presentation (labelled vs. hybrid) was not statistically significant, and indeed trended in the opposite direction to that hypothesised. 
+The predicted interaction between advisor confidence and advisor presentation (labelled versus hybrid) was not statistically significant, and indeed trended in the opposite direction to that hypothesised. 
 It appeared from the numerical patterns, where participants were _more_ influenced by moderate confidence advice if it was clearly labelled as coming from the High confidence advisor (despite therefore representing lower subjective confidence), and vice-versa for the Low confidence advisor, that participants had developed a mild positive association between the more confident advisor and more confident advice, treating that advisor as more trustworthy even when they expressed a moderate level of confidence.
 
 There are several features of this experiment that may have led to the underwhelming conclusion. 
@@ -2514,19 +2514,19 @@ Together with existing literature on the effects of advisor expertise [@sollStra
 The results of the confidence mapping experiments were less conclusive.
 We were unable to produce a manipulation which was sufficiently clear and strong to produce observable effects.
 It is plausible that people are sensitive to their knowledge of an advisor's confidence mapping, but it is also plausible that this degree of flexibility is beyond most people, and that simple heuristics such as relying on cultural norms about the meanings of metacognitive terms [@roseanoCommunicatingEpistemicStance2016; @dhamiInterpersonalComparisonSubjective2005; but see @wallstenMeasuringVagueMeanings1986] are used instead of complex calculations.
-The lack of flexibility on the timescale of a behavioural experiment does not, of course, negate the possibility of flexibility on the timescale of a human interpersonal relationship (perhaps there are a certain number of people whose confidence mappings we can track, as suggested by Robin Dunbar's Social Brain Hypothesis [@dunbarHowManyFriends2010]^[Note that this hypothesis has been viewed increasingly sceptically in recent years, as neatly covered by @lindenforsDunbarNumberDeconstructed2021]).
+The lack of flexibility on the time-scale of a behavioural experiment does not, of course, negate the possibility of flexibility on the time-scale of a human interpersonal relationship (perhaps there are a certain number of people whose confidence mappings we can track, as suggested by Robin Dunbar's Social Brain Hypothesis [@dunbarHowManyFriends2010]^[Note that this hypothesis has been viewed increasingly sceptically in recent years, as neatly covered by @lindenforsDunbarNumberDeconstructed2021]).
 Nor does it negate the possibility of a genetic or cultural evolutionary mechanism producing advice discounting as a protection against unknown confidence mapping, although it is questionable whether advice has been occurring in human societies for long enough to allow the former to take place.
 We have a plausible explanation of egocentric discounting that only relies on rational responses to environmental effects.
 These effects are ubiquitous, and thus a ubiquitous egocentric bias prior to engaging with the specifics of a situation makes sense.
-It is entirely plausible that experiments showing egocentric discounting behaviour fail to overcome the hyperpriors held by participants that taking advice is risky for various reasons.
+It is entirely plausible that experiments showing egocentric discounting behaviour fail to overcome the hyper-priors held by participants that taking advice is risky for various reasons.
 
 We saw in the first part of this thesis§\@ref(chapter-advisor-choice) that people are sensitive to the quality of advice and advisors, and will curate their information environments based on that sensitivity.
 We have seen in this section how the properties of the information environment can change people's sensitivity to advice.
 
-We present a picture of egocentric discounting that portrays it as a feature, not a bug.
+This work presents a picture of egocentric discounting that portrays it as a feature, not a bug.
 Overall, manipulations that affect the degree to which people take advice have the effects predicted by a normative theory: more advice is taken from advisors who are better at the task [e.g. @yanivAdviceTakingDecision2000; @rakoczyYoungChildrenHeed2015; @sniezekImprovingJudgementPrepaid2004; @sollJudgmentalAggregationStrategies2011]; more confident advice is weighted more highly [@pulfordPersuasivePowerKnowledge2018; @sollStrategiesRevisingJudgment2009; @moussaidSocialInfluenceCollective2013; @bangDoesInteractionMatter2014; @priceIntuitiveEvaluationLikelihood2004] (and people show a positive association between confidence and accuracy [@pulfordPersuasivePowerKnowledge2018]); advisors with whom judges have stronger relationships are trusted more [@vanswolFactorsAffectingAcceptance2005; @sniezekTrustConfidenceExpertise2001]; and advisors with an incentive to mislead are trusted less [@bonnerGroupJudgmentAdviceTaking2014].
 With _changes_ in advice-taking accounted for well by the normative model, only the base rate stands in need of explanation: the egocentric discounting phenomenon that people take less advice than they should.
-We explain this base rate reduction by appealing to the wider context of participants' personal, cultural, and evolutionary histories.
+I explain this base rate reduction by appealing to the wider context of participants' personal, cultural, and evolutionary histories.
 Egocentric discounting is irrational only where the judge can be sure the advice will be, on average, as good as their own initial estimate.
 It is our contention that this assumption is simply not true in everyday life, and there is no reason why these background assumptions should be waived within the confines of a Judge-Advisor System, especially in the context of psychology experiments (which are notorious for deceiving participants).
 
@@ -2534,7 +2534,7 @@ The behavioural experiments extending the results of our evolutionary computatio
 The apparently obvious result that people take less advice from advisors who may sometimes mislead them proved quite difficult to demonstrate in practice -- participants in early experiments did not appear to attend very much to the source of advice and it required a heavy-handed manipulation alongside splitting experience with the advisors into separate blocks to produce the effect seen in simulation.
 The difficulty we encountered would cast serious doubt on the amount of support we can derive from our experiments, except that the results proved robust once established: pre-registered replications showed very similar patterns in independent samples.
 
-There is one major feature of advice-taking that has received relatively little investigation, yet that would, if real, be entirely inexplicable in terms of evolutionarily optimal hyperpriors.
+There is one major feature of advice-taking that has received relatively little investigation, yet that would, if real, be entirely inexplicable in terms of evolutionarily optimal hyper-priors.
 This is the finding that people tend to consider all advisory estimates they receive as a single, multifaceted opinion, which is then integrated with their own individual opinion§\@ref(context-number).
 Crucially, this seems to happen no matter how many advisory estimates are supplied [@hutterSeekingAdviceSampling2016; @yonahTheyDonKnow2021].
 Some studies have found the opposite -- rational weighting of advice according to the size of the group that produces it: @parkIntegrationIndividualSocial2017 showed that a Bayesian model that took group size into account outperformed other models of advice-taking, although linear mixed modelling of their behavioural data did not show a group size effect except as an interaction with opinion differences; @martinoSocialInformationIntegrated2017a found that participants' ratings of on-line shopping products were influenced by other users' reviews, although they did not present evidence as to how closely social influence scaled with the number of reviewers.

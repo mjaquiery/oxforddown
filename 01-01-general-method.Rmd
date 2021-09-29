@@ -30,7 +30,7 @@ The advice is always computer-generated, although the specifics of the generatin
 
 #### Recruitment
 
-Human participants were recruited from the online experiment participation platform Prolific (https://prolific.co).
+Human participants were recruited from the on-line experiment participation platform Prolific (https://prolific.co).
 Participants were prevented from taking the study if they had participated in one of the other studies in the thesis, or if they had an overall approval rating on Prolific of less than 95/100.
 
 #### Payment
@@ -41,8 +41,8 @@ Experiments took the average participant between 10 and 30 minutes to complete.
 Later studies introduced attention checks which terminated the study as a consequence for failure.
 It is not clear whether this technique constitutes best practice on Prolific because automatic termination means participants may return the study rather than having their participation explicitly rejected (and thus affecting their Prolific participation rating).
 Participants who failed these attention checks were not paid.
-There is an ongoing ethical debate concerning non-payment of participants who fail attention checks in online studies.
-In online studies, where low-effort participation is a serious and enduring concern, platforms such as Prolific make clear to participants and researchers that payment is only expected for responses which are given with satisfactory effort.
+There is an ongoing ethical debate concerning non-payment of participants who fail attention checks in on-line studies.
+In on-line studies, where low-effort participation is a serious and enduring concern, platforms such as Prolific make clear to participants and researchers that payment is only expected for responses which are given with satisfactory effort.
 Participants are thus fully aware of and consenting to the process of screening results for adequate effort prior to payment.
 
 #### Demographics
@@ -100,7 +100,7 @@ Lastly, the task is neutrally-valenced and unlikely to provoke strong associatio
 
 Stimuli in the Dots task consisted of two boxes arranged to the left and right of a fixation cross (Figure \@ref(fig:m-dots)).
 These boxes were briefly (300ms) and simultaneously filled with an array of non-overlapping dots, and the participant was instructed to identify the box with the most dots.
-The participant submitted their response by selecting a point on a horizontal bar: points to the left of the midpoint indicated the participant thought the lefthand box had more dots, and points to the right that they thought the righthand box had more dots. 
+The participant submitted their response by selecting a point on a horizontal bar: points to the left of the midpoint indicated the participant thought the left-hand box had more dots, and points to the right that they thought the right-hand box had more dots. 
 The further away from the midpoint the participant selected on the bar, the more confidence they indicated in their response.
 
 The number of dots was exactly determined by the difficulty of the trial: the box with the \mccorrect{!TODO[check this description]} least dots had 200 - the difficulty, while the box with the most had 200 + the difficulty.
@@ -207,10 +207,10 @@ Advice in the continuous version of the task was still conceptualised along dime
 While it is possible to operationalise these as binary properties, with accurate advice including all advice where the advisor's marker covered the correct year and agreeing advice including all advice where the advisor's maker intersected with the participant's initial estimate marker, we decided that this approach was prohibitively difficult to implement, especially where initial estimate markers were very wide. 
 Instead, accuracy and agreement were taken as continuous properties, measured from the centre of the advisor's marker to the correct year (for accuracy) or the centre of the participant's initial estimate marker (agreement).
 
-Advisors in these experiments typically placed their advice markers by identifying a target year, either the correct year (where the advisor was defined in terms of its objective accuracy) or the centre of the participant's initial estimate marker (where the advisor was defined in terms of its propensity to agree vs. disagree with a participant's answer), and then placing the centre of their advice marker on a year sampled from a normal distribution around that target year.
-On occasion, advisors would offer 'off-brand' advice, designed to neither be close to the participant's initial estimate nor the correct year, to allow for comparisons of influence across advisors that were not confounded with differences in the advice provided.  
+Advisors in these experiments typically placed their advice markers by identifying a target year, either the correct year (where the advisor was defined in terms of its objective accuracy) or the centre of the participant's initial estimate marker (where the advisor was defined in terms of its propensity to agree versus disagree with a participant's answer), and then placing the centre of their advice marker on a year sampled from a normal distribution around that target year.
+On occasion, advisors would offer 'Off-brand' advice, designed to neither be close to the participant's initial estimate nor the correct year, to allow for comparisons of influence across advisors that were not confounded with differences in the advice provided.  
 
-When a choice of advisors was offered, the two advisors were shown next to one another vertically on the lefthand side of the screen, and the participant clicked on the advisor from whom they wished to receive advice.
+When a choice of advisors was offered, the two advisors were shown next to one another vertically on the left-hand side of the screen, and the participant clicked on the advisor from whom they wished to receive advice.
 There was never a time limit for making this choice.
 
 On trials that contained feedback, the correct year was identified by the placement of a gold star placed over the timeline with a line pointing to the correct point on the timeline. 
@@ -231,7 +231,7 @@ In the binary version of the Dates task, participants were shown an event and gi
 Their task was to correctly identify whether the event occurred before or after the date shown (Figure \@ref(fig:m-dates-binary)).
 
 Below the event and anchor display were the answer bars used to make responses. 
-Participants selected a point on the bar of their choice (the lefthand bar indicating they believed the event was before the anchor year, and the righthand bar indicating they believed the event occurred after the anchor year).
+Participants selected a point on the bar of their choice (the left-hand bar indicating they believed the event was before the anchor year, and the right-hand bar indicating they believed the event occurred after the anchor year).
 The higher the point they selected on the bar, the more confident their response. 
 A blue bar appeared while they were choosing the height of their response, and the bar remained through the trial as a reference.
 
@@ -321,7 +321,7 @@ Lastly, both the Dots task and the Dates task had an objectively correct answer 
 A substantial portion of everyday real-world advice-seeking behaviour concerns questions on which there is no readily-determinable objectively correct answer, such as where might be a good holiday destination, or whether one should pursue postgraduate education.
 These more subjective questions have received some attention by @vanswolForecastingAnotherEnjoyment2011, but are seldom studied in the advice-taking cognitive psychology literature.
 
-\mccorrect{TODO: explain No gender breakdown (simplicity/privacy vs data gap)}
+\mccorrect{TODO: explain No gender breakdown (simplicity/privacy versus data gap)}
     
 ## Analysis {#m-analysis}
 
@@ -329,7 +329,7 @@ These more subjective questions have received some attention by @vanswolForecast
 
 #### Pick rate
 
-Pick rate provides a measure of source selection behaviour. 
+Pick rate provides a measure of advisor choice behaviour. 
 In most experiments there are some trials that offer participants a choice of which advisor they would like to hear from. 
 There are always two choices, and a choice must always be made. 
 The two choices are consistent within the experiment.
@@ -342,7 +342,7 @@ The relationship between preference and pick rate is non-linear and idiosyncrati
 
 #### Weight on Advice {#m-analysis-dv-woa}
 
-Weight on Advice, and its complement Advice Taking, are commonly used to quantify the relative contributions of advice and initial estimates in making final decisions.
+Weight on Advice, and its complement Advice-taking, are commonly used to quantify the relative contributions of advice and initial estimates in making final decisions.
 It is obtained by dividing the amount an initial estimate was updated by the amount the advisor recommended adjusting the initial estimate.
 It thus expresses the amount the estimate changed as a proportion of the advised change.
 
@@ -482,7 +482,7 @@ The meaning of open science varies within each sub-discipline, and this section 
 Following the Center for Open Science (https://cos.io), this thesis uses a series of badges to indicate adherence to particular aspects of open science.
 Three badges, _preregistration_, _open materials_, and _open data_, are adopted directly from the Centre and used according to the [Centre's rules](https://osf.io/tvyxz/wiki/1.%20View%20the%20Badges/).
 Studies which qualify for a badge will have the badge displayed immediately below their title.
-Each badge will contain a link to online resources which provide the content for which the badge is awarded.
+Each badge will contain a link to on-line resources which provide the content for which the badge is awarded.
 
 #### \OpenScience{prereg} Preregistration {#os-prereg}
 
@@ -510,12 +510,12 @@ The links accompanying the open materials badge points to this code.
 Theories are the output of science as a whole, but data are the output of any individual study.
 Sharing data directly allows other scientists to check and extend the data analysis conducted, to reuse the data in meta-analyses, and to repurpose the data for other investigations.
 This increases the robustness of the results, and increases the efficiency of science as a whole.
-The links accompanying the open data badge point to online storage where the data can be obtained for a study, along with appropriate metadata.
+The links accompanying the open data badge point to on-line storage where the data can be obtained for a study, along with appropriate metadata.
 
 ### Thesis workflow
 
 This thesis is written in RMarkdown, with the data fetched and analysed at the time the document is produced using the publicly available pipeline - the entire document can be reproduced locally using the source code in an appropriate environment.
 Some parts of the thesis use computational modelling or model fitting. 
-These parts use cached datasets, also available online, in order to reduce the time required to create the thesis from its source files from hours to minutes using a high-end desktop personal computer.
+These parts use cached datasets, also available on-line, in order to reduce the time required to create the thesis from its source files from hours to minutes using a high-end desktop personal computer.
 The caching behaviour can be prevented for those wishing to evaluate the validity of the modelling components by setting the value of the R option `ESM.recalculate` to higher values (documented in the `index.Rmd` file).
 A Docker environment copying the environment used to produce this document is available at \mccorrect{MAYBE: do the containerisation thing if there's time}

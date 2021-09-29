@@ -37,7 +37,7 @@ Data for these participants could be included in a study that was agnostic about
 
 The first version had a bug which meant that the advisors were identical in the familiarisation phase.
 Both the first and second versions had a bug in which advisors who were supposed to agree with the participant's initial estimate gave the correct answer rather than agreeing.
-These participants' data could be included in an analysis which used a participant's actual experience of advice to predict their advice-taking and source selection behaviour, provided appropriate care was taken to reconstruct the advice data from the raw values instead of relying on the reported summaries.
+These participants' data could be included in an analysis which used a participant's actual experience of advice to predict their advice-taking and advisor choice behaviour, provided appropriate care was taken to reconstruct the advice data from the raw values instead of relying on the reported summaries.
 
 #### Experiment 5
 
@@ -49,7 +49,7 @@ Later versions introduced a clearer manipulation, equivalent rather than genuine
 
 Two short pilot versions of this experiment were run, and participants' data were not analysed due to bugs in the experiment code.
 
-# Appendix 2: Advice-taking in the Dates task {#appendix-2}
+# Appendix 2: advice-taking in the Dates task {#appendix-2}
 
 ```{r setup-appendix-2, echo = F, include = F}
 source('scripts_and_filters/general_setup.R')
@@ -71,12 +71,12 @@ Participants' subjective assessments of the trustworthiness of the advisors roug
 
 We aimed to replicate these results in a new paradigm.
 This new paradigm, the Dates task, was newly-implemented for this project.
-The Dates task was designed with several appealing features in mind: it was to be more similar to the tasks performed by participants in previous advice-taking experiments; it was to be shorter for participants to complete, and suitable for online delivery; and it was supposed to be more engaging for participants.
+The Dates task was designed with several appealing features in mind: it was to be more similar to the tasks performed by participants in previous advice-taking experiments; it was to be shorter for participants to complete, and suitable for on-line delivery; and it was supposed to be more engaging for participants.
 We hoped this replication would accomplish two objectives: pilot our novel implementation and replicate the key advice-taking features reported by @pescetelliRoleDecisionConfidence2021 using a different experimental task.
 
 For this replication, we chose to directly contrast the tendency to prefer agreeing advisors over accurate ones where feedback was withheld with the tendency to prefer accurate advisors over agreeing ones where feedback was available. 
 
-## Experiment 0: Extending results to the Dates task {#ai-ava}
+## Experiment 0: extending results to the Dates task {#ai-ava}
 
 ```{r ai-ava-load, include = F}
 
@@ -179,7 +179,7 @@ The first order in which advisors were encountered was counterbalanced between p
 For each advisor, participants saw the advisor's advice on `r max(at$all/2)` trials. 
 Advice was probabilistic: on each trial there was an 80% chance the advisor gave advice according to the advice profile (detailed below). 
 Otherwise, the advisors issued the same kind of advice as one another, chosen to neither agree with the participant's answer nor indicate the correct answer. 
-This "off-brand" advice was used to control for the effects of advice when the influence of advice was the dependent variable.
+This "Off-brand" advice was used to control for the effects of advice when the influence of advice was the dependent variable.
 These trials are the key ones for analysis because they allow us to assess the influence of each advisor's advice, while matching the overall properties of that advice (i.e. objective accuracy and nearness to the participant's initial estimate).
 
 ##### Advice profiles {#ai-ava-m-advisors}
@@ -189,7 +189,7 @@ Both advisors used markers that spanned 7 years, and both placed the markers in 
 The target point for the High accuracy advisor was the correct answer, whereas the target point for the High agreement advisor was the participant's initial estimate.
 Neither advisor ever placed their marker exactly on the midpoint of the participant's marker (because doing so means the weight on advice statistic is undefined). 
 
-Each advice trial had a 20% chance of being designated "off-brand".
+Each advice trial had a 20% chance of being designated "Off-brand".
 On these trials advisors neither indicated the correct answer nor agreed with the participant. 
 This was achieved by picking a target point of the participant's answer reflected around the correct answer. 
 Thus, if the centre of the participant's initial estimate was 1955, and the correct answer was 1945, the target point would be 1935.
@@ -319,7 +319,7 @@ for (E in c(.GlobalEnv, .prevStudy)) {
     ) %>%
     order_factors()
   
-  E$Familiarization <- tmp
+  E$Familiarisation <- tmp
   
   E$OffBrand <- tmp %>% 
     filter(!str_detect(advisor0actualType, "^[ca]"))
@@ -334,7 +334,7 @@ dw <- .2
 
 # Accuracy
 for (E in c(.GlobalEnv, .prevStudy))
-  E$tmp <- E$Familiarization %>% 
+  E$tmp <- E$Familiarisation %>% 
   group_by(Advisor, pid) %>%
   summarise(
     `Initial estimate` = mean(responseError),
@@ -384,7 +384,7 @@ tmp %>%
 dw <- .4
 
 for (E in c(.GlobalEnv, .prevStudy)) 
-  E$tmp <- E$Familiarization %>% 
+  E$tmp <- E$Familiarisation %>% 
   mutate(
     `Initial error` = responseError,
     `Initial width` = responseMarkerWidth,
@@ -464,7 +464,7 @@ tmp %>%
 ```{r ai-ava-r-aov}
 
 # Accuracy
-tmp <- Familiarization %>%
+tmp <- Familiarisation %>%
   mutate(Initial = responseError, Final = responseErrorFinal) %>%
   pivot_longer(c(Initial, Final), names_to = "Decision", values_to = "Error") %>%
   select(pid, Error, Decision, Advisor) %>%
@@ -502,7 +502,7 @@ For both initial estimates and final decisions, error was higher for wider marke
 
 ```{r ai-ava-r-advice}
 
-tmp <- Familiarization %>%
+tmp <- Familiarisation %>%
   group_by(pid, Advisor) %>%
   summarise(
     Error = mean(advisor0Error),
@@ -547,7 +547,7 @@ Overall, this indicates that the manipulation was implemented as planned.
 
 ##### \OpenScience{prereg} Hypothesis test {#ai-ava-r-h}
 
-```{r ai-ava-r-graph, fig.caption="Dates task advisor influence for high accuracy/agreement advisors.  Shows the influence of the advice of the advisors. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The dashed outline shows the distribution of participant means in the original study of which this is a replication."}
+```{r ai-ava-r-graph, fig.caption="Dates task advisor influence for High accuracy/agreement advisors.  Shows the influence of the advice of the advisors. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The dashed outline shows the distribution of participant means in the original study of which this is a replication."}
 
 for (E in c(.GlobalEnv, .prevStudy)) {
   
@@ -646,7 +646,7 @@ s_inf <- summariseANOVA(aov_inf$ANOVA, mm_inf)
 
 ```
 
-There were systematic differences in the influence of advice on the key trials where the advice itself was balanced between advisors (Figure \@ref(fig:ai-ava-r-graph).
+There were systematic differences in the influence of advice on the Key trials where the advice itself was balanced between advisors (Figure \@ref(fig:ai-ava-r-graph).
 A 2x2 mixed ANOVA of Advisor (within) by Feedback (between) indicated that the Accurate advisor was more influential than the Agreeing advisor (`r s_inf$s[2]`), and this was more extreme in the Feedback than the No feedback condition (`r s_inf$s[3]`).
 There was no significant difference between the Feedback and No feedback groups overall (`r s_inf$s[1]`).
 As shown in the Bayesian statistics on the graph (Figure \@ref(fig:ai-ava-r-graph)), there was good evidence that the advisors were differently influential in the Feedback condition (`r .T.fb`), and adequate evidence that they were not different in the No feedback condition (`r .T.Nfb`).
@@ -664,7 +664,7 @@ The latter result provides a conceptual replication of the results found by @pes
 Nevertheless, the results are not wholly consistent with an account of advice-taking in which people use agreement to evaluate advisors in the absence of feedback.
 Under such an account, we would expect participants in the No feedback condition to have shown a greater susceptibility to advice from the Agreeing advisor, but this did not happen.
 
-One explanation for this discrepancy may be that it is possible that different people have differing preferences for agreeing vs. non-redundant advice, particularly where the task is hard and participants are lacking information with which to judge their own and others' performance (as in the No Feedback condition).
+One explanation for this discrepancy may be that it is possible that different people have differing preferences for agreeing versus non-redundant advice, particularly where the task is hard and participants are lacking information with which to judge their own and others' performance (as in the No Feedback condition).
 Another explanation for the equivalence of the influence of the advisors in the No feedback condition may be a consequence of relatively high levels of advice influence overall, producing a ceiling effect (the numerical advantage for the Agreeing advisor is as predicted by the theory).
 The relatively high levels of advice influence are a feature of the Dates task; the questions are difficult for most participants and consequently participants are likely to take more advice [@ginoEffectsTaskDifficulty2007; @yonahTheyDonKnow2021].
 A third possible explanation for the equivalence of influence between the advisors is that participants may not have had enough exposure to the advisors to properly learn about the value of their advice. 

@@ -22,41 +22,6 @@ documentclass: book
     * Continuous axes which show theoretical limits should have small expand, axes which do not show those limits should have arrowheads from broken_axis_*  
     * Fix p =< 
     * Check spaces around = 
-* Terminology:  
-    * Participants are human individuals.  
-    * Agents are simulated individuals.  
-    * Judge and advisor are roles, that can be played by either participants or agents.
-* Headings should all be Sentence case.
-* ctrl-shift-f:
-  * we -> I (when talking about thesis rather than experiment or example)
-  * online -> on-line
-  * offline -> off-line
-  * adviser -> advisor
-  * egocentric-discounting -> egocentric discounting
-  * advice taking -> advice-taking
-  * source ?selection -> advice-seeking (except in literature on selective exposure)
-  * advisor-choice -> advisor choice
-  * advisor selection -> advisor choice
-  * under ?weighting -> under-weighting
-  * over ?weighting -> over-weighting
-  * time ?scales -> time-scales
-  * like ?minded -> like-minded
-  * operationalization -> operationalisation
-  * randomization -> randomisation
-  * polarization -> polarisation
-  * hyper ?prior -> hyper-prior
-  * left ?hand -> left-hand
-  * right ?hand -> right-hand
-  * vs -> versus
-  * set-up -> setup
-  * \\@ref\(# -> \@ref(
-  * Capitalization:
-    * Advisor names:
-      * 
-    * Trial types:
-      * Test (block|trial)
-      * Familiarisation (block|trial)
-      * Key (block|trial)
   
   * mccorrect -> resolve issues
   
@@ -64,7 +29,8 @@ documentclass: book
 
 \mccorrect{Search final output for ()}
     
-\mccorrect{TODO: acknowledgements, dedication (MAF)}
+\mccorrect{TODO: abstract, acknowledgements, dedication (MAF)}
+
 
 <!-- this adds an image in gitbook output --> 
 <img src="figures/cover.png" width="315" height="445" alt="Cover image" align="right" style="margin: 0 1em 0 1em" />
@@ -118,12 +84,12 @@ This is generally within the marrow of what is understood by "advice", and the a
 Advice occurs in the context of a decision, and forms a part of the information which is integrated during the decision-making process to produce a decision.
 To the extent that the decision reached differs from the decision that would have occurred had the advice not been presented, the advice has had an effect on the decision; to the extent that this difference changes the decision in a way consistent with the advice, the advice has been 'taken' (as opposed to 'rejected').
 
-It is tacitly implied by many operationalizations of advice-taking that the informational content of the advice determines the extent to which it is taken or rejected.
+It is tacitly implied by many operationalisations of advice-taking that the informational content of the advice determines the extent to which it is taken or rejected.
 For example, _weight on own estimate_ and its derivatives quantify advice-taking as the amount an opinion is updated in the direction of advice [@yanivAdviceTakingDecision2000].
 Insofar as the identity of the advisor matters, it matters because it functions as a cue to the informational content of the advice -- for example where advice is more likely to be correct because it comes from someone with expert knowledge rather than someone who is guessing.
 This is likely a major oversimplification, however, because in many real-world contexts advice-giving and advice-taking form part of a developing social relationship: being consulted for advice and having one's advice followed are inherently rewarding [@hertzIntrinsicValueSocial2018; @hertzNeuralComputationsUnderpinning2017]; and taking advice can serve as a (sometimes costly) social signal of valuing a relationship with a person or group [@byrneOstracismReducesReliance2016].
 Furthermore, some authors have argued that people may perceive taking advice as sacrificing their independence or autonomy [@raderAdviceFormSocial2017; @ronayneWhenGoodAdvice2018].
-While this thesis follows previous literature in omitting to consider the wider social concerns influencing the taking of advice, it is nevertheless important to remember that the processes investigated herein take place in a variety of social contexts where complex social agents attempt to optimise over numerous goals over numerous timescales.
+While this thesis follows previous literature in omitting to consider the wider social concerns influencing the taking of advice, it is nevertheless important to remember that the processes investigated herein take place in a variety of social contexts where complex social agents attempt to optimise over numerous goals over numerous time-scales.
 
 \mccorrect{NICK: This is a good point -- and perhaps something you can come back to in the final chapter. In some ways, it develops the theme from your evolutionary modelling, about what's locally optimal sometimes (oftentimes?) differing from what's globally optimum.}
 
@@ -265,29 +231,29 @@ Again, this can be benign, as when newcomers to a social group are welcomed and 
 Where this cycle generates concern is when reciprocal influence produces increasingly extreme attributes, for example political opinions.
 This process is known as "polarisation".
 
-Polarisation is the phenomenon whereby the distribution of opinions in a population trend toward extremes over time, with moderate stances becoming increasingly less popular.^[There are a variety of precise and somewhat different definitions in the literature [@bramsonDisambiguationSocialPolarization2016].] 
+Polarisation is the phenomenon whereby the distribution of opinions in a population trend toward extremes over time, with moderate stances becoming increasingly less popular.^[There are a variety of precise and somewhat different definitions in the literature [@bramsonDisambiguationSocialPolarisation2016].] 
 Polarisation can be one-way, as when a consensus forms on a topic and that consensus shifts the entire ground of the debate (as with the core feminist principle that women and men deserve equal respect), or two-way as with divisive issues like the suitability of former President Donald Trump for office.
 While in both cases the whole population has acquired an extreme opinion, in the former the population remains united whereas in the latter the population is deeply divided, with little middle ground.
 
-Theoretically, homophily may lead to polarization because it isolates people from the checks and balances of the real world.
+Theoretically, homophily may lead to polarisation because it isolates people from the checks and balances of the real world.
 Within an echo chamber inhabited by those who have similar values, experiences, and opinions to ourselves, it becomes easy to miss the drawbacks to new ideas.
 We receive positive feedback for opinions of a certain stripe, and join in with applauding them when we hear them.
 More extreme ideas in keeping with the views appear pioneering and courageous, while more moderate ideas become old-fashioned.
 
-Most people who argue for the nefarious consequences of homophily and polarization for society as a whole highlight social media, and the fluency of association that it offers, as a catalyst that sweeps away many traditional checks to the vicious cycle of homophily and polarization.
-Whereas in the physical world we can only interact with those nearby, in the online world we can interact with people anywhere in the world, meaning we can find people whose opinions are far more similar to our own along far more dimensions [@daviesTwinImpactHomophily2017].
+Most people who argue for the nefarious consequences of homophily and polarisation for society as a whole highlight social media, and the fluency of association that it offers, as a catalyst that sweeps away many traditional checks to the vicious cycle of homophily and polarisation.
+Whereas in the physical world we can only interact with those nearby, in the on-line world we can interact with people anywhere in the world, meaning we can find people whose opinions are far more similar to our own along far more dimensions [@daviesTwinImpactHomophily2017].
 Added to this, the algorithms that curate content on dominant social media platforms prioritise emotive content, selecting extremes of opinion to be reviled or applauded, and replacing the previously universally-shared culture with a culture shared only by our echo chamber [@sunsteinRepublicCom2002; @sunsteinRepublicDividedDemocracy2018]. 
 Modelling work demonstrates that where there is a bias in assimilation of information, homophily exacerbates polarisation [@dandekarBiasedAssimilationHomophily2013].
 Where polarisation in turn increases homophily, for example through selective exposure (where individuals seek out reinforcing views) or avoidance (where individuals avoid challenges to their views), a self-reinforcing spiral emerges wherein social connections become increasingly homogeneous and attitudes increasingly extreme [@songDynamicSpiralsPut2017].
 
 Despite this compelling picture, whether homophily in on-line social networks actually _is_ responsible for increases in polarisation is debated.
-Proponents of the idea note that political polarization has increased in recent years [@perrettDividedKingdomVariation2021; @boxellGreaterInternetUse2017]; opponents note that this is not a new phenomenon [@perrettDividedKingdomVariation2021] and that the sections of society polarising most rapidly are the least likely to use social media [@boxellGreaterInternetUse2017].
+Proponents of the idea note that political polarisation has increased in recent years [@perrettDividedKingdomVariation2021; @boxellGreaterInternetUse2017]; opponents note that this is not a new phenomenon [@perrettDividedKingdomVariation2021] and that the sections of society polarising most rapidly are the least likely to use social media [@boxellGreaterInternetUse2017].
 Experimental investigation has shown that corroboration may increase the extremity of opinions [@baronSocialCorroborationOpinion1996; @schkadeWhenDeliberationProduces2010], and this may outweigh the mollifying effect of contradiction [@lordBiasedAssimilationAttitude1979]; but @gronlundDoesEnclaveDeliberation2015 found decreased extremism of opinion among anti-immigration participants after group discussion.
-Empirical studies demonstrate homophily in on-line social networks [@cardosoTopicalHomophilyOnline2017; @colleoniEchoChamberPublic2014]; but @barberaHowSocialMedia2015 argue that these social networks are _less_ homophilic than their off-line equivalents, and hence should _reduce_ polarization.
+Empirical studies demonstrate homophily in on-line social networks [@cardosoTopicalHomophilyOnline2017; @colleoniEchoChamberPublic2014]; but @barberaHowSocialMedia2015 argue that these social networks are _less_ homophilic than their off-line equivalents, and hence should _reduce_ polarisation.
 There are many egregious examples of pathologically polarised insular on-line communities, but these are either pre-existing groups that have moved on-line (such as creationist communities), or new groups with deep similarities to old ones (such as Q-Anon and previous conspiracy theorist communities). 
-Selective exposure is a potential driving mechanism for polarization [@kobayashiSelectiveExposurePolitical2009]; although criticism of the idea goes back a long way [@searsSelectiveExposureInformation1967] and the emerging consensus among researchers seems to be that while individuals may preferentially seek out reinforcing information they are unlikely to selectively avoid information that would challenge their views [@garrettEchoChambersOnline2009; @garrettPoliticallyMotivatedReinforcement2009; @nelsonMythPartisanSelective2017].
+Selective exposure is a potential driving mechanism for polarisation [@kobayashiSelectiveExposurePolitical2009]; although criticism of the idea goes back a long way [@searsSelectiveExposureInformation1967] and the emerging consensus among researchers seems to be that while individuals may preferentially seek out reinforcing information they are unlikely to selectively avoid information that would challenge their views [@garrettEchoChambersOnline2009; @garrettPoliticallyMotivatedReinforcement2009; @nelsonMythPartisanSelective2017].
 
-The discrepancies between computational models that demonstrate polarization and empirical evidence that paints a mixed picture may be due to people's tendencies for selective exposure and selective assimilation of information being lower than those assumed by the models. 
+The discrepancies between computational models that demonstrate polarisation and empirical evidence that paints a mixed picture may be due to people's tendencies for selective exposure and selective assimilation of information being lower than those assumed by the models. 
 Inter-individual variation may also contribute to this puzzle.
 This thesis explores biased source selection, its heterogeneity, and their impact on the way information flows through social networks.
 
@@ -295,7 +261,7 @@ This thesis explores biased source selection, its heterogeneity, and their impac
 
 From the perspective of the normative model above§\@ref(i-normative), decision-makers should weigh their own estimate equally with each other estimate they receive in the process of coming to their decision.
 This is because the errors in the judgements made by the decision-maker and the advisors are interchangeable, mathematically-speaking, and on average one will approximate the correct answer most nearly by allowing all of the errors to cancel one another out, which is achieved by averaging across all estimates as show in Equation \ref{eq:wisdom-of-crowds}.
-However, one of the most robust findings in the literature on advice-taking is that people routinely underweight advisory estimates relative to their own estimates, a phenomenon known as _egocentric discounting_[@danaAdviceChoice2015; @ginoEffectsTaskDifficulty2007; @hutterSeekingAdviceSampling2016; @libermanNaiveRealismCapturing2012; @minsonCostCollaborationWhy2012; @raderAdviceFormSocial2017; @ronayneIgnoringGoodAdvice2018; @seeDetrimentalEffectsPower2011; @sollJudgmentalAggregationStrategies2011; @troucheVigilantConservatismEvaluating2018; @yanivAdviceTakingDecision2000; @yanivExploitingWisdomOthers2012; @yanivUsingAdviceMultiple2007].
+However, one of the most robust findings in the literature on advice-taking is that people routinely under-weight advisory estimates relative to their own estimates, a phenomenon known as _egocentric discounting_[@danaAdviceChoice2015; @ginoEffectsTaskDifficulty2007; @hutterSeekingAdviceSampling2016; @libermanNaiveRealismCapturing2012; @minsonCostCollaborationWhy2012; @raderAdviceFormSocial2017; @ronayneIgnoringGoodAdvice2018; @seeDetrimentalEffectsPower2011; @sollJudgmentalAggregationStrategies2011; @troucheVigilantConservatismEvaluating2018; @yanivAdviceTakingDecision2000; @yanivExploitingWisdomOthers2012; @yanivUsingAdviceMultiple2007].
 
 @yanivAdviceTakingDecision2000 provided a classic example of egocentric discounting in a task that required participants to provide initial estimates of historical dates (e.g. "When were the Dead Sea Scrolls first discovered?"), and then provide final decisions of the same after seeing advice (taken from a random participant's answer in a previous study).
 Despite both the initial estimates and the advice estimates being similarly accurate, participants' final decisions were much closer to their initial estimates than to the advice.
@@ -332,7 +298,7 @@ Confidence functions well in this role insofar as the judge has high metacogniti
 
 ### Use of advice {#i-use}
 
-Normative models of advice taking§\@ref(i-normative) state that averaging estimates minimises errors.
+Normative models of advice-taking§\@ref(i-normative) state that averaging estimates minimises errors.
 As discussed at length later§\@ref(chapter-context), the assumptions underlying the normative model do not always hold in the real world, but this normative framework is a useful starting point for considering how advice can or should be used.
 The performance of the normative model can be characterised according to differences between the advisor and the judge on ability and bias [@sollStrategiesRevisingJudgment2009], proving effective for the kinds of decisions on which the errors made by judge and advisor are independent of one another.
 Equation \ref{eq:variance-weights} for our normative model states that advice should contribute to the final decision in proportion to the ability of the advisor compared to the judge.
@@ -425,7 +391,7 @@ Such additional complexity is not warranted here, but I highlight the distinctio
 #### Justification for use of the aggregation model
 
 The criticisms above are important, but they do not invalidate the model for use in the present project.
-This work seeks to establish how differences in advice taking manifest according to properties of advisors.
+This work seeks to establish how differences in advice-taking manifest according to properties of advisors.
 These differences are well characterised by the model, especially in the judge-advisor system used for the experiments.
 All models are inexact descriptions of reality, and inclusion of a more complex model capable of handling the cases outlined above would require greatly increased complexity for relatively little gain in explanatory power.
 For studying the questions at hand, the psychological model is an appropriate and useful approximation of human behaviour.

@@ -1,12 +1,12 @@
 
-## Effects of Advisor Agreement on Advisor Selection {#ac-agr}
+## Effects of advisor agreement on advisor choice {#ac-agr}
 
 Experiments 1A§\@ref(ac-acc-dots) and 1B§\@ref(ac-acc-dates) revealed differences in how participants selected the advisors between the Dots task (which has no feedback) and the No feedback condition of the Dates task for High versus Low accuracy advisors. 
 We may expect more pronounced effects in the absence of feedback when contrasting High versus Low agreement advisors, because we expect that agreement is the driving force behind the accuracy differences where feedback is not provided.
 @pescetelliRoleDecisionConfidence2021 demonstrated that advisors who agree more frequently are more influential (regardless of the presence of feedback, but especially without it) in a lab-based perceptual decision-making task.
 Here we explored the impact of agreement on choice of advisor. Experiment 2A§\@ref(ac-agr-dots) looks at this effect in the Dots task, while Experiment 2B§\@ref(ac-agr-dates) does the same for the Dates task.
 
-### Experiment 2A: Advisor agreement effects in the Dots Task {#ac-agr-dots}
+### Experiment 2A: advisor agreement effects in the Dots task {#ac-agr-dots}
 
 ```{r ac-agr-dots-load, include = F}
 
@@ -57,8 +57,8 @@ tmp <- tmp %>% filter(!practice)
 ```
 
 Participants then performed `r sum(tmp$typeName == "choice")` sets of `r nrow(tmp) / sum(tmp$typeName == "choice")` blocks each.
-These sets consisted of `r sum(tmp$typeName == "force") / sum(tmp$typeName == "choice")` familiarisation block of `r tmp %>% filter(typeName == "force") %>% .$n %>% unique()` trials in which participants were assigned one of two advisors.
-The familiarisation block was followed with a test block of `r tmp %>% filter(typeName == "choice") %>% .$n %>% unique()` trials in which participants could choose between the advisors they encountered in the familiarisation block.
+These sets consisted of `r sum(tmp$typeName == "force") / sum(tmp$typeName == "choice")` Familiarisation block of `r tmp %>% filter(typeName == "force") %>% .$n %>% unique()` trials in which participants were assigned one of two advisors.
+The Familiarisation block was followed with a Test block of `r tmp %>% filter(typeName == "choice") %>% .$n %>% unique()` trials in which participants could choose between the advisors they encountered in the Familiarisation block.
 The participants saw different pairs of advisors in each set, with each pair consisting of one advisor with each of the advice profiles.
 
 ##### Advice profiles
@@ -155,7 +155,7 @@ exclusions %>%
   kable(caption = "\\label{tab:ac-agr-dots-exclusions}Participant exclusions for Dots task Agreement experiment") %>%
   row_spec((n - 1):n, bold = T)
 
-familiarization <- trials %>%
+familiarisation <- trials %>%
   filter(typeName == "force", adviceType %in% c(7,8)) %>%
   mutate(Advisor = advisor_profile_name(adviceType),
          Advisor = factor(Advisor)) %>%
@@ -173,7 +173,7 @@ Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded,
 # Task performance figure
 dw <- .2
 
-tmp <- familiarization %>%
+tmp <- familiarisation %>%
   group_by(Advisor, pid) %>%
   summarise(
     `Initial estimate` = mean(initialAnswerCorrect),
@@ -183,7 +183,7 @@ tmp <- familiarization %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`),
                names_to = 'Response', values_to = 'Accuracy')
 
-adv <- familiarization %>%
+adv <- familiarisation %>%
   group_by(Advisor, pid) %>%
   summarise(
     Response = 'Advice',
@@ -240,7 +240,7 @@ tmp %>%
 
 ```{r ac-agr-dots-r-performance-conf, fig.caption="Confidence for the Dots task with dis/agreeing advisors.  Faint lines show individual participant means, for which the violin and box plots show the distributions. Final confidence is negative where the answer side changes. Theoretical range of confidence scores is initial: [0,1]; final: [-1,1]."}
 
-tmp <- familiarization %>%
+tmp <- familiarisation %>%
   mutate(
     `Initial estimate accuracy` =
       if_else(initialAnswerCorrect, 'Initial correct', 'Initial incorrect')
@@ -301,7 +301,7 @@ tmp %>%
 ```{r ac-agr-dots-r-performance-aov}
 
 # Accuracy
-tmp <- familiarization %>% 
+tmp <- familiarisation %>% 
   transmute(
     pid = factor(pid),
     initialAnswerCorrect,
@@ -339,7 +339,7 @@ message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
 s_acc <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 
 # Confidence
-df <- familiarization %>% 
+df <- familiarisation %>% 
   transmute(
     pid = factor(pid),
     initialConfidence,
@@ -378,7 +378,7 @@ message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
 
 s_conf <- summariseANOVA(aov_conf$ANOVA, mm_conf)
 
-r <- familiarization %>% 
+r <- familiarisation %>% 
   group_by(pid) %>% 
   summarise(
     initialAccuracy = mean(initialAnswerCorrect),
@@ -408,7 +408,7 @@ It is thus important to get a sense of the actual advice experienced by the part
 
 ```{r ac-agr-dots-r-advice-agr}
 
-tmp <- familiarization %>% 
+tmp <- familiarisation %>% 
   mutate(Advisor = advisor_profile_name(adviceType)) %>%
   filter(!is.na(Advisor)) %>%
   group_by(pid, Advisor) %>%
@@ -424,7 +424,7 @@ tmp <- familiarization %>%
   )
 n_ap <- sum(tmp$`Participant experience` == "As planned")
 
-tmp <- familiarization %>% 
+tmp <- familiarisation %>% 
   mutate(Advisor = advisor_profile_name(adviceType)) %>%
   filter(!is.na(Advisor)) %>%
   group_by(pid, Advisor, initialAnswerCorrect) %>%
@@ -458,7 +458,7 @@ agr.table %>%
 
 ```{r ac-agr-dots-r-advice-acc}
 
-tmp <- familiarization %>% 
+tmp <- familiarisation %>% 
   group_by(pid, Advisor) %>%
   summarise(Accuracy = mean(adviceCorrect), .groups = 'drop') %>%
   group_by(Advisor) %>%
@@ -479,7 +479,7 @@ All participants experienced the intended relationship wherein the High agreemen
 
 ##### \OpenScience{prereg} Hypothesis test {#ac-agr-dots-r-h}
 
-```{r ac-agr-dots-r-graph, fig.caption="Dot task advisor choice for high/low agreement advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line.", fig.height=6, fig.width=5}
+```{r ac-agr-dots-r-graph, fig.caption="Dot task advisor choice for High/Low agreement advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line.", fig.height=6, fig.width=5}
 
 test <- trials %>% 
   filter(hasChoice) %>%
@@ -499,7 +499,7 @@ ggplot(tmp, aes(x = '', y = pChooseHigh)) +
   geom_hline(yintercept = .5, linetype = 'dashed') +
   geom_violindot(size_dots = .4) +
   geom_violinhalf(aes(fill = `Feedback condition`, colour = `Feedback condition`)) +
-  annotate(geom = 'label', label = paste0('BF vs chance\n', bf2str(exp(bf@bayesFactor$bf))),
+  annotate(geom = 'label', label = paste0('BF versus chance\n', bf2str(exp(bf@bayesFactor$bf))),
            x = 1, y = 1.05) +
   scale_y_continuous(limits = c(0, 1.1), breaks = seq(0, 1, length.out = 5)) +
   labs(y = 'p(Choose High agreement advisor)', x = '') +
@@ -548,7 +548,7 @@ They are also consistent with our hypothesis that agreement is used as a proxy f
 @pescetelliRoleDecisionConfidence2021 found a similar pattern using the same perceptual decision-making task and measuring the influence of advice rather than the choice of advisor.
 We next explored whether this pattern would also be apparent in the Dates task.
 
-### Experiment 2B: Advisor agreement effects in the Dates Task {#ac-agr-dates}
+### Experiment 2B: advisor agreement effects in the Dates task {#ac-agr-dates}
 
 As with Experiment 1B§\@ref(ac-acc-dates), we attempted to replicate the result using the Dates task.
 Participants in this task were split into conditions depending upon whether or not they received feedback, allowing a direct exploration of the effect of feedback on advisor preference.
@@ -612,12 +612,12 @@ They were informed that they would "receive advice from advisors" to "help you c
 They were told that the "advisors aren't always correct, but they are quite good at the task", and informed that they should "identify which advisors are best and to weigh their advice accordingly".
 
 Participants then performed `r sum(tmp$type == "core")` blocks of trials that constituted the main experiment.
-The first two of these were familiarization blocks where participants had a single advisor in each block for `r tmp %>% filter(block == 2, type == "core") %>% pull(n) %>% round()` trials, plus `r tmp %>% filter(block == 2, type == "atn_check") %>% pull(n) %>% round()` attention check.
+The first two of these were Familiarisation blocks where participants had a single advisor in each block for `r tmp %>% filter(block == 2, type == "core") %>% pull(n) %>% round()` trials, plus `r tmp %>% filter(block == 2, type == "atn_check") %>% pull(n) %>% round()` attention check.
 
-Participants were split into four conditions that produced differences in their experience of these familiarization blocks.
+Participants were split into four conditions that produced differences in their experience of these Familiarisation blocks.
 These conditions were whether or not they received feedback, and which of the two advisors they were familiarized with first.
 
-Finally, participants performed a test block of `r tmp %>% filter(block == 4) %>% pull(n) %>% round()` trials that offered them a choice on each trial of which of the two advisors they had encountered over the last two blocks would give them advice.
+Finally, participants performed a Test block of `r tmp %>% filter(block == 4) %>% pull(n) %>% round()` trials that offered them a choice on each trial of which of the two advisors they had encountered over the last two blocks would give them advice.
 No participants received feedback during the test phase.
 
 ##### Advice profiles
@@ -662,7 +662,7 @@ kable(
 maxTrialRT <- 60000   # trials take < 1 minute
 minTrials <- 11       # at least 11 trials completed
 minChangeRate <- .1   # some advice taken on 10%+ of trials
-minKeyTrials <- 10    # exactly 10 key trials
+minKeyTrials <- 10    # exactly 10 Key trials
 
 droppedTrials <- AdvisedTrial %>%
   filter(timeEnd > maxTrialRT)
@@ -679,7 +679,7 @@ exclusions <- AdvisedTrial %>%
   nest(d = -pid) %>%
   mutate(
     `Too few trials` = map_lgl(d, ~ nrow(.) < minTrials),
-    `Insufficient advice taking` = 
+    `Insufficient advice-taking` = 
       map_lgl(d, ~ (mutate(
         ., 
         x = responseAnswerSide != responseAnswerSideFinal |
@@ -728,14 +728,14 @@ tmp <- AdvisedTrial %>%
   ) %>%
   order_factors()
 
-Familiarization <- tmp %>% filter(is.na(advisorChoice) | !advisorChoice) 
+Familiarisation <- tmp %>% filter(is.na(advisorChoice) | !advisorChoice) 
 
 Test <- tmp %>% filter(advisorChoice)
 
 ```
 
-Before exploring the interaction between the participants' responses and the advisors' advice, and the participants' advisor selection behaviour, it is useful to verify that participants interacted with the task in a sensible way, and that the task manipulations worked as expected.
-In this section, task performance is explored during the Familiarization phase of the experiment where participants received advice from a pre-specified advisor on each trial. 
+Before exploring the interaction between the participants' responses and the advisors' advice, and the participants' advisor choice behaviour, it is useful to verify that participants interacted with the task in a sensible way, and that the task manipulations worked as expected.
+In this section, task performance is explored during the Familiarisation phase of the experiment where participants received advice from a pre-specified advisor on each trial. 
 There were an equal number of these trials for each participant for each advisor.
 As before (Experiment 1B§\@ref(ac-acc-dates)), the conditions are pooled together while exploring participants' performance on the task. 
 
@@ -745,7 +745,7 @@ As before (Experiment 1B§\@ref(ac-acc-dates)), the conditions are pooled togeth
 dw <- .2
 
 # Accuracy
-acc <- Familiarization %>% 
+acc <- Familiarisation %>% 
   group_by(Advisor, pid) %>%
   summarise(
     `Initial estimate` = mean(responseAnswerSideCorrect),
@@ -755,7 +755,7 @@ acc <- Familiarization %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`), 
                names_to = 'Response', values_to = 'Accuracy')
 
-adv <- Familiarization %>%
+adv <- Familiarisation %>%
   group_by(Advisor, pid) %>%
   summarise(
     Response = 'Advice',
@@ -801,7 +801,7 @@ acc %>%
 
 ```{r ac-agr-dates-r-performance-conf, fig.caption="Confidence for the Dates task with dis/agreeing advisors.  Faint lines show individual participant means, for which the violin and box plots show the distributions. Final confidence is negative where the answer side changes. Theoretical range of confidence scores is initial: [0,1]; final: [-1,1]."}
 # Confidence
-conf <- Familiarization %>% 
+conf <- Familiarisation %>% 
   mutate(
     `Initial estimate accuracy` = 
       if_else(responseAnswerSideCorrect, 'Correct', 'Incorrect'),
@@ -907,7 +907,7 @@ This decrease in confidence was greater when the initial estimate was incorrect 
 
 ```{r ac-agr-dates-r-advice-agr}
 
-tmp <- Familiarization %>% 
+tmp <- Familiarisation %>% 
   group_by(pid, Advisor) %>%
   summarise(
     `Agreement rate` = mean(advisor0adviceSide == responseAnswerSide), 
@@ -924,7 +924,7 @@ tmp <- Familiarization %>%
 
 n_ap <- sum(tmp$`Participant experience` == "As planned")
 
-tmp <- Familiarization %>% 
+tmp <- Familiarisation %>% 
   group_by(pid, Advisor, responseAnswerSideCorrect) %>%
   summarise(
     `Agreement rate` = mean(advisor0adviceSide == responseAnswerSide), 
@@ -959,7 +959,7 @@ agr.table %>%
 
 ```{r ac-agr-dates-r-advice-acc}
 
-tmp <- Familiarization %>% 
+tmp <- Familiarisation %>% 
   group_by(pid, Advisor) %>%
   summarise(Accuracy = mean(advisor0adviceSideCorrect), .groups = 'drop') %>%
   group_by(Advisor) %>%
@@ -976,13 +976,13 @@ agr.table %>%
 
 The advice is generated probabilistically from the rules described previously (Advice profiles§\@ref(ac-acc-dates-m-advice-profiles)).
 The advisors agreed with participants contingent on the accuracy of the participants' initial estimates at close to the target rates (Table \@ref(tab:ac-agr-dates-r-advice-agr-t)).
-This meant that advisors were distinguished by their overall agreement rates as they were intended to be in the familiarization phase. 
+This meant that advisors were distinguished by their overall agreement rates as they were intended to be in the familiarisation phase. 
 The accuracy of participants' initial estimates was not much above 50%, meaning that the overall accuracy rates of the advisors were similar to those projected (Table \@ref(tab:ac-agr-dates-r-advice-acc-t)).
-Most (`r n_ap`/`r length(unique(Familiarization$pid))`, `r num2str(n_ap / length(unique(Familiarization$pid)) * 100)`%) participants experienced the High agreement advisor as providing advice that agreed more frequently than the Low agreement advisor.
+Most (`r n_ap`/`r length(unique(Familiarisation$pid))`, `r num2str(n_ap / length(unique(Familiarisation$pid)) * 100)`%) participants experienced the High agreement advisor as providing advice that agreed more frequently than the Low agreement advisor.
 
 ##### \OpenScience{prereg} Hypothesis test {#ac-agr-dates-r-h}
 
-```{r ac-agr-dates-r-graph, fig.caption="Dates task advisor choice for High/Low agreement advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line. Participants in the Feedback condition received feedback during the Familiarization phase, but not during the Choice phase.", fig.height=6, fig.width=6}
+```{r ac-agr-dates-r-graph, fig.caption="Dates task advisor choice for High/Low agreement advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line. Participants in the Feedback condition received feedback during the Familiarisation phase, but not during the Choice phase.", fig.height=6, fig.width=6}
 
 tmp <- AdvisedTrial %>% 
   filter(advisorChoice == T) %>%
@@ -1017,7 +1017,7 @@ ggplot(tmp, aes(x = feedbackCondition, y = pChooseHigh)) +
   geom_hline(yintercept = .5, linetype = 'dashed') +
   geom_violindot(size_dots = .4) +
   geom_violinhalf(aes(fill = `Feedback condition`, colour = `Feedback condition`)) +
-  geom_label(aes(label = paste0('BF vs chance\n', bf)), y = 1.1, data = bf) +
+  geom_label(aes(label = paste0('BF versus chance\n', bf)), y = 1.1, data = bf) +
   annotate(geom = 'segment', x = 1, xend = 2, y = 1.2, yend = 1.2) +
   annotate(geom = 'label', x = 1.5, y = 1.2, label = paste0('BF = ', bf.comp)) +
   scale_y_continuous(limits = c(0, 1.2), breaks = seq(0, 1, length.out = 5)) +
@@ -1069,7 +1069,7 @@ As noted previously (Experiment 1: Discussion§\@ref(ac-acc-d)), this is in cont
 ### Discussion {#ac-agr-d}
 
 These two experiments investigated the impact of advisor agreement on choice of advice. 
-In both Dots and Dates tasks, where the absence of feedback means advisors' performances cannot be evaluated objectively, participants preferred high agreement advisors to low agreement advisors.
+In both Dots and Dates tasks, where the absence of feedback means advisors' performances cannot be evaluated objectively, participants preferred High agreement advisors to Low agreement advisors.
 This is consistent with our underlying theory that agreement is used as a mechanism for evaluating advisors in the absence of objective feedback.
 
 When feedback was provided in the Dates task, advisors were selected at rates equivalent to chance overall.

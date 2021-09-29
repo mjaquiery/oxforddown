@@ -28,7 +28,7 @@ library(patchwork)
 library(ez)
 ```
 
-# Psychology of source selection {#chapter-advisor-choice}
+# Psychology of advisor choice {#chapter-advisor-choice}
 \adjustmtc 
 
 Advice is relied upon to a different extent depending upon a variety of markers for its trustworthiness, including its plausibility and the reputation of its source.
@@ -70,7 +70,7 @@ In this chapter, we partially replicate the findings of @pescetelliRoleDecisionC
 
 ### Overview of Experiments
 
-We conducted a series of experiments to explore whether the advice-taking behaviour observed previously [@pescetelliRoleDecisionConfidence2021] would translate into preferential source selection behaviour.
+We conducted a series of experiments to explore whether the advice-taking behaviour observed previously [@pescetelliRoleDecisionConfidence2021] would translate into preferential advisor choice behaviour.
 In these experiments participants were familiarised with different pairs of advisors, and then given the opportunity to select which advisor they would like to get advice from (General Method§\@ref(gm)).
 
 Each experiment was repeated using two different tasks: a perceptual decision-making "Dots task", extended from @pescetelliRoleDecisionConfidence2021; and a historical date estimation "Dates task" newly built for this project.
@@ -79,7 +79,7 @@ In the Dates task, due to its novelty, participants were split into conditions b
 
 The first of the advisor pairs was a high accuracy advisor and a low accuracy advisor (Experiment 1A§\@ref(ac-acc-dots) and Experiment 1B§\@ref(ac-acc-dates)). 
 We predicted that the high accuracy advisor would be selected more often, even where feedback was not available. 
-This experiment would demonstrate the minimum phenomenon of interest -- sensitivity to advisor accuracy in the absence of feedback translating into preferential advisor selection.
+This experiment would demonstrate the minimum phenomenon of interest -- sensitivity to advisor accuracy in the absence of feedback translating into preferential advisor choice.
 
 The second advisor pair was a high agreement and a low agreement advisor (Experiment 2A§\@ref(ac-agr-dots) and Experiment 2B§\@ref(ac-agr-dates)). 
 We predicted that the high agreement advisor would be selected more frequently, because we expect agreement to be the method by which the accurate advisors were detected in the previous task.
@@ -106,12 +106,12 @@ This experiment would explore whether metacognitive processes are able to finess
 ## General discussion
 
 Previous work in our lab indicated that people are able to evaluate advice in the absence of feedback using agreement as a proxy [@pescetelliRoleDecisionConfidence2021].
-We performed a series of experiments investigating whether the patterns observed for advice taking are also evident in advisor selection.
+We performed a series of experiments investigating whether the patterns observed for advice-taking are also evident in advisor choice.
 Our experiments exercised tight control over the advisors' answers in the domains of agreement and accuracy, and allowed us to explore their relative contributions.
 
 Modelling and theoretical work indicates that biased source selection can dramatically reshape communication networks and create echo chamber effects where accurate but unpalatable information is ignored [@sunsteinRepublicCom2002; @madsenLargeNetworksRational2018].
 Empirical research on source selection behaviour has found relatively little indication that people behave this way in the real world [@marquartSelectiveExposureContext2016; @searsSelectiveExposureInformation1967; @nelsonMythPartisanSelective2017], particularly in terms of avoiding exposure to unpalatable information [@weeksPartisanEnclavesShared2016; @jangChallengesSelectiveExposure2014a].
-If the effects seen by @pescetelliRoleDecisionConfidence2021 in the domain of advisor choice also occur in the domain of advisor selection, they may demonstrate in principle a psychological mechanism which could drive biased source selection that are rational and appropriate given the information available.
+If the effects seen by @pescetelliRoleDecisionConfidence2021 in the domain of advice-taking also occur in the domain of advisor choice, they may demonstrate in principle a psychological mechanism which could drive biased source selection that are rational and appropriate given the information available.
 
 #### Advisor choice results
 

@@ -51,17 +51,17 @@ The aspects of on-line communities that are troublesome are similarly troublesom
 Despite the intuitive appeal of arguments and simulations showing echo chambers as a dominant social phenomenon, it remains highly plausible that echo chambers are nothing new, and that the opportunities granted by greater mixing on-line do not increase their prevalence or strength.
 
 The second question is a puzzle that exemplifies the ongoing debate in psychology over whether people are rational^[The debate is older than psychology as a discipline -- Jonathan Swift for example wrote to Alexander Pope that humans should be defined not as "animal rationale" (a rational animal) but instead as "rationis capax" (capable of rationality) [@swiftLettersJonathanSwift1801, Dr. Swift to Mr. Pope, 29 September 1725].] or whether their apparent rationality is an illusion created by a motley collection of heuristics.
-We certainly do not claim to have the last word in this debate, but we do show that egocentric discounting, hitherto a good example of irrational cognition, may quite readily be seen as rational when the frame of reference is appropriately adjusted.
+I certainly do not claim to have the last word in this debate, but this thesis does show that egocentric discounting, hitherto a good example of irrational cognition, may quite readily be seen as rational when the frame of reference is appropriately adjusted.
 Computational simulations showed that egocentric discounting is adaptive when there is the potential for advice to be deceptive, shiftless, or even slightly misunderstood.
 There is always this potential.
 Behavioural experiments added to a wealth of other experiments in the literature showing that advice-taking follows rational patterns once the base rate reduction (egocentric discounting) is explained.
-Our experiments on confidence calibration were unsuccessful in producing the results predicted by the simulations, though we cannot determine whether they were methodologically unsuccessful or whether they were unsuccessful because the simulated behaviour does not emerge in practice on a timescale appropriate to behavioural experimental investigation.
+Our experiments on confidence calibration were unsuccessful in producing the results predicted by the simulations, though we cannot determine whether they were methodologically unsuccessful or whether they were unsuccessful because the simulated behaviour does not emerge in practice on a time-scale appropriate to behavioural experimental investigation.
 
 The perspective of egocentric discounting as irrational is based on a normative model: the _discounting_ is relative to an optimal level of advice weighting.
-We argue that the normative model is not so much incorrect as it is inappropriate.
+I argue that the normative model is not so much incorrect as it is inappropriate.
 It requires that certain assumptions are met: there will be no lying; advisors will try as hard as the judge, and be roughly as good as the judge; the advice will be perfectly understood; and the advisor's expressions of confidence are interpreted as intended.
 If any of these are not met, the judge will be over-reliant on advice.
-We argue that these assumptions are never fully met.
+I argue that these assumptions are never fully met.
 
 The appeal of the normative model on one hand is matched on the other by the strength of the intuition that one should not equally weight advice with one's own opinion.
 This intuition may be culturally bound (indeed little English language research has been done on advice-taking outside Western Educated Industrialised Rich and Demographic populations [@henrichWeirdestPeopleWorld2010] apart from @mahmoodiEqualityBiasImpairs2015), but it appears to be widely shared by both scientists and laypeople with whom I have discussed my research.
@@ -76,7 +76,7 @@ We demonstrate that the guarded approach people show to advice-taking in general
 ## Generalisability, limitations, and open questions {#c-generalisability}
 
 Despite the variety of methods and experimental tasks used in this work, it is necessarily limited in scope, and consequently there remains a deep concern about generalisability.
-Advice is the exchange of social information, and we have focussed far more on the information than the social.
+Advice is the exchange of social information, and this thesis has focussed far more on the information than the social.
 Each instance of advice-taking is a meeting of particular people exchanging particular information with particular goals within a broader social context.
 Reading an advertisement is a very different situation from agonising with an old friend about their marital concerns, and both of these are very different from sharing a short message on a social media platform about planned building developments in your local area or reading expert reviews of food processors.
 
@@ -95,7 +95,7 @@ Furthermore, even within the dimension of ability, a great many different kinds 
 We may have been recommended to consult with someone by another person we trust, as happens when accountants acquire work through word-of-mouth.
 We might be consulting someone who has a reputation for expertise, like a rambler who has done a particular hike we want to try, or who belongs to a relevant professional organisation, like a counsellor who is a member of the British Association for Counselling and Psychotherapy.
 We may make inferences about expertise from how closely a potential advisor fits our stereotypes: do they dress appropriately or, more problematically, do they have the "right" accent, gender, or skin tone [@hollingsheadGenderStereotypesAssumptions2003; @arnoldPsychologicalHeuristicsFaculty2016].
-How these features are combined with personal experience with an advisor is an important question because many of these aspects are constant, or change on different timescales to the personal experience studied in this work, and thus may work to establish and maintain divisions that are difficult to break down using personal experience.
+How these features are combined with personal experience with an advisor is an important question because many of these aspects are constant, or change on different time-scales to the personal experience studied in this work, and thus may work to establish and maintain divisions that are difficult to break down using personal experience.
 
 The method of comparison based on the many factors contributing to perceptions of ability is also likely to differ according to context.
 In our work, we gave participants in behavioural experiments pairs of advisors to choose between, and in simulation we extended this direct comparison process to a wider selection of potential advisors.
@@ -107,7 +107,7 @@ As with the relative importance of personal experience with an advisor to other 
 
 Our work on egocentric discounting appears more robustly generalisable to the phenomenon of interest.
 Although the broader contextual considerations highlighted by our evolutionary simulations affect the conclusions one draws from egocentric discounting relative to the normative model, however, they do not detract substantially from the practice of using the normative model as an optimum 'set point' from which to evaluate advice-taking behaviour.
-Our conclusion is therefore not that the normative model should be abandoned or even extended in general use, rather we recommend that researchers avoid implying that deviation from the normative model is 'irrational', mistaken, or even the result of a 'satisficing' heuristic [@radnerSatisficing1975].
+The conclusion is therefore not that the normative model should be abandoned or even extended in general use, rather a recommendation that researchers avoid implying that deviation from the normative model is 'irrational', mistaken, or even the result of a 'satisficing' heuristic [@radnerSatisficing1975].
 
 Our theory of egocentric discounting's underlying rationality is not incontrovertible. 
 In fact, the theory is poorly positioned to explain people's apparent tendency to treat multiple advisory estimates as a single instance of advice, and to discount it as if it represented only a single alternative opinion [@hutterSeekingAdviceSampling2016; @yonahTheyDonKnow2021], or at least to increase the weighting of it much less than would be expected as the number of contributing estimates increases [@parkIntegrationIndividualSocial2017].
@@ -118,7 +118,7 @@ This is perhaps mediated by confidence.
 The normative model makes the prediction that what matters is the relative difficulty of the task for the judge and the advisor, not the absolute difficulty for the judge, and thus does not explain this effect.
 This puzzle is resolved by looking at the _perception_ of relative difficulty, rather than the relative difficulty itself. 
 People typically over-estimate their ability relative to others for easy tasks, while under-estimating their ability relative to others for difficult tasks [@krugerLakeWobegonBe1999].
-This behaviour may not be rational in the way that we have argued discounting is in general, but it may be an inescapable consequence of confidence [@hilbertSynthesisCognitiveBiases2012].
+This behaviour may not be rational in the way that I have argued discounting is in general, but it may be an inescapable consequence of confidence [@hilbertSynthesisCognitiveBiases2012].
 
 ## Key directions for future research
 
@@ -149,7 +149,7 @@ More work needs to be done to properly demarcate the similarities and difference
 ## Summary
 
 This work explored two questions: whether people take too much advice from those who agree with them; and why people do not take enough advice in general.
-To the first, we can say that people may well do this, but that the extent and consequences of their doing so are probably over-estimated.
+To the first, I can say that people may well do this, but that the extent and consequences of their doing so are probably over-estimated.
 The natural variation in people's tendencies, and the wealth of other factors that contribute to the ways in which people interact when exchanging information, mean that simple but persuasive models of frictionless social network dynamics may not accurately capture relevant dynamics in real on-line social networks.
-To the second question, we answer that people _do_ take enough advice... we just misrepresent how much 'enough' should be. 
+To the second question, I answer that people _do_ take enough advice... we just misrepresent how much 'enough' should be. 
 When wider contexts are taken into account, the mystery fades, leaving the 'normative' model to act as a reference rather than an ideal.
