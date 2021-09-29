@@ -120,9 +120,31 @@ This puzzle is resolved by looking at the _perception_ of relative difficulty, r
 People typically over-estimate their ability relative to others for easy tasks, while under-estimating their ability relative to others for difficult tasks [@krugerLakeWobegonBe1999].
 This behaviour may not be rational in the way that we have argued discounting is in general, but it may be an inescapable consequence of confidence [@hilbertSynthesisCognitiveBiases2012].
 
-The behavioural experiments extending the results of our evolutionary computational simulations were messier than we had hoped. 
-The apparently obvious result that people take less advice from advisors who may sometimes mislead them proved quite difficult to demonstrate in practice -- participants in early experiments did not appear to attend very much to the source of advice and it required a heavy-handed manipulation alongside splitting experience with the advisors into separate blocks to produce the effect seen in simulation.
-The difficulty we encountered would cast serious doubt on the amount of support we can derive from our experiments, except that the results proved robust once established: pre-registered replications showed very similar patterns in independent samples.
+## Key directions for future research
+
+Behavioural experiments in this thesis provided some evidence to support the idea that people use agreement as a proxy for accuracy when they do not have access to feedback.
+This details of this picture require elucidation -- for example it would be informative to know more precisely how task difficulty alters people's updating of trust in advisors.
+Extrapolating from the @pescetelliRoleDecisionConfidence2021 theory of confidence-mediation, trust is updated more (in the absence of feedback) where the judge is most confident. 
+For difficult decisions, the judge usually has very low confidence in their initial decisions and consequently we would expect advisor trust to update very little.
+Despite this, our experiments showed a very wide range of preference strengths and directions when participants were offered choices between advisors, suggesting that perhaps people did develop preferences (although they may also have had those preferences from the outset).
+It would be a useful extension of the @pescetelliRoleDecisionConfidence2021 theory to explore how it interacts with very difficult decisions, especially because advice-taking is very high for difficult tasks [@ginoEffectsTaskDifficulty2007] and it is intuitive to think that the act of trusting (taking advice) should lead to greater trust in future.
+
+The behavioural experiments used either binary decisions or continuous estimates as the task. 
+In these tasks agreement can be readily quantified.
+Perhaps the majority of decisions for which advice is sought in the real world are not of this kind: they are much richer qualitative decisions with multiple options where advice is seldom a simple endorsement or specific estimate: "Where should I go on holiday?"; "Should I try watching this new drama programme?"; "What's the best way to get rust off a vintage cheese grater?".
+Even the second of these, most like the tasks faced by participants in the behavioural experiments, tend not to have simple answers like "yes" or "no", but qualified answers accompanied by non-verbal confidence cues: "I liked it, but you don't like things that are too dark, right?"; "Definitely, but you have to watch until episode 3 to get into it."; "I thought [some other programme] was better.".
+It is important to investigate whether similar 'agreement' effects operate in these more complex interactions.
+It is plausible, for instance, that agreement is actually an instance of endorsement or positivity, and that these are responsible for increasing trust more than agreement per se.
+
+This work replicated other models of polarisation and echo-chamber formation [@pescetelliRoleDecisionConfidence2021; @madsenLargeNetworksRational2018a] and indicated that the heterogeneity seen in the participants of the behavioural experiments worked to slow the pace and limit the extent of those effects.
+Whether that heterogeneity needs to be a stable feature of agents deserves investigation, especially in light of the suggestion from our data that there was as much heterogeneity within participants as between them.
+Secondly, although these models make a strong theoretical case for polarisation and echo-chamber formation in social networks, more work needs to be done to investigate whether these effects actually occur in practice.
+Analysis of data from on-line social networks has been equivocal on the subject [@colleoniEchoChamberPublic2014; @barberaHowSocialMedia2015; @weeksPartisanEnclavesShared2016; @huiGroupthinkPeerPressure2009], and this is an area where further research is needed.
+
+This thesis presented a view of egocentric discounting that sees it as a rational response to ubiquitous issues in advice-taking: whether advice is well-intentioned; the quality of the advice; and the interpretability of advice.
+These issues are akin to generic issues in information exchange -- how accurately information can be decoded from a signal and the utility of that information.
+Following this, a prediction from our view of egocentric discounting is that information exchange between any organisms, not just advice-giving humans, will show similar 'discounting' where the full utility of salient information cannot be used because it would lead to over-reliance on less useful or misunderstood information.
+More work needs to be done to properly demarcate the similarities and differences between advice-taking and other information exchange domains.
 
 ## Summary
 

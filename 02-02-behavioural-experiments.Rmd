@@ -2530,6 +2530,10 @@ We explain this base rate reduction by appealing to the wider context of partici
 Egocentric discounting is irrational only where the judge can be sure the advice will be, on average, as good as their own initial estimate.
 It is our contention that this assumption is simply not true in everyday life, and there is no reason why these background assumptions should be waived within the confines of a Judge-Advisor System, especially in the context of psychology experiments (which are notorious for deceiving participants).
 
+The behavioural experiments extending the results of our evolutionary computational simulations were messier than we had hoped. 
+The apparently obvious result that people take less advice from advisors who may sometimes mislead them proved quite difficult to demonstrate in practice -- participants in early experiments did not appear to attend very much to the source of advice and it required a heavy-handed manipulation alongside splitting experience with the advisors into separate blocks to produce the effect seen in simulation.
+The difficulty we encountered would cast serious doubt on the amount of support we can derive from our experiments, except that the results proved robust once established: pre-registered replications showed very similar patterns in independent samples.
+
 There is one major feature of advice-taking that has received relatively little investigation, yet that would, if real, be entirely inexplicable in terms of evolutionarily optimal hyperpriors.
 This is the finding that people tend to consider all advisory estimates they receive as a single, multifaceted opinion, which is then integrated with their own individual opinion§\@ref(context-number).
 Crucially, this seems to happen no matter how many advisory estimates are supplied [@hutterSeekingAdviceSampling2016; @yonahTheyDonKnow2021].
