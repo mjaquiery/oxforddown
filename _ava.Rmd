@@ -15,13 +15,13 @@ rm(list = ls()); source('scripts_and_filters/general_setup.R')
 
 select_experiment(
   project = 'dotstask',
-  function(x) filter(x, study == 'Accuracy versus agreement', version == 'v2 Serial design')
+  function(x) filter(x, study == 'Accuracy vs agreement', version == 'v2 Serial design')
 )
 
 .dropEnv <- new.env()
 tada('dotstask', package = 'esmData', envir = .dropEnv)
 .dropEnv$dotstask <- .dropEnv$dotstask %>% 
-  filter(study == 'Accuracy versus agreement', version != 'v2 Serial design')
+  filter(study == 'Accuracy vs agreement', version != 'v2 Serial design')
 
 .dropEnv$DROP_V <- paste0(unique(.dropEnv$dotstask$version), collapse = ', ')
 .dropEnv$DROP_P <- sum(.dropEnv$dotstask %>% 

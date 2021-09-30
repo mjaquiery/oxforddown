@@ -148,7 +148,10 @@ t1 <- Sys.time()
 fName <- "cache/thesis-parameter-estimation.rda"
 fURL <- "https://sandbox.zenodo.org/record/915958/files/thesis-parameter-estimation.rda?download=1"
 can_download_pe <- 
-  tryCatch(attr(curlGetHeaders(fURL, timeout = 5), 'status') == 200)
+  tryCatch(
+    attr(curlGetHeaders(fURL, timeout = 5), 'status') == 200,
+    error = \(e) F
+  )
 must_rerun_pe <- 
   ESM.recalculate >= 3 || 
   (!file.exists(fName) && !can_download_pe)
