@@ -43,7 +43,7 @@ A snapshot of the state of the code for running the experiment at the time the e
 An initial version of this study was conducted and run as a proper experiment in which participants learned about both advisors simultaneously (preregistered at https://osf.io/5z2fp), but there were no effects in the data. 
 We suspected the absence of effects was because participants had difficulty distinguishing the advisors when they were presented together. 
 The version of the experiment reported here presented one advisor per block in the familiarisation phase.
-Data for the unreported null study can be found in the `esmData::` R package and at https://osf.io/26yut/.
+Data for the unreported null study can be found in the `esmData` R package [@jaquieryOxacclabEsmDataThesis2021] and at https://osf.io/26yut/.
 
 #### Method {#ac-ava-dots-m}
 
