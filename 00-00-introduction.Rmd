@@ -20,16 +20,12 @@ documentclass: book
 
 * Graphs and stats:  
     * Continuous axes which show theoretical limits should have small expand, axes which do not show those limits should have arrowheads from broken_axis_*  
-    * Fix p =< 
-    * Check spaces around = 
   
   * mccorrect -> resolve issues
   
 \mccorrect{TODO: Check R output messages, warnings, errors}
 
 \mccorrect{Search final output for ()}
-    
-\mccorrect{TODO: abstract, acknowledgements, dedication (MAF)}
 
 
 <!-- this adds an image in gitbook output --> 
@@ -90,8 +86,6 @@ Insofar as the identity of the advisor matters, it matters because it functions 
 This is likely a major oversimplification, however, because in many real-world contexts advice-giving and advice-taking form part of a developing social relationship: being consulted for advice and having one's advice followed are inherently rewarding [@hertzIntrinsicValueSocial2018; @hertzNeuralComputationsUnderpinning2017]; and taking advice can serve as a (sometimes costly) social signal of valuing a relationship with a person or group [@byrneOstracismReducesReliance2016].
 Furthermore, some authors have argued that people may perceive taking advice as sacrificing their independence or autonomy [@raderAdviceFormSocial2017; @ronayneWhenGoodAdvice2018].
 While this thesis follows previous literature in omitting to consider the wider social concerns influencing the taking of advice, it is nevertheless important to remember that the processes investigated herein take place in a variety of social contexts where complex social agents attempt to optimise over numerous goals over numerous time-scales.
-
-\mccorrect{NICK: This is a good point -- and perhaps something you can come back to in the final chapter. In some ways, it develops the theme from your evolutionary modelling, about what's locally optimal sometimes (oftentimes?) differing from what's globally optimum.}
 
 ### Three-factor model of trust
 
@@ -231,7 +225,7 @@ Again, this can be benign, as when newcomers to a social group are welcomed and 
 Where this cycle generates concern is when reciprocal influence produces increasingly extreme attributes, for example political opinions.
 This process is known as "polarisation".
 
-Polarisation is the phenomenon whereby the distribution of opinions in a population trend toward extremes over time, with moderate stances becoming increasingly less popular.^[There are a variety of precise and somewhat different definitions in the literature [@bramsonDisambiguationSocialPolarisation2016].] 
+Polarisation is the phenomenon whereby the distribution of opinions in a population trend toward extremes over time, with moderate stances becoming increasingly less popular.^[There are a variety of precise and somewhat different definitions in the literature [@bramsonDisambiguationSocialPolarization2016].] 
 Polarisation can be one-way, as when a consensus forms on a topic and that consensus shifts the entire ground of the debate (as with the core feminist principle that women and men deserve equal respect), or two-way as with divisive issues like the suitability of former President Donald Trump for office.
 While in both cases the whole population has acquired an extreme opinion, in the former the population remains united whereas in the latter the population is deeply divided, with little middle ground.
 

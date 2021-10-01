@@ -88,11 +88,9 @@ We expected that participants would rate advice from an advisor who was more ben
 ##### Open scholarship practices
 
 This experiment was preregistered at `r unique(datequiz$preregistration)`.
-The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from \mccorrect{!TODO[OSFify Dates task data]}.
-A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/b4289fea196f71ccf0ba0b2ae8fde12139a16301/ACv2/db.html.
-
 This is a replication of a study of identical design that produced the same results. 
-The data for the original study can be obtained from the `esmData::` R package or from \mccorrect{!TODO[OSFify]}.
+The data for both this and the original study can be obtained from the `esmData` R package [@jaquieryOxacclabEsmDataThesis2021].
+A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/b4289fea196f71ccf0ba0b2ae8fde12139a16301/ACv2/db.html.
 
 There were two deviations from the preregistered analysis in this experiment.
 Several participants used translation software to translate the experiment website. 
@@ -475,7 +473,7 @@ r <- apply(tmp, 2, \(x) x[1]/x[2])
 
 s_r <- sapply(1:length(r), \(i) paste(names(r)[i], num2str(r[i]))) %>%
   paste(collapse = ", ")
-s <- glue("({chi$parameter})={num2str(chi$statistic)}, p={prop2str(chi$p.value)}, BF={bf2str(exp(bf@bayesFactor$bf))}; AlwaysHonest:SometimesDeceptive ratio: {s_r}")
+s <- glue("({chi$parameter}) = {num2str(chi$statistic)}, _p_{p2str(chi$p.value)}, BF~H1:H0~ = {bf2str(exp(bf@bayesFactor$bf))}; AlwaysHonest:SometimesDeceptive ratio: {s_r}")
 
 ```
 
@@ -524,7 +522,7 @@ Using a more complete test, such as 2x3 ANOVA, would have suffered greatly from 
 
 To explore the effect of advice, a 1x3 ANOVA was run on weight on advice across ratings. 
 In all, `r length(unique(x$pid))`/`r length(unique(Familiarisation$pid))` (`r num2str(length(unique(x$pid)) / length(unique(Familiarisation$pid)) * 100)`%) participants had at least one trial rated with each of the three ratings.
-The weight on advice differed according to the rating assigned the advice (`r s_advice$s[1]`; Mauchly's test for Sphericity W=`r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][2][[1]])`, p=`r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][3][[1]])`).
+The weight on advice differed according to the rating assigned the advice (`r s_advice$s[1]`; Mauchly's test for Sphericity W = `r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][2][[1]])`, _p_ = `r p2str(aov_advice[["Mauchly's Test for Sphericity"]][3][[1]])`).
 As expected, participants were more influenced by advice they rated as Honest compared to advice they rated as Deceptive.
 
 ###### \OpenScience{prereg} Effect of advisor {#be-dba-r-h-advisor}
@@ -638,9 +636,9 @@ coefs <- cbind(
   mutate(
     beta = beta - 1,
     across(c(Estimate:last_col(), -`Pr(>|t|)`), num2str),
-    `Pr(>|t|)` = prop2str(`Pr(>|t|)`, minPrefix = "<"),
+    `Pr(>|t|)` = p2str(`Pr(>|t|)`),
     s = glue(
-      "{Estimate} [{`2.5 %`}, {`97.5 %`}], df={df}, p={`Pr(>|t|)`}"
+      "{Estimate} [{`2.5 %`}, {`97.5 %`}], df = {df}, _p_ = {`Pr(>|t|)`}"
     )
   )
 
@@ -689,7 +687,7 @@ coefs <- left_join(
 ) %>% 
   mutate(
     bf = if_else(is.na(bf), 1, bf),
-    s = glue("{s}, BF={bf2str(bf)}")
+    s = glue("{s}, BF~H1:H0~ = {bf2str(bf)}")
   )
 
 ```
@@ -702,16 +700,16 @@ A linear mixed model was used to better understand the significance of the relat
 Random intercepts were included for participant.
 A similar Bayesian model was included to produce Bayes factors.
 
-Overall, the distance between the initial estimate and the advice was hugely influential, with an increase in distance leading to an approximately equal increase in influence ($\beta$=`r coefs$s[3]`).
+Overall, the distance between the initial estimate and the advice was hugely influential, with an increase in distance leading to an approximately equal increase in influence ($\beta$ = `r coefs$s[3]`).
 This indicates that the advice rated Honest from the Always honest advisor was generally followed, as is shown clearly in Figure \@ref(fig:be-dba-r-overall).
 This pattern indicates that the participants see the difference between their own estimates and the advisor's as indicating that they themselves are mistaken.
-Conversely, the relationship between distance and influence was decreased when the advice came from the Sometimes deceptive advisor, even for advice rated as Honest ($\beta$=`r coefs$s[6]`).
+Conversely, the relationship between distance and influence was decreased when the advice came from the Sometimes deceptive advisor, even for advice rated as Honest ($\beta$ = `r coefs$s[6]`).
 
-Advice rated as Deceptive from the Sometimes deceptive advisor was substantially less influential ($\beta$=`r coefs$s[8]`), and this was complemented by the relationship between distance and influence being substantially reduced in this case ($\beta$=`r coefs$s[12]`).
+Advice rated as Deceptive from the Sometimes deceptive advisor was substantially less influential ($\beta$ = `r coefs$s[8]`), and this was complemented by the relationship between distance and influence being substantially reduced in this case ($\beta$ = `r coefs$s[12]`).
 
 There are other patterns in Figure \@ref(fig:be-dba-r-overall) that do not come out in the statistics, possibly due to the very low trial and participant numbers, but are suggestive of a pattern we might expect.
 The relationship of advice rated Honest is similar between the advisors: as the advice gets further away it retains its level of influence and the participants are willing to go further to match it.
-This is not tested directly in the statistics, but there is no significant effect of advisor alone ($\beta$=`r coefs$s[2]`), the presence of which would indicate that Honest-rated advice differed between advisors.
+This is not tested directly in the statistics, but there is no significant effect of advisor alone ($\beta$ = `r coefs$s[2]`), the presence of which would indicate that Honest-rated advice differed between advisors.
 The Bayesian analogue of the test indicated that there was not enough evidence to decide whether Advisor alone was an important factor.
 The preregistered test of this relationship above§\@ref(be-dba-r-h-advisor), however, did indicate that there was a difference when tested directly.
 
@@ -778,7 +776,7 @@ We expect that advice from the less benevolent group will be less likely to be r
 ##### Open scholarship practices
 
 This experiment was preregistered at `r unique(datequiz$preregistration)`.
-The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from \mccorrect{!TODO[OSFify Dates task data]}.
+The experiment data are available in the `esmData` package for R [@jaquieryOxacclabEsmDataThesis2021].
 A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/1ba333b91366c63a8ab1aed889dd87ea9295a01d/ACv2/dbc.html.
 In addition to the exclusion criteria listed in the preregistration, we excluded participants who used translation software when visiting the experiment webpage.
 
@@ -1134,7 +1132,7 @@ r <- apply(tmp, 2, \(x) x[1]/x[2])
 
 s_r <- sapply(1:length(r), \(i) paste(names(r)[i], num2str(r[i]))) %>%
   paste(collapse = ", ")
-s <- glue("({chi$parameter})={num2str(chi$statistic)}, p={prop2str(chi$p.value)}, BF={bf2str(exp(bf@bayesFactor$bf))}; HonestGroup:DeceptiveGroup ratio: {s_r}")
+s <- glue("({chi$parameter}) = {num2str(chi$statistic)}, _p_{p2str(chi$p.value)}, BF~H1:H0~ = {bf2str(exp(bf@bayesFactor$bf))}; HonestGroup:DeceptiveGroup ratio: {s_r}")
 
 ```
 
@@ -1182,7 +1180,7 @@ Using a more complete test, such as 2x3 ANOVA, would have suffered greatly from 
 
 To explore the effect of advice, a 1x3 ANOVA was run on weight on advice across ratings. 
 In all, `r length(unique(x$pid))`/`r length(unique(Familiarisation$pid))` (`r num2str(length(unique(x$pid)) / length(unique(Familiarisation$pid)) * 100)`%) participants had at least one trial rated with each of the three ratings.
-The weight on advice differed according to the rating assigned the advice (`r s_advice$s[1]`; Mauchly's test for Sphericity W=`r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][2][[1]])`, p=`r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][3][[1]])`).
+The weight on advice differed according to the rating assigned the advice (`r s_advice$s[1]`; Mauchly's test for Sphericity W = `r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][2][[1]])`, _p_ = `r p2str(aov_advice[["Mauchly's Test for Sphericity"]][3][[1]])`).
 As expected, participants were more influenced by advice they rated as Honest compared to advice they rated as Deceptive.
 
 ###### \OpenScience{prereg} Effect of advisor
@@ -1289,9 +1287,9 @@ coefs <- cbind(
   mutate(
     beta = beta - 1,
     across(c(Estimate:last_col(), -`Pr(>|t|)`), num2str),
-    `Pr(>|t|)` = prop2str(`Pr(>|t|)`, minPrefix = "<"),
+    `Pr(>|t|)` = p2str(`Pr(>|t|)`),
     s = glue(
-      "{Estimate} [{`2.5 %`}, {`97.5 %`}], df={df}, p={`Pr(>|t|)`}"
+      "{Estimate} [{`2.5 %`}, {`97.5 %`}], df = {df}, _p_ = {`Pr(>|t|)`}"
     )
   )
 
@@ -1340,7 +1338,7 @@ coefs <- left_join(
 ) %>% 
   mutate(
     bf = if_else(is.na(bf), 1, bf),
-    s = glue("{s}, BF={bf2str(bf)}")
+    s = glue("{s}, BF~H1:H0~ = {bf2str(bf)}")
   )
 
 ```
@@ -1351,12 +1349,12 @@ Random intercepts were included for participant.
 A similar Bayesian model was included to produce Bayes factors.
 
 The overall pattern showed both advisors were responded to similarly to the Sometimes deceptive advisor in Experiment 5 (Figure \@ref(fig:be-dba-r-overall)).
-For advice rated as Honest from the Honest group of advisors, the distance between the initial estimate and the advice was hugely influential, with an increase in distance leading to an approximately equal increase in influence ($\beta$=`r coefs$s[3]`).
-This pattern was neither clearly different nor clearly the same for advice rated as Honest from the Deceptive group of advisors ($\beta$=`r coefs$s[6]`).
+For advice rated as Honest from the Honest group of advisors, the distance between the initial estimate and the advice was hugely influential, with an increase in distance leading to an approximately equal increase in influence ($\beta$ = `r coefs$s[3]`).
+This pattern was neither clearly different nor clearly the same for advice rated as Honest from the Deceptive group of advisors ($\beta$ = `r coefs$s[6]`).
 
-Compared to advice rated as Honest, advice rated as Deceptive had a much flatter relationship with distance (when coming from the Honest group of advisors: $\beta$=`r coefs$s[10]`; when coming from the Deceptive group of advisors: $\beta$=`r coefs$s[12]`).
-Advice rated as Possibly Deceptive did not show this nearly flat relationship, but neither was it clearly the same as advice rated Honest in its relationship with distance ($\beta$=`r coefs$s[9]`), and it is likely more evidence would reveal a subtler pattern in the direction of that found for advice rated as Deceptive. 
-The relationship of advice rated as Possibly Deceptive to distance was, however, different between advisor groups, with the Possibly Deceptive advice being considered more trustworthy as it got more distant when it came from the Deceptive group of advisors ($\beta$=`r coefs$s[11]`).
+Compared to advice rated as Honest, advice rated as Deceptive had a much flatter relationship with distance (when coming from the Honest group of advisors: $\beta$ = `r coefs$s[10]`; when coming from the Deceptive group of advisors: $\beta$ = `r coefs$s[12]`).
+Advice rated as Possibly Deceptive did not show this nearly flat relationship, but neither was it clearly the same as advice rated Honest in its relationship with distance ($\beta$ = `r coefs$s[9]`), and it is likely more evidence would reveal a subtler pattern in the direction of that found for advice rated as Deceptive. 
+The relationship of advice rated as Possibly Deceptive to distance was, however, different between advisor groups, with the Possibly Deceptive advice being considered more trustworthy as it got more distant when it came from the Deceptive group of advisors ($\beta$ = `r coefs$s[11]`).
 This surprising result may be due to participants applying different criteria to judging the deceptiveness of advice according to the advisors giving it.
 
 More clearly visible in Figure \@ref(fig:be-dbc-r-overall) than Figure \@ref(fig:be-dba-r-overall), but present in both, is the tendency for participants to rate advice as Deceptive more frequently as it is further away from their initial estimates.
@@ -1435,7 +1433,7 @@ Trial <- annotate_responses(Trial)
 #### Open scholarship practices
 
 This experiment was not preregistered because it was highly exploratory.
-The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from \mccorrect{!TODO[OSFify Dates task data]}.
+The experiment data are available in the `esmData` package for R [@jaquieryOxacclabEsmDataThesis2021].
 A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/4d8aace6b864c4465cacd8579ec1abd870dd65d2/ACBin/ce.html.
 
 #### Method
@@ -1656,7 +1654,7 @@ acc %>%
 
 ```
 
-```{r be-ce-r-performance-inf, fig.caption="Influence for Experiment 7. Participants' weight on the advice for advisors in the Familiarisation and Test stages of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2]."}
+```{r be-ce-r-performance-inf, fig.caption="Influence for Experiment 7.  Participants' weight on the advice for advisors in the Familiarisation and Test stages of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2]."}
 
 # Influence
 
@@ -1772,7 +1770,7 @@ It is not clear why this occurred; it was likely the result of random chance.
 
 A second ANOVA was run to explore the effects of advisor influence, using factors of advisor (Consistent individual versus Group member) and stage (Familiarisation versus Test). 
 The influence of advisors might differ according to whether participants had learned become familiar with them, hence separating out the initial Familiarisation trials (that contained feedback) from the later Test trials (that did not) might provide some evidence of learning.
-No significant effects were found for influence (Figure \@ref(fig:be-ce-r-performance-conf)).
+No significant effects were found for influence (Figure \@ref(fig:be-ce-r-performance-inf)).
 Neither the advisor presentation (`r s_inf$s[1]`), nor whether the trial was in the Familiarisation stage (with feedback) or the test stage (without feedback) appeared to be systematically linked to the influence of the advice (`r s_inf$s[2]`). 
 There was also no indication that the influence of the advisors' advice changed differently between stages (`r s_inf$s[3]`).
 
@@ -1884,7 +1882,7 @@ Trial <- Trial %>%
 #### Open scholarship practices
 
 This experiment was not preregistered because it was exploratory.
-The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from \mccorrect{!TODO[OSFify Dates task data]}.
+The experiment data are available in the `esmData` package for R [@jaquieryOxacclabEsmDataThesis2021].
 A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/9ac26116e348f8c4ff5617a8e68710b889bc7e08/ACBin/ck.html.
 
 #### Method
@@ -2171,7 +2169,7 @@ acc %>%
 
 ```
 
-```{r be-ck-r-performance-conf, fig.caption="Confidence for Experiment 8. Faint lines show individual participant means, for which the violin and box plots show the distributions. Final confidence is negative where the answer side changes. Theoretical range of confidence scores is initial: [0,1]; final: [-1,1]."}
+```{r be-ck-r-performance-conf, fig.caption="Confidence for Experiment 8.  Faint lines show individual participant means, for which the violin and box plots show the distributions. Final confidence is negative where the answer side changes. Theoretical range of confidence scores is initial: [0,1]; final: [-1,1]."}
 
 # Confidence
 conf <- Familiarisation %>% 
@@ -2423,9 +2421,9 @@ coefs <- cbind(
   mutate(
     beta = beta - 1,
     across(c(Estimate:last_col(), -`Pr(>|t|)`), num2str),
-    `Pr(>|t|)` = prop2str(`Pr(>|t|)`, minPrefix = "<"),
+    `Pr(>|t|)` = p2str(`Pr(>|t|)`),
     s = glue(
-      "{Estimate} [{`2.5 %`}, {`97.5 %`}], df={df}, p={`Pr(>|t|)`}"
+      "{Estimate} [{`2.5 %`}, {`97.5 %`}], df = {df}, _p_ = {`Pr(>|t|)`}"
     )
   )
 
@@ -2472,7 +2470,7 @@ coefs <- left_join(
 ) %>% 
   mutate(
     bf = if_else(is.na(bf), 1, bf),
-    s = glue("{s}, BF={bf2str(bf)}")
+    s = glue("{s}, BF~H1:H0~ = {bf2str(bf)}")
   )
 
 ```
@@ -2482,8 +2480,8 @@ Indeed, a paired T-test of the influence of the advisors in Key trials where the
 Statistically, there was not enough evidence to conclude whether or not the effect was present or absent.
 
 This suggested that participants were simply adopting a heuristic that more confident advice was more likely to be correct -- entirely ignoring the calibration of the advisors.
-Indeed, linear mixed modelling indicated that, when predicting the influence on Key trials from the advisor, presentation, advisor-by-presentation interaction, and advice confidence (with random intercepts for participant), only advice confidence was a significant predictor ($\beta$=`r coefs$s[4]`).
-The other main predictors were both demonstrably absent ($\beta_{\text{High confidence advisor}}$=`r coefs$s[2]`; $\beta_{\text{Unambiguous presentation}}$=`r coefs$s[3]`), and there was not sufficient evidence to adjudicate on the presence of an interaction ($\beta_{\text{High confidence advisor, Unambiguous presentation}}$=`r coefs$s[5]`).
+Indeed, linear mixed modelling indicated that, when predicting the influence on Key trials from the advisor, presentation, advisor-by-presentation interaction, and advice confidence (with random intercepts for participant), only advice confidence was a significant predictor ($\beta$ = `r coefs$s[4]`).
+The other main predictors were both demonstrably absent ($\beta_{\text{High confidence advisor}}$ = `r coefs$s[2]`; $\beta_{\text{Unambiguous presentation}}$ = `r coefs$s[3]`), and there was not sufficient evidence to adjudicate on the presence of an interaction ($\beta_{\text{High confidence advisor, Unambiguous presentation}}$ = `r coefs$s[5]`).
 
 #### Discussion
 

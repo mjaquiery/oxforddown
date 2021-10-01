@@ -587,12 +587,14 @@ Each model consists of a population of agents implementing the same mathematical
 
 ### \OpenScience{materials} Open code
 
-The agent-based modelling is performed using a custom-written R package.
-\mccorrect{Zenodo}
+The agent-based modelling is performed using the custom-written R package `adviseR` [@jaquieryOxacclabAdviseRThesis2021].
 The functions which implement each of the steps below are listed in the (non-exported) simulation loop function [`simulationStep`](https://github.com/oxacclab/adviseR/blob/master/R/simulation.R#L261). 
 Each of these sub-functions includes unit tests to verify its behaviour.
 For readers who prefer to follow along with code rather than maths, each section below includes details of the function implementing the equations.
 These small functions are not exported by the package, so links are to source code rather than package documentation.
+
+The models take a long time to run when creating the thesis from base code.
+To assist with exploring the models without having to rerun models from scratch, cached data is available from @jaquieryExploringSocialMetacognition2021.
 
 ### Model details
 

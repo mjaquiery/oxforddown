@@ -24,7 +24,7 @@ trials <- annotate_responses(trials)
 #### Open scholarship practices
 
 Due to an oversight, this experiment was not preregistered.
-The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from https://osf.io/8cnpq/.
+The experiment data are available in the `esmData` package for R [@jaquieryOxacclabEsmDataThesis2021], and also directly from https://osf.io/8cnpq/.
 A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/9932543c62b00bd96ef7ddb3439e6c2d5bdb99ce/AdvisorChoice/index.html.
 
 #### Method {#ac-agr-dots-m}
@@ -581,7 +581,7 @@ AdvisedTrial <- annotate_responses(AdvisedTrial)
 #### Open scholarship practices
 
 This experiment was preregistered at `r unique(datequiz$preregistration)`.
-The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from \mccorrect{!TODO[OSFify Dates task data]}.
+The experiment data are available in the `esmData` package for R [@jaquieryOxacclabEsmDataThesis2021].
 A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/master/ACBin/acc.html.
 
 #### Method {#ac-agr-dates-m}
@@ -1034,7 +1034,7 @@ ggplot(tmp, aes(x = feedbackCondition, y = pChooseHigh)) +
 .T.Nfb <- tmp %>%
   filter(feedbackCondition != 'Feedback') %>%
   pull(pChooseHigh) %>%
-  md.ttest(y = .5, labels = c('M~No feedback~'))
+  md.ttest(y = .5, labels = c('M~NoFeedback~'))
 
 # Binomial test of pick rate chance
 bn <- Test %>%

@@ -86,8 +86,6 @@ The schematic for this trial structure is shown for the Dots Task in Figure \@re
 knitr::include_graphics("figures/methods/dots-structure.jpg")
 ```
 
-\mccorrect{!TODO[Check feedback duration and style in image caption]}
-
 #### Perceptual decision (Dots task) {#m-p-dots}
 
 The Dots task is a two-alternative forced choice task that has been used in various forms for many experiments in our lab [@steinhauserDecisionProcessesHuman2010; @boldtSharedNeuralMarkers2015a; @charlesDynamicSourcesEvidence2019; @carlebachSubjectiveConfidenceActs2020; @pescetelliConfidenceAdviceSeeking2021; @pescetelliRoleDecisionConfidence2021] and beyond [@rouaultFormingGlobalEstimates2019; @rouaultPsychiatricSymptomDimensions2018; @flemingDomainspecificImpairmentMetacognitive2014].
@@ -103,7 +101,7 @@ These boxes were briefly (300ms) and simultaneously filled with an array of non-
 The participant submitted their response by selecting a point on a horizontal bar: points to the left of the midpoint indicated the participant thought the left-hand box had more dots, and points to the right that they thought the right-hand box had more dots. 
 The further away from the midpoint the participant selected on the bar, the more confidence they indicated in their response.
 
-The number of dots was exactly determined by the difficulty of the trial: the box with the \mccorrect{!TODO[check this description]} least dots had 200 - the difficulty, while the box with the most had 200 + the difficulty.
+The number of dots was exactly determined by the difficulty of the trial: the box with the least dots had 200 - the difficulty, while the box with the most had 200 + the difficulty.
 The dots did not move during the presentation of the stimulus.
 There was thus an objectively correct answer to the question which, given enough time, could be precisely determined from the stimulus.
 
@@ -325,6 +323,9 @@ These more subjective questions have received some attention by @vanswolForecast
     
 ## Analysis {#m-analysis}
 
+The results of statistical analyses are included within the text.
+Where a number is expressed in the form $x [y, z]$, $y$ and $z$ are the lower and upper 95% confidence limits for $x$, respectively.
+
 ### Dependent variables {#m-analysis-dv}
 
 #### Pick rate
@@ -425,14 +426,17 @@ Where the level of influence exerted by two different advisors is studied, for e
 
 #### Bayesian statistics
 
-Bayesian statistics measure relative likelihood between statistical models given observed data and prior beliefs. 
+The 'Bayes factor' quantifies relative likelihood between statistical models given observed data and prior beliefs. 
+This is usually presented as a comparison between a model representing the alternative hypothesis and a model representing the null hypothesis, written as BF~H1:H0~.
+When using Bayes factors to explore the results of linear modelling, tests are conducted on whether the data are better fit by a model with an effect as compared to a model without that effect, written as BF~+Effect:-Effect~.
+
 In order to draw categorical inferences, thresholds are placed on this continuous outcome.
 Here these thresholds are 1/3 < BF < 3, meaning that a BF of less than 1/3 constitutes evidence in favour of the simpler model while a BF greater than 3 constitutes evidence in favour of the more complex model.
-These values are those suggested by \mccorrect{!TODO[CITE whoever has that neat little table. Jeffreys?]} as representing \mccorrect{!TODO[which word does the paper use?]} evidence in a given direction.
+These values are those suggested by @schonbrodtBayesFactorDesign2018 as representing moderate evidence in a given direction.
 Where the BF lies between these thresholds it is labelled as 'uninformative'.
 An uninformative result supports neither the simpler nor the more complex model, and indicates that the data are insufficient to distinguish the hypotheses.
 
-The Bayesian tests used here rely on the priors specified by the BayesFactor R package \mccorrect{!TODO[CITE BayesFactor]}.
+The Bayesian tests used here rely on the priors specified by the BayesFactor R package [@moreyBayesFactorComputationBayes2015].
 These priors govern the expected distributions of observed differences between samples where there is or is not a genuine effect creating systematic differences.
 The use of the same, weakly-informative priors for all tests means the approach used here is an 'objective Bayesian' approach.
 This objective Bayesian approach can be contrasted with a 'subjective Bayesian' approach in which the goal is to specify the exact amount of belief one should have in one hypothesis over another.
@@ -442,7 +446,7 @@ There is some risk that results will be a poor fit to reality because the priors
 
 #### Integrating statistical results
 
-In most cases, Bayesian and frequentist statistics produce the same conclusion \mccorrect{!TODO[pretty sure there's a paper which states/demonstrates this]}.
+In most cases, Bayesian and frequentist statistics produce the same conclusion.
 Where this is not the case, results should be interpreted very cautiously: a significant frequentist test with an uninformative or null-favouring Bayesian test can indicate that the result may be a false-positive, while clear Bayesian support for the alternate hypothesis in the absence of a significant frequentist test can indicate that the priors in the Bayesian test are inappropriate. 
 
 Where null conclusions are to be drawn, i.e. the null hypothesis is to be retained, only Bayesian statistics can be considered informative. 
@@ -450,10 +454,8 @@ In these cases Bayesian statistics will be interpreted, with the caveat that the
 
 #### Software
 
-Data analysis was performed using R [@rcoreteamLanguageEnvironmentStatistical2018].
-For a full list of packages and software environment information, see \mccorrect{!TODO[figure out where to include this stuff.
-Appendix?
-Also link to a containerized version of this.]}
+Data analysis was performed using R [@rcoreteamLanguageEnvironmentStatistical2018], and relied extensively on the Tidyverse family of packages [@R-tidyverse].
+For a full list of packages and software environment information, see Appendix 3§\@ref(appendix-3).
 
 ### Unanalysed data
 

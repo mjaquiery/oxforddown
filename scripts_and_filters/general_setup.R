@@ -53,7 +53,8 @@ knitr::opts_hooks$set(
     short <- str_match(options$fig.caption, '(.+?)( {2})')
     if (!is.na(short[1]))
       options$fig.scap <- short[2]
-    options$fig.cap <- gsub(' {2}', '\\\\newline ', options$fig.caption)
+    newline <- if (knitr::is_latex_output()) "\\\\newline " else "<br/> "
+    options$fig.cap <- gsub(' {2}', newline, options$fig.caption)
     options
   }
 )
@@ -288,7 +289,7 @@ summariseANOVA <- function(ANOVA, mMeans) {
         d, 
         ~ glue(
           "F({.$DFn},{.$DFd}) = {num2str(.$F, 2)}, ", 
-          "p = {prop2str(.$p, minPrefix = '<')}"
+          "_p_{p2str(.$p)}"
         )
       )
     ) %>%

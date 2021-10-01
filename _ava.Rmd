@@ -35,7 +35,7 @@ trials <- annotate_responses(trials)
 #### Open scholarship practices
 
 This experiment was preregistered at `r unique(dotstask$preregistration)`.
-The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from https://osf.io/y47ec/.
+The experiment data are available in the `esmData` package for R [@jaquieryOxacclabEsmDataThesis2021], and also directly from https://osf.io/y47ec/.
 A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/c18c26b5da3622988e2261433cf256aae4d19f39/AdvisorChoice/ava.html.
 
 #### Unanalysed data
@@ -263,7 +263,7 @@ tmp %>%
 
 ```
 
-```{r ac-ava-dots-r-performance-conf, fig.caption="Confidence for the Dots task with agreeing versus accurate advisors. Faint lines show individual participant means, for which the violin and box plots show the distributions. Final confidence is negative where the answer side changes. Theoretical range of confidence scores is initial: [0,1]; final: [-1,1]."}
+```{r ac-ava-dots-r-performance-conf, fig.caption="Confidence for the Dots task with agreeing versus accurate advisors.  Faint lines show individual participant means, for which the violin and box plots show the distributions. Final confidence is negative where the answer side changes. Theoretical range of confidence scores is initial: [0,1]; final: [-1,1]."}
 
 tmp <- familiarisation %>%
   mutate(
@@ -634,13 +634,13 @@ tmp <- left_join(
   tidy() %>%
   mutate(
     bf = correlationBF(tmp$acc, tmp$pPickHigh)@bayesFactor$bf %>% exp(),
-    s = glue("r({parameter})={prop2str(estimate)}, p={prop2str(p.value)}, BF={bf2str(bf)}")
+    s = glue("r({parameter}) = {prop2str(estimate)}, _p_{p2str(p.value)}, BF~H1:H0~ = {bf2str(bf)}")
   ) 
 .auc <- cor.test(tmp$area, tmp$pPickHigh) %>%
   tidy() %>%
   mutate(
     bf = correlationBF(tmp$area, tmp$pPickHigh)@bayesFactor$bf %>% exp(),
-    s = glue("r({parameter})={prop2str(estimate)}, p={prop2str(p.value)}, BF={bf2str(bf)}")
+    s = glue("r({parameter}) = {prop2str(estimate)}, _p_{p2str(p.value)}, BF~H1:H0~ = {bf2str(bf)}")
   ) 
 
 ```
@@ -694,7 +694,7 @@ The lack of systematic preference from the participants was surprising.
 Each participant's data were tested against a null hypothesis that their picking was random, and `r num2str(mean(tmp$sig) * 100, 1)`% of participants demonstrated a statistically significant preference.
 As seen in Figure \@ref(fig:ac-ava-dots-r-graph), however, these preferences were quite evenly split between the High accuracy and the High agreement advisors, both in terms of frequency and strength (although with a slight advantage for the High accuracy advisor).
 
-The wide variation in preferences was not significantly correlated with either experienced agreement (`r glue("r={prop2str(r_agr$estimate)}, p={prop2str(r_agr$p.value)}")`) or experienced accuracy (`r glue("r={prop2str(r_acc$estimate)}, p={prop2str(r_acc$p.value)}")`).
+The wide variation in preferences was not significantly correlated with either experienced agreement (`r glue("r = {prop2str(r_agr$estimate)}, _p_{p2str(r_agr$p.value)}")`) or experienced accuracy (`r glue("r = {prop2str(r_acc$estimate)}, _p_{p2str(r_acc$p.value)}")`).
 
 ##### Summary
 
@@ -755,11 +755,9 @@ for (E in c(.GlobalEnv, .prevStudy)) {
 #### Open scholarship practices
 
 This experiment was preregistered at `r unique(datequiz$preregistration)`.
-The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from \mccorrect{!TODO[OSFify Dates task data]}.
-A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/ed13951c488e1996df7ff53d48629843bacfd074/ACv2/ac.html.
-
 This is a replication of a study of identical design. 
-The data for the original study can be obtained from the `esmData::` R package or from \mccorrect{!TODO[OSFify]}.
+The data for this and the original study can be obtained from the `esmData` R package [@jaquieryOxacclabEsmDataThesis2021].
+A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/ed13951c488e1996df7ff53d48629843bacfd074/ACv2/ac.html.
 
 #### Method {#ac-ava-dates-m}
 
@@ -1200,12 +1198,12 @@ ggplot(tmp, aes(x = feedbackCondition, y = pChooseAcc)) +
 .T.Nfb <- tmp %>%
   filter(feedbackCondition != 'Feedback') %>%
   pull(pChooseAcc) %>%
-  md.ttest(y = .5, labels = c('M~No feedback~'))
+  md.ttest(y = .5, labels = c('M~NoFeedback~'))
 
 .T.Int <- md.ttest(
   filter(tmp, feedbackCondition == "Feedback") %>% pull(pChooseAcc), 
   filter(tmp, feedbackCondition == "No feedback") %>% pull(pChooseAcc), 
-  labels = c("M~Feedback~", "M~No feedback~")
+  labels = c("M~Feedback~", "M~NoFeedback~")
 )
 
 ```

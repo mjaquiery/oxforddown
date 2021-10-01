@@ -39,7 +39,7 @@ We predict that, given a choice, judges will prefer to receive advice from a _Bi
 This experiment was preregistered at https://aspredicted.org/ze3tn.pdf.
 One analysis in the preregistration is not reported here because the results are non-significant and they represented a branch of analysis that we sidelined in other experiments. 
 This analysis explored participants' subjective assessments of advisors.
-The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from https://osf.io/vgcnb/.
+The experiment data are available in the `esmData` package for R [@jaquieryOxacclabEsmDataThesis2021], and also directly from https://osf.io/vgcnb/.
 The code for running the experiment can be obtained from https://github.com/mjaquiery/nofeedback_trust.
 
 #### Method {#ac-cca-lab-m}
@@ -484,7 +484,7 @@ aov_inf <- aov_inf$ANOVA %>%
   mutate(
     Effect = str_replace_all(Effect, "trialType", "Trial type"),
     Effect = str_replace_all(Effect, "agree", "Advisor agreement"),
-    s = glue("F({DFn},{DFd})={num2str(F)}, p={prop2str(p)}")
+    s = glue("F({DFn},{DFd}) = {num2str(F)}, _p_{p2str(p)}")
   ) 
 
 aov_inf_cap <- tmp %>% 
@@ -497,7 +497,7 @@ aov_inf_cap <- tmp %>%
   mutate(
     Effect = str_replace_all(Effect, "trialType", "Trial type"),
     Effect = str_replace_all(Effect, "agree", "Advisor agreement"),
-    s = glue("F({DFn},{DFd})={num2str(F)}, p={prop2str(p)}")
+    s = glue("F({DFn},{DFd}) = {num2str(F)}, _p_{p2str(p)}")
   )
 
 kableANOVA(
@@ -523,8 +523,8 @@ mmAdvisor <- trials %>%
   unnest(cols = c(inf, infCapped), names_sep = "_") %>%
   mutate(
     across(-Advisor, num2str),
-    s = glue("M~{Advisor}~={inf_y} [95%CI {inf_ymin}, {inf_ymax}]"),
-    sCapped = glue("M~{Advisor}~={infCapped_y} [{infCapped_ymin}, {infCapped_ymax}]")
+    s = glue("M~{Advisor}~ = {inf_y} [{inf_ymin}, {inf_ymax}]"),
+    sCapped = glue("M~{Advisor}~ = {infCapped_y} [{infCapped_ymin}, {infCapped_ymax}]")
   )
 
 mmAgree <- trials %>%
@@ -545,8 +545,8 @@ mmAgree <- trials %>%
   mutate(
     agree = case_when(agree == 0 ~ "Disagree", agree == 1 ~ "Agree"),
     across(-agree, num2str),
-    s = glue("M~{agree}~={inf_y} [95%CI {inf_ymin}, {inf_ymax}]"),
-    sCapped = glue("M~{agree}~={infCapped_y} [{infCapped_ymin}, {infCapped_ymax}]")
+    s = glue("M~{agree}~ = {inf_y} [{inf_ymin}, {inf_ymax}]"),
+    sCapped = glue("M~{agree}~ = {infCapped_y} [{infCapped_ymin}, {infCapped_ymax}]")
   )
 
 mmTrialType <- trials %>%
@@ -572,8 +572,8 @@ mmTrialType <- trials %>%
   unnest(cols = c(inf, infCapped), names_sep = "_") %>%
   mutate(
     across(-trialType, num2str),
-    s = glue("M~{trialType}~={inf_y} [{inf_ymin}, {inf_ymax}]"),
-    sCapped = glue("M~{trialType}~={infCapped_y} [95%CI {infCapped_ymin}, {infCapped_ymax}]")
+    s = glue("M~{trialType}~ = {inf_y} [{inf_ymin}, {inf_ymax}]"),
+    sCapped = glue("M~{trialType}~ = {infCapped_y} [{infCapped_ymin}, {infCapped_ymax}]")
   )
 
 ```
@@ -694,7 +694,7 @@ tmp <- test %>%
   tmp$High, 
   tmp$Low, 
   paired = T, 
-  labels = c('M~High confidence~', 'M~Low confidence~')
+  labels = c('M~HighConfidence~', 'M~LowConfidence~')
 )
 
 ```
@@ -730,8 +730,8 @@ r <- cor.test(tmp$agreeDiff_firstBlock, tmp$pPickBS_later) %>%
   tidy() %>%
   mutate(
     s = glue(
-      "r({parameter})={prop2str(estimate)} [{prop2str(conf.low)}",
-      ", {prop2str(conf.high)}], p={prop2str(p.value)}"
+      "r({parameter}) = {prop2str(estimate)} [{prop2str(conf.low)}",
+      ", {prop2str(conf.high)}], _p_{p2str(p.value)}"
     )
   )
 
@@ -782,8 +782,8 @@ eqs <- Q_diffs %>%
       ~ {
         . <- tidy(.)
         glue(
-          "r({.$parameter})={prop2str(.$estimate)} [{prop2str(.$conf.low)}",
-          ", {prop2str(.$conf.high)}], p={prop2str(.$p.value)}"
+          "r({.$parameter}) = {prop2str(.$estimate)} [{prop2str(.$conf.low)}",
+          ", {prop2str(.$conf.high)}], _p_{p2str(.$p.value)}"
         )
       }
     )
@@ -855,9 +855,8 @@ trials <- annotate_responses(trials) %>%
 
 #### Open scholarship practices
 
-
 This experiment was preregistered at `r unique(dotstask$preregistration)`.
-The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from https://osf.io/xb4kh/.
+The experiment data are available in the `esmData` package for R [@jaquieryOxacclabEsmDataThesis2021], and also directly from https://osf.io/xb4kh/.
 A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/90c04ff21d3a2876beaddd9ee35c577a821e5727/AdvisorChoice/index.html.
 
 #### Method {#ac-cca-dots-m}

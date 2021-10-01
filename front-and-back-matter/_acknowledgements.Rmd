@@ -1,13 +1,37 @@
-This is where you will normally thank your advisor, colleagues, family and friends, as well as funding and institutional support. In our case, we will give our praises to the people who developed the ideas and tools that allow us to push open science a little step forward by writing plain-text, transparent, and reproducible theses in R Markdown. 
+It almost feels dishonest to check the little box on the submission form that claims this work as wholly my own when so much thanks and credit is due to others who have helped along the way.
+The greatest contributions are due to my supervisor, Nick, without whose gentle wisdom, perspicacious comments, and apparent ability to read limitless text of ludicrous density without losing concentration this thesis would be very much the worse.
+Many of the best ideas in this thesis arose from our discussions, if they didn't come from him directly, and every part of this thesis has been improved by his suggestions at one point or another.
 
-We must be grateful to John Gruber for inventing the original version of Markdown, to John MacFarlane for creating Pandoc (<http://pandoc.org>) which converts Markdown to a large number of output formats, and to Yihui Xie for creating `knitr` which introduced R Markdown as a way of embedding code in Markdown documents, and `bookdown` which added tools for technical and longer-form writing.
+I have enjoyed similarly helpful discussions with members of our Attention and Cognitive Control (ACC) Lab, especially with Johsua, Linda, Sarah, Maja, and Raj.
+Between journal clubs, maths clubs, lab socials, and side projects they've always been there to help me learn, think, and reflect.
+Similarly, members of the Oxford Experimental Psychology ReproducibiliTea journal club have inspired me -- I've enjoyed our discussions immensely when we agreed and still more when we found points of difference to investigate. 
+Special mentions must go to Dorothy, Laura, and Malika.
+Mentions also to Sam and Amy, for those journal clubs and also for welcoming me to the ReproducibiliTea Core Team.
+Likewise, Marcus, Jackie, Emma, and the UK Reproducibility Network for helping me wield my experience with open research practices for a practical purpose.
 
-Special thanks to [Chester Ismay](http://chester.rbind.io), who created the `thesisdown` package that helped many a PhD student write their theses in R Markdown. And a very special thanks to John McManigle, whose adaption of Sam Evans' adaptation of Keith Gillow's original maths template for writing an Oxford University DPhil thesis in LaTeX provided the template that I in turn adapted for R Markdown.
+I thank my collaborators on non-thesis projects for all the discussion and support.
+Alex, whose academic companionship has been invaluable since Sussex.
+Olly and Lisa, whose willingness to listen to me ramble about things has saved me many hours of draft-writing and whose friendship has brought me joy.
+Jools, Marwa, and Danielle, whose work on our various projects has always constituted the lion's share -- I'm sorry for all the times I've kept them waiting for something or had to rely on them catching some mistake I've made!
+Balacz, Marton, and Máté, whose response when we found a critical analysis bug while the proofs for our paper were with the editor was nothing short of exemplary.
 
-Finally, profuse thanks to JJ Allaire, the founder and CEO of [RStudio](http://rstudio.com), and Hadley Wickham, the mastermind of the tidyverse without whom we'd all just given up and done data science in Python instead. Thanks for making data science easier, more accessible, and more fun for us all.
+My family, gran, Caroline, and Edd, who kept a place for me to go to when breaks were needed, and to mum for meeting me there when she could.
+To Jo, whose support during this thesis is appreciated, and whose support in the years before I began studying was invaluable.
+The chance to unwind playing basketball, ultimate, volleyball, and anything else that came my way was appreciated, too -- thanks to Maarten, Richard, the Wolfson Ultimate Frisbee squad, and the West Oxford Dads.
+Thanks to the Film and Discussion Night crew for opportunities to relax in a less active but equally fun way.
+Some of the best discussions were about the films I liked the least!
+
+On a less personal but equally important note, I thank the Medical Research Council for funding my studentship, and the very many programmers on whose work this thesis relies.
+Notable amongst the latter group is Ulrik Lyngs, whose work on the Oxforddown thesis template has saved many hours of fiddling about with code and made writing in RMarkdown a practical option.
+And thank you to anyone who has tried to read this thesis, proofreaders and reader-readers alike.
+Even if you only get this far.
+
+Finally, thanks to Frances and Savvy.
+They enrich and enliven my life.
+One of them kindly provided proofreading services, and neither of them brought me too many mice in the middle of the night... thanks, love, and gratitude to both.
 
 \begin{flushright}
-Ulrik Lyngs \\
-Linacre College, Oxford \\
-2 December 2018
+Matt Jaquiery \\
+Wolfson College, Oxford \\
+8 October 2020
 \end{flushright}

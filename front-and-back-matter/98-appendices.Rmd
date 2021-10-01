@@ -115,11 +115,10 @@ for (E in c(.GlobalEnv, .prevStudy)) {
 #### Open scholarship practices
 
 This experiment was preregistered at `r unique(datequiz$preregistration)`.
-The experiment data are available in the `esmData::` package for R from \mccorrect{!TODO[Zenodo esmData]}, and also directly from \mccorrect{!TODO[OSFify Dates task data]}.
+This is a replication of a study of identical design that produced the same results. 
+The data for both this and the original study can be obtained from the `esmData` R package [@jaquieryOxacclabEsmDataThesis2021].
 A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/f90b6f9266a901211a4ddb7b5ee1de1c74e8df57/ACv2/index.html.
 
-This is a replication of a study of identical design that produced the same results. 
-The data for the original study can be obtained from the `esmData::` R package or from \mccorrect{!TODO[OSFify]}.
 
 #### Method {#ai-ava-m}
 
@@ -679,3 +678,8 @@ In the Feedback condition, we saw, as expected, a much greater influence of advi
 In the No feedback condition, however, the influence of the advisors appeared to be equivalent.
 We did demonstrate that this paradigm is capable of measuring influence differences.
 
+# Appendix 3: Literate programming environment information {#appendix-3}
+
+```{r session-info, comment = NA}
+sessionInfo()
+```

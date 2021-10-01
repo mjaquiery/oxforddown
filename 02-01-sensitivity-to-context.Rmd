@@ -32,11 +32,12 @@ In each of these three scenarios, we hypothesised that some level of egocentric 
 ```{r ed-load}
 
 fName <- "cache/evo-ego-bias.Rdata"
+data_url <- "https://sandbox.zenodo.org/record/913705/files/thesis.Rdata?download=1"
 
 if (!file.exists(fName)) {
   # Download cached data
   curl::curl_download(
-    'https://sandbox.zenodo.org/record/913705/files/thesis.Rdata?download=1',
+    data_url,
     fName
   )
 }
@@ -48,7 +49,7 @@ load(fName)
 ## General method
 
 Agent-based computational models of an evolutionary process were programmed in R [@rcoreteamLanguageEnvironmentStatistical2018] and run variously on a desktop computer and the Oxford Advanced Research Computing cluster [@richardsUniversityOxfordAdvanced2015].
-The code is available at https://github.com/oxacclab/EvoEgoBias, and the specific data presented below are archived at \mccorrect{!TODO[find somewhere...]}
+The code is available at https://github.com/oxacclab/EvoEgoBias, and the specific data presented below are archived at `r data_url`.
 
 The models reported here use 100 generations of 1000 agents which each make 60 decisions in each generation on which they receive the advice of another agent.
 Each scenario is run with 7 different strengths of the manipulation value, and each of these instances is run 50 times.
