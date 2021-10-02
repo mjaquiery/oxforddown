@@ -119,7 +119,6 @@ This is a replication of a study of identical design that produced the same resu
 The data for both this and the original study can be obtained from the `esmData` R package [@jaquieryOxacclabEsmDataThesis2021].
 A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/f90b6f9266a901211a4ddb7b5ee1de1c74e8df57/ACv2/index.html.
 
-
 #### Method {#ai-ava-m}
 
 ```{r ai-ava-m-structure}

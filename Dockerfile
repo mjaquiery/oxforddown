@@ -2,16 +2,13 @@
 # NOTE: this builds a smaller version of the thesis for continuous integration
 # testing. 
 # 
-# To build the full version, remove the call to set the R option 'ESM.skip'.
+# To build the full version, set the R option 'ESM.recalculate' to a higher value.
 
 # Use image with base R included
-FROM rstudio/r-base:4.0-focal
-
-# Prevent "must specify --save, --no-save, or --vanilla" complaint
-ENTRYPOINT ["/bin/bash"]
+FROM rstudio/r-base:4.1-focal
 
 # Install system libraries the R packages will depend on
-# Also nginx so we can serve the thesis
+# Also nginx so we can serve the thesis when knit to HTML
 RUN apt-get update && apt-get install -y \
   git \
   libcurl4-openssl-dev \
@@ -19,8 +16,13 @@ RUN apt-get update && apt-get install -y \
   libxml2-dev \
   libpng-dev \
   libjpeg-dev \
+  libfontconfig1-dev \
   cargo \
   nginx
+  
+# Update pandoc
+RUN wget -O /pandoc.deb https://github.com/jgm/pandoc/releases/download/2.14.2/pandoc-2.14.2-1-amd64.deb
+RUN sudo dpkg -i /pandoc.deb
 
 # # Clone thesis from github
 RUN git clone https://github.com/mjaquiery/oxforddown.git
@@ -34,11 +36,3 @@ RUN cp scripts_and_filters/docker-setup/localhost.conf \
 
 # Update packages from renv.lock file
 RUN R -e "renv::restore(); tinytex::tlmgr_install('cbfonts-fd')"
-
-# Knit PDF
-RUN rm -f _main.* && \
-  rm -r docs && \
-	Rscript -e 'options(ESM.skip = T); bookdown::render_book("index.Rmd")'
-
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]

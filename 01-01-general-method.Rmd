@@ -516,7 +516,7 @@ The links accompanying the open data badge point to on-line storage where the da
 
 ### Thesis workflow
 
-This thesis is written in RMarkdown, with the data fetched and analysed at the time the document is produced using the publicly available pipeline - the entire document can be reproduced locally using the source code in an appropriate environment.
+This thesis is written in RMarkdown using the Oxforddown template [@lyngsOxforddown2019], with the data fetched and analysed at the time the document is produced using the publicly available pipeline - the entire document can be reproduced locally using the source code in an appropriate environment.
 Some parts of the thesis use computational modelling or model fitting. 
 These parts use cached datasets, also available on-line, in order to reduce the time required to create the thesis from its source files from hours to minutes using a high-end desktop personal computer.
 The caching behaviour can be prevented for those wishing to evaluate the validity of the modelling components by setting the value of the R option `ESM.recalculate` to higher values (documented in the `index.Rmd` file).
