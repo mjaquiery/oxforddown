@@ -153,7 +153,7 @@ The marker was placed with its centre on a point sampled from a normal distribut
 
 ###### Exclusions
 
-```{r be-dba-exclusions}
+```{r be-dba-r-exclusions}
 
 nMaxOutliers <- 1
 maxTrialRT <- 60000
@@ -236,11 +236,11 @@ for (E in c(.GlobalEnv, .prevStudy)) {
 
 Participants (total *n* = `r nrow(exclusions)`) could be excluded for a number of reasons: failing attention checks, having fewer than `r nMaxTrials - nMaxOutliers` trials which took less than `r maxTrialRT / 1000`s to complete, providing final decisions which were the same as the initial estimate on more than `r round((1 - minChangeRate) * 100)`% of trials, or using non-English labels for the honesty questionnaire.
 The latter exclusion was added after data were collected because it was not anticipated that participants would use translation software in the task.
-The numbers of participants who failed the various checks are detailed in Table \@ref(tab:be-dba-exclusions).
+The numbers of participants who failed the various checks are detailed in Table \@ref(tab:be-dba-r-exclusion).
 
 The final participant list consists of `r length(unique(AdvisedTrial$pid))` participants who completed an average of `r num2str(mean(aggregate(advisor0 ~ pid, AdvisedTrial, length)$advisor0))` trials each.
 
-```{r be-dba-r-exclusion-table}
+```{r be-dba-r-exclusion}
 
 exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
 n <- ncol(exclusions)
@@ -248,7 +248,7 @@ exclusions %>%
   summarise(across(where(is.logical), sum)) %>%
   mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
-  kable(caption = "\\label{tab:be-dba-exclusions}Participant exclusions for Experiment 5") %>%
+  kable(caption = "Participant exclusions for Experiment 5") %>%
   row_spec((n - 1):n, bold = T)
 
 ```
@@ -819,7 +819,7 @@ The marker was placed with its centre on a point sampled from a roughly normal d
 
 ###### Exclusions
 
-```{r be-dbc-exclusions}
+```{r be-dbc-r-exclusions}
 
 nMaxOutliers <- 1
 maxTrialRT <- 60000
@@ -900,14 +900,14 @@ do_exclusions(exclusions, backup = F)
 
 Participants (total *n* = `r nrow(exclusions)`) could be excluded for a number of reasons: failing attention checks, having fewer than `r nMaxTrials - nMaxOutliers` trials which took less than `r maxTrialRT / 1000`s to complete, providing final decisions which were the same as the initial estimate on more than `r round((1 - minChangeRate) * 100)`% of trials, or using non-English labels for the honesty questionnaire.
 The latter exclusion was added after data were collected because it was not anticipated that participants would use translation software in the task.
-The numbers of participants who failed the various checks are detailed in Table \@ref(tab:be-dbc-exclusions).
+The numbers of participants who failed the various checks are detailed in Table \@ref(tab:be-dbc-r-exclusion).
 
 The number of participants excluded was quite high.
 In part, this was due to an unexpectedly high number of participants completing the experiment using translation software. 
 It may also have been due to the study being run on a weekend, whereas most of the other studies were run during the working week, and it is possible that participants using the recruitment platform at the weekend are less well practised at taking experiments than those using it during the week.
 The final participant list consists of `r length(unique(AdvisedTrial$pid))` participants who completed an average of `r num2str(mean(aggregate(advisor0 ~ pid, AdvisedTrial, length)$advisor0))` trials each.
 
-```{r be-dbc-r-exclusion-table}
+```{r be-dbc-r-exclusion}
 
 exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
 n <- ncol(exclusions)
@@ -915,7 +915,7 @@ exclusions %>%
   summarise(across(where(is.logical), sum)) %>%
   mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
-  kable(caption = "\\label{tab:be-dbc-exclusions}Participant exclusions for Experiment 6") %>%
+  kable(caption = "Participant exclusions for Experiment 6") %>%
   row_spec((n - 1):n, bold = T)
 
 ```
@@ -1495,7 +1495,7 @@ The advisor was maximally confident where the difference between the internal es
 
 ##### Exclusions
 
-```{r be-ce-exclusions}
+```{r be-ce-r-exclusions}
 
 nMaxOutliers <- 0
 maxTrialRT <- 60000
@@ -1556,12 +1556,12 @@ do_exclusions(exclusions, backup = F)
 ```
 
 Participants (total *n* = `r nrow(exclusions)`) were excluded for a number of reasons: having fewer than `r nMaxTrials - nMaxOutliers` no-feedback trials which took less than `r maxTrialRT / 1000`s to complete, or providing final decisions which were the same as the initial estimate on more than `r round((1 - minChangeRate) * 100)`% of trials.
-Table \@ref(tab:be-ce-exclusions) shows the number of participants excluded and the reasons why.
+Table \@ref(tab:be-ce-r-exclusion) shows the number of participants excluded and the reasons why.
 Participants who failed attention checks would have been immediately dropped, but no participants did so.
 
 The final participant list consists of `r length(unique(AdvisedTrial$pid))` participants who completed an average of `r num2str(mean(aggregate(advisor0 ~ pid, AdvisedTrial, length)$advisor0))` trials each.
 
-```{r be-ce-r-exclusion-table}
+```{r be-ce-r-exclusion}
 
 exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
 n <- ncol(exclusions)
@@ -1569,7 +1569,7 @@ exclusions %>%
   summarise(across(where(is.logical), sum)) %>%
   mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
-  kable(caption = "\\label{tab:be-ce-exclusions}Participant exclusions for Experiment 5") %>%
+  kable(caption = "Participant exclusions for Experiment 5") %>%
   row_spec((n - 1):n, bold = T)
 
 ```
@@ -1991,7 +1991,7 @@ These `r 4 * 2 * 2` Key trials are central to testing our hypothesis that partic
 
 ##### Exclusions
 
-```{r be-ck-exclusions}
+```{r be-ck-r-exclusions}
 
 nMinKeyTrials <- 4 * 2 * 2
 maxTrialRT <- 60000
@@ -2060,13 +2060,13 @@ do_exclusions(exclusions, backup = F)
 ```
 
 Participants (total *n* = `r nrow(exclusions)`) were excluded for a number of reasons: having fewer than `r nMinKeyTrials` Key trials which took less than `r maxTrialRT / 1000`s to complete, or providing final decisions which were the same as the initial estimate on more than `r round((1 - minChangeRate) * 100)`% of trials.
-Table \@ref(tab:be-ck-exclusions) shows the number of participants excluded and the reasons why.^[Note that no participants were excluded only for failing to finish the study.]
+Table \@ref(tab:be-ck-r-exclusion) shows the number of participants excluded and the reasons why.^[Note that no participants were excluded only for failing to finish the study.]
 Participants who failed attention checks do not reach this stage of the experiment.
 
 The final participant list consists of `r length(unique(AdvisedTrial$pid))` participants who completed an average of `r num2str(mean(aggregate(advisor0 ~ pid, AdvisedTrial, length)$advisor0))` trials each.
 Many participants were excluded using our typical exclusion criteria, but the results of the main statistical tests are the same when participants who seldom altered their responses are left in the sample, even where they did not complete the entire study. 
 
-```{r be-ck-r-exclusion-table}
+```{r be-ck-r-exclusion}
 
 exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
 n <- ncol(exclusions)
@@ -2074,7 +2074,7 @@ exclusions %>%
   summarise(across(where(is.logical), sum)) %>%
   mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
-  kable(caption = "\\label{tab:be-ck-exclusions}Participant exclusions for Experiment 5") %>%
+  kable(caption = "Participant exclusions for Experiment 5") %>%
   row_spec((n - 1):n, bold = T)
 
 ```

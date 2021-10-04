@@ -81,7 +81,7 @@ The Low accuracy advisor did likewise, but was less likely to agree with correct
 Overall, given an expected participant accuracy of 71% obtained by the staircasing procedure, the High accuracy advisor was correct 80% of the time while the Low accuracy advisor was correct 60% of the time.
 The advisor profiles were not balanced for overall agreement rates.
 
-```{r ac-acc-dots-m-profiles-r} 
+```{r ac-acc-dots-m-profiles} 
 
 pCor <- .71
 
@@ -96,15 +96,15 @@ agr.table <- tribble(
 
 kable(
   agr.table, 
-  caption = "\\label{tab:ac-acc-dots-m-profiles}Advisor advice profiles for Dots task Accuracy experiment"
+  caption = "Advisor advice profiles for Dots task Accuracy experiment"
 ) %>%
   kable_styling() %>%
   column_spec(1, bold = T) %>%
   row_spec(0, bold = F) %>%
-  collapse_rows(columns = 1, valign = "top") %>%
   add_header_above(c(" ", 
                      "Probability of agreement" = 3,
-                     " "))
+                     " ")) %>%
+  collapse_rows(columns = 1, valign = "top") 
 
 ```
 
@@ -112,7 +112,7 @@ kable(
 
 ##### Exclusions
 
-```{r ac-acc-dots-r-clean}
+```{r ac-acc-dots-r-exclusions}
 nMaxOutliers <- 2
 zThresh <- 3
 accuracyRange <- c(.6, .85)
@@ -163,7 +163,7 @@ exclusions %>%
   summarise(across(where(is.logical), sum)) %>%
   mutate(`Total remaining` = length(unique(trials$pid))) %>% 
   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
-  kable(caption = "\\label{tab:ac-acc-dots-exclusions}Participant exclusions for Dots task Accuracy experiment") %>%
+  kable(caption = "Participant exclusions for Dots task Accuracy experiment") %>%
   row_spec((n - 1):n, bold = T)
 
 familiarisation <- trials %>%
@@ -174,7 +174,7 @@ familiarisation <- trials %>%
 ```
 
 In line with the preregistration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or had completed the experiment after the preregistered amount of data has already been collected. 
-Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-acc-dots-exclusions).
+Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-acc-dots-r-exclusions).
 
 ##### Task performance {#ac-acc-dots-r-performance}
 
@@ -650,7 +650,7 @@ agr.table %>%
     `Target|incorrect`,
     `Actual|incorrect`
   ) %>%
-  kable(caption = "\\label{tab:ac-acc-dots-r-advice-agr-t}Advisor agreement for Dots task Accuracy experiment")
+  kable(caption = "Advisor agreement for Dots task Accuracy experiment")
 
 ```
 
@@ -681,14 +681,14 @@ agr.table %>%
   select(Advisor, `Target accuracy` = `Overall accuracy`) %>%
   left_join(tmp, by = "Advisor") %>%
   mutate(`Mean accuracy` = prop2str(`Mean accuracy`)) %>%
-  kable(caption = "\\label{tab:ac-acc-dots-r-advice-acc-t}Advisor accuracy for Dots task Accuracy experiment")
+  kable(caption = "Advisor accuracy for Dots task Accuracy experiment")
 
 ```
 
 The advisors' performance was stochastic, with the advisors agreeing or disagreeing with set probabilities depending upon whether the participant was correct or incorrect in their initial estimate. 
-The performance of the advisors in practice was as specified (Table \@ref(tab:ac-acc-dots-r-advice-agr-t)).
+The performance of the advisors in practice was as specified (Table \@ref(tab:ac-acc-dots-r-advice-agr)).
 The participants' accuracy rates were controlled with an adaptive staircase, meaning that the advisors' agreement strategies produced overall advice accuracy at target rates.
-The advisors' actual accuracies matched the target accuracies (Table \@ref(tab:ac-acc-dots-r-advice-acc-t)), with `r n_ap`/`r length(unique(familiarisation$pid))` participants experiencing the planned relationship wherein the High accuracy advisor's advice was more accurate than the Low accuracy advisor's advice.
+The advisors' actual accuracies matched the target accuracies (Table \@ref(tab:ac-acc-dots-r-advice-acc)), with `r n_ap`/`r length(unique(familiarisation$pid))` participants experiencing the planned relationship wherein the High accuracy advisor's advice was more accurate than the Low accuracy advisor's advice.
 
 ##### \OpenScience{prereg} Hypothesis test {#ac-acc-dots-r-h}
 
@@ -955,13 +955,13 @@ No participants received feedback during the test phase.
 
 ##### Advice profiles {#ac-acc-dates-m-advice-profiles}
 
-The High accuracy and Low accuracy advisor profiles issued binary advice (endorsing either the 'before' or 'after' column) probabilistically based on whether or not the participant had selected the correct column in their initial estimate. 
+The High accuracy and Low accuracy advisor profiles issued binary advice (endorsing either the 'before' or 'after' column) probabilistically based on whether or not the participant had selected the correct column in their initial estimate (Table \@ref(tab:ac-acc-dates-m-profiles)). 
 The High accuracy advisor was agreed with the participant's initial estimate on 80% of the trials where the participant was correct, but only 20% of the trials on which the participant was incorrect, meaning that the High accuracy advisor was correct 80% of the time. 
 Using an analogous setup, the Low accuracy advisor was correct 59% of the time.
 To the extent that a participant was better than chance in answering the questions, the High accuracy advisor profile would agree more frequently.
 This mimics the hypothesised relationship wherein agreement between advisors and judges is driven by shared access to the truth.
 
-```{r ac-acc-dates-m-profiles-r} 
+```{r ac-acc-dates-m-profiles} 
 
 pCor <- .5
 agr <- matrix(c(.8, .2, .59, .41), 2, 2)
@@ -976,17 +976,17 @@ agr.table <- tribble(
 
 kable(
   agr.table, 
-  caption = "\\label{tab:ac-acc-dates-m-profiles}Advisor advice profiles for Dates task Accuracy experiment",
+  caption = "Advisor advice profiles for Dates task Accuracy experiment",
   escape = F
 ) %>%
   kable_styling() %>%
   column_spec(1, bold = T) %>%
   row_spec(0, bold = F) %>%
-  collapse_rows(columns = 1, valign = "top") %>%
   add_header_above(c(" ", 
                      "Probability of agreement (%)" = 3,
                      " ")) %>%
-  add_footnote("Where participants' initial estimate accuracy is 50%")
+  add_footnote("Where participants' initial estimate accuracy is 50%") %>%
+  collapse_rows(columns = 1, valign = "top") 
 ```
 
 #### Results {#ac-acc-dates-r}
@@ -1034,7 +1034,7 @@ n <- ncol(exclusions)
 #   summarise(across(where(is.logical), sum)) %>%
 #   mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
 #   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
-#   kable(caption = "\\label{tab:ac-acc-dates-exclusions}Participant exclusions for Dates task Accuracy experiment") %>%
+#   kable(caption = "Participant exclusions for Dates task Accuracy experiment") %>%
 #   row_spec((n - 1):n, bold = T)
 
 ```
@@ -1576,7 +1576,7 @@ agr.table %>%
     `Target|incorrect`,
     `Actual|incorrect`
   ) %>%
-  kable(caption = "\\label{tab:ac-acc-dates-r-advice-agr-t}Advisor agreement for Dates task Accuracy experiment")
+  kable(caption = "Advisor agreement for Dates task Accuracy experiment")
 
 ```
 
@@ -1607,13 +1607,13 @@ agr.table %>%
   select(Advisor, `Target accuracy` = starts_with("Overall accuracy")) %>%
   left_join(tmp, by = "Advisor") %>%
   mutate(`Mean accuracy` = prop2str(`Mean accuracy`)) %>%
-  kable(caption = "\\label{tab:ac-acc-dates-r-advice-acc-t}Advisor accuracy for Dates task Accuracy experiment")
+  kable(caption = "Advisor accuracy for Dates task Accuracy experiment")
 
 ```
 
 The advice is generated probabilistically from the rules described previously (Advice profiles§\@ref(ac-acc-dates-m-advice-profiles)).
-The advisors agreed with participants contingent on the accuracy of the participants' initial estimates at close to the target rates (Table \@ref(tab:ac-acc-dates-r-advice-agr-t)).
-This meant that advisors were as accurate overall as they were intended to be in the familiarisation phase (Table \@ref(tab:ac-acc-dates-r-advice-acc-t)).
+The advisors agreed with participants contingent on the accuracy of the participants' initial estimates at close to the target rates (Table \@ref(tab:ac-acc-dates-r-advice-agr)).
+This meant that advisors were as accurate overall as they were intended to be in the familiarisation phase (Table \@ref(tab:ac-acc-dates-r-advice-acc)).
 Most (`r n_ap`/`r length(unique(Familiarisation$pid))`, `r num2str(n_ap / length(unique(Familiarisation$pid)) * 100)`%) participants experienced the High accuracy advisor as providing more accurate advice than the Low accuracy advisor.
 
 ##### Advisor influence
@@ -1892,19 +1892,19 @@ ggplot(tmp, aes(x = Difference, y = pPickHigh)) +
 ```{r ac-acc-dates-r-cors-acc}
 kableLM(
   lm_acc,
-  caption = "\\label{tab:ac-acc-dates-r-cors-acc-t}Experienced accuracy difference effects in the Dates task with in/accurate advisors"
+  caption = "Experienced accuracy difference effects in the Dates task with in/accurate advisors"
 )
 ```
 
 ```{r ac-acc-dates-r-cors-agr}
 kableLM(
   lm_agr,
-  caption = "\\label{tab:ac-acc-dates-r-cors-agr-t}Experienced agreement difference effects in the Dates task with in/accurate advisors"
+  caption = "Experienced agreement difference effects in the Dates task with in/accurate advisors"
 )
 ```
 
 The stochastic nature of the advisors' advice meant that there was some variation in the participants' experience of the advisors.
-Linear models were run predicting advisor choice behaviour based on experienced differences in accuracy (Table \@ref(tab:ac-acc-dates-r-cors-acc-t)) and agreement (Table \@ref(tab:ac-acc-dates-r-cors-agr-t)).
+Linear models were run predicting advisor choice behaviour based on experienced differences in accuracy (Table \@ref(tab:ac-acc-dates-r-cors-acc)) and agreement (Table \@ref(tab:ac-acc-dates-r-cors-agr)).
 Bayesian linear models were run obtaining Bayes Factors of leaving each component out of a model containing experienced agreement or accuracy difference, feedback condition, and their interaction, as well as a random factor for the participant's identity. 
 
 In aggregate, the models indicated that participants in the Feedback group had a stronger preference for the High accuracy advisor than participants in the No feedback group, regardless of their actual experience of advisor agreement (BF~+Feedback:-Feedback~ = `r bf2str(lm_acc_bf$bf[2])`) or accuracy (BF~+Feedback:-Feedback~ = `r bf2str(lm_agr_bf$bf[2])`).

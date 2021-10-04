@@ -17,7 +17,13 @@ knit: (function(input, ...) {
 ## thesis metadata ##
 #####################
 title: Exploring Social Metacognition 
-#  the role of confidence in updating estimates of advisor reliability with and without feedback.
+#  
+description: |
+  This Experimental Psychology DPhil thesis for the University of Oxford 
+  explores how experience of advice changes estimates of advisor reliability 
+  with and without feedback. 
+  It also investigates whether egocentric discounting is explicable as a 
+  rational response to basic uncertainties of information transmission.
 
 university: University of Oxford
 university-logo: templates/beltcrest.pdf

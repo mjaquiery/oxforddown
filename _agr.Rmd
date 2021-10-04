@@ -84,16 +84,16 @@ These advisors were defined in terms of their likelihood of agreement with parti
 The High agreement advisor gave advice that endorsed the same answer side as the participant's initial estimate `r round(tmp[1] * 100, 1)`% of the time while the Low agreement advisor agreed with the participant `r round(tmp[2] * 100, 1)`% of the time.
 These overall agreement rates were split based on the target accuracy rates for participants' initial estimates to achieve balanced overall accuracy rates between advisors.
 
-```{r ac-agr-dots-m-profiles-r} 
+```{r ac-agr-dots-m-profiles} 
 
-kable(agr.table, caption = "\\label{tab:ac-agr-dots-m-profiles}Advisor advice profiles for Dots task Agreement experiment") %>%
+kable(agr.table, caption = "Advisor advice profiles for Dots task Agreement experiment") %>%
   kable_styling() %>%
   column_spec(1, bold = T) %>%
   row_spec(0, bold = F) %>%
-  collapse_rows(columns = 1, valign = "top") %>%
   add_header_above(c(" ", 
                      "Probability of agreement" = 3,
-                     " "))
+                     " ")) %>%
+  collapse_rows(columns = 1, valign = "top") 
 
 ```
 
@@ -101,7 +101,7 @@ kable(agr.table, caption = "\\label{tab:ac-agr-dots-m-profiles}Advisor advice pr
 
 ##### Exclusions
 
-```{r ac-agr-dots-r-clean}
+```{r ac-agr-dots-r-exclusions}
 nMaxOutliers <- 2
 zThresh <- 3
 accuracyRange <- c(.6, .85)
@@ -152,7 +152,7 @@ exclusions %>%
   summarise(across(where(is.logical), sum)) %>%
   mutate(`Total remaining` = length(unique(trials$pid))) %>% 
   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
-  kable(caption = "\\label{tab:ac-agr-dots-exclusions}Participant exclusions for Dots task Agreement experiment") %>%
+  kable(caption = "Participant exclusions for Dots task Agreement experiment") %>%
   row_spec((n - 1):n, bold = T)
 
 familiarisation <- trials %>%
@@ -164,7 +164,7 @@ familiarisation <- trials %>%
 ```
 
 In line with the pre-registration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or finished the experiment after `r preRegParticipants` participants had already submitted data which passed the other exclusion tests. 
-Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-agr-dots-exclusions).
+Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-agr-dots-r-exclusions).
 
 ##### Task performance {#ac-agr-dots-r-performance}
 
@@ -452,7 +452,7 @@ agr.table %>%
     `Target|incorrect`,
     `Actual|incorrect`
   ) %>%
-  kable(caption = "\\label{tab:ac-agr-dots-r-advice-agr-t}Advisor agreement for Dots task Agreement experiment")
+  kable(caption = "Advisor agreement for Dots task Agreement experiment")
 
 ```
 
@@ -469,11 +469,11 @@ agr.table %>%
   select(Advisor, `Target accuracy` = `Overall accuracy`) %>%
   left_join(tmp, by = "Advisor") %>%
   mutate(`Mean accuracy` = prop2str(`Mean accuracy`)) %>%
-  kable(caption = "\\label{tab:ac-agr-dots-r-advice-acc-t}Advisor accuracy for Dots task Agreement experiment")
+  kable(caption = "Advisor accuracy for Dots task Agreement experiment")
 
 ```
 
-The advisors agreed with the participants' initial estimates at close to target rates (Table \@ref(tab:ac-agr-dots-r-advice-agr-t)), and were as accurate on average as expected (Table \@ref(tab:ac-agr-dots-r-advice-acc-t)). 
+The advisors agreed with the participants' initial estimates at close to target rates (Table \@ref(tab:ac-agr-dots-r-advice-agr)), and were as accurate on average as expected (Table \@ref(tab:ac-agr-dots-r-advice-acc)). 
 Nevertheless, some participants experienced in practice 10-20% differences in advisor accuracy (although neither advisor was systematically more accurate across participants). 
 All participants experienced the intended relationship wherein the High agreement advisor agreed with them more than the Low agreement advisor.
 
@@ -622,10 +622,10 @@ No participants received feedback during the test phase.
 
 ##### Advice profiles
 
-The High agreement and Low agreement advisor profiles issued binary advice (endorsing either the 'before' or 'after' column) probabilistically based on which column the participant had selected in their initial estimate and whether that was the correct answer. 
+The High agreement and Low agreement advisor profiles issued binary advice (endorsing either the 'before' or 'after' column) probabilistically based on which column the participant had selected in their initial estimate and whether that was the correct answer (Table \@ref(tab:ac-agr-dates-m-profiles)). 
 Unlike in the Dots task above (Experiment 2A§\@ref(ac-agr-dots)), the accuracy of the advisors was not controlled because we were unable to control the participants' accuracy, and advisor accuracy depends upon participant accuracy when agreement rates are fixed.
 
-```{r ac-agr-dates-m-profiles-r} 
+```{r ac-agr-dates-m-profiles} 
 
 pCor <- .5
 agr <- matrix(c(.9, .65, .75, .35), 2, 2)
@@ -640,17 +640,17 @@ agr.table <- tribble(
 
 kable(
   agr.table, 
-  caption = "\\label{tab:ac-agr-dates-m-profiles}Advisor advice profiles for Dates task Agreement experiment",
+  caption = "Advisor advice profiles for Dates task Agreement experiment",
   escape = F
 ) %>%
   kable_styling() %>%
   column_spec(1, bold = T) %>%
   row_spec(0, bold = F) %>%
-  collapse_rows(columns = 1, valign = "top") %>%
   add_header_above(c(" ", 
                      "Probability of agreement (%)" = 3,
                      " ")) %>%
-  add_footnote("Where participants' initial estimate accuracy is 50%")
+  add_footnote("Where participants' initial estimate accuracy is 50%") %>%
+  collapse_rows(columns = 1, valign = "top") 
 
 ```
 
@@ -700,7 +700,7 @@ n <- ncol(exclusions)
 #   summarise(across(where(is.logical), sum)) %>%
 #   mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
 #   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
-#   kable(caption = "\\label{tab:ac-agr-dates-exclusions}Participant exclusions for Dates task Agreement experiment") %>%
+#   kable(caption = "Participant exclusions for Dates task Agreement experiment") %>%
 #   row_spec((n - 1):n, bold = T)
 
 ```
@@ -953,7 +953,7 @@ agr.table %>%
     `Target|incorrect`,
     `Actual|incorrect`
   ) %>%
-  kable(caption = "\\label{tab:ac-agr-dates-r-advice-agr-t}Advisor agreement for Dates task Accuracy experiment")
+  kable(caption = "Advisor agreement for Dates task Accuracy experiment")
 
 ```
 
@@ -970,14 +970,14 @@ agr.table %>%
   select(Advisor, `Target accuracy` = starts_with("Overall accuracy")) %>%
   left_join(tmp, by = "Advisor") %>%
   mutate(`Mean accuracy` = prop2str(`Mean accuracy`)) %>%
-  kable(caption = "\\label{tab:ac-agr-dates-r-advice-acc-t}Advisor accuracy for Dates task Accuracy experiment")
+  kable(caption = "Advisor accuracy for Dates task Accuracy experiment")
 
 ```
 
 The advice is generated probabilistically from the rules described previously (Advice profiles§\@ref(ac-acc-dates-m-advice-profiles)).
-The advisors agreed with participants contingent on the accuracy of the participants' initial estimates at close to the target rates (Table \@ref(tab:ac-agr-dates-r-advice-agr-t)).
+The advisors agreed with participants contingent on the accuracy of the participants' initial estimates at close to the target rates (Table \@ref(tab:ac-agr-dates-r-advice-agr)).
 This meant that advisors were distinguished by their overall agreement rates as they were intended to be in the familiarisation phase. 
-The accuracy of participants' initial estimates was not much above 50%, meaning that the overall accuracy rates of the advisors were similar to those projected (Table \@ref(tab:ac-agr-dates-r-advice-acc-t)).
+The accuracy of participants' initial estimates was not much above 50%, meaning that the overall accuracy rates of the advisors were similar to those projected (Table \@ref(tab:ac-agr-dates-r-advice-acc)).
 Most (`r n_ap`/`r length(unique(Familiarisation$pid))`, `r num2str(n_ap / length(unique(Familiarisation$pid)) * 100)`%) participants experienced the High agreement advisor as providing advice that agreed more frequently than the Low agreement advisor.
 
 ##### \OpenScience{prereg} Hypothesis test {#ac-agr-dates-r-h}

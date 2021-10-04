@@ -582,7 +582,7 @@ Agent-based modelling is used to simulate the interactive effects of repeated pa
 The agents in the model perform a cycle of making an initial estimate, selecting one of the other agents as an advisor, receiving advice from the chosen advisor, making a final decision, and updating their trust in their advisor and their internal beliefs about the world.
 The task the agents face is roughly analogous to the task faced by human participants in the Dots task experiments§\@ref(m-p-dots), where the participants make a decision about which of two rapidly and simultaneously presented grids contained more dots.
 
-Each model consists of a population of agents implementing the same mathematical model of decision-making, trust-updating, and advisor choice, with different coefficients for parameters of that mathematical model (Table \@ref(tab:nw-m-agent-properties-table)) drawn from appropriate distributions.
+Each model consists of a population of agents implementing the same mathematical model of decision-making, trust-updating, and advisor choice, with different coefficients for parameters of that mathematical model (Table \@ref(tab:nw-m-agent-properties)) drawn from appropriate distributions.
 
 ### \OpenScience{materials} Open code
 
@@ -597,7 +597,7 @@ To assist with exploring the models without having to rerun models from scratch,
 
 ### Model details
 
-Each model is defined by a set of model parameters (\@ref(tab:nw-m-model-properties-table)), which are assigned capital letters in the equations below. 
+Each model is defined by a set of model parameters (\@ref(tab:nw-m-model-properties)), which are assigned capital letters in the equations below. 
 These parameters are used to generate further parameters which govern agents' tendencies, and these are assigned lower-case letters and superscripted with the agent to whom they belong. 
 Variables which change over the course of the model have a subscript indicating which step of the model they belong to.
 
@@ -608,8 +608,8 @@ When the agent is created, the parameter defining its sensitivity distribution (
 
 #### Creating agents
 
-Each agent has the properties listed in Table \@ref(tab:nw-m-agent-properties-table).
-An agent's values for each of these properties are created by drawing values from normal distributions defined by parameters in the model settings (Table \@ref(tab:nw-m-model-properties-table)).
+Each agent has the properties listed in Table \@ref(tab:nw-m-agent-properties).
+An agent's values for each of these properties are created by drawing values from normal distributions defined by parameters in the model settings (Table \@ref(tab:nw-m-model-properties)).
 
 ```{r nw-m-agent-properties}
 
@@ -623,7 +623,7 @@ tribble(
   "$b^a_t$", "Agent's prior expectation about the task answer", "Yes"
 ) %>%
   kable(
-    caption = "\\label{tab:nw-m-agent-properties-table}Agent properties",
+    caption = "Agent properties",
     escape = F
   )
 
@@ -930,7 +930,7 @@ tribble(
 ) %>%
   mutate(across(everything(), ~ str_wrap(., 40, indent = 2) %>% linebreak("l"))) %>%
   kable(
-    caption = "\\label{tab:nw-m-model-properties-table}Model properties",
+    caption = "Model properties",
     escape = F
   )
 

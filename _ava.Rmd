@@ -84,9 +84,9 @@ The advisor profiles were not balanced for overall agreement or accuracy rates.
 
 The High accuracy advisor predominantly agreed with correct participant responses and disagreed with incorrect ones.
 The High agreement advisor agreed with the participant at the same rate regardless of the accuracy of the participant's initial estimate.
-In practical terms, the difference between the advisors is that the High agreement advisor continued to agree with participants where their initial estimates were incorrect, while the High accuracy advisor did not.
+In practical terms, the difference between the advisors is that the High agreement advisor continued to agree with participants where their initial estimates were incorrect, while the High accuracy advisor did not (Table \@ref(tab:ac-ava-dots-m-profiles)).
 
-```{r ac-ava-dots-m-profiles-r} 
+```{r ac-ava-dots-m-profiles} 
 
 pCor <- .71
 agr <- matrix(c(.8, .2, .8, .8), 2, 2)
@@ -98,14 +98,14 @@ agr.table <- tribble(
 ) %>% 
   prop2str()
 
-kable(agr.table, caption = "\\label{tab:ac-ava-dots-m-profiles}Advisor advice profiles for Dots task Accuracy/agreement experiment") %>%
+kable(agr.table, caption = "Advisor advice profiles for Dots task Accuracy/agreement experiment") %>%
   kable_styling() %>%
   column_spec(1, bold = T) %>%
   row_spec(0, bold = F) %>%
-  collapse_rows(columns = 1, valign = "top") %>%
   add_header_above(c(" ", 
                      "Probability of agreement" = 3,
-                     " "))
+                     " ")) %>%
+  collapse_rows(columns = 1, valign = "top")
 
 ```
 
@@ -174,13 +174,13 @@ exclusions %>%
   summarise(across(where(is.logical), sum)) %>%
   mutate(`Total remaining` = length(unique(trials$pid))) %>% 
   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
-  kable(caption = "\\label{tab:ac-ava-dots-exclusions}Participant exclusions for Dots task Accuracy versus Agreement experiment") %>%
+  kable(caption = "Participant exclusions for Dots task Accuracy versus Agreement experiment") %>%
   row_spec((n - 1):n, bold = T)
 
 ```
 
 In line with the pre-registration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or finish the experiment after `r preRegParticipants` participants have already submitted data which passed the other exclusion tests. 
-Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-ava-dots-exclusions).
+Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-ava-dots-r-exclusions-tab).
 This number is somewhat higher than in the previous experiments, but this is largely due to collecting data in larger batches than previously: a large number of participants were excluded because their data were in excess of the preregistered sample size.
 
 ##### Task performance
@@ -487,7 +487,7 @@ agr.table %>%
     `Target|incorrect`,
     `Actual|incorrect`
   ) %>%
-  kable(caption = "\\label{tab:ac-ava-dots-r-advice-agr-t}Advisor agreement for Dots task Accuracy versus Agreement experiment")
+  kable(caption = "Advisor agreement for Dots task Accuracy versus Agreement experiment")
 
 ```
 
@@ -504,11 +504,11 @@ agr.table %>%
   select(Advisor, `Target accuracy` = `Overall accuracy`) %>%
   left_join(tmp, by = "Advisor") %>%
   mutate(`Mean accuracy` = prop2str(`Mean accuracy`)) %>%
-  kable(caption = "\\label{tab:ac-ava-dots-r-advice-acc-t}Advisor accuracy for Dots task Accuracy versus Agreement experiment")
+  kable(caption = "Advisor accuracy for Dots task Accuracy versus Agreement experiment")
 
 ```
 
-The advisors agreed with the participants' initial estimates at close to target rates (Table \@ref(tab:ac-ava-dots-r-advice-agr-t)), and were as accurate on average as expected (Table \@ref(tab:ac-ava-dots-r-advice-acc-t)).  
+The advisors agreed with the participants' initial estimates at close to target rates (Table \@ref(tab:ac-ava-dots-r-advice-agr)), and were as accurate on average as expected (Table \@ref(tab:ac-ava-dots-r-advice-acc)).  
 `r n_ap`/`r length(unique(familiarisation$pid))` participants experienced the intended relationship wherein the High agreement advisor agreed with them more than the High accuracy advisor and the High accuracy advisor gave more accurate advice than the High agreement advisor.
 
 ##### \OpenScience{prereg} Hypothesis test {#ac-ava-dots-r-h}
@@ -839,7 +839,7 @@ A detailed example was given in Experiment 0§\@ref(ai-ava-m-advisors).
 
 ##### Exclusions
 
-```{r ac-ava-dates-r-clean}
+```{r ac-ava-dates-r-exclusions}
 maxTrialRT <- 60000   # trials take < 1 minute
 minTrials <- 11       # at least 11 trials completed
 minChangeRate <- .1   # some advice taken on 10%+ of trials
@@ -876,7 +876,7 @@ exclusions %>%
   summarise(across(where(is.logical), sum)) %>%
   mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
-  kable(caption = "\\label{tab:ac-ava-dates-exclusions}Participant exclusions for Dates task Accuracy versus Agreement experiment") %>%
+  kable(caption = "Participant exclusions for Dates task Accuracy versus Agreement experiment") %>%
   row_spec((n - 1):n, bold = T)
 
 ```
@@ -884,7 +884,7 @@ exclusions %>%
 Individual trials were screened to remove those that took longer than `r maxTrialRT/1000`s to complete. 
 Participants were then excluded for having fewer than `r minTrials` trials remaining, fewer than `r minKeyTrials` trials on which they had a choice of advisor, or for giving the same initial and final response on more than `r (1 - minChangeRate) * 100`% of trials. 
 Participants were also excluded for technical problems with the experiment and data: sometimes the widths of the markers placed by the participants had unrecognised values, and sometimes the values for the advisors' advice were corrupted.
-Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-ava-dates-exclusions).
+Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-ava-dates-r-exclusions).
 
 ##### Task performance
 

@@ -265,11 +265,11 @@ for (E in c(.GlobalEnv, .prevStudy)) {
 ```
 
 In line with the preregistration, participants' data were excluded from analysis where they failed attention checks, failed to complete the entire experiment, or had more than `r nMaxOutliers` outlying trials. Outlying trials were calculated after excluding participants who failed to complete the experiment, and were defined as trials for which the total trial time was greater than `r zThresh` standard deviations away from the mean of all trials from all participants.
-Table \@ref(tab:ai-ava-dates-exclusions) shows the number of participants excluded for each of the reasons, broken down by experimental condition.
+Table \@ref(tab:ai-ava-r-exclusion) shows the number of participants excluded for each of the reasons, broken down by experimental condition.
 
 A browser compatibility issue in this study meant that any participants completing the study using the Safari family of browsers had to be excluded because the advice was not presented appropriately. 
 
-```{r ai-ava-r-exclusion-table}
+```{r ai-ava-r-exclusion}
 
 condition <- all.metadata %>%
   transmute(pid, feedback = if_else(condition < 3, "Feedback", "No feedback"))
@@ -289,7 +289,7 @@ exclusions %>%
   pivot_longer(-feedback, names_to = "Reason", values_to = "Participants excluded") %>%
   pivot_wider(names_from = feedback, values_from = `Participants excluded`) %>%
   mutate(Total = Feedback + `No feedback`) %>%
-  kable(caption = "\\label{tab:ai-ava-dates-exclusions}Participant exclusions for Dates task advice influence experiment") %>%
+  kable(caption = "Participant exclusions for Dates task advice influence experiment") %>%
   row_spec((n - 1):n, bold = T) %>%
   column_spec(4, bold = T) %>%
   add_header_above(c(" " = 1, "Condition" = 2, " " = 1))
