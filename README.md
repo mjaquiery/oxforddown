@@ -1,83 +1,63 @@
+# Contents:
+-   [Abstract](#Abstract)
+-   [Oxforddown](#Oxforddown)
+-   [Docker users](#Docker-users)
+
+# Abstract
+
+This thesis explores two questions: does the way individuals seek advice produce echo chamber-like networks; and is the well-established phenomenon of egocentric discounting explicable as a rational process?
+Both parts are presented within a framework of advice as information transfer; the implications for wider interpretations of advice are discussed in the conclusion.
+Both parts are investigated with a mixture of computational simulations and behavioural experiments.
+
+For the first question, behavioural experiments implementing a Judge-Advisor System with a perceptual decision-making task and a date estimation task are used to characterise people's propensity to use agreement as a signal of advice quality in the absence of feedback.
+These experiments provide moderate evidence suggesting that people do do this, and that experience of agreement in the absence of feedback increases their trust in advisors.
+Agent-based computational simulations take the results of the behavioural experiments and simulate their effects on trust ratings between agents.
+The simulations indicate that including the kind of heterogeneity seen in the participants in the behavioural experiments slows down the formation of echo-chambers and limits the extent of polarisation.
+
+In the second part, I argue that egocentric discounting deviates from a normative model of advice-taking because it is a rational response to concerns that always accompany advice: that the advice might be deliberately misleading, lazily researched, or misunderstood.
+Evolutionary computational simulations of advice-taking illustrate that when any of these circumstances might be true, egocentric discounting emerges as an adaptive response.
+Behavioural experiments using a date estimation task within a Judge-Advisor System test whether people respond adaptively to alterations in the circumstances explored in the evolutionary simulations.
+These experiments show that people respond flexibly to changes in the probability that their advisor will attempt to mislead them.
+Experiments attempting to explore people's ability to flexibly respond to acquiring information about an advisor's confidence calibration were inconclusive.
+
 # Oxforddown
 
-A template for writing an Oxford University thesis in R Markdown.
+This thesis is written in RMarkdown using Ulrik Lyngs' [oxforddown](https://github.com/ulyngs/oxforddown/) template for Oxford University.
+Oxforddown uses the [bookdown](https://bookdown.org) R package together with the [OxThesis LaTeX template](https://github.com/mcmanigle/OxThesis), plus lots of inspiration from [thesisdown](https://github.com/ismayc/thesisdown).
 
-See the video tutorials for how to use the template:
-- [Part 1: Building the entire thesis](https://www.youtube.com/watch?v=Yf1W1BBS9cU)
-- [Part 2: Building a single chapter](https://www.youtube.com/watch?v=-EJfCA3VA-I)
-- [Part 3: Understanding the file structure](https://www.youtube.com/watch?v=jafgJobOgpc)
-- [Part 4: A walk-through example of creating your thesis](https://www.youtube.com/watch?v=uWpinaVSZ6Q)
-- [Part 5: The content included in index.Rmd (or: why the introduction chapter is special)](https://www.youtube.com/watch?v=FPlwCj5ZH8M)
-- [Part 6: Adjusting the order of chapters](https://www.youtube.com/watch?v=-0M3TuDnu7Y)
-- [Part 7: \_bookdown.yml: Adjusting build settings](https://www.youtube.com/watch?v=jXYfC8RXTvg)
-- [Part 8: Makefile: Adjusting build settings](https://www.youtube.com/watch?v=L6mV8z32RfE)
-- [Part 9: The LaTeX templates](https://www.youtube.com/watch?v=o2fd_O1On7g)
+## Requirements
 
+The thesis was developed using:
+-   [R](https://cran.rstudio.com) version 4.1.0
+-   [RStudio version 1.4.1717](https://www.rstudio.com/products/rstudio/download/#download)
 
-For how to write your content with the R Markdown syntax, read through the sample content.
+-   R packages managed using `renv::`
 
-The template uses the [bookdown](https://bookdown.org) R package together with the [OxThesis LaTeX template](https://github.com/mcmanigle/OxThesis), plus lots of inspiration from [thesisdown](https://github.com/ismayc/thesisdown).
+-   LaTeX via [TinyTeX](https://yihui.name/tinytex/)
 
-# Requirements
-- LaTeX - if you're lazy and got sufficient disc space, just download and install the MacTeX distribution from [tug.org/mactex/](http://www.tug.org/mactex/). If you're short on disc space, go for the BasicTeX distribution from the same site. 
-  - (For opaque reasons, Yihui Xie's [TinyTeX](https://yihui.name/tinytex/) sometimes causes trouble! If you are unable to get the PDF output to work with TinyTex, try uninstalling it with tinytex::uninstall_tinytex(), then install the MacTeX LaTeX distribution and restart RStudio.)
-- [R](https://cran.rstudio.com) and [RStudio version 1.2 or higher](https://www.rstudio.com/products/rstudio/download/#download)
-  - (pandoc version 2 or higher - comes bundled with RStudio v1.2+)
-- The R packages `bookdown`, `tidyverse`and `kableExtra` (should be automatically installed for you if you don't already have them, when you build this project for the first time in RStudio)
-- (If on a Mac): Command line developer tools. You can install these by typing `xcode-select --install` in a terminal prompt
+# Docker users
 
-# Example output
-- PDF output: see [**docs/_main.pdf**](https://github.com/ulyngs/oxforddown/blob/master/docs/_main.pdf)
-- Gitbook output: see [ulyngs.github.io/oxforddown/](https://ulyngs.github.io/oxforddown/)
+If you have used the Docker image that contains the thesis code and environment, you can build the thesis from the command line using R.
+You enter the container in the relevant directory `/oxforddown`.
+The container has very few commands available (you can install more with `apt-get install [software]`), but you can browser the files with `ls` and `cat`.
+To create the thesis from the ingredients, first we remove the existing docs folder:
 
-# Usage
-- clone the **ulyngs/oxforddown** repo or download it as a zip
-- open **oxforddown.Rproj** in RStudio
+``` bash
+rm -rf docs
+```
 
-## Compiling your thesis
-### PDF output
-- click 'Build All' on the 'Build' tab *or* type 'make pdf' in the terminal (not the R console!)
-- the compiled PDF is saved as **docs/\_main.pdf**, and the PDF is opened
+Next, we tell R to run the `render_book` function from the `bookdown::` package:
 
-![](screenshots/build_all.png)
-![](screenshots/compiled_pdf.png)
+``` bash
+Rscript -e 'bookdown::render_book("index.Rmd")'
+```
 
-### Gitbook output
-- in the terminal tab (not the R console!), type 'make gitbook'
-- the set of HTML files for the gitbook are stored in the **docs/** folder, and the front page (docs/index.html) is opened in a browser
+If we want R to do more of the calculation work, we can tell it to avoid simply downloading data and try to recreate it itself. 
+This does not necessarily work for all parts of the thesis, but it does work for some of the modelling stuff.
+In the command below we replace `[x]` with some number greater than 0. 
+Using 1 will make the processing time be hours as opposed to minutes; using 2 or greater will result in a processing time of several hours and the process may crash due to lack of RAM.
 
-![](screenshots/build_gitbook.png)
-![](screenshots/compiled_gitbook.png)
+``` bash
+Rscript -e 'options(ESM.recalculate = [x]); bookdown::render_book("index.Rmd")'
+```
 
-### Word output
-- in the terminal tab (not the R console!), type 'make word'
-- the compiled MS Word document is saved as **docs/\_main.docx** and opened
-
-The Word output has no template behind it, and many things do not work (e.g. image rotation, highlighting corrections). **I encourage pull requests that optimise the Word output, e.g. by using tools from the [`officer`](https://github.com/davidgohel/officer) package.**
-
-## Writing your thesis
-To use this template to write your thesis, do the following:
-- update the YAML header (the stuff at the top between '---') in **index.Rmd** with your name, college, etc.
-- write the individual chapters as **.Rmd** files in the root folder - **the introduction chapter *must* be named _00-introduction.Rmd**.
-- write the front matter (abstract, acknowledgements, abbreviations) and back matter (appendices) by adjusting the **.Rmd** files in the **front-and-back-matter/** folder
-- for abbreviations, change **front-and-back-matter/abbreviations.tex** to fit your needs (follow the LaTeX syntax in there)
-
-**.Rmd** files you don't want included in the body text must be given file names that begin with an underscore (e.g. **front-and-back-matter/\_abstract.Rmd** and **front-and-back-matter/\_acknowledgements.Rmd**). (Alternatively, specify manually in **\_bookdown.yml** which files should be merged into the body text.)
-
-## Knitting individual chapters
-To knit an individual chapter without compiling the entire thesis:
-1. open the **.Rmd** file of a chapter
-2. add a YAML header specifying the output format(s) (e.g. `bookdown::word_document2` for a word document you might want to upload to Google Docs for feedback from collaborators)
-  - To output a single chapter to PDF, use `bookdown::pdf_documents2: template: templates/brief_template.tex` - this will format the chapter in the OxThesis style but without including the front matter (table of contents, abstract, etc)
-
-The output file is saved in the root folder.
-
-## Cleaning up generated auxiliary files
-By default, when you build the entire thesis, the auxillary files will be removed (to adjust how this is done, edit **Makefile**).
-
-To clean up files generated when knitting individual chapters, type 'make clean-knits' in the terminal.
-
-# Limitations
-- at the moment only PDF and HTML output have been properly implemented; I may improve on the Word output further down the line
-
-Enjoy!

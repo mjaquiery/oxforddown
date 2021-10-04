@@ -1,5 +1,17 @@
-This *R Markdown* template is for writing an Oxford University thesis. The template is built using Yihui Xie's `bookdown` package, with heavy inspiration from Chester Ismay's `thesisdown`, and the `OxThesis` \LaTeX\ template (most recently adapted by John McManigle).
 
-This template's sample content include illustrations of how to do the various things you need to write a thesis in R Markdown, and largely follow the structure from [this R Markdown workshop](https://ulyngs.github.io/rmarkdown-workshop-2019/).
 
-Congratulations for taking a step further into the lands of open, reproducible science, by writing your thesis using a tool that allows you to transparently include tables and dynamically generated plots directly from the underlying data. Hip hooray!
+This thesis explores two questions: does the way individuals seek advice produce echo chamber-like networks; and is the well-established phenomenon of egocentric discounting explicable as a rational process?
+Both parts are presented within a framework of advice as information transfer; the implications for wider interpretations of advice are discussed in the conclusion.
+Both parts are investigated with a mixture of computational simulations and behavioural experiments.
+
+For the first question, behavioural experiments implementing a Judge-Advisor System with a perceptual decision-making task and a date estimation task are used to characterise people's propensity to use agreement as a signal of advice quality in the absence of feedback.
+These experiments provide moderate evidence suggesting that people do do this, and that experience of agreement in the absence of feedback increases their trust in advisors.
+Agent-based computational simulations take the results of the behavioural experiments and simulate their effects on trust ratings between agents.
+The simulations indicate that including the kind of heterogeneity seen in the participants in the behavioural experiments slows down the formation of echo-chambers and limits the extent of polarisation.
+
+In the second part, I argue that egocentric discounting deviates from a normative model of advice-taking because it is a rational response to concerns that always accompany advice: that the advice might be deliberately misleading, lazily researched, or misunderstood.
+Evolutionary computational simulations of advice-taking illustrate that when any of these circumstances might be true, egocentric discounting emerges as an adaptive response.
+Behavioural experiments using a date estimation task within a Judge-Advisor System test whether people respond adaptively to alterations in the circumstances explored in the evolutionary simulations.
+These experiments show that people respond flexibly to changes in the probability that their advisor will attempt to mislead them.
+Experiments attempting to explore people's ability to flexibly respond to acquiring information about an advisor's confidence calibration were inconclusive.
+

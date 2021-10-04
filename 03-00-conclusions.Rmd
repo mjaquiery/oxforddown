@@ -1,0 +1,155 @@
+---
+output:
+  bookdown::pdf_document2:
+    template: templates/brief_template.tex
+  bookdown::word_document2: default
+  bookdown::html_document2: default
+documentclass: book
+
+bibliography: 
+  - bibliography/references.bib
+bibliography-heading-in-pdf: Works Cited
+params:
+  corrections: true 
+---
+
+<!-- # (PART) Conclusion {-} -->
+
+# Conclusion {#chapter-conclusion}
+\adjustmtc 
+
+This thesis presented work on two questions: whether people take too much advice from those who agree with them; and why people do not take enough advice in general.
+Behavioural experiments using a Judge-Advisor System extended previous work [@pescetelliRoleDecisionConfidence2021] on advice-taking to the domain of advisor choice, showing that people can use an advisor's agreement as a proxy for the advisor's accuracy where direct feedback about accuracy is not available.
+Computational simulations explored the implications of this tendency for the structure of social networks, replicating the echo chamber formation and polarisation found in similar simulations [@pescetelliRoleDecisionConfidence2021; @madsenLargeNetworksRational2018a] but suggesting that modelling heterogeneous agents reduced the speed and extent of these effects. 
+The second arm of the thesis argued that egocentric discounting -- taking advice less seriously than a normative model would predict -- is not as irrational as it is often portrayed.
+Computation simulations showed that egocentric discounting was an adaptive trait in environments where advice was sometimes misleading, where advisors put less effort into making decisions than judges, and even where honest and diligent advice was communicated with a slightly different scaling of confidence.
+These simulations were complemented with a series of behavioural experiments investigating whether short-term changes in an advice-taking context would produce the discounting behaviour seen in the simulations.
+The results of these experiments were mixed: reducing the risk of deceptive advice increased advice-taking; but we found no evidence that familiarisation with an advisor's confidence calibration increased advice-taking.
+
+The first of our questions is motivated by a concern that people are trapped in echo chambers -- hearing only their own opinions parroted back to them and ignoring other perspectives.
+The argument is that people form social connections on the basis of similarities with others (homophily), and that their behaviour becomes increasingly similar to those they interact with. 
+These age-old tendencies become pathological in the hyper-fluid social environment of on-line social networks: the pool of potential connections is much wider, meaning criteria for similarity go up; and the friction of making and breaking connections is much lower.
+Overall, as @sunsteinRepublicDividedDemocracy2018 persuasively argued, the on-line social world produces pockets of self-reinforcing opinion that trends to extremes because they exclude dissenting voices.
+In the last two decades there has been a great deal of discussion about the extent to which this picture is true [@garrettEchoChambersOnline2009; @colleoniEchoChamberPublic2014; @barberaHowSocialMedia2015; @weeksPartisanEnclavesShared2016; @sunsteinRepublicCom2002].
+
+We found some evidence that the basic processes necessary for this to occur exist using behavioural experiments: people do seem to prefer to hear from advisors who are likely to support their initial opinion in the absence of reliable feedback, but this tendency did not show clearly when accurate and agreeing advisors were contrasted directly.
+Similar work using media sources rather than ostensibly human advisors has likewise shown mixed results: people seem to have a moderate tendency to choose sources likely to agree with their perspective when given a direct choice [@kobayashiSelectiveExposurePolitical2009; @marquartSelectiveExposureContext2016; @hartFeelingValidatedBeing2009], but do not seem to deliberately avoid sources likely to disagree [@jangChallengesSelectiveExposure2014a; @hartFeelingValidatedBeing2009].
+Viewing agreement as a positive attribute, while pathologised in this discourse, is not inherently misguided.
+We follow others [@sollStrategiesRevisingJudgment2009] in highlighting that, for advisors and judges who perform better than chance, their answers overlap more the better they are at the task.
+Likewise, when consulting media sources, the framing placed on events and policies will ring more true for a person where it matches their own framing: a newspaper that talks about 'riots' will probably appear to be giving a more truthful account to a police officer, while one that speaks of 'protests' will probably appear more truthful to an activist.
+
+Partisan media and homophilic social networks are long-standing concerns [@freedmanConfidenceUtilitySelective1965; @searsSelectiveExposureInformation1967]^[The Pamphlet wars [@PamphletWars2020] are an example from the 16th and 17th centuries.], so a key question is whether, as argued by @sunsteinRepublicDividedDemocracy2018, on-line social media exacebates the effects due to its presenting people with a multitude of potential social connections, activated by the click of a button. 
+Our computational simulations presented agents with a similar frictionless environment -- they were free to associate with which other agents they chose and incurred no cost to do so.
+These simulations reproduced the basic phenomenon of echo chamber formation seen in previous work [@pescetelliRoleDecisionConfidence2021; @madsenLargeNetworksRational2018a], but including the kind of heterogeneity in advice-taking and -seeking behaviour observed in our participant population worked to dilute the effect, slowing them down and making the divergence into two camps less complete.
+
+There are further reasons to question whether experimental and simulation evidence adequately supports the idea of on-line social networks as engines of division and polarisation rather than tools for connecting the world.
+The interactions considered in this thesis and similar work are information transfers along social connections.
+These bare-bones representations are abstractions of much richer experiences that are conducted by specific individuals within particular contexts (discussed more below§\@ref(c-generalisability)).
+Any number of aspects of these wider and richer experiences could mollify or reverse the simple effects of information.
+Secondly, on-line communities are not divorced from the real world -- most have both on-line and off-line meetings, and most on-line communities are joined through pre-existing social connections [@huiGroupthinkPeerPressure2009], with off-line connections being the dominant entry points [@boydTakenOutContext2008].
+The aspects of on-line communities that are troublesome are similarly troublesome in off-line communities: the problematic echo chambers that make headlines, Q-Anon for example, share more features with other cults and conspiracy theorist networks from the off-line days than they do with the on-line social networks of the average contemporary netizen.^[_Netizen_ is a neologism for an inter\emph{net} cit\emph{izen}.]
+Despite the intuitive appeal of arguments and simulations showing echo chambers as a dominant social phenomenon, it remains highly plausible that echo chambers are nothing new, and that the opportunities granted by greater mixing on-line do not increase their prevalence or strength.
+
+The second question is a puzzle that exemplifies the ongoing debate in psychology over whether people are rational^[The debate is older than psychology as a discipline -- Jonathan Swift for example wrote to Alexander Pope that humans should be defined not as "animal rationale" (a rational animal) but instead as "rationis capax" (capable of rationality) [@swiftLettersJonathanSwift1801, Dr. Swift to Mr. Pope, 29 September 1725].] or whether their apparent rationality is an illusion created by a motley collection of heuristics.
+I certainly do not claim to have the last word in this debate, but this thesis does show that egocentric discounting, hitherto a good example of irrational cognition, may quite readily be seen as rational when the frame of reference is appropriately adjusted.
+Computational simulations showed that egocentric discounting is adaptive when there is the potential for advice to be deceptive, shiftless, or even slightly misunderstood.
+There is always this potential.
+Behavioural experiments added to a wealth of other experiments in the literature showing that advice-taking follows rational patterns once the base rate reduction (egocentric discounting) is explained.
+Our experiments on confidence calibration were unsuccessful in producing the results predicted by the simulations, though we cannot determine whether they were methodologically unsuccessful or whether they were unsuccessful because the simulated behaviour does not emerge in practice on a time-scale appropriate to behavioural experimental investigation.
+
+The perspective of egocentric discounting as irrational is based on a normative model: the _discounting_ is relative to an optimal level of advice weighting.
+I argue that the normative model is not so much incorrect as it is inappropriate.
+It requires that certain assumptions are met: there will be no lying; advisors will try as hard as the judge, and be roughly as good as the judge; the advice will be perfectly understood; and the advisor's expressions of confidence are interpreted as intended.
+If any of these are not met, the judge will be over-reliant on advice.
+I argue that these assumptions are never fully met.
+
+The appeal of the normative model on one hand is matched on the other by the strength of the intuition that one should not equally weight advice with one's own opinion.
+This intuition may be culturally bound (indeed little English language research has been done on advice-taking outside Western Educated Industrialised Rich and Demographic populations [@henrichWeirdestPeopleWorld2010] apart from @mahmoodiEqualityBiasImpairs2015), but it appears to be widely shared by both scientists and laypeople with whom I have discussed my research.
+This cultural norm advocating discounting exists alongside other norms that place strong emphasis on fairness and equality, including in integrating estimates to produce group decisions [@mahmoodiEqualityBiasImpairs2015].
+There may be other cultural norms surrounding more proximal explanations of egocentric discounting that may also play a role, such as norms surrounding accountability for one's actions.
+
+Overall, this work contributes to a picture of advice-taking and -seeking as remarkable quotidian. 
+We highlight that there are reasonable motivations for trusting agreement over disagreement in the absence of feedback, and where tasks become more difficult the strength of this preference subsides.
+We illustrate how the heterogeneity that is sometimes lamented as the reason for social divisions appears to also prevent these divisions from wholly dichotomising opinions.
+We demonstrate that the guarded approach people show to advice-taking in general can be seen as rational even without invoking the presence of cheats, liars, and free-loaders.
+
+## Generalisability, limitations, and open questions {#c-generalisability}
+
+Despite the variety of methods and experimental tasks used in this work, it is necessarily limited in scope, and consequently there remains a deep concern about generalisability.
+Advice is the exchange of social information, and this thesis has focussed far more on the information than the social.
+Each instance of advice-taking is a meeting of particular people exchanging particular information with particular goals within a broader social context.
+Reading an advertisement is a very different situation from agonising with an old friend about their marital concerns, and both of these are very different from sharing a short message on a social media platform about planned building developments in your local area or reading expert reviews of food processors.
+
+In many cases, advice comes not as a bald recommendation or a statement with mere confidence attached, but as a constructed argument with reasons and rhetoric.
+Indeed, reasons are more persuasive than recommendations with confidence where they are appropriate to the task at hand [@troucheArgumentsMoreConfidence2014], as is often the case.
+Advice also serves several important social tasks: seeking advice can be a mark of respect and having advice taken an inherent pleasure [@hertzIntrinsicValueSocial2018]; giving advice can be a form of dominance [@seeDetrimentalEffectsPower2011]; and taking advice can be a way of diluting responsibility for decisions [@harveyTakingAdviceAccepting1997].
+
+These interactions are what build up the social relationships modelled in our simulations, and they do not change greatly in the on-line social arena.
+Like the off-line world, the on-line world is full of the same people pursuing the same goals; they may have slightly different opportunities and affordances, but they are in service of the same ends.
+The implications for real social networks of our simulations that are constructed from a narrow, information-centric view of advice-taking should be interpreted with caution -- as should the simulations of others [@songDynamicSpiralsPut2017; @madsenLargeNetworksRational2018a].
+
+Our work is limited even within the information part of social information.
+We examined situations that present decision-makers with constrained choices concerning their advisors and variation only in the trust dimension of (perceived) ability.
+When real people make real choices about where to seek advice they are not constrained in this way, and their choice may be based on all three of the trust dimensions identified by @mayerIntegrativeModelOrganizational1995.
+Furthermore, even within the dimension of ability, a great many different kinds of cues may be available beyond past personal experience.
+We may have been recommended to consult with someone by another person we trust, as happens when accountants acquire work through word-of-mouth.
+We might be consulting someone who has a reputation for expertise, like a rambler who has done a particular hike we want to try, or who belongs to a relevant professional organisation, like a counsellor who is a member of the British Association for Counselling and Psychotherapy.
+We may make inferences about expertise from how closely a potential advisor fits our stereotypes: do they dress appropriately or, more problematically, do they have the "right" accent, gender, or skin tone [@hollingsheadGenderStereotypesAssumptions2003; @arnoldPsychologicalHeuristicsFaculty2016].
+How these features are combined with personal experience with an advisor is an important question because many of these aspects are constant, or change on different time-scales to the personal experience studied in this work, and thus may work to establish and maintain divisions that are difficult to break down using personal experience.
+
+The method of comparison based on the many factors contributing to perceptions of ability is also likely to differ according to context.
+In our work, we gave participants in behavioural experiments pairs of advisors to choose between, and in simulation we extended this direct comparison process to a wider selection of potential advisors.
+In real choices of where to get advice, however, people are unlikely to dispassionately weigh up a variety of options and select the one that excels most according to their own criteria.
+Firstly, even in apparently simple multi-item choice problems, people's relative preferences for options varies according to the other options available [@beckerValueBehavioralDecision1967].
+Secondly, unlike in our simulations and experiments, the opportunity cost to acquiring advice is usually low: people generally have the option to consult as many advisors as they have time to.
+Thirdly, the cost of consulting sources in terms of time, effort, or social risk is likely to be a factor that differs between sources.
+As with the relative importance of personal experience with an advisor to other factors, depending upon the extent of these considerations governing advisor choice, and depending upon their tendency to exacerbate or reduce homophily, the results of our computational simulations of network dynamics might be considerably different if they included these features.
+
+Our work on egocentric discounting appears more robustly generalisable to the phenomenon of interest.
+Although the broader contextual considerations highlighted by our evolutionary simulations affect the conclusions one draws from egocentric discounting relative to the normative model, however, they do not detract substantially from the practice of using the normative model as an optimum 'set point' from which to evaluate advice-taking behaviour.
+The conclusion is therefore not that the normative model should be abandoned or even extended in general use, rather a recommendation that researchers avoid implying that deviation from the normative model is 'irrational', mistaken, or even the result of a 'satisficing' heuristic [@radnerSatisficing1975].
+
+Our theory of egocentric discounting's underlying rationality is not incontrovertible. 
+In fact, the theory is poorly positioned to explain people's apparent tendency to treat multiple advisory estimates as a single instance of advice, and to discount it as if it represented only a single alternative opinion [@hutterSeekingAdviceSampling2016; @yonahTheyDonKnow2021], or at least to increase the weighting of it much less than would be expected as the number of contributing estimates increases [@parkIntegrationIndividualSocial2017].
+The presentation of the advisory estimates may be an issue: presenting a single figure may understandably lead people to treat it as the product of a single advisory estimate; and requiring people to keep many suggestions in mind will likely overwhelm them and lead to cognitive shortcuts.
+
+Another puzzle for our account is the hard-easy effect of advice: when given difficult tasks (such as our Dates task), people take more advice than when given easy tasks [@ginoEffectsTaskDifficulty2007].
+This is perhaps mediated by confidence.
+The normative model makes the prediction that what matters is the relative difficulty of the task for the judge and the advisor, not the absolute difficulty for the judge, and thus does not explain this effect.
+This puzzle is resolved by looking at the _perception_ of relative difficulty, rather than the relative difficulty itself. 
+People typically over-estimate their ability relative to others for easy tasks, while under-estimating their ability relative to others for difficult tasks [@krugerLakeWobegonBe1999].
+This behaviour may not be rational in the way that I have argued discounting is in general, but it may be an inescapable consequence of confidence [@hilbertSynthesisCognitiveBiases2012].
+
+## Key directions for future research
+
+Behavioural experiments in this thesis provided some evidence to support the idea that people use agreement as a proxy for accuracy when they do not have access to feedback.
+This details of this picture require elucidation -- for example it would be informative to know more precisely how task difficulty alters people's updating of trust in advisors.
+Extrapolating from the @pescetelliRoleDecisionConfidence2021 theory of confidence-mediation, trust is updated more (in the absence of feedback) where the judge is most confident. 
+For difficult decisions, the judge usually has very low confidence in their initial decisions and consequently we would expect advisor trust to update very little.
+Despite this, our experiments showed a very wide range of preference strengths and directions when participants were offered choices between advisors, suggesting that perhaps people did develop preferences (although they may also have had those preferences from the outset).
+It would be a useful extension of the @pescetelliRoleDecisionConfidence2021 theory to explore how it interacts with very difficult decisions, especially because advice-taking is very high for difficult tasks [@ginoEffectsTaskDifficulty2007] and it is intuitive to think that the act of trusting (taking advice) should lead to greater trust in future.
+
+The behavioural experiments used either binary decisions or continuous estimates as the task. 
+In these tasks agreement can be readily quantified.
+Perhaps the majority of decisions for which advice is sought in the real world are not of this kind: they are much richer qualitative decisions with multiple options where advice is seldom a simple endorsement or specific estimate: "Where should I go on holiday?"; "Should I try watching this new drama programme?"; "What's the best way to get rust off a vintage cheese grater?".
+Even the second of these, most like the tasks faced by participants in the behavioural experiments, tend not to have simple answers like "yes" or "no", but qualified answers accompanied by non-verbal confidence cues: "I liked it, but you don't like things that are too dark, right?"; "Definitely, but you have to watch until episode 3 to get into it."; "I thought [some other programme] was better.".
+It is important to investigate whether similar 'agreement' effects operate in these more complex interactions.
+It is plausible, for instance, that agreement is actually an instance of endorsement or positivity, and that these are responsible for increasing trust more than agreement per se.
+
+This work replicated other models of polarisation and echo-chamber formation [@pescetelliRoleDecisionConfidence2021; @madsenLargeNetworksRational2018a] and indicated that the heterogeneity seen in the participants of the behavioural experiments worked to slow the pace and limit the extent of those effects.
+Whether that heterogeneity needs to be a stable feature of agents deserves investigation, especially in light of the suggestion from our data that there was as much heterogeneity within participants as between them.
+Secondly, although these models make a strong theoretical case for polarisation and echo-chamber formation in social networks, more work needs to be done to investigate whether these effects actually occur in practice.
+Analysis of data from on-line social networks has been equivocal on the subject [@colleoniEchoChamberPublic2014; @barberaHowSocialMedia2015; @weeksPartisanEnclavesShared2016; @huiGroupthinkPeerPressure2009], and this is an area where further research is needed.
+
+This thesis presented a view of egocentric discounting that sees it as a rational response to ubiquitous issues in advice-taking: whether advice is well-intentioned; the quality of the advice; and the interpretability of advice.
+These issues are akin to generic issues in information exchange -- how accurately information can be decoded from a signal and the utility of that information.
+Following this, a prediction from our view of egocentric discounting is that information exchange between any organisms, not just advice-giving humans, will show similar 'discounting' where the full utility of salient information cannot be used because it would lead to over-reliance on less useful or misunderstood information.
+More work needs to be done to properly demarcate the similarities and differences between advice-taking and other information exchange domains.
+
+## Summary
+
+This work explored two questions: whether people take too much advice from those who agree with them; and why people do not take enough advice in general.
+To the first, I can say that people may well do this, but that the extent and consequences of their doing so are probably over-estimated.
+The natural variation in people's tendencies, and the wealth of other factors that contribute to the ways in which people interact when exchanging information, mean that simple but persuasive models of frictionless social network dynamics may not accurately capture relevant dynamics in real on-line social networks.
+To the second question, I answer that people _do_ take enough advice... we just misrepresent how much 'enough' should be. 
+When wider contexts are taken into account, the mystery fades, leaving the 'normative' model to act as a reference rather than an ideal.

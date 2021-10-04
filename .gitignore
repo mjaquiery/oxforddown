@@ -3,6 +3,10 @@
 .RData
 .Ruserdata
 .DS_Store
+_main.bbl
+_main.blg
+_main.run.xml
+_todo.md
 _bookdown_files
 _book
 _main.maf
@@ -13,3 +17,14 @@ text/*.aux
 *.mlt*
 _main.*
 .httr-oauth
+repos/EvoEgoBias/
+repos/ExploringSocialMetacognition/
+repos/nofeedback_trust/
+[0-9][0-9]-[0-9][0-9]-*
+![0-9][0-9]-[0-9][0-9]-*.Rmd
+_[0-9][0-9]-[0-9][0-9]-*
+!_[0-9][0-9]-[0-9][0-9]-*.Rmd
+_cache/*
+cache/*
+_knit_thesis_output_format.rda
+_sandbox*

@@ -1,0 +1,1944 @@
+
+## Effects of advice accuracy on advisor choice {#ac-acc}
+
+@pescetelliRoleDecisionConfidence2021 demonstrated that more accurate advisors are more trusted and more influential (regardless of the presence of feedback) in a lab-based perceptual decision-making task.
+We attempted to extend this finding to the domain of advisor choice in two on-line tasks: a 'Dots task' requiring similar perceptual decision-making, and an estimation-based 'Dates task'.
+We predicted that participants would choose a more accurate advisor over a less accurate one, and would do so even in the absence of objective feedback (based on the hypothesis that they can infer accuracy from differing agreement rates).
+
+The ability to distinguish between accurate advisors in these experiments is important because discrimination based on accuracy is crucial to the phenomenon we are attempting to explain: rational advice-seeking behaviour in the absence of feedback.
+@pescetelliRoleDecisionConfidence2021 demonstrated that people could identify and exploit more accurate advice, and these experiments seek to determine whether people will use that ability to obtain advice from a more reliable source.
+Experiment 1A§\@ref(ac-acc-dots) addressed this issue using the same perceptual decision task as use by @pescetelliRoleDecisionConfidence2021; Experiment 1B§\@ref(ac-acc-dates) extended the approach in a task asking participants to estimate historical dates.
+
+### Experiment 1A: advice accuracy effects in the Dots Task {#ac-acc-dots}
+
+```{r ac-acc-dots-load, include = F}
+source('scripts_and_filters/general_setup.R')
+
+select_experiment(
+  project = 'dotstask',
+  function(x) filter(x, study == 'Accuracy', version == '120 practice trials')
+)
+
+.dropEnv <- new.env()
+tada('dotstask', package = 'esmData', envir = .dropEnv)
+.dropEnv$dotstask <- .dropEnv$dotstask %>% 
+  filter(study == 'Accuracy', version != '120 practice trials')
+
+.dropEnv$DROP_P <- sum(.dropEnv$dotstask %>% 
+                         filter(table == 'AdvisedTrial') %>% 
+                         pull(N))
+
+trials <- annotate_responses(trials)
+
+```
+
+#### Open scholarship practices
+
+This experiment was preregistered at `r unique(dotstask$preregistration)`.
+The experiment data are available in the `esmData` package for R [@jaquieryOxacclabEsmDataThesis2021], and also directly from https://osf.io/kn23p/.
+A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/9932543c62b00bd96ef7ddb3439e6c2d5bdb99ce/AdvisorChoice/index.html.
+
+#### Method {#ac-acc-dots-m}
+
+```{r ac-acc-dots-m-structure}
+tmp <- trials %>% 
+  group_by(block, pid) %>% 
+  summarise(
+    n = n(), 
+    typeName = paste(unique(typeName)), 
+    practice = sum(practice),
+    .groups = 'drop'
+  ) %>% 
+  select(-pid) %>% 
+  unique()
+```
+
+`r length(unique(trials$pid))` participants each completed `r sum(tmp$n)` trials over `r nrow(tmp)` blocks of a perceptual decision-making task.
+Each trial consisted of three phases: participants gave an initial estimate (with confidence) of which of two briefly presented boxes contained more dots; received advice on their decision from an advisor; and made a final decision (again, with confidence).
+
+Participants started with `r sum(tmp$typeName == "catch")` blocks of `r tmp %>% filter(typeName == "catch") %>% mutate(n = n - (n %% 4)) %>% .$n %>% unique()` trials that contained no advice to allow them to familiarise themselves with the task; to allow the staircasing process to titrate the difficulty to their ability in order to maintain approximately 71% initial estimate accuracy; and to allow estimating of participants' idiosyncratic confidence reporting style.
+The first three trials were introductory trials that explained the task.
+All trials in this section included feedback indicating whether or not the participant's response was correct.
+
+Participants then did `r tmp %>% filter(typeName == "force" & practice) %>% .$n %>% sum()` trials with a practice advisor to get used to receiving advice.
+They were informed that they would "get **advice** from an advisor to help you make your decision [original emphasis]", and that "advice is not always correct, but it is there to help you: if you use the advice you will perform better on the task."
+
+```{r ac-acc-dots-m-structure-main}
+tmp <- tmp %>% filter(!practice)
+```
+
+Participants then performed `r sum(tmp$typeName == "choice")` sets of `r nrow(tmp) / sum(tmp$typeName == "choice")` blocks each.
+These sets consisted of `r sum(tmp$typeName == "force") / sum(tmp$typeName == "choice")` Familiarisation block of `r tmp %>% filter(typeName == "force") %>% .$n %>% unique()` trials in which participants were assigned one of two advisors.
+The Familiarisation block was followed with a Test block of `r tmp %>% filter(typeName == "choice") %>% .$n %>% unique()` trials in which participants could choose between the advisors they encountered in the Familiarisation block.
+The participants saw different pairs of advisors in each set, with each pair consisting of one advisor with each of the advice profiles.
+
+##### Advice profiles
+
+The two advisor profiles (Table \@ref(tab:ac-acc-dots-m-profiles)) used in the experiment were High accuracy and Low accuracy.
+The advisors' advice was stochastically generated according to the participant's response.
+The High accuracy advisor predominantly agreed with correct participant responses and disagreed with incorrect ones.
+The Low accuracy advisor did likewise, but was less likely to agree with correct responses and more likely to agree with incorrect ones.
+Overall, given an expected participant accuracy of 71% obtained by the staircasing procedure, the High accuracy advisor was correct 80% of the time while the Low accuracy advisor was correct 60% of the time.
+The advisor profiles were not balanced for overall agreement rates.
+
+```{r ac-acc-dots-m-profiles-r} 
+
+pCor <- .71
+
+agr <- matrix(c(.8, .2, .6, .4), 2, 2)
+
+agr.table <- tribble(
+  ~`Advisor`, ~`Participant correct`, ~`Participant incorrect`, ~`Overall`, ~`Overall accuracy`,
+  "High accuracy", agr[1, 1], agr[2, 1], sum(agr[,1] * c(pCor, 1 - pCor)), sum(agr[1,1] * pCor, (1 - agr[2,1]) * (1 - pCor)),
+  "Low accuracy", agr[1, 2], agr[2, 2], sum(agr[,2] * c(pCor, 1 - pCor)), sum(agr[1,2] * pCor, (1 - agr[2,2]) * (1 - pCor))
+) %>% 
+  prop2str()
+
+kable(
+  agr.table, 
+  caption = "\\label{tab:ac-acc-dots-m-profiles}Advisor advice profiles for Dots task Accuracy experiment"
+) %>%
+  kable_styling() %>%
+  column_spec(1, bold = T) %>%
+  row_spec(0, bold = F) %>%
+  collapse_rows(columns = 1, valign = "top") %>%
+  add_header_above(c(" ", 
+                     "Probability of agreement" = 3,
+                     " "))
+
+```
+
+#### Results {#ac-acc-dots-r}
+
+##### Exclusions
+
+```{r ac-acc-dots-r-clean}
+nMaxOutliers <- 2
+zThresh <- 3
+accuracyRange <- c(.6, .85)
+minTrialsPerCategory <- 12
+preRegParticipants <- 50
+
+tmp <- trials %>% 
+  nest(d = -pid) %>%
+  mutate(d = map_dbl(d, ~ mean(.$initialAnswerCorrect)))
+
+exclusions <- tibble(pid = unique(trials$pid)) %>%
+  mutate(
+    `Accuracy too low` = pid %in% filter(tmp, d < accuracyRange[1])$pid,
+    `Accuracy too high` = pid %in% filter(tmp, d > accuracyRange[2])$pid
+  )
+
+tmp <- trials %>% 
+  filter(!practice) %>%
+  nest(d = c(-pid, -confidenceCategory)) %>%
+  mutate(n = map_int(d, nrow)) %>%
+  select(-d) %>%
+  pivot_wider(names_from = confidenceCategory, 
+              names_prefix = "cc", 
+              values_from = n) %>%
+  mutate(
+    anyNA = is.na(cc0) | is.na(cc1) | is.na(cc2),
+    lowest = pmin(cc0, cc1, cc2, na.rm = T)
+  )
+
+exclusions <- exclusions %>% 
+  mutate(
+    `Missing confidence categories` = pid %in% filter(tmp, anyNA)$pid,
+    `Skewed confidence categories` = pid %in% filter(tmp, lowest < minTrialsPerCategory)$pid
+  )
+  
+do_exclusions(exclusions)
+
+tmp <- trials %>% nest(d = -pid) %>% rowid_to_column() %>% filter(rowid > preRegParticipants)
+
+exclusions <- exclusions %>% mutate(`Too many participants` = pid %in% tmp$pid)
+
+do_exclusions(exclusions, backup = F)
+
+
+exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
+n <- ncol(exclusions)
+exclusions %>% 
+  summarise(across(where(is.logical), sum)) %>%
+  mutate(`Total remaining` = length(unique(trials$pid))) %>% 
+  pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
+  kable(caption = "\\label{tab:ac-acc-dots-exclusions}Participant exclusions for Dots task Accuracy experiment") %>%
+  row_spec((n - 1):n, bold = T)
+
+familiarisation <- trials %>%
+  filter(typeName == "force", adviceType %in% c(5,6)) %>%
+  mutate(Advisor = advisor_profile_name(adviceType),
+         Advisor = factor(Advisor)) %>%
+  order_factors()
+```
+
+In line with the preregistration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or had completed the experiment after the preregistered amount of data has already been collected. 
+Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-acc-dots-exclusions).
+
+##### Task performance {#ac-acc-dots-r-performance}
+
+```{r ac-acc-dots-r-response-times}
+# Save RT info for plotting alongside Dates later
+dots_rt <- familiarisation %>% 
+  transmute(
+    pid = factor(pid),
+    `Initial estimate` = timeInitialResponse - timeInitialStart,
+    `Final decision` = timeFinalResponse - timeInitialStart
+  ) %>%
+  pivot_longer(c(`Initial estimate`, `Final decision`),
+               names_to = "Event", 
+               values_to = "Time") %>%
+  filter(!is.na(Event) & !is.na(Time)) %>%
+  rename(Participant = pid)
+
+save(dots_rt, file = paste0(tempdir(), "/.dot_rt.rda"))
+
+```
+
+```{r ac-acc-dots-r-performance-acc, fig.caption="Response accuracy for the Dots task with in/accurate advisors.  Faint lines show individual participant means, for which the violin and box plots show the distributions. The half-width horizontal dashed lines show the level of accuracy which the staircasing procedure targeted, while the full width dashed line indicates chance performance. Dotted violin outlines show the distribution of actual advisor accuracy."}
+
+# Task performance figure
+dw <- .2
+
+tmp <- familiarisation %>%
+  group_by(Advisor, pid) %>%
+  summarise(
+    `Initial estimate` = mean(initialAnswerCorrect),
+    `Final decision` = mean(finalAnswerCorrect),
+    .groups = 'drop'
+  ) %>%
+  pivot_longer(
+    cols = c(`Initial estimate`, `Final decision`),
+    names_to = 'Response', values_to = 'Accuracy'
+  )
+
+adv <- familiarisation %>%
+  group_by(Advisor, pid) %>%
+  summarise(
+    Response = 'Advice',
+    Accuracy = mean(adviceCorrect),
+    .groups = 'drop'
+  ) %>%
+  order_factors()
+
+stair <- tribble(
+  ~Response, ~Accuracy,
+  'Initial estimate', .71
+) %>%
+  crossing(tibble(Advisor = unique(tmp$Advisor))) %>%
+  filter(!is.na(Advisor))
+
+bf <- tmp %>%
+  nest(d = -Advisor) %>%
+  mutate(d = map(d, as.data.frame),
+    bf = map(d, ~ ttestBF(x = .$Accuracy[.$Response == 'Initial estimate'],
+                          y = .$Accuracy[.$Response == 'Final decision'],
+                          data = ., paired = T)),
+         bf = map_chr(bf, ~ .@bayesFactor %>% .$bf %>% exp() %>% bf2str())) %>%
+  select(-d)
+
+tmp %>%
+  order_factors() %>%
+  ggplot(aes(x = Response, y = Accuracy, colour = Advisor)) +
+  scale_y_continuous(limits = c(NA, 1), expand = c(0, 0)) +
+  scale_x_discrete() +
+  coord_cartesian(clip = F) +
+  geom_hline(yintercept = .5, linetype = 'dashed') +
+  geom_segment(aes(y = Accuracy, yend = Accuracy, x = 0, xend = 1.5),
+               linetype = 'dashed', colour = 'black', data = stair) +
+  geom_line(aes(group = pid), alpha = .25) +
+  geom_split_violin(aes(x = nudge(Response, dw),
+                        group = Response, fill = Advisor),
+                    width = .9, colour = NA) +
+  geom_split_violin(aes(x = 2 + dw),
+                    group = 2, fill = NA, colour = 'black', linetype = 'dotted',
+                    data = adv) +
+  geom_boxplot(aes(x = nudge(Response, dw), group = Response),
+               outlier.shape = NA, size = 1, width = dw/2, colour = 'black') +
+  geom_segment(x = 1 - dw, xend = 2 + dw, y = .98, yend = .98, colour = 'black') +
+  geom_label(x = 1.5, y = .98, aes(label = paste0('BF = ', bf)), colour = 'black',
+             data = bf) +
+  facet_wrap(~Advisor) +
+  theme(legend.position = 'none', text = element_text(size = 12)) +
+  labs(x = "") +
+  broken_axis_bottom + 
+  scale_fill_advisor(aesthetics = c("fill", "colour"))
+
+```
+
+```{r ac-acc-dots-r-performance-conf, fig.caption="Confidence for the Dots task with in/accurate advisors.  Faint lines show individual participant means, for which the violin and box plots show the distributions. Final confidence is negative where the answer side changes. Theoretical range of confidence scores is initial: [0,1]; final: [-1,1]."}
+
+tmp <- familiarisation %>%
+  mutate(
+    `Initial estimate accuracy` =
+      if_else(initialAnswerCorrect, 'Initial correct', 'Initial incorrect')
+  ) %>%
+  group_by(`Initial estimate accuracy`, pid) %>%
+  summarise(
+    `Initial estimate` = mean(initialConfidenceScore),
+    `Final decision` = mean(
+      if_else(
+        initialAnswer == finalAnswer, 
+        finalConfidenceScore, 
+        -finalConfidenceScore
+      )
+    ),
+    .groups = 'drop'
+  ) %>%
+  pivot_longer(cols = c(`Initial estimate`, `Final decision`),
+               names_to = 'Response', values_to = 'Confidence') %>%
+  mutate(`Initial estimate accuracy` = factor(`Initial estimate accuracy`))
+
+bf <- tmp %>%
+  nest(d = -Response) %>%
+  mutate(d = map(d, as.data.frame),
+         bf = map(d, ~ ttestBF(
+           x = .$Confidence[.$`Initial estimate accuracy` == 'Initial correct'],
+           y = .$Confidence[.$`Initial estimate accuracy` == 'Initial incorrect'],
+           data = ., paired = T)
+         ),
+         bf = map_chr(bf, ~ .@bayesFactor %>% .$bf %>% exp() %>% bf2str())) %>%
+  select(-d)
+
+tmp %>%
+  order_factors() %>%
+  ggplot(aes(x = `Initial estimate accuracy`, y = Confidence, colour = Response)) +
+  scale_y_continuous(limits = c(-.5, 1), expand = c(0, 0)) +
+  scale_x_discrete() +
+  coord_cartesian(clip = F) +
+  geom_line(aes(group = pid), alpha = .25) +
+  geom_split_violin(aes(x = nudge(`Initial estimate accuracy`, dw),
+                        group = `Initial estimate accuracy`,
+                        fill = Response),
+                    width = .9, colour = NA) +
+  geom_boxplot(aes(x = nudge(`Initial estimate accuracy`, dw),
+                   group = `Initial estimate accuracy`),
+               outlier.shape = NA, size = 1, width = dw/2, colour = 'black') +
+  geom_segment(x = 1 - dw, xend = 2 + dw, y = .97, yend = .97,
+               colour = 'black') +
+  geom_label(aes(label = paste0('BF = ', bf)),
+             x = 1.5, y = .97, colour = 'black', data = bf) +
+  labs(x = "") +
+  theme(legend.position = 'none', text = element_text(size = 12)) +
+  facet_wrap(~Response) +
+  scale_fill_decision(aesthetics = c("fill", "colour")) +
+  broken_axis_bottom
+
+```
+
+Before exploring the interaction between the participants' responses and the advisors' advice, and the participants' advisor choice behaviour, it is useful to verify that participants interacted with the task in a sensible way, and that the task manipulations worked as expected.
+In this section, task performance is explored during the Familiarisation phase of the experiment where participants received advice from a pre-specified advisor on each trial. 
+There were an equal number of these trials for each participant for each advisor.
+
+###### Accuracy
+
+```{r ac-acc-dots-r-accuracy}
+tmp <- familiarisation %>% 
+  transmute(
+    pid = factor(pid),
+    initialAnswerCorrect,
+    finalAnswerCorrect,
+    Advisor
+  ) %>%
+  group_by(pid, Advisor) %>%
+  summarise(
+    initial = mean(initialAnswerCorrect), 
+    final = mean(finalAnswerCorrect), 
+    .groups = 'drop'
+  ) %>%
+  pivot_longer(
+    c(initial, final), 
+    names_to = 'Decision', 
+    values_to = 'accuracy'
+  ) %>%
+  mutate(
+    Decision = factor(str_to_sentence(Decision))
+  ) %>%
+  select(pid, accuracy, Decision, Advisor)
+  
+aov_acc <- ezANOVA(
+  tmp, 
+  dv = accuracy,
+  wid = pid,
+  within = c(Advisor, Decision)
+)
+mm_acc <- marginalMeans(tmp, accuracy, pid, "Improvement")
+
+message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
+
+s <- summariseANOVA(aov_acc$ANOVA, mm_acc)
+
+```
+
+Accuracy of initial estimates was controlled by a staircasing procedure which aimed to pin accuracy to 71%.
+The accuracy of final decisions was free to vary according to the ability of the participant to take advantage of the advice on offer.
+As Figure \@ref(fig:ac-acc-dots-r-performance-acc) shows, participants' accuracy scores for initial estimates were close to the target values (partly because participants whose accuracy scores diverged considerably were excluded).
+Participants tended to improve the accuracy of their responses following advice from High accuracy advisors, while the evidence was unclear as to whether there was any difference in response accuracy with Low accuracy advice.
+This is supported statistically by an ANOVA of response accuracy by Advisor and Time: there was no discernible effect of Advisor (`r s$s[[1]]`), but there was an interaction between Advisor and Time (`r s$s[[3]]`); and there was an effect of Time `r s$s[[2]]`. 
+
+###### Confidence
+
+```{r ac-acc-dots-r-confidence}
+
+df <- familiarisation %>% 
+  transmute(
+    pid = factor(pid),
+    initialConfidence,
+    finalConfidence = if_else(
+      initialAnswer == finalAnswer,
+      finalConfidence,
+      -finalConfidence
+    ),
+    initialAnswerCorrect = if_else(
+      initialAnswerCorrect, "Correct", "Incorrect"
+    ),
+  ) %>%
+  pivot_longer(
+    cols = c(initialConfidence, finalConfidence),
+    names_to = "Decision", 
+    names_pattern = "(.+)Confidence",
+    values_to = "Confidence"
+  ) %>%
+  group_by(pid, Decision, initialAnswerCorrect) %>%
+  summarise(
+    Confidence = mean(Confidence), 
+    .groups = 'drop'
+  ) %>% 
+  mutate(across(-Confidence, factor))
+
+aov_conf <- ez::ezANOVA(
+  df, 
+  dv = Confidence,
+  wid = pid,
+  within = c(Decision, initialAnswerCorrect)
+)
+
+mm_conf <- marginalMeans(df, Confidence, pid, "Increase")
+
+message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
+
+s <- summariseANOVA(aov_conf$ANOVA, mm_conf)
+
+tmp <- aov_conf$ANOVA %>%
+  nest(d = -Effect) %>%
+  mutate(s = map_chr(d, ~ glue(
+    "F({.$DFn},{.$DFd}) = {num2str(.$F, 2)}, _p_{p2str(.$p)}"
+  )))
+
+
+r <- familiarisation %>% 
+  group_by(pid) %>% 
+  summarise(
+    initialAccuracy = mean(initialAnswerCorrect),
+    finalAccuracy = mean(finalAnswerCorrect),
+    initialConfidence = mean(initialConfidence),
+    finalConfidence = mean(finalConfidence)
+  )
+
+r_i <- correlationBF(r$initialAccuracy, r$initialConfidence, paired = T)
+r_f <- correlationBF(r$finalAccuracy, r$finalConfidence, paired = T)
+
+```
+
+```{r ac-acc-dots-r-confidence-cor, fig.caption="Accuracy x Confidence correlations for Dots task with in/accurate advisors.  Each point marks the Bayes factor for a participant's correlation between their initial accuracy and confidence (horizontal axis) and final accuracy and confidence (vertical axis). Shaded bands show areas of no information (1/3 < BF < 3), with evidence for a correlation rightwards and upwards of the area and evidence against below and leftwards. Note that the Bayes factor is a measure of the likelihood the correlation is not 0, not a direct measure of the strenght of the correlation. The blue line indicates the overall pattern, with shaded area giving the 95\\% confidence intervals. Axes use $\\text{log}_{10}$ scale."}
+
+
+f <- function(x, y) {
+  b <- correlationBF(x, y, paired = T)
+  exp(b@bayesFactor$bf)
+}
+
+p <- familiarisation %>% 
+  nest(d = -pid) %>%
+  mutate(
+    initialBF = map_dbl(d, ~ f(.$initialAnswerCorrect, .$initialConfidence)),
+    finalBF = map_dbl(d, ~ f(.$finalAnswerCorrect, .$finalConfidence))
+  )
+
+ggplot(p, aes(x = initialBF, y = finalBF)) +
+  geom_rect(ymin = log10(1/3), ymax = log10(3), xmin = -Inf, xmax = Inf, fill = "grey90") +
+  geom_rect(xmin = log10(1/3), xmax = log10(3), ymin = -Inf, ymax = Inf, fill = "grey90") +
+  geom_smooth(method = 'lm', formula = y ~ x, fill = "blue", alpha = .1) +
+  geom_point(alpha = .25) +
+  coord_fixed() +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "Initial Accuracy x Confidence", y = "Final Accuracy x Confidence") +
+  broken_axis_top +
+  broken_axis_right
+
+```
+
+Generally, we expect participants to be more confident on trials on which they are correct compared to trials on which they are incorrect.
+Participants were systematically more confident on correct as compared to incorrect trials for both initial estimates and final decisions (Figure \@ref(fig:ac-acc-dots-r-performance-conf); Figure \@ref(fig:ac-acc-dots-r-confidence-cor)).
+There is considerable variation between participants both on their baseline confidence and on its variability (not shown), despite all participants being roughly matched for accuracy.
+The narrow accuracy range, and its random nature mean there was no evidence of a correlation between participant accuracy and confidence for initial (BF~H1:H0~ = `r bf2str(exp(r_i@bayesFactor$bf))`) or final (BF~H1:H0~ = `r bf2str(exp(r_f@bayesFactor$bf))`), although neither of these correlations indicated good evidence that no correlation existed.
+Variation between individuals' confidence reports is expected [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017].
+
+We ran an ANOVA on confidence by Time (initial estimates versus final decisions) and Correctness of the initial estimate (Correct initial estimates versus Incorrect initial estimates).
+For this analysis confidence was directionally coded so that final decision confidence was negative if the answer side changed between the initial estimate and final decision.
+The analysis indicated that participants were more confident in their initial estimates than their final decisions (`r s$s[1]`).
+This makes sense given that there is more scope for participants to reverse their confidence than to increase it on any given trial given the way the scale works.
+There was also a main effect of Correctness, with participants being more confident overall where their initial estimate was on correct as compared to when it was incorrect (`r s$s[[2]]`). 
+There was an interaction, with participants becoming even less confident between initial estimates and final decisions for trials where the initial estimate was incorrect (`r s$s[3]`).
+This indicates that confidence is behaving as in a sensible manner.
+
+###### Metacognitive ability
+
+```{r ac-acc-dots-r-metacog, fig.caption="Metacognitive performance for the Dots task with in/accurate advisors.  Faint lines show Reciever Operator Characteristic (ROC) curves for individual participants, while points and solid lines show mean data for all participants. Each participant's data are split into initial estimates and final decisions. For correct and incorrect responses seperately, the probability of a confidence rating being above a response threshold is calculated, with the threshold set to every possible confidence value in turn. This produces a point for each participant in each response for each possible confidence value indicating the probability of confidence being at least that high given the answer was correct, and the equivalent probability given the answer was incorrect. These points are used to create the faint lines, and averaged to produce the solid lines. The dashed line shows chance performance where the increasing confidence threshold leads to no increase in discrimination between correct and incorrect answers. The inset plot shows the distribution of areas under the ROC, and the label gives the mean value."}
+
+dw <- .2
+
+nQuantiles <- 50 # confidence range
+
+tmp <- familiarisation %>% 
+  pivot_longer(cols = c(starts_with('initial'), starts_with('final')),
+               names_to = c('Response', '.value'),
+               names_pattern = '(initial|final)(.*)') %>%
+  # calculate p(confidence > q) for in/correct answers at each quantile q
+  nest(d = c(-pid, -Response, -AnswerCorrect)) %>%
+  mutate(
+    d = map(d, ~ p_conf(., seq(0, 1, length.out = nQuantiles)))
+  ) %>%
+  unnest(cols = d) %>% 
+  unnest(cols = d)
+
+tmp <- tmp %>% 
+  mutate(
+    Response = factor(if_else(Response == 'initial', 
+                              'Initial estimate', 'Final decision')),
+    Confidence = factor(Confidence),
+    Confidence = fct_relabel(Confidence, ~prop2str(as.numeric(.)))
+  ) %>%
+  pivot_wider(names_from = AnswerCorrect, 
+              names_prefix = 'Correct', 
+              values_from = pConf) 
+
+auroc <- tmp %>% 
+  nest(d = c(-pid, -Response)) %>%
+  mutate(
+    d = map(d, ~arrange(., CorrectFALSE, rev(CorrectTRUE))),
+    d = map(d, ~mutate(., area = CorrectTRUE * 
+                         (CorrectFALSE - lag(CorrectFALSE)))),
+    area = map_dbl(d, ~ sum(.$area, na.rm = T))
+  ) %>%
+  select(-d) 
+
+auroc.gg <- auroc %>%
+  nest(d = -Response) %>%
+  mutate(
+    d = map(d, ~ mutate(., mean = mean(area))),
+    gg = map(
+      d, 
+      ~ ggplot(., aes(y = area)) +
+        geom_hline(yintercept = .5, linetype = 'dashed') +
+        geom_density(fill = 'black') +
+        geom_hline(aes(yintercept = mean), data = unique(select(., mean))) +
+        geom_label(aes(y = mean, x = nrow(.), 
+                       label = prop2str(mean)), 
+                   hjust = 1, data = unique(select(., mean))) +
+        scale_y_continuous(limits = c(0, 1), expand = c(0, 0), 
+                           breaks = c(0, .5, 1)) +
+        scale_x_continuous(limits = c(0, nrow(.)), expand = c(0, 0),
+                           position = 'top') +
+        labs(x = "", y = "AUC") +
+        theme(axis.ticks.x = element_blank(),
+              axis.line.x = element_blank(),
+              panel.grid.major.x = element_line(),
+              plot.margin = unit(rep(0, 4), 'lines'))
+    )
+  )
+
+tmp.avg <- tmp %>%
+  group_by(Confidence, Response) %>%
+  summarise(across(where(is.numeric), mean), .groups = 'drop')
+
+tmp.avg %>%
+  order_factors() %>%
+  ggplot(aes(x = CorrectFALSE, y = CorrectTRUE)) +
+  geom_abline(slope = 1, intercept = 0, linetype = 'dashed') +
+  geom_path(aes(group = pid), alpha = .2, colour = 'grey', data = tmp) +
+  geom_path() +
+  geom_point() +
+  geom_plot(aes(label = gg), x = 1, y = .025, vp.width = 2/3, data = auroc.gg) +
+  scale_x_continuous(limits = c(0, 1), expand = c(0, .01)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, .01)) +
+  coord_fixed() +
+  facet_wrap(~Response) +
+  theme(panel.spacing.x = unit(2, 'lines'),
+        plot.margin = unit(c(0, 0, 4, 0), 'lines')) +
+  labs(x = 'p( Confidence > threshold | Incorrect )', 
+       y = 'p( Confidence > threshold | Correct )')
+
+# Correlations between Type II AUROC and accuracy
+acc <- left_join(
+  auroc,
+  familiarisation %>% 
+    group_by(pid) %>% 
+    summarise(initialAccuracy = mean(initialAnswerCorrect),
+              finalAccuracy = mean(finalAnswerCorrect),
+              .groups = 'drop') %>%
+    pivot_longer(-pid) %>%
+    transmute(
+      pid,
+      Response = factor(
+        if_else(name == 'initialAccuracy', 
+                'Initial estimate', 'Final decision')
+      ),
+      accuracy = value
+    ),
+  by = c('pid', 'Response')
+)
+
+r = acc %>% 
+  nest(d = -Response) %>%
+  mutate(
+    d = map(d, ~ cor.test(.$area, .$accuracy)),
+    d = map(d, tidy),
+    s = map_chr(d, ~ glue(
+      "r({.$parameter}) = {prop2str(.$statistic)} [{prop2str(.$conf.low)}, ",
+      "{prop2str(.$conf.high)}], _p_{p2str(.$p.value)}"
+    ))
+  )
+
+```
+
+Where performance on the underlying task is held constant, as here at least for participants' initial pre-advice decisions, metacognitive sensitivity can be measured in a bias-free way by plotting Receiver Operating Characteristic (ROC) curves for metacognitive responses [@flemingHowMeasureMetacognition2014].^[The constant underlying task performance is only true for initial estimates in the paradigm used here, and thus the ROC curves for final decisions should be interpreted with caution because they cannot be proven to be unaffected by metacognitive bias.]
+ROC curves are obtained by calculating at each of a number of different points on a confidence scale, the probability that the confidence is at least that high for correct versus incorrect answers. 
+The area under the ROC curve gives a measure of the ability of confidence ratings to distinguish correct and incorrect responses.
+An area under the ROC curve of .5 indicates chance performance, and a value of 1 indicates perfect discrimination.
+
+As shown by Figure \@ref(fig:ac-acc-dots-r-metacog)A, almost all participants showed above-chance metacognitive sensitivity for initial estimates and final decisions.
+Participants generally showed higher metacognitive sensitivity for final decisions, in line with their improved performance on these trials.
+Participants' metacognitive sensitivity was not particularly high, reflecting the difficulty of the task, and in line with previous datasets with this task [@pescetelliConfidenceAdviceSeeking2021].
+There was no evidence of participants' metacognitive sensitivity being correlated with their task performance (Initial estimates: `r r$s[1]`; Final decisions: `r r$s[2]`). 
+This is expected when task performance is tightly controlled, because under these conditions variation in task performance reflects variation in ability within a participant rather than between participants. 
+
+##### Advisor performance
+
+The advice is generated probabilistically from the rules described previously in Table \@ref(tab:ac-acc-dots-m-profiles).
+It is thus important to get a sense of the actual advice experienced by the participants.
+
+```{r ac-acc-dots-r-advice-agr}
+
+tmp <- familiarisation %>% 
+  mutate(Advisor = advisor_profile_name(adviceType)) %>%
+  filter(!is.na(Advisor)) %>%
+  group_by(pid, Advisor, initialAnswerCorrect) %>%
+  summarise(`Agreement rate` = mean(advisorAgrees), .groups = 'drop') %>%
+  group_by(Advisor, initialAnswerCorrect) %>%
+  summarise(`Agreement rate` = mean(`Agreement rate`), .groups = 'drop') %>%
+  mutate(`Agreement rate` = prop2str(`Agreement rate`)) %>%
+  pivot_wider(
+    names_from = initialAnswerCorrect, 
+    values_from = `Agreement rate`
+  ) %>%
+  rename(`Actual|correct` = `TRUE`, `Actual|incorrect` = `FALSE`)
+
+agr.table %>%
+  select(
+    Advisor, 
+    `Target|correct` = `Participant correct`,
+    `Target|incorrect` = `Participant incorrect`
+  ) %>%
+  left_join(tmp, by = "Advisor") %>%
+  select(
+    Advisor,
+    `Target|correct`,
+    `Actual|correct`,
+    `Target|incorrect`,
+    `Actual|incorrect`
+  ) %>%
+  kable(caption = "\\label{tab:ac-acc-dots-r-advice-agr-t}Advisor agreement for Dots task Accuracy experiment")
+
+```
+
+```{r ac-acc-dots-r-advice-acc}
+
+tmp <- familiarisation %>% 
+  group_by(pid, Advisor) %>%
+  summarise(Accuracy = mean(adviceCorrect), .groups = 'drop') %>%
+  # Calculate anomalous experiences
+  pivot_wider(names_from = Advisor, values_from = Accuracy) %>%
+  mutate(`Participant experience` = if_else(`Low accuracy` > `High accuracy`,
+                                            'Anomalous', 'As planned'),
+         `Participant experience` = factor(
+           `Participant experience`, 
+           levels = c('As planned', 'Anomalous')
+         ))
+
+n_ap <- sum(tmp$`Participant experience` == "As planned")
+
+tmp <- tmp %>%
+  pivot_longer(cols = c(`High accuracy`, `Low accuracy`), 
+               names_to = 'Advisor', values_to = 'Accuracy') %>%
+  group_by(Advisor) %>%
+  summarise(`Mean accuracy` = mean(Accuracy), .groups = 'drop')
+
+# Note: agr.table defined in the Advice profile section
+agr.table %>% 
+  select(Advisor, `Target accuracy` = `Overall accuracy`) %>%
+  left_join(tmp, by = "Advisor") %>%
+  mutate(`Mean accuracy` = prop2str(`Mean accuracy`)) %>%
+  kable(caption = "\\label{tab:ac-acc-dots-r-advice-acc-t}Advisor accuracy for Dots task Accuracy experiment")
+
+```
+
+The advisors' performance was stochastic, with the advisors agreeing or disagreeing with set probabilities depending upon whether the participant was correct or incorrect in their initial estimate. 
+The performance of the advisors in practice was as specified (Table \@ref(tab:ac-acc-dots-r-advice-agr-t)).
+The participants' accuracy rates were controlled with an adaptive staircase, meaning that the advisors' agreement strategies produced overall advice accuracy at target rates.
+The advisors' actual accuracies matched the target accuracies (Table \@ref(tab:ac-acc-dots-r-advice-acc-t)), with `r n_ap`/`r length(unique(familiarisation$pid))` participants experiencing the planned relationship wherein the High accuracy advisor's advice was more accurate than the Low accuracy advisor's advice.
+
+##### \OpenScience{prereg} Hypothesis test {#ac-acc-dots-r-h}
+
+```{r ac-acc-dots-r-graph, fig.caption="Dot task advisor choice for in/accurate advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line.", fig.width=4, fig.height=6}
+
+test <- trials %>% 
+  filter(hasChoice) %>%
+  mutate(Advisor = advisor_profile_name(adviceType),
+         Advisor = factor(Advisor)) %>%
+  order_factors()
+
+tmp <- test %>%
+  group_by(pid) %>%
+  summarise(pChooseHigh = sum(adviceType == 5) / sum(adviceType %in% c(5,6)),
+            .groups = 'drop') %>%
+  mutate(`Feedback condition` = 'No feedback')
+
+bf <- ttestBF(pull(tmp, pChooseHigh), mu = .5)
+
+ggplot(tmp, aes(x = '', y = pChooseHigh)) +
+  geom_hline(yintercept = .5, linetype = 'dashed') +
+  geom_violindot(size_dots = .4) +
+  geom_violinhalf(aes(fill = `Feedback condition`, colour = `Feedback condition`)) +
+  annotate(geom = 'label', label = paste0('BF versus chance\n', bf2str(exp(bf@bayesFactor$bf))),
+           x = 1, y = 1.05) +
+  scale_y_continuous(limits = c(0, 1.1), breaks = seq(0, 1, length.out = 5)) +
+  labs(y = 'p(Choose High accuracy advisor)', x = '') +
+  theme(axis.ticks.x = element_blank(), axis.line.x = element_blank()) +
+  scale_fill_feedback(aesthetics = c("fill", "colour"))
+
+.T <- tmp %>%
+  pull(pChooseHigh) %>%
+  md.ttest(y = .5)
+
+.T.first <- test %>% 
+  mutate(firstPos = choice0 == advisorId) %>% 
+  group_by(pid) %>% 
+  summarise(m = mean(firstPos)) %>% 
+  pull(m) %>%
+  md.ttest(mu = .5, labels = c("M~P(PickFirst)~"))
+
+positions <- test %>% 
+  pivot_longer(starts_with("choice"), names_to = "choice", values_to = "adv") %>% 
+  select(id, pid, choice, adv) %>% 
+  left_join(advisors, by = c("pid", adv = "id")) %>% 
+  mutate(Advisor = advisor_profile_name(adviceType)) %>% 
+  select(id, pid, choice, Advisor) %>% 
+  pivot_wider(names_from = choice, values_from = Advisor)
+
+.T.pos <- positions %>% 
+  group_by(pid) %>% 
+  summarise(x = mean(choice0 == "High accuracy")) %$%
+  md.ttestBF(x, mu = .5, labels = c("M~P(HighAccuracyFirst)~"))
+
+```
+
+With basic task performance as expected, our key analysis focused on participants' choice of advisors. 
+As predicted, and as shown in Figure \@ref(fig:ac-acc-dots-r-graph), participants selected the High accuracy advisor at a rate greater than would be expected if their choosing were random (`r .T`).
+The modal choice remained at chance level (.5), but almost all participants manifesting a preference preferred the High accuracy advisor.
+
+While this effect is interesting, it is substantially smaller than participants' preference for picking the top advisor regardless of identity (`r .T.first`), an effect that we would hope would be random and even out across participants. 
+Note that because the advisor position is well balanced (`r .T.pos`) across advisors the presence of a preference for advisor by position would not cause a preference for an individual advisor.
+
+##### Follow-up tests {#ac-acc-dots-r-follow-up}
+
+```{r ac-acc-dots-r-choice-by-exp, fig.caption="Advisor choice by experience in the Dots task with in/accurate advisors.  Each dot is a participant's proportions. The difference in accuracy rates is calculated as the proportion of correct answers seen from the High accuracy advisor minus the proportion of correct answers seen from the Low accuracy advisor, and the difference in agreement rates similarly for agreement. The participants did not receive feedback on the correct answers"}
+
+tmp <- left_join(
+  left_join(
+    familiarisation %>% 
+      group_by(pid, Advisor) %>%
+      summarise(acc = mean(adviceCorrect), .groups = 'drop') %>%
+      pivot_wider(names_from = Advisor, values_from = acc) %>%
+      transmute(
+        pid, 
+        Accuracy = `High accuracy` - `Low accuracy`
+      ),
+    familiarisation %>% 
+      group_by(pid, Advisor) %>%
+      summarise(agr = mean(advisorAgrees), .groups = 'drop') %>%
+      pivot_wider(names_from = Advisor, values_from = agr) %>%
+      transmute(
+        pid, 
+        Agreement = `High accuracy` - `Low accuracy`
+      ),
+    by = "pid"
+  ),
+  test %>%
+    group_by(pid) %>%
+    summarise(pPickHigh = mean(Advisor == "High accuracy")),
+  by = "pid"
+)
+
+m_acc <- lm(pPickHigh ~ Accuracy, data = tmp) %>%
+  tidy()
+m_agr <- lm(pPickHigh ~ Agreement, data = tmp) %>%
+  tidy()
+s <- tribble(
+  ~ Dimension, ~ Label,
+  "Accuracy",
+  glue(
+    "y = {a}{num2str(x)}{a}x + {b}{num2str(i)}{b}",
+    i = m_acc$estimate[1],
+    x = m_acc$estimate[2], 
+    b = ifelse(m_acc$p.value[1] < .05, "**", ""),
+    a = ifelse(m_acc$p.value[2] < .05, "**", "")
+  ),
+  "Agreement",
+  glue(
+    "y = {a}{num2str(x)}{a}x + {b}{num2str(i)}{b}",
+    i = m_agr$estimate[1],
+    x = m_agr$estimate[2], 
+    b = ifelse(m_agr$p.value[1] < .05, "**", ""),
+    a = ifelse(m_agr$p.value[2] < .05, "**", "")
+  )
+)
+
+r_acc <- correlationBF(tmp$pPickHigh, tmp$Accuracy, paired = T)
+r_agr <- correlationBF(tmp$pPickHigh, tmp$Agreement, paired = T)
+
+tmp <- tmp %>%
+  pivot_longer(
+    c(Accuracy, Agreement),
+    names_to = "Dimension",
+    values_to = "Difference"
+  )
+
+ggplot(tmp, aes(x = Difference, y = pPickHigh)) +
+  geom_vline(xintercept = 0, linetype = 'dashed') +
+  geom_smooth(method = 'lm', formula = y ~ x) +
+  geom_point(alpha = .25) +
+  # coord_fixed() +
+  scale_y_continuous(limits = 0:1) +
+  geom_richtext(
+    aes(label = Label), y = 1, x = mean(tmp$Difference), fill = NA, data = s
+  ) +
+  facet_wrap(~Dimension) +
+  labs(y = "p(Choose High accuracy advisor)")
+
+```
+
+As noted above, the stochastic nature of the advisors' advice meant that there was some variation in the participants' experience of the advisors.
+Despite this difference, there was no evidence of a relationship between participants' advisor preference and their experience of either advisor accuracy (BF~H1:H0~ = `r bf2str(exp(r_acc@bayesFactor$bf))`) or advisor agreement (BF~H1:H0~ = `r bf2str(exp(r_agr@bayesFactor$bf))`), with the latter indicating an absence of a relationship (Figure \@ref(fig:ac-acc-dots-r-choice-by-exp)). 
+This is not entirely surprising because, as with the accuracy correlations discussed above, there was relatively little variation in experience of advisors so effects might be expected to be small and difficult to detect.
+
+```{r}
+tmp <- test %>%
+  select(pid, initialConfidence, Advisor) %>%
+  nest(d = -pid) %>%
+  mutate(
+    d = map(
+      d, 
+      ~ mutate(
+        ., 
+        initialConfidence = initialConfidence >= median(.$initialConfidence)
+      )
+    )
+  ) %>%
+  unnest(cols = d) %>%
+  group_by(pid, initialConfidence) %>%
+  summarise(pickRate = mean(Advisor == "High accuracy"), .groups = 'drop') %>%
+  pivot_wider(names_from = initialConfidence, values_from = pickRate) %>%
+  rename(lowConf = `FALSE`, highConf = `TRUE`)
+  
+bf <- ttestBF(tmp$lowConf, tmp$highConf, paired = T)
+tmp <- tmp %>%
+  summarise(across(-pid, mean))
+
+```
+
+We might also expect advisor preference to vary as a function of initial confidence.
+Perhaps, for example, participants may have a strong preference for the High accuracy advisor but only exercise that preference where they are unsure about the answer themselves (i.e. where advice is most valuable to them).
+This appeared not to be the case: we split participants' trials into high and low confidence based on their idiosyncratic median confidence, and conducted a paired t-test to compare pick rate of the High accuracy advisor for high versus low confidence trials.
+The Bayes factor for this t-test indicated good evidence of no difference in pick rates (BF~H1:H0~ = `r bf2str(exp(bf@bayesFactor$bf))`).
+
+These uninformative results are typical of those across all Dots task experiments in this chapter.
+To save space, these analyses are not reported for subsequent Dots task experiments.
+
+##### Discussion
+
+In the absence of feedback, it should be possible for a person to evaluate advice using the proxy of whether or not the advice accords with their initial opinion, at least given some reasonable assumptions about the independence of the initial opinion and the advice.
+In this experiment, we tested whether participants would be able to exploit this heuristic to detect that one advisor was more useful than another, and whether they would choose to hear advice from the more useful advisor.
+Participants showed a tendency, where they had a preference, to prefer the High accuracy advisor. 
+In the next experiment, we aimed to replicate the results in a different task.
+
+### Experiment 1B: Advice accuracy effects in the Dates task {#ac-acc-dates}
+
+This experiment attempted to replicate the results of the previous experiment using a different task.
+The replication used a binary version of the Dates task reported in Experiment 0§\@ref(ai-ava). 
+Unlike in the Dots task above, and because the study was newly designed for this work, participants in the Dates task were split into conditions so that half received feedback while learning about the advisors and half did not.
+
+```{r ac-acc-dates-load, include = F}
+
+rm(list = ls()); source('scripts_and_filters/general_setup.R')
+
+# Load the study data
+select_experiment(
+  project = 'datequiz',
+  function(x) filter(x, study == 'accuracyDates', manipulationOK)
+)
+
+
+.dropEnv <- new.env()
+tada('datequiz', package = 'esmData', envir = .dropEnv)
+.dropEnv$datequiz <- .dropEnv$datequiz %>% 
+  filter(study == 'accuracyDates', !manipulationOK)
+
+.dropEnv$DROP_V <- paste0(unique(.dropEnv$datequiz$version), collapse = ', ')
+.dropEnv$DROP_P <- sum(.dropEnv$datequiz %>% 
+                         filter(table == 'AdvisedTrial') %>% 
+                         pull(N))
+
+AdvisedTrial <- annotate_responses(AdvisedTrial) %>%
+  filter(!is.na(block))
+
+```
+
+#### Open scholarship practices
+
+This experiment was preregistered at `r unique(datequiz$preregistration)`.
+The experiment data are available in the `esmData` package for R [@jaquieryOxacclabEsmDataThesis2021].
+A snapshot of the state of the code for running the experiment at the time the experiment was run can be obtained from https://github.com/oxacclab/ExploringSocialMetacognition/blob/master/ACBin/acc.html.
+
+#### Method {#ac-acc-dates-m}
+
+```{r ac-acc-dates-m-structure}
+
+tmp <- bind_rows(
+  mutate(practiceTrial, type = "practice", block = 0),
+  mutate(practiceAdvisedTrial, type = "advice_practice", block = 1),
+  mutate(Trial, type = "atn_check") %>% filter(!is.na(block)),
+  mutate(AdvisedTrial, type = "core") %>% filter(!is.na(block))
+) %>%
+  group_by(pid, type, block) %>%
+  summarise(n = n(), advisorChoice = sum(advisorChoice), .groups = "drop") %>%
+  group_by(type, block) %>%
+  summarise(across(-pid, mean), .groups = "drop") %>%
+  arrange(block)
+
+```
+
+`r length(unique(AdvisedTrial$pid))` participants each completed `r round(sum(tmp$n))` trials over `r max(tmp$block)` blocks of the binary version of the Dates task§\@ref(m-p-dates-b).
+On each trial, participants were presented with an historical event that occurred on a specific year between 1900 and 2000.
+They were given a date and asked whether the event occurred before or after that date, indicating their confidence in their decision by selecting an appropriate point on the relevant answer bar.
+Participants then received advice indicating which of the two bars (before or after) was supposedly the correct answer.
+Participants could then mark a final response in the same manner as their original response.
+
+Participants started with `r sum(tmp$type == "practice")` block of `r tmp %>% filter(type == "practice") %>% pull(n) %>% round()` trials that contained no advice to allow them to familiarise themselves with the task.
+All trials in this section included feedback for all participants indicating whether or not the participant's response was correct.
+
+Participants then did `r tmp %>% filter(type == "advice_practice") %>% pull(n) %>% round()` trials with a practice advisor to get used to receiving advice.
+They also received feedback on these trials.
+They were informed that they would "receive advice from advisors" to "help you complete the task".
+They were told that the "advisors aren't always correct, but they are quite good at the task", and informed that they should "identify which advisors are best and to weigh their advice accordingly".
+
+Participants then performed `r sum(tmp$type == "core")` blocks of trials that constituted the main experiment.
+The first two of these were Familiarisation blocks where participants had a single advisor in each block for `r tmp %>% filter(block == 2, type == "core") %>% pull(n) %>% round()` trials, plus `r tmp %>% filter(block == 2, type == "atn_check") %>% pull(n) %>% round()` attention check.
+
+Participants were split into four conditions that produced differences in their experience of these Familiarisation blocks.
+These conditions were whether or not they received feedback, and which of the two advisors they were familiarized with first.
+
+Finally, participants performed a Test block of `r tmp %>% filter(block == 4) %>% pull(n) %>% round()` trials that offered them a choice on each trial of which of the two advisors they had encountered over the last two blocks would give them advice.
+No participants received feedback during the test phase.
+
+##### Advice profiles {#ac-acc-dates-m-advice-profiles}
+
+The High accuracy and Low accuracy advisor profiles issued binary advice (endorsing either the 'before' or 'after' column) probabilistically based on whether or not the participant had selected the correct column in their initial estimate. 
+The High accuracy advisor was agreed with the participant's initial estimate on 80% of the trials where the participant was correct, but only 20% of the trials on which the participant was incorrect, meaning that the High accuracy advisor was correct 80% of the time. 
+Using an analogous setup, the Low accuracy advisor was correct 59% of the time.
+To the extent that a participant was better than chance in answering the questions, the High accuracy advisor profile would agree more frequently.
+This mimics the hypothesised relationship wherein agreement between advisors and judges is driven by shared access to the truth.
+
+```{r ac-acc-dates-m-profiles-r} 
+
+pCor <- .5
+agr <- matrix(c(.8, .2, .59, .41), 2, 2)
+
+agr.table <- tribble(
+  ~`Advisor`, ~`Participant correct`, ~`Participant incorrect`, ~ `Overall`, ~`Overall accuracy`,
+  "High accuracy", agr[1, 1], agr[2, 1], sum(agr[,1] * c(pCor, 1 - pCor)), sum(agr[1,1] * pCor, (1 - agr[2,1]) * (1 - pCor)),
+  "Low accuracy", agr[1, 2], agr[2, 2], sum(agr[,2] * c(pCor, 1 - pCor)), sum(agr[1,2] * pCor, (1 - agr[2,2]) * (1 - pCor))
+) %>% 
+  rename_with(~ paste0(., footnote_marker_alphabet(1)), contains("Overall")) %>% 
+  prop2str()
+
+kable(
+  agr.table, 
+  caption = "\\label{tab:ac-acc-dates-m-profiles}Advisor advice profiles for Dates task Accuracy experiment",
+  escape = F
+) %>%
+  kable_styling() %>%
+  column_spec(1, bold = T) %>%
+  row_spec(0, bold = F) %>%
+  collapse_rows(columns = 1, valign = "top") %>%
+  add_header_above(c(" ", 
+                     "Probability of agreement (%)" = 3,
+                     " ")) %>%
+  add_footnote("Where participants' initial estimate accuracy is 50%")
+```
+
+#### Results {#ac-acc-dates-r}
+
+##### Exclusions
+
+```{r ac-acc-dates-r-clean}
+maxTrialRT <- 60000   # trials take < 1 minute
+minTrials <- 11       # at least 11 trials completed
+minChangeRate <- .1   # some advice taken on 10%+ of trials
+minKeyTrials <- 10    # exactly 10 Key trials
+
+droppedTrials <- AdvisedTrial %>%
+  filter(timeEnd > maxTrialRT)
+
+tmp <- droppedTrials %>%
+  group_by(pid) %>%
+  summarise(n = n())
+
+pc <- nrow(droppedTrials) / nrow(AdvisedTrial)
+
+AdvisedTrial <- AdvisedTrial %>% filter(timeEnd <= maxTrialRT)
+
+exclusions <- AdvisedTrial %>% 
+  nest(d = -pid) %>%
+  mutate(
+    `Too few trials` = map_lgl(d, ~ nrow(.) < minTrials),
+    `Insufficient advice-taking` = 
+      map_lgl(d, ~ (mutate(
+        ., 
+        x = responseAnswerSide != responseAnswerSideFinal |
+          responseConfidence != responseConfidenceFinal) %>%
+          pull(x) %>% mean()) < minChangeRate),
+    `Too few choice trials` = map_lgl(d, ~ sum(!is.na(.$advisorChoice)) < minKeyTrials)
+  ) %>% 
+  select(-d)
+
+do_exclusions(exclusions)
+
+exclusions$`Total excluded` <- exclusions %>% select(-pid) %>% apply(1, any)
+n <- ncol(exclusions)
+
+# No participants excluded here, so we don't show the table
+# exclusions %>% 
+#   summarise(across(where(is.logical), sum)) %>%
+#   mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
+#   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
+#   kable(caption = "\\label{tab:ac-acc-dates-exclusions}Participant exclusions for Dates task Accuracy experiment") %>%
+#   row_spec((n - 1):n, bold = T)
+
+```
+
+Individual trials were screened to remove those that took longer than `r maxTrialRT/1000`s to complete.
+`r nrow(tmp)` participants had a total of `r sum(tmp$n)` trials removed in this way, representing `r num2str(pc * 100)`% of all trials.
+Participants were then excluded for having fewer than `r minTrials` trials remaining, fewer than `r minKeyTrials` trials on which they had a choice of advisor, or for giving the same initial and final response on more than `r (1 - minChangeRate) * 100`% of trials. 
+These criteria led to no participants being excluded from this experiment.
+
+##### Task performance {#ac-acc-dates-r-performance}
+
+```{r ac-acc-dates-r-split}
+
+fb <- AdvisedTrial %>% 
+  group_by(pid) %>%
+  summarise(Feedback = max(feedback)) %>%
+  mutate(Feedback = if_else(Feedback == 1, "Feedback", "No feedback"))
+
+tmp <- AdvisedTrial %>%
+  left_join(fb, by = "pid") %>%
+  mutate(
+    Advisor = advisor_description_name(advisor0idDescription),
+    Advisor = factor(Advisor),
+    Feedback = factor(Feedback)
+  ) %>%
+  order_factors()
+
+Familiarisation <- tmp %>% filter(is.na(advisorChoice) | !advisorChoice) 
+
+Test <- tmp %>% filter(advisorChoice)
+
+```
+
+Before exploring participants' advisor choice behaviour, it is useful to verify that participants interacted with the task in a sensible way, and that the task manipulations worked as expected.
+In this section, task performance is explored during the Familiarisation phase of the experiment where participants received advice from a pre-specified advisor on each trial. 
+There were an equal number of these trials for each participant for each advisor, although as mentioned above a small number of trials were dropped from analysis where response times were overly long.
+
+For the purposes of exploring participants' performance on the task, the conditions are pooled together.
+The participants were randomly assigned to conditions, and thus we know any differences in performance between conditions would be random. 
+
+###### Response times
+
+Participants made two decisions during each trial. 
+Neither of these decisions had a maximum response time. 
+Each participant's response times for both initial estimates and final decisions can be seen in Figure \@ref(fig:ac-acc-dates-r-response-times).
+The distribution of these response times helps characterise some differences between the Dots task and the Dates task.
+In the former, decisions for both initial estimates and final decisions are tightly clustered, with a clear structure and pattern to the responses for all participants.
+In the Dates task however, response times are not only longer, but they are also much more varied within participants.
+Some increase in variance is expected with an increase in mean, especially with fewer trials for each participant, but the extent of the differences clearly shows that the tasks provide participants with different experiences: the Dots task is tightly rhythmic and repetitive, while the Dates task is more heterogeneous.
+
+```{r ac-acc-dates-r-response-times, fig.caption="Response times for the Dates task with in/accurate advisors.  Each row indicates a single participant's trials. The error bars show the 95\\% confidence intervals of the mean response time for each decision. The plusses on the right show the number of trials where response times were more than 3 standard deviations away from the mean of all Dates task final response times (rounded to the next 10s): + = 1-5 trials, ++ = 6-10 trials.", fig.height=6}
+
+load(paste0(tempdir(), "/.dot_rt.rda"))
+unlink(paste0(tempdir(), "/.dot_rt.rda"))
+
+tmp <- Familiarisation %>% 
+  transmute(
+    pid = factor(pid),
+    `Initial estimate` = responseTimeEstimate,
+    `Final decision` = responseTimeEstimateFinal
+  ) %>%
+  pivot_longer(c(`Initial estimate`, `Final decision`),
+               names_to = "Event", 
+               values_to = "Time") %>%
+  filter(!is.na(Event) & !is.na(Time)) %>%
+  rename(Participant = pid)
+
+tmp <- bind_rows(
+  mutate(tmp, Experiment = "Dates task"),
+  mutate(dots_rt, Experiment = "Dots task")
+)
+
+max_rt <- tmp %>% 
+  filter(Event == 'Final decision', Experiment == "Dates task") %>%
+  mutate(zTime = scale(Time)) %>%
+  filter(zTime > 3) %>%
+  filter(zTime == min(zTime)) %>% 
+  pull(Time) %>% 
+  .[1]
+# round to 10s
+max_rt <- ceiling(max_rt / 10000) * 10000
+  
+
+# Replace out-of-scale values with a display of dropped values
+dropped <- tmp %>%
+  group_by(Participant, Experiment) %>%
+  filter(Time > max_rt) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  mutate(
+    plusses = ceiling(n / 5),
+    s = map_chr(plusses, ~ paste0(rep('+', .), collapse = ''))
+  )
+
+tmp <- tmp %>%
+  filter(Time <= max_rt) %>% 
+  mutate(
+    Participant = fct_reorder(Participant, Time, .desc = T),
+    Response = factor(Event),
+    Experiment = factor(Experiment),
+    Time = Time / 1000,
+    g = glue("{Participant}_{Response}")
+  )
+
+tmp %>% 
+  order_factors() %>%
+  ggplot(aes(y = Participant, x = Time, fill = Response, colour = Response)) +
+  stat_summary(
+    geom = "errorbarh", 
+    aes(group = g), 
+    fun.data = mean_cl_normal,
+    # height = 0,
+    alpha = .75
+  ) +
+  geom_text(
+    aes(label = s, y = Participant), inherit.aes = F, 
+    x = max_rt / 1000, colour = 'grey', hjust = 1,
+    data = dropped
+  ) +
+  scale_x_continuous(limits = c(0, max_rt / 1000), expand = c(0, 0)) +
+  labs(x = 'Seconds since trial start') +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    legend.position = 'top',
+    panel.spacing = unit(1, "lines")
+  ) +
+  facet_wrap(~Experiment, scales = "free_y") +
+  scale_fill_decision(aesthetics = c("fill", "colour"))
+
+```
+
+```{r ac-acc-dates-r-performance-acc, fig.caption="Response accuracy for the Dates task with in/accurate advisors.  Faint lines show individual participant means, for which the violin and box plots show the distributions. The dashed line indicates chance performance. Dotted violin outlines show the distribution of actual advisor accuracy.  Because there were relatively few trials, the proportion of correct trials for a participant generally falls on one of a few specific values. This produces the lattice-like effect seen in the graph. Some participants had individual trials excluded for over-long response times, meaning that the denominator in the accuracy calculations is different, and thus producing accuracy values which are slightly offset from others'."}
+
+# Task performance figure
+dw <- .2
+
+# Accuracy
+acc <- Familiarisation %>% 
+  group_by(Advisor, pid) %>%
+  summarise(
+    `Initial estimate` = mean(responseAnswerSideCorrect),
+    `Final decision` = mean(responseAnswerSideCorrectFinal),
+    .groups = 'drop'
+  ) %>%
+  pivot_longer(cols = c(`Initial estimate`, `Final decision`), 
+               names_to = 'Response', values_to = 'Accuracy')
+
+adv <- Familiarisation %>%
+  group_by(Advisor, pid) %>%
+  summarise(
+    Response = 'Advice',
+    Accuracy = mean(advisor0adviceSideCorrect),
+    .groups = 'drop'
+  )
+
+bf <- acc %>% 
+  nest(d = -Advisor) %>%
+  mutate(d = map(d, as.data.frame),
+    bf = map(d, ~ ttestBF(x = .$Accuracy[.$Response == 'Initial estimate'],
+                          y = .$Accuracy[.$Response == 'Final decision'], 
+                          data = ., paired = T)),
+         bf = map_chr(bf, ~ .@bayesFactor %>% .$bf %>% exp() %>% bf2str())) %>%
+  select(-d)
+
+acc %>%
+  mutate(Response = factor(Response)) %>%
+  order_factors() %>%
+  ggplot(aes(x = Response, y = Accuracy, colour = Advisor)) +
+  scale_y_continuous(limits = c(NA, 1), expand = c(0, 0)) +
+  scale_x_discrete() +
+  coord_cartesian(clip = F) +
+  geom_hline(yintercept = .5, linetype = 'dashed') +
+  geom_line(aes(group = pid), alpha = .25) +
+  geom_split_violin(aes(x = nudge(Response, dw), 
+                        group = Response, fill = Advisor), 
+                    width = .9, colour = NA) +
+  geom_split_violin(aes(x = 2 + dw), 
+                    group = 2, fill = NA, colour = 'black', linetype = 'dotted', 
+                    data = adv) +
+  geom_boxplot(aes(x = nudge(Response, dw), group = Response),
+               outlier.shape = NA, size = 1, width = dw/2, colour = 'black') +
+  geom_segment(x = 1 - dw, xend = 2 + dw, y = .97, yend = .97, 
+               colour = 'black') +
+  geom_label(aes(label = paste0('BF = ', bf)), 
+             x = 1.5, y = .97, colour = 'black', data = bf) +
+  facet_wrap(~Advisor) +
+  broken_axis_bottom +
+  scale_fill_advisor(aesthetics = c("fill", "colour"))
+
+```
+
+```{r ac-acc-dates-r-performance-conf, fig.caption="Confidence for the Dates task with in/accurate advisors.  Faint lines show individual participant means, for which the violin and box plots show the distributions. Final confidence is negative where the answer side changes. Theoretical range of confidence scores is initial: [0,1]; final: [-1,1]."}
+
+# Confidence
+conf <- Familiarisation %>% 
+  mutate(
+    `Initial estimate accuracy` = 
+      if_else(responseAnswerSideCorrect, 'Correct', 'Incorrect'),
+    responseConfidenceScoreFinal = if_else(
+      responseAnswerSide == responseAnswerSideFinal,
+      responseConfidenceScoreFinal,
+      -responseConfidenceScoreFinal
+    )
+  ) %>%
+  group_by(`Initial estimate accuracy`, pid) %>%
+  summarise(
+    `Initial estimate` = mean(responseConfidenceScore),
+    `Final decision` = mean(responseConfidenceScoreFinal),
+    .groups = 'drop'
+  ) %>%
+  pivot_longer(cols = c(`Initial estimate`, `Final decision`), 
+               names_to = 'Response', values_to = 'Confidence')
+
+bf <- conf %>% 
+  nest(d = -Response) %>%
+  mutate(d = map(d, as.data.frame),
+         bf = map(d, ~ ttestBF(
+           x = .$Confidence[.$`Initial estimate accuracy` == 'Correct'],
+           y = .$Confidence[.$`Initial estimate accuracy` == 'Incorrect'], 
+           data = ., paired = T)
+         ),
+         bf = map_chr(bf, ~ .@bayesFactor %>% .$bf %>% exp() %>% bf2str())) %>%
+  select(-d)
+
+conf %>%
+  mutate(`Initial estimate accuracy` = factor(`Initial estimate accuracy`)) %>%
+  order_factors() %>%
+  ggplot(aes(x = `Initial estimate accuracy`, y = Confidence, colour = Response)) +
+  scale_y_continuous(limits = c(NA, 1), expand = c(0, 0)) +
+  scale_x_discrete() +
+  coord_cartesian(clip = F) +
+  geom_line(aes(group = pid), alpha = .25) +
+  geom_split_violin(aes(x = nudge(`Initial estimate accuracy`, dw), 
+                        group = `Initial estimate accuracy`, 
+                        fill = Response), 
+                    width = .9, colour = NA) +
+  geom_boxplot(aes(x = nudge(`Initial estimate accuracy`, dw), 
+                   group = `Initial estimate accuracy`),
+               outlier.shape = NA, size = 1, width = dw/2, colour = 'black') +
+  geom_segment(x = 1 - dw, xend = 2 + dw, y = .97, yend = .97, 
+               colour = 'black') +
+  geom_label(aes(label = paste0('BF = ', bf)), 
+             x = 1.5, y = .97, colour = 'black', data = bf) +
+  facet_wrap(~Response) +
+  scale_fill_decision(aesthetics = c("fill", "colour")) +
+  broken_axis_bottom
+
+```
+
+
+```{r ac-acc-dates-r-performance-inf, fig.caption="Influence for the Dates task with in/accurate advisors.  Participants' weight on the advice for advisors in the Familiarisation stage of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The theoretical range for influence values is [-2, 2]."}
+
+# Influence
+
+adv_inf <- Familiarisation %>%
+  group_by(pid, Advisor, feedback) %>%
+  select(c(matches('(influence|WOA)'), group_vars(.))) %>%
+  summarise_all(mean)
+
+# Add in feedback condition
+adv_inf <- left_join(
+  adv_inf,
+  AdvisedTrial %>% 
+    group_by(pid) %>% 
+    summarise(feedbackCondition = case_when(any(feedback == 1) ~ 'Feedback', 
+                                            T ~ 'No feedback'),
+              .groups = 'drop'),
+  by = 'pid'
+) %>% 
+  ungroup() %>%
+  mutate_if(is.character, factor) %>%
+  mutate(`Feedback condition` = feedbackCondition) %>%
+  order_factors()
+
+bf <- adv_inf %>% 
+  nest(d = -c(feedbackCondition, `Feedback condition`)) %>%
+  mutate(
+    bf = map(d, ~ select(., pid, Advisor, advisor0Influence) %>%
+               pivot_wider(names_from = Advisor, 
+                           values_from = advisor0Influence) %>%
+               filter_if(is.numeric, ~ !is.na(.)) %>%
+               as.data.frame() %$%
+               ttestBF(x = `High accuracy`, y = `Low accuracy`, data = ., paired = T))
+  ) 
+
+bf$BF <- sapply(1:nrow(bf), function(i) bf2str(exp(bf$bf[[i]]@bayesFactor$bf)))
+
+dw <- .1
+
+ggplot(adv_inf, aes(x = Advisor, y = advisor0Influence, 
+                colour = `Feedback condition`, fill = `Feedback condition`)) +
+  geom_hline(yintercept = 0, colour = 'lightgrey', size = 1) +
+  geom_line(aes(group = pid), alpha = .25) +
+  geom_split_violin(aes(x = nudge(Advisor, dw),
+                        group = Advisor), width = 1,
+               colour = NA) +
+  geom_boxplot(outlier.shape = NA, size = 1, width = dw/2,
+               aes(x = nudge(Advisor, dw), 
+                   group = Advisor),
+               colour = 'black') +
+  geom_segment(x = 1, xend = 2, y = 1.55, yend = 1.55, colour = 'black') +
+  geom_label(y = 1.55, x = 1.5, colour = 'black', fill = 'white', 
+             aes(label = paste0('BF = ', BF)), data = bf) +
+  scale_y_continuous(limits = c(-.5, 1.6), 
+                     breaks = seq(-.5, 1.5, length.out = 6)) +
+  facet_grid(~`Feedback condition`) +
+  labs(x = 'Advisor advice profile', y = 'Influence of advice') +
+  broken_axis_y +
+  scale_fill_feedback(aesthetics = c("fill", "colour"))
+
+```
+
+###### Accuracy
+
+```{r ac-acc-dates-r-acc} 
+
+aov_acc <- acc %>%
+  mutate(across(-Accuracy, factor)) %>%
+  ezANOVA(
+    dv = Accuracy,
+    wid = pid,
+    within = c(Advisor, Response)
+  )
+
+mm_acc <- acc %>%
+  select(pid, Accuracy, Response, Advisor) %>%
+  mutate(Advisor = str_extract(Advisor, ".+")) %>%
+  marginalMeans(Accuracy, pid, "Improvement")
+
+message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
+
+s <- summariseANOVA(aov_acc$ANOVA, mm_acc)
+
+```
+
+Unlike in the Dots version of the task, participant accuracy is not controlled because it depends on participants' existing knowledge (and guesses) across a relatively small and varied set of questions. 
+Correspondingly, accuracy varied substantially across participants (Figure \@ref(fig:ac-acc-dates-r-performance-acc)). 
+Figure \@ref(fig:ac-acc-dates-r-performance-acc) also shows that participants managed to improve their performance from their initial estimates to their final decisions with both advisors (`r s$s[2]`). 
+This is likely because the advisors themselves were more accurate than the participants, so following their advice was generally a good strategy, and the difficulty of the task meant that participants were very willing to be influenced by advice.
+
+As would be expected from participants following advice, the improvement in accuracy from initial estimates to final decisions was greater for the High accuracy advisor than the Low accuracy advisor (`r s$s[3]`).
+
+###### Confidence
+
+```{r ac-acc-dates-r-conf}
+
+aov_conf <- conf %>%
+  rename(initialCor = `Initial estimate accuracy`) %>%
+  mutate(across(-Confidence, factor)) %>%
+  ezANOVA(
+    dv = Confidence,
+    wid = pid,
+    within = c(initialCor, Response)
+  )
+
+mm_conf <- conf %>%
+  select(pid, Confidence, Response, initialCor = `Initial estimate accuracy`) %>%
+  marginalMeans(Confidence, pid, "Increase")
+
+message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
+
+s_conf <- summariseANOVA(aov_conf$ANOVA, mm_conf)
+
+```
+
+Generally, we expect participants to be more confident on trials on which they are correct compared to trials on which they are incorrect (Figure \@ref(fig:ac-acc-dates-r-performance-conf)).
+Participants' initial estimates and final decisions were both systematically more confident when the initial estimate was correct as compared to incorrect (`r s_conf$s[1]`).
+Participants were less confident on final decisions than on initial estimates (`r s_conf$s[2]`), and the decrease over time was greatest for the trials where the initial estimate was incorrect (`r s_conf$s[3]`).
+
+###### Metacognitive ability
+
+```{r ac-acc-dates-r-metacog, fig.caption="Metacognitive performance for the Dates task with in/accurate advisors.  Faint lines show Reciever Operator Characteristic (ROC) curves for individual participants, while points and solid lines show mean data for all participants. Each participant's data are split into initial estimates and final decisions. For correct and incorrect responses seperately, the probability of a confidence rating being above a response threshold is calculated, with the threshold set to every possible confidence value in turn. This produces a point for each participant in each response for each possible confidence value indicating the probability of confidence being at least that high given the answer was correct, and the equivalent probability given the answer was incorrect. These points are used to create the faint lines, and averaged to produce the solid lines. The dashed line shows chance performance where the increasing confidence threshold leads to no increase in discrimination between correct and incorrect answers. The inset plot shows the distribution of areas under the ROC, and the label gives the mean value."}
+
+dw <- .2
+
+# ROC
+nQuantiles <- 100 # confidence range
+
+roc <- Familiarisation %>% 
+  transmute(
+    pid, 
+    Advisor,
+    initialAnswerCorrect = responseAnswerSideCorrect,
+    finalAnswerCorrect = responseAnswerSideCorrectFinal,
+    initialConfidenceScore = responseConfidenceScore,
+    finalConfidenceScore = responseConfidenceScoreFinal
+  ) %>%
+  pivot_longer(
+    cols = c(starts_with('initial'), starts_with('final')),
+    names_to = c('Response', '.value'),
+    names_pattern = '(initial|final)(.*)'
+  ) %>%
+  # calculate p(confidence > q) for in/correct answers at each quantile q
+  nest(d = c(-pid, -Response, -AnswerCorrect)) %>%
+  mutate(
+    d = map(d, ~ p_conf(., seq(0, 1, length.out = nQuantiles)))
+  ) %>%
+  unnest(cols = d) %>% 
+  unnest(cols = d)
+
+roc <- roc %>% 
+  mutate(
+    Response = if_else(Response == 'initial', 
+                       'Initial estimate', 'Final decision'),
+    Confidence = factor(Confidence),
+    Confidence = fct_relabel(Confidence, ~prop2str(as.numeric(unique(.))))
+  ) %>%
+  pivot_wider(names_from = AnswerCorrect, 
+              names_prefix = 'Correct', 
+              values_from = pConf) 
+
+auroc <- roc %>% 
+  nest(d = c(-pid, -Response)) %>%
+  mutate(
+    d = map(d, ~arrange(., CorrectFALSE, rev(CorrectTRUE))),
+    d = map(d, ~mutate(., area = CorrectTRUE * 
+                         (CorrectFALSE - lag(CorrectFALSE)))),
+    area = map_dbl(d, ~ sum(.$area, na.rm = T))
+  ) %>%
+  select(-d) 
+
+auroc.gg <- auroc %>%
+  nest(d = -Response) %>%
+  mutate(
+    d = map(d, ~ mutate(., mean = mean(area))),
+    gg = map(
+      d, 
+      ~ ggplot(., aes(y = area)) +
+        geom_hline(yintercept = .5, linetype = 'dashed') +
+        geom_density(fill = 'black') +
+        geom_hline(aes(yintercept = mean), data = unique(select(., mean))) +
+        geom_label(aes(y = mean, x = nrow(.), 
+                       label = paste0('Mean = ', prop2str(mean))), 
+                   hjust = 1, data = unique(select(., mean))) +
+        scale_y_continuous(limits = c(0, 1), expand = c(0, 0), 
+                           breaks = c(0, .5, 1)) +
+        scale_x_continuous(limits = c(0, nrow(.)), expand = c(0, 0),
+                           position = 'top') +
+        labs(x = "", y = "AUC") +
+        theme(axis.ticks.x = element_blank(),
+              axis.line.x = element_blank(),
+              panel.grid.major.x = element_line(),
+              plot.margin = unit(rep(0, 4), 'lines'))
+    )
+  )
+
+roc.avg <- roc %>%
+  group_by(Confidence, Response) %>%
+  summarise(across(where(is.numeric), mean), .groups = 'drop')
+
+roc.avg %>%
+  order_factors() %>%
+  ggplot(aes(x = CorrectFALSE, y = CorrectTRUE)) +
+  geom_abline(slope = 1, intercept = 0, linetype = 'dashed') +
+  geom_path(aes(group = pid), alpha = .2, colour = 'grey', data = roc) +
+  geom_path() +
+  geom_point() +
+  geom_plot(aes(label = gg), x = 1, y = .025, vp.width = 2/3, data = auroc.gg) +
+  scale_x_continuous(limits = c(0, 1), expand = c(0, .01)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, .01)) +
+  coord_fixed() +
+  facet_wrap(~Response) +
+  theme(panel.spacing.x = unit(2, 'lines'),
+        plot.margin = unit(c(0, 0, 4, 0), 'lines')) +
+  labs(x = 'p(Confidence > threshold | Incorrect)', 
+       y = 'p(Confidence > threshold | Correct)')
+
+# Correlations between Type II AUROC and accuracy
+.acc <- left_join(
+  auroc,
+  Familiarisation %>% 
+    group_by(pid) %>% 
+    summarise(
+      initialAccuracy = mean(responseAnswerSideCorrect),
+      finalAccuracy = mean(responseAnswerSideCorrectFinal),
+      .groups = 'drop'
+    ) %>%
+    pivot_longer(-pid) %>%
+    transmute(
+      pid,
+      Response = factor(
+        if_else(name == 'initialAccuracy', 
+                'Initial estimate', 'Final decision')
+      ),
+      accuracy = value
+    ),
+  by = c('pid', 'Response')
+)
+
+r = .acc %>% 
+  nest(d = -Response) %>%
+  mutate(
+    d = map(d, ~ cor.test(.$area, .$accuracy)),
+    d = map(d, tidy),
+    s = map_chr(d, ~ glue(
+      "r({.$parameter}) = {prop2str(.$statistic)} [{prop2str(.$conf.low)}, ",
+      "{prop2str(.$conf.high)}], _p_{p2str(.$p.value)}"
+    ))
+  )
+
+```
+
+Estimates of the participants' metacognitive abilities were highly variable, with many participants displaying below-chance metacognitive ability (Figure \@ref(fig:ac-acc-dates-r-metacog)).
+While this may appear concerning, recall that metacognitive sensitivity and bias vary substantially and cannot be reliably estimated using ROC curves where performance accuracy on the underlying task is highly variable, so it is not necessarily the case that these values give cause for alarm.
+
+Performance on the underlying task and metacognitive ability were correlated (Initial estimates: `r r$s[1]`; Final decisions: `r r$s[2]`), showing that, as one might expect, participants with a greater ability to perform the Dates task have a greater insight into their performance on the Dates task.
+This in turn suggests that, despite the low number of trials on the task, we are able to obtain meaningful insights into participants' metacognitive abilities, albeit without being able to precisely estimate the metacognitive sensitivity or bias for an individual participant.
+
+##### Advisor performance
+
+```{r ac-acc-dates-r-advice-agr}
+
+tmp <- Familiarisation %>% 
+  group_by(pid, Advisor, responseAnswerSideCorrect) %>%
+  summarise(
+    `Agreement rate` = mean(advisor0adviceSide == responseAnswerSide), 
+    .groups = 'drop'
+  ) %>%
+  group_by(Advisor, responseAnswerSideCorrect) %>%
+  summarise(`Agreement rate` = mean(`Agreement rate`), .groups = 'drop') %>%
+  mutate(`Agreement rate` = prop2str(`Agreement rate`)) %>%
+  pivot_wider(
+    names_from = responseAnswerSideCorrect, 
+    values_from = `Agreement rate`
+  ) %>%
+  rename(`Actual|correct` = `TRUE`, `Actual|incorrect` = `FALSE`)
+
+agr.table %>%
+  select(
+    Advisor, 
+    `Target|correct` = `Participant correct`,
+    `Target|incorrect` = `Participant incorrect`
+  ) %>%
+  left_join(tmp, by = "Advisor") %>%
+  select(
+    Advisor,
+    `Target|correct`,
+    `Actual|correct`,
+    `Target|incorrect`,
+    `Actual|incorrect`
+  ) %>%
+  kable(caption = "\\label{tab:ac-acc-dates-r-advice-agr-t}Advisor agreement for Dates task Accuracy experiment")
+
+```
+
+```{r ac-acc-dates-r-advice-acc}
+
+tmp <- Familiarisation %>% 
+  group_by(pid, Advisor) %>%
+  summarise(Accuracy = mean(advisor0adviceSideCorrect), .groups = 'drop') %>%
+  # Calculate anomalous experiences
+  pivot_wider(names_from = Advisor, values_from = Accuracy) %>%
+  mutate(`Participant experience` = if_else(`Low accuracy` > `High accuracy`,
+                                            'Anomalous', 'As planned'),
+         `Participant experience` = factor(
+           `Participant experience`, 
+           levels = c('As planned', 'Anomalous')
+         ))
+
+n_ap <- sum(tmp$`Participant experience` == "As planned")
+
+tmp <- tmp %>%
+  pivot_longer(cols = c(`High accuracy`, `Low accuracy`), 
+               names_to = 'Advisor', values_to = 'Accuracy') %>%
+  group_by(Advisor) %>%
+  summarise(`Mean accuracy` = mean(Accuracy), .groups = 'drop')
+
+# Note: agr.table defined in the Advice profile section
+agr.table %>% 
+  select(Advisor, `Target accuracy` = starts_with("Overall accuracy")) %>%
+  left_join(tmp, by = "Advisor") %>%
+  mutate(`Mean accuracy` = prop2str(`Mean accuracy`)) %>%
+  kable(caption = "\\label{tab:ac-acc-dates-r-advice-acc-t}Advisor accuracy for Dates task Accuracy experiment")
+
+```
+
+The advice is generated probabilistically from the rules described previously (Advice profiles§\@ref(ac-acc-dates-m-advice-profiles)).
+The advisors agreed with participants contingent on the accuracy of the participants' initial estimates at close to the target rates (Table \@ref(tab:ac-acc-dates-r-advice-agr-t)).
+This meant that advisors were as accurate overall as they were intended to be in the familiarisation phase (Table \@ref(tab:ac-acc-dates-r-advice-acc-t)).
+Most (`r n_ap`/`r length(unique(Familiarisation$pid))`, `r num2str(n_ap / length(unique(Familiarisation$pid)) * 100)`%) participants experienced the High accuracy advisor as providing more accurate advice than the Low accuracy advisor.
+
+##### Advisor influence
+
+```{r ac-acc-dates-r-influence-aov}
+
+inf_aov <- suppressWarnings(
+  ezANOVA(
+    data = adv_inf,
+    dv = advisor0Influence,
+    wid = pid,
+    within = Advisor,
+    between = feedbackCondition
+  )
+) 
+
+mm_inf <- adv_inf %>%
+  transmute(
+    pid, 
+    advisor0Influence, 
+    Advisor = fct_rev(Advisor), 
+    `Feedback condition`
+  ) %>%
+  marginalMeans(advisor0Influence, pid, "High-Low accuracy")
+
+message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
+
+s <- summariseANOVA(inf_aov$ANOVA, mm_inf)
+
+```
+
+The High accuracy advisor was substantially more influential than the other Low accuracy advisor (`r s$s[2]`).
+This tendency did not differ significantly between the group who received trial-by-trial feedback and the group who did not receive feedback (`r s$s[3]`).
+Nor did the participants in the feedback and no feedback conditions appear to differ in the extent to which they took advice (`r s$s[1]`).
+
+These influence measurements are calculated on the Familiarisation phase trials in which participants are not offered a choice of advisor.
+It is during this phase that participants are learning about the value of the advice (especially in the Feedback condition), and thus any influence on later trials may be diluted by low influence on trials which occur before an advisor has had time to develop a reputation as reliable.
+This means that influence cannot be used as a reliable outcome measure for this experimental design, but it is nevertheless useful to explore to get a sense of how participants responded to the advice.
+An inspection of the individual participants' data shows that very few participants had large influence differences between advisors (Figure \@ref(fig:ac-acc-dates-r-performance-inf)).
+
+##### \OpenScience{prereg} Hypothesis test {#ac-acc-dates-r-h}
+
+```{r ac-acc-dates-r-graph, fig.caption="Dates task advisor choice for in/accurate advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line. Participants in the Feedback condition received feedback during the Familiarisation phase, but not during the Choice phase.", fig.width=6, fig.height=6}
+
+tmp <- Test %>%
+  group_by(pid) %>%
+  summarise(pChooseHigh = mean(advisor0idDescription == 'highAccuracy'),
+            .groups = 'drop')
+
+# Add in feedback condition
+tmp <- left_join(
+  tmp,
+  AdvisedTrial %>% 
+    group_by(pid) %>% 
+    summarise(`Feedback condition` = case_when(any(feedback == 1) ~ 'Feedback', 
+                                            T ~ 'No feedback'),
+              .groups = 'drop'),
+  by = 'pid'
+) %>% 
+  mutate_if(is.character, factor) %>%
+  order_factors()
+
+bf <- tmp %>% 
+  nest(d = -`Feedback condition`) %>%
+  mutate(bf = map(d, ~ pull(., pChooseHigh) %>% 
+                        ttestBF(mu = .5))) 
+bf$bf <- sapply(1:nrow(bf), 
+                function(i) num2str(exp(pull(bf, bf)[[i]]@bayesFactor$bf)))
+
+bf.comp <- ttestBF(formula = pChooseHigh ~ `Feedback condition`, 
+                   data = as.data.frame(tmp)) %>%
+  .@bayesFactor %>% .$bf %>% exp() %>% num2str()
+
+ggplot(tmp, aes(x = `Feedback condition`, y = pChooseHigh)) +
+  geom_hline(yintercept = .5, linetype = 'dashed') +
+  geom_violindot(size_dots = .4) +
+  geom_violinhalf(aes(fill = `Feedback condition`, colour = `Feedback condition`)) +
+  geom_label(aes(label = paste0('BF versus chance\n', bf)), y = 1.1, data = bf) +
+  annotate(geom = 'segment', x = 1, xend = 2, y = 1.2, yend = 1.2) +
+  annotate(geom = 'label', x = 1.5, y = 1.2, label = paste0('BF = ', bf.comp)) +
+  scale_y_continuous(limits = c(0, 1.2), breaks = seq(0, 1, length.out = 5)) +
+  labs(y = 'p(Choose High accuracy advisor)', x = '') +
+  theme(axis.line.x = element_blank(), axis.ticks.x = element_blank()) +
+  scale_fill_feedback(aesthetics = c("fill", "colour"))
+
+.T.fb <- tmp %>%
+  filter(`Feedback condition` == 'Feedback') %>%
+  pull(pChooseHigh) %>%
+  md.ttest(y = .5, labels = c('M~Feedback~'))
+
+.T.Nfb <- tmp %>%
+  filter(`Feedback condition` != 'Feedback') %>%
+  pull(pChooseHigh) %>%
+  md.ttest(y = .5, labels = c('M~NoFeedback~'))
+
+.T.comp <- md.ttest(
+  tmp %>% filter(`Feedback condition` == 'Feedback') %>% pull(pChooseHigh),
+  tmp %>% filter(`Feedback condition` == 'No feedback') %>% pull(pChooseHigh),
+  labels = c("M~Feedback~", "M~NoFeedback~")
+)
+
+```
+
+The key analysis in this experiment explores the participants' preferences for picking the High accuracy advisor over the Low accuracy advisor.
+In the No feedback condition the mean of the distribution of participant picking preferences between the advisors was equivalent to chance (`r .T.Nfb`).
+This is a different result to that observed in the Dots task§\@ref(ac-acc-dots-r-h), which also had no feedback.
+Preferences were quite evenly distributed across the full range of directions and strengths, with a slight numerical advantage for the Low accuracy advisor (Figure \@ref(fig:ac-acc-dates-r-graph)).
+
+In the Feedback condition the mean of the distribution of selection rates was clearly different from chance. 
+The High accuracy advisor was preferred by more participants, and preferred more strongly (`r .T.fb`).
+The modal selection strategy was to select the High accuracy advisor at every opportunity.
+This indicates that participants could identify the more accurate advisor when feedback was provided and preferred to receive advice from that advisor.
+Interestingly, this meant that there was a difference in participants' preference for picking the High accuracy advisor according to their experimental condition (`r .T.comp`).
+
+It was discovered after the completion of experiments that the advisor position (whether the advisor appears on the top or bottom of the advisor choice panel) was not counterbalanced between advisors.
+This was true for all the Dates task experiments reported in this chapter.
+It had been decided during development of the tests to keep the advisors in the same position for every trial so that participants did not get mixed up between them.
+Together, this meant that the High accuracy advisor always appeared at the top and the Low accuracy advisor always appeared at the bottom, for every trial for every participant.
+We are thus unable to confirm that pick rate differences, or the absence of those differences, are caused by participants' preferences for the advice the advisor would provide or the position the advisor was in on the screen.
+Furthermore, it is possible that any genuine preference for one advisor over the other was _induced_ by the position, rather than independent of it [@zajkowskiCrossDomainEffectsChoiceInduced2021].
+
+##### Follow-up tests
+
+###### Ability of participants
+
+```{r ac-acc-dates-r-follow-up-participants}
+
+tmp <- left_join(
+  Familiarisation %>% 
+    group_by(pid) %>%
+    summarise(
+      acc = mean(responseAnswerSideCorrect),
+      Feedback = unique(Feedback),
+      .groups = 'drop'
+    ),
+  Test %>%
+    group_by(pid) %>%
+    summarise(pPickHigh = mean(Advisor == "High accuracy")),
+  by = "pid"
+) %>%
+  left_join(
+    auroc %>% 
+      filter(str_starts(Response, "Initial")) %>%
+      select(-Response),
+    by = "pid"
+  ) %>%
+  filter(Feedback == "No feedback")
+
+.acc <- cor.test(tmp$acc, tmp$pPickHigh) %>%
+  tidy() %>%
+  mutate(
+    bf = correlationBF(tmp$acc, tmp$pPickHigh)@bayesFactor$bf %>% exp(),
+    s = glue("r({parameter}) = {prop2str(estimate)}, _p_{p2str(p.value)}, BF~H1:H0~ = {bf2str(bf)}")
+  ) 
+.auc <- cor.test(tmp$area, tmp$pPickHigh) %>%
+  tidy() %>%
+  mutate(
+    bf = correlationBF(tmp$area, tmp$pPickHigh)@bayesFactor$bf %>% exp(),
+    s = glue("r({parameter}) = {prop2str(estimate)}, _p_{p2str(p.value)}, BF~H1:H0~ = {bf2str(bf)}")
+  ) 
+
+```
+
+It is plausible that participants who were better at the task had more insight into which of their advisors was more accurate.
+There was not enough evidence to determine whether participants in the No feedback condition selected the High accuracy advisor more frequently where they were more accurate themselves (`r .acc$s`) or more well calibrated (as measured by area under the Receiver Operator Characteristics curve for initial estimates; `r .auc$s`).
+
+###### Experience of advisors
+
+```{r ac-acc-dates-r-follow-up, fig.caption="Preference predictors in the Dates task with in/accurate advisors.  Scatter plots of participants' experience with advisors in terms of agreement or accuracy rates. Differences are expressed as the experienced rate for the High accuracy advisor minus the experienced rate for the Low accuracy advisor during the Familiarisation phase. Numbers in bold in the regression equations are significant at p < .05."}
+
+tmp <- left_join(
+  left_join(
+    Familiarisation %>% 
+      group_by(pid, Advisor) %>%
+      summarise(
+        acc = mean(advisor0adviceSideCorrect),
+        Feedback = unique(Feedback),
+        .groups = 'drop'
+      ) %>%
+      pivot_wider(names_from = Advisor, values_from = acc) %>%
+      transmute(
+        pid, 
+        Accuracy = `High accuracy` - `Low accuracy`
+      ),
+    Familiarisation %>% 
+      group_by(pid, Advisor) %>%
+      summarise(
+        agr = mean(advisor0adviceSide == responseAnswerSide), 
+        Feedback = unique(Feedback),
+        .groups = 'drop'
+      ) %>%
+      pivot_wider(names_from = Advisor, values_from = agr) %>%
+      transmute(
+        pid, 
+        Agreement = `High accuracy` - `Low accuracy`
+      ),
+    by = "pid"
+  ),
+  Test %>%
+    group_by(pid) %>%
+    summarise(
+      pPickHigh = mean(Advisor == "High accuracy"),
+      Feedback = unique(Feedback)
+    ),
+  by = "pid"
+) 
+
+df <- tmp %>%
+  mutate(pid = factor(pid)) %>%
+  as.data.frame()
+lm_acc <- lm(
+  formula = pPickHigh ~ Accuracy * Feedback,
+  data = tmp
+)
+lm_acc_bf <- generalTestBF(
+  formula = pPickHigh ~ Accuracy * Feedback, 
+  data = df, 
+  whichModels = "top",
+  progress = F
+) %>% 
+  .@bayesFactor %>%
+  as_tibble(rownames = "model") %>%
+  transmute(model, bf = 1/exp(bf))
+
+lm_agr <- lm(
+  formula = pPickHigh ~ Agreement * Feedback,
+  data = tmp
+)
+lm_agr_bf <- generalTestBF(
+  formula = pPickHigh ~ Agreement * Feedback, 
+  data = df, 
+  whichModels = "top",
+  progress = F
+) %>% 
+  .@bayesFactor %>%
+  as_tibble(rownames = "model") %>%
+  transmute(model, bf = 1/exp(bf))
+
+tmp <- tmp %>%
+  pivot_longer(
+    c(Accuracy, Agreement),
+    names_to = "Dimension",
+    values_to = "Difference"
+  )
+
+s <- tmp %>%
+  nest(d = -c(Feedback, Dimension)) %>%
+  mutate(lm = map(d, ~ lm(pPickHigh ~ Difference, data = .) %>% tidy())) %>%
+  select(-d) %>%
+  unnest(cols = lm) %>%
+  mutate(term = str_match(term, "\\(?(.)")[,2]) %>%
+  pivot_wider(names_from = term, values_from = where(is.numeric)) %>%
+  mutate(
+    s = glue(
+      "y = {a}{num2str(estimate_D)}x{a} + {b}{num2str(estimate_I)}{b}",
+      a = if_else(p.value_D < .05, "**", ""),
+      b = if_else(p.value_I < .05, "**", "")
+    )
+  )
+
+ggplot(tmp, aes(x = Difference, y = pPickHigh)) +
+  geom_vline(xintercept = 0, linetype = 'dashed') +
+  geom_smooth(method = 'lm', formula = y ~ x, fullrange = T) +
+  geom_point(alpha = .25) +
+  scale_y_continuous(limits = 0:1) +
+  geom_richtext(
+    aes(label = s), data = s, y = 1, x = 0, fill = NA, 
+    hjust = 1, vjust = 1.1
+  ) +
+  facet_grid(Feedback~Dimension) +
+  labs(y = "p(Choose High accuracy advisor)") +
+  broken_axis_x
+
+```
+
+```{r ac-acc-dates-r-cors-acc}
+kableLM(
+  lm_acc,
+  caption = "\\label{tab:ac-acc-dates-r-cors-acc-t}Experienced accuracy difference effects in the Dates task with in/accurate advisors"
+)
+```
+
+```{r ac-acc-dates-r-cors-agr}
+kableLM(
+  lm_agr,
+  caption = "\\label{tab:ac-acc-dates-r-cors-agr-t}Experienced agreement difference effects in the Dates task with in/accurate advisors"
+)
+```
+
+The stochastic nature of the advisors' advice meant that there was some variation in the participants' experience of the advisors.
+Linear models were run predicting advisor choice behaviour based on experienced differences in accuracy (Table \@ref(tab:ac-acc-dates-r-cors-acc-t)) and agreement (Table \@ref(tab:ac-acc-dates-r-cors-agr-t)).
+Bayesian linear models were run obtaining Bayes Factors of leaving each component out of a model containing experienced agreement or accuracy difference, feedback condition, and their interaction, as well as a random factor for the participant's identity. 
+
+In aggregate, the models indicated that participants in the Feedback group had a stronger preference for the High accuracy advisor than participants in the No feedback group, regardless of their actual experience of advisor agreement (BF~+Feedback:-Feedback~ = `r bf2str(lm_acc_bf$bf[2])`) or accuracy (BF~+Feedback:-Feedback~ = `r bf2str(lm_agr_bf$bf[2])`).
+There was no evidence of a relationship between participants' advisor preference and their experience of either advisor accuracy (BF~+Accuracy:-Accuracy~ = `r bf2str(lm_acc_bf$bf[3])`) or advisor agreement (BF~+Agreement:-Agreement~ = `r bf2str(lm_agr_bf$bf[3])`), but neither of these had evidence strong enough to suggest the absence of such a relationship. 
+The strongest evidence for the absence of an effect was for the interaction between feedback condition and experienced accuracy (BF~+Interaction:-Interaction~ = `r bf2str(lm_acc_bf$bf[1])`) or agreement (BF~+Interaction:-Interaction~ = `r bf2str(lm_agr_bf$bf[1])`), but this was also not beyond the stated threshold of 1/3.
+
+The vagueness of the results is is not entirely surprising because, as with the accuracy correlations discussed above, there was relatively little variation in experience of advisors so effects might be expected to be small and difficult to detect.
+These uninformative results are typical of those across all Dots task experiments in this chapter.
+To save space, these analyses are not reported for subsequent Dots task experiments.
+
+### Discussion {#ac-acc-d}
+
+We investigated whether more accurate advisors would be preferentially selected by participants when participants were unable to use feedback to evaluate the quality of advisors.
+We performed two experiments using different tasks, and found mixed results.
+In the branch of the Dates task where feedback was provided, participants had a clear preference for the more accurate advisor.
+This preference was also seen in the Dots task, in which no participants received feedback. 
+Contrary to these results, however, participants in the Dates task who did not receive feedback did not show a systematic preference for either advisor.
+
+The difference between the task results where feedback was denied to participants is probably due to the Dates task being a generally more difficult task for participants than the Dots task.
+This extra difficulty likely meant that participants in the Dates task were unable to tell the advisors apart.
+If the @pescetelliRoleDecisionConfidence2021 model of metacognitive evaluation of advice is accurate, participants may have been subjectively very unsure of whether their answer was correct or incorrect, and thus in the absence of feedback they cannot glean insight into the accuracy of advice by attending to whether or not the advice contradicts their initial estimate.
+Alternatively, if this process is not driving performance in the Dates task, the additional difficulty may simply have meant that participants' strong desire to see advice [@ginoEffectsTaskDifficulty2007] may have rendered the relative quality of the advice unimportant.
+
+In both tasks the advisor preferences included many participants whose preference was either neutral (all tasks) or in favour of the Low accuracy advisor (Dates task).
+This variability in pick rates from the participants in the No feedback condition of the Dates task, suggests that preferences are diverse both in terms of direction and strength in the absence of any systematic effects.
+There is substantial variability in pick rates for participants in the Feedback condition of the Dates task, too, indicating that, compared to the No feedback condition, everyone might have nudged their preference a bit towards the High accuracy advisor. 
+
+Pick rates in the Dots task were also varied, but rather than being evenly spread (as in the No feedback Dates task participants) or massed in favour of the High accuracy advisor with a long, fat tail including exclusive selection of the Low accuracy advisor, Dots task participants were massed in the centre with a long tail out to strong preference for the High accuracy advisor.
+The Dots task data may have reduced variability because there were more trials that offered the participants a choice of advisor, and the novelty value of the ignored advisor may have increased relative to the chosen advisor as the test phase progressed. 
+Alternatively, participants making repeated choices may have eventually felt that continuing to ignore one advisor was unfair, and that pragmatic reasons for including the opinion of a less expert voice outweighed the performance-maximisation reasons for not including that voice [@mahmoodiEqualityBiasImpairs2015].
+
+Another explanation for the difference may be the level of engagement with the tasks.
+If participants in the Dates task were more engaged with the more challenging and (subjectively but consistent with participant feedback) more enjoyable task, picking of advisors may have been more deliberative than in the Dots task, where the repetitive nature of the trials could have led to disengagement and random advisor choice behaviour for some participants.
+
+The results of these studies were mixed in terms of supporting our hypothesis that more expert advisors would be discriminated and preferentially picked by participants even in the absence of feedback.
+The underlying mechanism we believe to be responsible for evaluating advisors in the absence of feedback is agreement, and thus a more powerful test of the mechanism is to move from demonstrating the phenomenon (detection of accuracy differences without feedback) to demonstrating the mechanism (discrimination based on agreement differences). 
+This investigation of agreement as a mechanism for driving advisor evaluation in the absence of feedback is the subject of the next experiments.
