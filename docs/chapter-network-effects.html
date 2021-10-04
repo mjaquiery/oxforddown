@@ -6,20 +6,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>4 Network effects of advisor choice | Exploring Social Metacognition</title>
 <meta name="author" content="Matt Jaquiery">
+<meta name="description" content="4.1 Introduction The behavioural experiments in the previous chapter, along with predecessors from others in our lab (Pescetelli and Yeung 2021), indicate that people show preferences for...">
 <meta name="generator" content="bookdown 0.24 with bs4_book()">
 <meta property="og:title" content="4 Network effects of advisor choice | Exploring Social Metacognition">
 <meta property="og:type" content="book">
+<meta property="og:description" content="4.1 Introduction The behavioural experiments in the previous chapter, along with predecessors from others in our lab (Pescetelli and Yeung 2021), indicate that people show preferences for...">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="4 Network effects of advisor choice | Exploring Social Metacognition">
+<meta name="twitter:description" content="4.1 Introduction The behavioural experiments in the previous chapter, along with predecessors from others in our lab (Pescetelli and Yeung 2021), indicate that people show preferences for...">
 <!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/header-attrs-2.11/header-attrs.js"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
 <script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.3.0/transition.js"></script><script src="libs/bs3compat-0.3.0/tabs.js"></script><script src="libs/bs3compat-0.3.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
 <script src="libs/bs4_book-1.0.0/bs4_book.js"></script><script src="libs/kePrint-0.0.1/kePrint.js"></script><link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><link rel="stylesheet" href="templates/bs4_style.css">
 <link rel="stylesheet" href="templates/corrections.css">
-<meta name="description" content="4.1 Introduction The behavioural experiments in the previous chapter, along with predecessors from others in our lab (Pescetelli and Yeung 2021), indicate that people show preferences for...">
-<meta property="og:description" content="4.1 Introduction The behavioural experiments in the previous chapter, along with predecessors from others in our lab (Pescetelli and Yeung 2021), indicate that people show preferences for...">
-<meta name="twitter:description" content="4.1 Introduction The behavioural experiments in the previous chapter, along with predecessors from others in our lab (Pescetelli and Yeung 2021), indicate that people show preferences for...">
 </head>
 <body data-spy="scroll" data-target="#toc">
 
@@ -172,7 +172,7 @@ The models illustrate the dynamics of advice interactions: how prior expectation
 <p>Agent-based modelling is used to simulate the interactive effects of repeated paired decision-making.
 The agents in the model perform a cycle of making an initial estimate, selecting one of the other agents as an advisor, receiving advice from the chosen advisor, making a final decision, and updating their trust in their advisor and their internal beliefs about the world.
 The task the agents face is roughly analogous to the task faced by human participants in the Dots task experiments§<a href="chapter-behavioural-experiment-method.html#m-p-dots">2.1.3.1</a>, where the participants make a decision about which of two rapidly and simultaneously presented grids contained more dots.</p>
-<p>Each model consists of a population of agents implementing the same mathematical model of decision-making, trust-updating, and advisor choice, with different coefficients for parameters of that mathematical model (Table <a href="#tab:nw-m-agent-properties-table"><strong>??</strong></a>) drawn from appropriate distributions.</p>
+<p>Each model consists of a population of agents implementing the same mathematical model of decision-making, trust-updating, and advisor choice, with different coefficients for parameters of that mathematical model (Table <a href="chapter-network-effects.html#tab:nw-m-agent-properties">4.1</a>) drawn from appropriate distributions.</p>
 <div id="open-code" class="section level3" number="4.2.1">
 <h3>
 <span class="header-section-number">4.2.1</span>  Open code<a class="anchor" aria-label="anchor" href="#open-code"><i class="fas fa-link"></i></a>
@@ -189,7 +189,7 @@ To assist with exploring the models without having to rerun models from scratch,
 <h3>
 <span class="header-section-number">4.2.2</span> Model details<a class="anchor" aria-label="anchor" href="#model-details"><i class="fas fa-link"></i></a>
 </h3>
-<p>Each model is defined by a set of model parameters (<a href="#tab:nw-m-model-properties-table"><strong>??</strong></a>), which are assigned capital letters in the equations below.
+<p>Each model is defined by a set of model parameters (<a href="chapter-network-effects.html#tab:nw-m-model-properties">4.2</a>), which are assigned capital letters in the equations below.
 These parameters are used to generate further parameters which govern agents’ tendencies, and these are assigned lower-case letters and superscripted with the agent to whom they belong.
 Variables which change over the course of the model have a subscript indicating which step of the model they belong to.</p>
 <p>This is best illustrated with an example.
@@ -200,8 +200,8 @@ When the agent is created, the parameter defining its sensitivity distribution (
 <h4>
 <span class="header-section-number">4.2.2.1</span> Creating agents<a class="anchor" aria-label="anchor" href="#creating-agents"><i class="fas fa-link"></i></a>
 </h4>
-<p>Each agent has the properties listed in Table <a href="#tab:nw-m-agent-properties-table"><strong>??</strong></a>.
-An agent’s values for each of these properties are created by drawing values from normal distributions defined by parameters in the model settings (Table <a href="#tab:nw-m-model-properties-table"><strong>??</strong></a>).</p>
+<p>Each agent has the properties listed in Table <a href="chapter-network-effects.html#tab:nw-m-agent-properties">4.1</a>.
+An agent’s values for each of these properties are created by drawing values from normal distributions defined by parameters in the model settings (Table <a href="chapter-network-effects.html#tab:nw-m-model-properties">4.2</a>).</p>
 <div class="inline-table"><table class="table table-sm">
 <caption>
 <span id="tab:nw-m-agent-properties">Table 4.1: </span>Agent properties
@@ -721,7 +721,7 @@ agents
 <li>
 <span class="math inline">\(W^\mu, W^\sigma\)</span>, the agents’ weighted selection values</li>
 </ul>
-<p>The exact specification of how these parameters are varied can be seen in the <a href="https://github.com/mjaquiery/oxforddown/blob/dockertest/03-01-network-effects.Rmd">source code for this document</a> .</p>
+<p>The exact specification of how these parameters are varied can be seen in the <a href="https://github.com/mjaquiery/oxforddown/blob/master/01-03-models-of-advice.Rmd">source code for this document</a>.</p>
 </div>
 <div id="nw-m-constant-parameters" class="section level4" number="4.2.3.2">
 <h4>
@@ -888,8 +888,8 @@ Figure 4.7: Distribution of final weights for each model.<br> Each plot shows a 
 </div>
 <div class="figure">
 <span style="display:block;" id="fig:nw-r-all-models-summary"></span>
-<img src="_main_files/figure-html/nw-r-all-models-summary-1.png" alt="Model final decision group ratio and mean final bias magnitude.&lt;br/&gt; Each of the trust weights and weighted selection sampling combinations in the figures above was run multiple times with different random seeds. Each of these runs is represented by a single line. Some models have no group ratio because there is only one group at the final decision (because there is a consensus wherein all agents have the same direction of bias), which means that the ratio of weights is undefined and consequently the line is broken." width="672"><p class="caption">
-Figure 4.8: Model final decision group ratio and mean final bias magnitude.<br> Each of the trust weights and weighted selection sampling combinations in the figures above was run multiple times with different random seeds. Each of these runs is represented by a single line. Some models have no group ratio because there is only one group at the final decision (because there is a consensus wherein all agents have the same direction of bias), which means that the ratio of weights is undefined and consequently the line is broken.
+<img src="_main_files/figure-html/nw-r-all-models-summary-1.png" alt="Model final decision group ratio and mean final bias magnitude.&lt;br/&gt; Each of the trust weights and weighted selection sampling combinations in the figures above was run multiple times with different random seeds. Each of these runs is represented by a single line. Some models have no group ratio because there is only one group at the final decision (because there is a consensus wherein all agents have the same direction of bias), which means that the ratio of weights is undefined and consequently the line is broken. Group ratio is not bounded to the vertical axis values shown." width="672"><p class="caption">
+Figure 4.8: Model final decision group ratio and mean final bias magnitude.<br> Each of the trust weights and weighted selection sampling combinations in the figures above was run multiple times with different random seeds. Each of these runs is represented by a single line. Some models have no group ratio because there is only one group at the final decision (because there is a consensus wherein all agents have the same direction of bias), which means that the ratio of weights is undefined and consequently the line is broken. Group ratio is not bounded to the vertical axis values shown.
 </p>
 </div>
 <p>A first set of simulations aimed to evaluate basic network behaviours in terms of trust formation.

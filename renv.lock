@@ -888,15 +888,15 @@
     },
     "prettyMD": {
       "Package": "prettyMD",
-      "Version": "1.0.0",
+      "Version": "1.0.1",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteUsername": "mjaquiery",
       "RemoteRepo": "prettyMD",
       "RemoteRef": "master",
-      "RemoteSha": "2892027b05dbe8d910b69a1d661e89afc7f2ef24",
+      "RemoteSha": "18d8313e2082ebdc19848d0526ee296ff9b32a31",
       "RemoteHost": "api.github.com",
-      "Hash": "1f4a9f1c015dcaff9295e1e32e2f1c1b"
+      "Hash": "59c51cd1ff3663078aafe0f956bb09b2"
     },
     "prettyunits": {
       "Package": "prettyunits",

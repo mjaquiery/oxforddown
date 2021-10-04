@@ -111,7 +111,7 @@ u^a = - \sum^{60}_{t=1} |v_t - f_t^a|
 Scenario 3§\@ref(models-scenario-3) uses categorical decisions. 
 These are processed using a fitness function that awards agents -1 point for each incorrect categorisation of the true world value.
 
-The selection algorithm proceeds as follows: The worst performance is subtracted from each agent’s fitness and 1 added to put fitness scores in a positive range.
+The selection algorithm proceeds as follows: the worst performance is subtracted from each agent’s fitness and 1 added to put fitness scores in a positive range.
 Each agent is then given a probability to reproduce equal to their share of the sum of all fitness scores:
 
 \begin{align}

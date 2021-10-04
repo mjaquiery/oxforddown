@@ -7,7 +7,7 @@
 # The format options are: 'pdf', 'bs4', 'gitbook', 'word'
 # For some reason they only work one-by-one
 knit: (function(input, ...) {
-    thesis_formats <- "bs4"
+    thesis_formats <- "pdf"
     
     source("scripts_and_filters/knit-functions.R");
     knit_thesis(input, thesis_formats, envir = .GlobalEnv, ...)

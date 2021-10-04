@@ -1,5 +1,3 @@
-
-
 This thesis explores two questions: does the way individuals seek advice produce echo chamber-like networks; and is the well-established phenomenon of egocentric discounting explicable as a rational process?
 Both parts are presented within a framework of advice as information transfer; the implications for wider interpretations of advice are discussed in the conclusion.
 Both parts are investigated with a mixture of computational simulations and behavioural experiments.
