@@ -650,7 +650,7 @@ mm_inf <- tmp %>%
   ) %>%
   marginalMeans(inf, pid, "Disagree-Agree")
 
-message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
 
 s_inf_m <- summariseANOVA(aov_inf_m$ANOVA, mm_inf)
 
@@ -669,7 +669,7 @@ mm_inf_cap <- tmp %>%
   ) %>%
   marginalMeans(cappedInf, pid, "Disagree-Agree")
 
-message(glue("Interaction calculation: {mm_inf_cap$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_inf_cap$.interactionExpression}"))
 
 s_inf_cap_m <- summariseANOVA(aov_inf_cap_m$ANOVA, mm_inf_cap)
 
@@ -1181,7 +1181,7 @@ mm_acc <- tmp %>%
   select(pid, accuracy, Decision, Advisor) %>%
   marginalMeans(accuracy, pid, "Improvement")
 
-message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
 
 s_acc <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 
@@ -1221,7 +1221,7 @@ aov_conf <- ez::ezANOVA(
 
 mm_conf <- marginalMeans(df, Confidence, pid, "Increase")
 
-message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
 
 s_conf <- summariseANOVA(aov_conf$ANOVA, mm_conf)
 

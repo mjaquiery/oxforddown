@@ -370,7 +370,7 @@ mm_acc <- tmp %>%
   mutate(Decision = fct_rev(Decision)) %>%
   marginalMeans(Error, pid, "Reduction")
 
-message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
 
 s_acc <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 
@@ -1030,7 +1030,7 @@ mm_acc <- tmp %>%
   mutate(Decision = fct_rev(Decision)) %>%
   marginalMeans(Error, pid, "Reduction")
 
-message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
 
 s_acc <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 
@@ -1720,7 +1720,7 @@ mm_acc <- acc %>%
   mutate(Advisor = str_extract(Advisor, ".+")) %>%
   marginalMeans(Accuracy, pid, "Improvement")
 
-message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
 
 s_acc <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 
@@ -1752,7 +1752,7 @@ mm_inf <- adv_inf %>%
   ungroup() %>%
   marginalMeans(advisor0Influence, pid, "Individual-Group")
 
-message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
 
 s_inf <- summariseANOVA(inf_aov$ANOVA, mm_inf)
 
@@ -2245,7 +2245,7 @@ mm_acc <- acc %>%
   mutate(Advisor = str_extract(Advisor, ".+")) %>%
   marginalMeans(Accuracy, pid, "Improvement")
 
-message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
 
 s_acc <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 
@@ -2264,7 +2264,7 @@ mm_conf <- conf %>%
   select(pid, Confidence, Response, initialCor = `Initial estimate accuracy`) %>%
   marginalMeans(Confidence, pid, "Decrease")
 
-message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
 
 s_conf <- summariseANOVA(aov_conf$ANOVA, mm_conf)
 
@@ -2371,7 +2371,7 @@ mm_inf <- adv_inf %>%
   ungroup() %>%
   marginalMeans(inf, pid, "Unambiguous-Hybrid")
 
-message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
 
 s_inf <- summariseANOVA(inf_aov$ANOVA, mm_inf)
 

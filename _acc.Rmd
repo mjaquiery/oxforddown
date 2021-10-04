@@ -365,7 +365,7 @@ aov_acc <- ezANOVA(
 )
 mm_acc <- marginalMeans(tmp, accuracy, pid, "Improvement")
 
-message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
 
 s <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 
@@ -416,7 +416,7 @@ aov_conf <- ez::ezANOVA(
 
 mm_conf <- marginalMeans(df, Confidence, pid, "Increase")
 
-message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
 
 s <- summariseANOVA(aov_conf$ANOVA, mm_conf)
 
@@ -1364,7 +1364,7 @@ mm_acc <- acc %>%
   mutate(Advisor = str_extract(Advisor, ".+")) %>%
   marginalMeans(Accuracy, pid, "Improvement")
 
-message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
 
 s <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 
@@ -1394,7 +1394,7 @@ mm_conf <- conf %>%
   select(pid, Confidence, Response, initialCor = `Initial estimate accuracy`) %>%
   marginalMeans(Confidence, pid, "Increase")
 
-message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
 
 s_conf <- summariseANOVA(aov_conf$ANOVA, mm_conf)
 
@@ -1639,7 +1639,7 @@ mm_inf <- adv_inf %>%
   ) %>%
   marginalMeans(advisor0Influence, pid, "High-Low accuracy")
 
-message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
 
 s <- summariseANOVA(inf_aov$ANOVA, mm_inf)
 

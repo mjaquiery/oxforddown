@@ -638,7 +638,7 @@ mm_inf <- tmp %>%
   select(pid, WOA, Advisor, Feedback) %>%
   marginalMeans(WOA, pid, "Accurate-Agreeing")
 
-message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
 
 s_inf <- summariseANOVA(aov_inf$ANOVA, mm_inf)
 

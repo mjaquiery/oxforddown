@@ -361,7 +361,7 @@ mm_acc <- tmp %>%
   select(pid, accuracy, Decision, Advisor) %>%
   marginalMeans(accuracy, pid, "Improvement")
 
-message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
 
 s_acc <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 
@@ -401,7 +401,7 @@ aov_conf <- ez::ezANOVA(
 
 mm_conf <- marginalMeans(df, Confidence, pid, "Increase")
 
-message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_conf$.interactionExpression}"))
 
 s_conf <- summariseANOVA(aov_conf$ANOVA, mm_conf)
 
@@ -1076,7 +1076,7 @@ mm_acc <- tmp %>%
   mutate(Decision = fct_rev(Decision)) %>%
   marginalMeans(Error, pid, "Reduction")
 
-message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_acc$.interactionExpression}"))
 
 s_acc <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 
@@ -1275,7 +1275,6 @@ ggplot(tmp, aes(x = Advisor, y = advisor0WOA,
   labs(x = 'Advisor advice profile', y = 'Weight on Advice') +
   scale_fill_feedback(aesthetics = c("fill", "colour"), guide = "none")
 
-
 # Marginal means
 tmp <- OffBrand %>%
   select(pid, Advisor, Feedback, advisor0WOA) %>%
@@ -1291,16 +1290,20 @@ lost <- AdvisedTrial %>%
   pull(pid) %>%
   unique()
 
-aov_inf <- tmp %>%
-  ezANOVA(
-    dv = WOA, wid = pid, within = Advisor, between = Feedback
-  )
+# Suppress Sum of Squares Type warning
+suppressWarnings({
+  aov_inf <- tmp %>%
+    ezANOVA(
+      dv = WOA, wid = pid, within = Advisor, between = Feedback
+    )
+})
+
 
 mm_inf <- tmp %>% 
   select(pid, WOA, Advisor, Feedback) %>%
   marginalMeans(WOA, pid, "Accuracy-Agreement")
 
-message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
+# message(glue("Interaction calculation: {mm_inf$.interactionExpression}"))
 
 s_inf <- summariseANOVA(aov_inf$ANOVA, mm_inf)
 
