@@ -29,7 +29,7 @@ documentclass: book
 
 
 <!-- this adds an image in gitbook output --> 
-<img src="figures/cover.png" width="315" height="445" alt="Cover image" align="right" style="margin: 0 1em 0 1em" />
+<img src="templates/cover.png" width="315" height="445" alt="Cover image" align="right" style="margin: 0 1em 0 1em" />
 
 Animals (and possibly other organisms) make decisions continually.
 They need to decide how to act, often on the basis of judgements on the state of the world.
