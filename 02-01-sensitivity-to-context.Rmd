@@ -162,7 +162,8 @@ d %>%
   labs(
     x = "Generation",
     y = "Mean weight on own advice"
-  )
+  ) +
+  broken_axis_bottom
 
 ```
 

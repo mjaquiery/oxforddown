@@ -626,13 +626,17 @@ tmp <- rename(
   ungroup() %>%
   mutate(across(where(is.character), factor))
   
-aov_inf <- ezANOVA(
-  tmp, 
-  dv = WOA, 
-  wid = pid, 
-  within = Advisor, 
-  between = Feedback
-)
+# Suppress Sum of Squares Type warning
+suppressWarnings({
+  aov_inf <- ezANOVA(
+    tmp, 
+    dv = WOA, 
+    wid = pid, 
+    within = Advisor, 
+    between = Feedback
+  )
+})
+
 
 mm_inf <- tmp %>% 
   select(pid, WOA, Advisor, Feedback) %>%

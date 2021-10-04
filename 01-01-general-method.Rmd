@@ -318,8 +318,6 @@ It is possible that this temporal compression does not fundamentally alter the p
 Lastly, both the Dots task and the Dates task had an objectively correct answer on every question.
 A substantial portion of everyday real-world advice-seeking behaviour concerns questions on which there is no readily-determinable objectively correct answer, such as where might be a good holiday destination, or whether one should pursue postgraduate education.
 These more subjective questions have received some attention by @vanswolForecastingAnotherEnjoyment2011, but are seldom studied in the advice-taking cognitive psychology literature.
-
-\mccorrect{TODO: explain No gender breakdown (simplicity/privacy versus data gap)}
     
 ## Analysis {#m-analysis}
 
@@ -520,4 +518,4 @@ This thesis is written in RMarkdown using the Oxforddown template [@lyngsOxfordd
 Some parts of the thesis use computational modelling or model fitting. 
 These parts use cached datasets, also available on-line, in order to reduce the time required to create the thesis from its source files from hours to minutes using a high-end desktop personal computer.
 The caching behaviour can be prevented for those wishing to evaluate the validity of the modelling components by setting the value of the R option `ESM.recalculate` to higher values (documented in the `index.Rmd` file).
-A Docker environment copying the environment used to produce this document is available at \mccorrect{MAYBE: do the containerisation thing if there's time}
+A Docker environment copying the environment used to produce this document can be produced by running the [`Dockerfile`](https://github.com/mjaquiery/oxforddown/blob/master/Dockerfile) included in the repository.

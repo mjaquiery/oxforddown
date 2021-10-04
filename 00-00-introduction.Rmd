@@ -16,18 +16,6 @@ documentclass: book
 
 \adjustmtc 
 
-\mccorrect{!TODO[Style notes]}: 
-
-* Graphs and stats:  
-    * Continuous axes which show theoretical limits should have small expand, axes which do not show those limits should have arrowheads from broken_axis_*  
-  
-  * mccorrect -> resolve issues
-  
-\mccorrect{TODO: Check R output messages, warnings, errors}
-
-\mccorrect{Search final output for ()}
-
-
 Animals (and possibly other organisms) make decisions continually.
 They need to decide how to act, often on the basis of judgements on the state of the world.
 The average person will make hundreds of conscious decisions a day, and thousands of unconscious ones: what do I want for breakfast?; do I take an umbrella?; what should I get my child for their birthday?; is that other pedestrian going to bump into me?; and so on.

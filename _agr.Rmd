@@ -851,7 +851,8 @@ conf %>%
   geom_label(aes(label = paste0('BF = ', bf)), 
              x = 1.5, y = .97, colour = 'black', data = bf) +
   facet_wrap(~Response) +
-  scale_fill_decision(aesthetics = c("fill", "colour"))
+  scale_fill_decision(aesthetics = c("fill", "colour")) +
+  broken_axis_bottom
 
 ```
 

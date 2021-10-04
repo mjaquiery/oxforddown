@@ -321,7 +321,7 @@ left_join(
     ~ entry, ~ colspan,
     "", 1,
     "Initial estimate confidence", 3, 
-    "Subtotals by initial estimate correctness", 2,
+    "... correctness", 2,
     "", 2
   )) %>%
   add_header_above(c("", "Agreement" = 6, ""))
@@ -605,7 +605,8 @@ tmp %>%
   facet_grid(~trialType) +
   labs(x = "Agreement between advisor and participant",
        y = "Influence of the advice (raw)") +
-  scale_fill_advisor(aesthetics = c("fill", "colour"))
+  scale_fill_advisor(aesthetics = c("fill", "colour")) +
+  broken_axis_y
 
 ```
 

@@ -609,7 +609,7 @@ ROC curves are obtained by calculating at each of a number of different points o
 The area under the ROC curve gives a measure of the ability of confidence ratings to distinguish correct and incorrect responses.
 An area under the ROC curve of .5 indicates chance performance, and a value of 1 indicates perfect discrimination.
 
-As shown by Figure \@ref(fig:ac-acc-dots-r-metacog)A, almost all participants showed above-chance metacognitive sensitivity for initial estimates and final decisions.
+As shown by Figure \@ref(fig:ac-acc-dots-r-metacog), almost all participants showed above-chance metacognitive sensitivity for initial estimates and final decisions.
 Participants generally showed higher metacognitive sensitivity for final decisions, in line with their improved performance on these trials.
 Participants' metacognitive sensitivity was not particularly high, reflecting the difficulty of the task, and in line with previous datasets with this task [@pescetelliConfidenceAdviceSeeking2021].
 There was no evidence of participants' metacognitive sensitivity being correlated with their task performance (Initial estimates: `r r$s[1]`; Final decisions: `r r$s[2]`). 
@@ -826,7 +826,8 @@ ggplot(tmp, aes(x = Difference, y = pPickHigh)) +
     aes(label = Label), y = 1, x = mean(tmp$Difference), fill = NA, data = s
   ) +
   facet_wrap(~Dimension) +
-  labs(y = "p(Choose High accuracy advisor)")
+  labs(y = "p(Choose High accuracy advisor)") +
+  broken_axis_x
 
 ```
 
