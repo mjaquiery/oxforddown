@@ -107,7 +107,7 @@ Where <span class="math inline">\(s^a\)</span> and <span class="math inline">\(s
 <span class="header-section-number">6.1.2</span> Advice<a class="anchor" aria-label="anchor" href="#advice-1"><i class="fas fa-link"></i></a>
 </h3>
 <p>Each agent receives advice from another agent which it combines with its initial estimate to reach a final decision.
-Each agent is reciprocally connected to 10 other agents at random when they are spawned, and on each decision they receive advice from one of their connections at random.<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;A small number of connections allows agents to sample multiple pieces of advice from the same advisors over their lifetime. The agents do not update during their lifetime, so more realistic connectivity structures are not needed in these simulations.&lt;/p&gt;"><sup>18</sup></a>
+Each agent is reciprocally connected to 10 other agents at random when they are spawned, and on each decision they receive advice from one of their connections at random.<a class="footnote-ref" tabindex="0" data-toggle="popover" data-content="&lt;p&gt;A small number of connections allows agents to sample multiple pieces of advice from the same advisors over their lifetime. The agents do not update during their lifetime, so more realistic connectivity structures are not needed in these simulations.&lt;/p&gt;"><sup>19</sup></a>
 The advice has a probability of being mutated in some fashion.
 The mutation depends upon the scenario and is described separately for each.</p>
 </div>
@@ -139,7 +139,7 @@ u^a = - \sum^{60}_{t=1} |v_t - f_t^a|
 \end{align}\]</span></p>
 <p>Scenario 3§<a href="chapter-advice-taking-context.html#models-scenario-3">6.4</a> uses categorical decisions.
 These are processed using a fitness function that awards agents -1 point for each incorrect categorisation of the true world value.</p>
-<p>The selection algorithm proceeds as follows: The worst performance is subtracted from each agent’s fitness and 1 added to put fitness scores in a positive range.
+<p>The selection algorithm proceeds as follows: the worst performance is subtracted from each agent’s fitness and 1 added to put fitness scores in a positive range.
 Each agent is then given a probability to reproduce equal to their share of the sum of all fitness scores:</p>
 <p><span class="math display" id="eq:models-selection">\[\begin{align}
 p^a = \frac{u^a}{\sum_{j=1}^{n}u^j}

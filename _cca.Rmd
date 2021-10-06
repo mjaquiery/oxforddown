@@ -1,7 +1,7 @@
 
 ## Effects of confidence-contingent advice {#ac-cca}
 
-The results of the experiments described previously (1A§\@ref(ac-acc-dots), 1B§\@ref(ac-acc-dates), 2A§\@ref(ac-agr-dots), 2B§\@ref(ac-agr-dates), 3A§\@ref(ac-ava-dots), 3B§\@ref(ac-ava-dates)) were mixed, but indicated overall [and in combination with @pescetelliRoleDecisionConfidence2021] that people prefer accurate over inaccuate advisors when they can assess the advisors based on feedback, but prefer agreeing over disagreeing advisors when feedback is absent. 
+The results of the experiments described previously (1A§\@ref(ac-acc-dots), 1B§\@ref(ac-acc-dates), 2A§\@ref(ac-agr-dots), 2B§\@ref(ac-agr-dates), 3A§\@ref(ac-ava-dots), 3B§\@ref(ac-ava-dates)) were mixed, but indicated overall [and in combination with @pescetelliRoleDecisionConfidence2021] that people prefer accurate over inaccurate advisors when they can assess the advisors based on feedback, but prefer agreeing over disagreeing advisors when feedback is absent. 
 Here we test whether advice selection can depend on a more sophisticated mechanism when feedback is absent.
 
 This mechanism, proposed by @pescetelliRoleDecisionConfidence2021, weights the updating of trust in an agreeing advisor using the confidence of the judge's initial estimate.
@@ -137,7 +137,7 @@ trials <- trials %>%
 ```
 
 The method for the lab study was different in many small ways from the general method used for the Dots task on-line.
-The basic trial experience was the same: participants saw two boxes of dots flashed breifly on the screen, and were asked to indicate which box had more dots, along with how confident they were in this initial estimate. 
+The basic trial experience was the same: participants saw two boxes of dots flashed briefly on the screen, and were asked to indicate which box had more dots, along with how confident they were in this initial estimate. 
 Participants then received advice and provided a final decision.
 On some trials participants were able to choose which of their advisors would provide the advice (Figure \@ref(fig:ac-ex1-paradigm)).
 
@@ -377,7 +377,7 @@ There was considerable variability across participants in the overall pick rate 
 Unlike in other experiments, there was no systematic effect of the position of the advisors on the screen (`r .T.first`).
 This placement is random, and has no relationship to the identity of the advisor (`r .T.pos`), so we expect that it would be random across participants.
 
-```{r ac-ex1-r-selection, fig.align='center', fig.caption="Advisor choice.  Proportion of the time each participant picked the Bias Sharing advisor. Faint lines and dots indicate data from individual participants, while the large dot indicates the mean proportion across all participants. The dashed reference line indicates picking both advisors equally, as would be expected by chance. Error bars give 95\\% confidence intervals.", out.width="100%"}
+```{r ac-ex1-r-selection, fig.align='center', fig.caption="Advisor choice for Lab experiment.  Proportion of the time each participant picked the Bias Sharing advisor. Faint lines and dots indicate data from individual participants, while the large dot indicates the mean proportion across all participants. The dashed reference line indicates picking both advisors equally, as would be expected by chance. Error bars give 95\\% confidence intervals.", out.width="100%"}
 
 pick <- test %>%
   group_by(pid, confidenceCategory) %>%
@@ -502,7 +502,7 @@ aov_inf_cap <- tmp %>%
 
 kableANOVA(
   aov_inf, 
-  caption = "ANOVA of Advisor influence in Lab experiment"
+  caption = "ANOVA of Advisor influence for Lab experiment"
 )
 
 # Relevant marginal means
@@ -586,7 +586,7 @@ As shown in Table \@ref(tab:ac-ex1-r-influence-aov), the only statistically sign
 
 When this analysis was repeated with the capped influence values (General Method - Capped influence§\@ref(m-analysis-dv-influence)) the effect of agreement was still significant, but less so (`r aov_inf_cap$s[1]`, `r mmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(sCapped)`, `r mmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(sCapped)`), and a main effect of trial type also emerged (raw influence: `r aov_inf$s[2]`, `r mmTrialType %>% filter(trialType == "Choice") %>% pull(s)`, `r mmTrialType %>% filter(trialType == "Force") %>% pull(s)`; capped influence: `r aov_inf_cap$s[2]`, `r mmTrialType %>% filter(trialType == "Choice") %>% pull(sCapped)`, `r mmTrialType %>% filter(trialType == "Force") %>% pull(sCapped)`).
 
-```{r ac-ex1-r-influence, fig.align='center', fig.caption="Advisor influence.  Influence of advice from each advisor by advisor, agreement, and trial type. Faint lines and indicate data from individual participants, while the dots indicate the mean proportion across all participants. Error bars give 95\\% confidence intervals.  Note: vertical axis is truncated to show group differences more clearly, the theoretical maximum influence given the scale is 110. The minimum is 0 as shown.", out.width="100%"}
+```{r ac-ex1-r-influence, fig.align='center', fig.caption="Advisor influence for Lab experiment.  Influence of advice from each advisor by advisor, agreement, and trial type. Faint lines and indicate data from individual participants, while the dots indicate the mean proportion across all participants. Error bars give 95\\% confidence intervals.  Note: vertical axis is truncated to show group differences more clearly, the theoretical maximum influence given the scale is 110. The minimum is 0 as shown.", out.width="100%"}
 
 tmp %>%
   mutate(

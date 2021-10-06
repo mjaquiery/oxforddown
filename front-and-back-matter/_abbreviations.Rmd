@@ -1,6 +1,34 @@
-\item[1-D, 2-D] One- or two-dimensional, referring **in this thesis** to spatial dimensions in an image.
+\item[Advice] Here broadly defined as information which comes from a social source, advice as commonly understood includes an intentional aspect on the part of the advisor (the advisor intends it to be advice).
 
-\item[Otter] One of the finest of water mammals.
+\item[ANOVA] Analysis of Variance; a statistical analysis technique based on the general linear model.
 
-\item[Hedgehog] Quite a nice prickly friend.
+\item[BF] Bayes Factor; the extent to which the data support one model over another.
+
+\item[CSS] Cascading Style Sheets; used for specifying the presentation of web pages.
+
+\item[Echo chamber] A social or information environment characterised by high levels of homogeneity in values, experiences, and opinions.
+
+\item[Egocentric discounting] The phenomenon wherein people take less advice than they should according to a normative model of advice-taking.
+
+\item[Feedback] Objective information concerning the correctness of a decision.
+
+\item[Homophily] The ubiquitous phenomenon that individuals more closely connected to one another within a social network tend to be more similar to one another than would be expected by chance across numerous dimensions.
+
+\item[HTML] Hyper-Text Markup Language; used for specifying the layout of web pages.
+
+\item[Influence] The amount a binary decision with confidence is adjusted in the direction of advice.
+
+\item[Judge-Advisor System] An experimental paradigm in which a _judge_ makes an initial estimate, receives advice from one or more _advisors_, and then makes a final decision.
+
+\item[PHP] PHP: Hypertext Preprocessor; server-side programming language for rendering and processing dynamic web content.
+
+\item[Polarisation] The phenomenon whereby the distribution of opinions in a population trend toward extremes over time, with moderate stances becoming increasingly less popular.
+
+\item[Preregistration] Specifying information about a study (and especially its analysis of data) prior to the analysis of the data.
+
+\item[R] Open source statistical programming language.
+
+\item[ROC] Receiver Operator Characteristic; a formal description of descriminative ability.
+
+\item[WoA] Weight on Advice; a measure of the relative contribution of advice (as compared to an initial estimate) to a final decision.
 

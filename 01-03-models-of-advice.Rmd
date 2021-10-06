@@ -49,7 +49,7 @@ Crucially, the equations governing agents' behaviour will have terms relating to
 
 Agent-based modelling is a powerful approach, because it can connect system-level phenomena to individuals' decision rules and incorporate individuals with outlying or different decision rules [@bonabeauAgentbasedModelingMethods2002].
 The power of agent-based modelling also comes with drawbacks [@jonesAgentbasedModellingUse2007]. 
-The intuitive nature of its explanations means that it is easy to lose touch with ecological validity (because even non-ecologically valid implementations may seem valid when expressed in agent-based terms) and easy to overclaim on the basis of results.
+The intuitive nature of its explanations means that it is easy to lose touch with ecological validity (because even non-ecologically valid implementations may seem valid when expressed in agent-based terms) and easy to over-claim on the basis of results.
 The interactivity and emergent behaviours that it produces can mean that some models are unstable: it is important to demonstrate robustness of emergent behaviours by running repeated tests on families of models.
 Furthermore, the multifaceted nature of the models means that there are more features to describe; modellers must make sure that the models are precisely specified and that those specifications are shared accurately so that others are able to reproduce and explore the models [@jonesAgentbasedModellingUse2007; @bruchAgentBasedModelsEmpirical2015].
 
@@ -111,15 +111,15 @@ Some participants' data do not fit well to the model, indicating that these part
 
 We then explore the behaviour of the agent-based models (within a narrow area of their parameter space), varying the way agents' preferences for more trusted advisors are determined.
 The Baseline model assigns all agents no preference for more trusted advisors, meaning that they sample from all possible advisors at random. 
-The Homogenous model applies the mean of the recovered parameter distribution to all agents. 
+The Homogeneous model applies the mean of the recovered parameter distribution to all agents. 
 The Heterogeneous model draws values from a distribution defined by the mean and standard deviation of the recovered parameter distribution. 
 The Empirical model selects values from those observed in the recovered parameter data (with replacement).
 For the first three models, trust update values are sampled from a distribution with the mean and standard deviation of the recovered parameters, while in the Empirical model the agents receive the trust update value for the participant whose preference strength coefficient they received.
 Two versions of each model are run, one which starts with a random trust network and one which starts with a homophilic trust network.
 
 In short, we set up a comparison between the Baseline and Homogeneous model that provides a basic proof-of-concept replication of previous work described above: we expect to see polarisation of opinions and the emergence of echo-chamber-like structures.
-Then we comapre the Homogenous model to the Hetergeneous and Empirical models, asking whether variation in agents' advice-taking and advisor choice behaviour changes the network dynamics.
-We also compare the Hetereogeneous and Empirical models to explore whether the use of idiosyncratic parameter sets results in further alterations to the network dynamics.
+Then we compare the Homogeneous model to the Heterogeneous and Empirical models, asking whether variation in agents' advice-taking and advisor choice behaviour changes the network dynamics.
+We also compare the Heterogeneous and Empirical models to explore whether the use of idiosyncratic parameter sets results in further alterations to the network dynamics.
 
 ### Current model {#ne-i-model}
 
@@ -131,7 +131,7 @@ The advice is integrated with the initial estimate, again in a Bayesian manner, 
 The final decision is used to update the agent's perception of the world, and in parallel also to update their trust in the advisor.
 The agent's bias drifts towards the final decision answer by weighted averaging.
 The trust they have in their advisor increases (or decreases) depending upon whether (or not) the advice is in agreement with the final decision.
-This dual update, of both expectation about the world and trust in the advisor, is a key feature of the model, and reflects ubiqitous situations where relative uncertainties have to be played off against one another [@kordingCausalInferenceMultisensory2007; @behrensAssociativeLearningSocial2008].
+This dual update, of both expectation about the world and trust in the advisor, is a key feature of the model, and reflects ubiquitous situations where relative uncertainties have to be played off against one another [@kordingCausalInferenceMultisensory2007; @behrensAssociativeLearningSocial2008].
 
 The estimate-advice-decision-update cycle is repeated thousands of times.
 The models illustrate the dynamics of advice interactions: how prior expectations change over time and whether and how polarisation or consensuses emerge; and how agents' trust in one another changes as they gain experience with one another.
@@ -903,7 +903,7 @@ Trust updates are accomplished using the [`newWeightsByDrift`](https://github.co
 
 In the current model, trust weights for an advisor do not change unless advice is received from that advisor.
 This is not the only approach: alternatives include decay of trust in unselected advisors towards a default value; and normalisation of trust weights such that the sum of an agent's  trust weights for all their advisors remains constant.
-Whether or not trust decayse over time and whether or not increased trust in one advisor diminishes trust in other advisors are empirical questions (and may change based on context), but we do not expect the results of the model would be substantially different if trust weights for unselected advisors were updated in these ways.
+Whether or not trust decays over time and whether or not increased trust in one advisor diminishes trust in other advisors are empirical questions (and may change based on context), but we do not expect the results of the model would be substantially different if trust weights for unselected advisors were updated in these ways.
 
 ### Model parameters
 
@@ -1194,7 +1194,7 @@ If the model run with the new parameter had better fitness, that new value was k
 The algorithm then began again, and halted when it detected that no more progress with increasing fitness was being made.
 The model assumed that at the first encounter the advisors were equally trusted.
 
-The resulting coefficients were clustered close to zero for most participants, with a roughly gaussian distribution, as shown in Figure \@ref(fig:nw-r-pe-hist).
+The resulting coefficients were clustered close to zero for most participants, with a roughly Gaussian distribution, as shown in Figure \@ref(fig:nw-r-pe-hist).
 The values are generally greater than zero for both $\text{w}^a$ (`r .T.ws`) and $\lambda^a$ (`r .T.tu`).
 This makes sense because it indicates that participants tended to trust advisors more to the extent that their advice agreed with participants' own initial judgements ($\lambda^a$), and that people tended to choose advisors they trusted more over less trusted advisors ($\text{w}^a$). 
 Nevertheless there was considerable variability in these estimates. 
@@ -1468,7 +1468,7 @@ This apparently contradictory finding is explicable because agents in the Empiri
 This leads to the peaks of weights at both the 0 and 1 end of the histogram for evolved weights.
 The negative weighted selection values can also drive agents to sample advice that is likely to disagree with them, moderating their biases as seen by a larger minority of agents with moderate biases in the Empirical run than in other runs.
 @madsenLargeNetworksRational2018a termed agents with this advice-seeking strategy 'Socratic' because they aimed to engage with others of a different opinion.
-This sampling approach may be behind the fact that many more agents switch the direction of their bias in the Empirical simulations than in the other simuations.
+This sampling approach may be behind the fact that many more agents switch the direction of their bias in the Empirical simulations than in the other simulations.
 
 Finally, Figure \@ref(fig:nw-r-weight-distribution) illustrates that a substantial minority of weights reach the maximum value in the Empirical simulations.
 This suggests that many agents adopt a favourite advisor and stick with that advisor because they tend to agree more often than not, meaning they retain their relative advantage over other advisors.
@@ -1492,7 +1492,7 @@ Each model was run `r length(unique(agents$random_seed))` times with different r
 The features described above were all consistent across runs, as can be seen by observing the variability in Figure \@ref(fig:nw-r-all-models-summary) in both of the outcome variables§\@ref(nw-m-analysis).
 
 For parameter sets in which all agents' biases tend towards the same extreme, which extreme was favoured varied according to the random seed used. 
-This stochasticity is akin to placing a ball on a gabled roof: tiny variations in the initial conditions affect which way it will roll, but it will always roll down one pitch or the other.
+This stochastic is akin to placing a ball on a gabled roof: tiny variations in the initial conditions affect which way it will roll, but it will always roll down one pitch or the other.
 
 Similarly, in some of these models, adding in weighted selection switches which bias extreme is adopted.
 This effect is not consistent between runs with different random seeds, and is an outsized effect of minor differences to early states, analogous to a breath of wind nudging the ball in the previous example one way or another.
@@ -1503,7 +1503,7 @@ Output in the style of Figures \@ref(fig:nw-r-bias-evolution), \@ref(fig:nw-r-we
 
 The results shown in Figure \@ref(fig:nw-r-all-models-summary) capture the key observations of this work.
 Weighted selection ($\text{w}^a \neq 0$) isn't necessary for the formation of echo chambers.
-Indeed, perhaps counterintuitively, we found some tendency that weighted selection can reduce these effects, because unsampled potential advisors aren't learnt about (and therefore aren't distrusted over other unsampled potential advisors). 
+Indeed, perhaps counter-intuitively, we found some tendency that weighted selection can reduce these effects, because unsampled potential advisors aren't learnt about (and therefore aren't distrusted over other unsampled potential advisors). 
 Heterogeneity complicates and enriches this picture in interesting ways, supporting the various minority strategies visible in Figure \@ref(fig:nw-r-bias-evolution).
 
 ## Discussion
@@ -1551,7 +1551,7 @@ Additionally, there may be variation in confidence across personality and psychi
 
 There are numerous potential causes for inter-individual variation in advice-taking and advisor choice behaviour. 
 In behavioural experiments in our lab, we often see a small minority of participants will take no advice at all -- never seeking it or changing their answer if they receive it -- and these participants typically report very high subjective confidence. 
-It is plausible, therefore, that whatever causes the hetereogeneity seen here, it has some relationship to confidence. 
+It is plausible, therefore, that whatever causes the heterogeneity seen here, it has some relationship to confidence. 
 Advice-seeking is has been argued to serve several purposes, including increasing accuracy [@sollStrategiesRevisingJudgment2009], diffusing responsibility [@raderAdviceFormSocial2017], and social inclusion [@mahmoodiEqualityBiasImpairs2015].
 Correspondingly, individual variation in the importance of any of these components may alter the tendency to seek and use advice.
 
@@ -1564,14 +1564,14 @@ These considerations fall into several different categories, from technical cons
 
 We were unable to demonstrate that independent estimates of participants' coefficients were more similar than would be expected by chance. 
 This means that we are unable to rule out the suggestion that there is as much variation in advice-taking and -seeking behaviour within people as between them.
-In our models, agents have set individual propensitites governing how they take and use advice.
-The literature suggests that people have idiosyncracies governing confidence and its relationship with advice-seeking [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017; @pescetelliConfidenceAdviceSeeking2021], but it is nevertheless plausible that these idiosyncrasies vary dramatically across time and context. 
+In our models, agents have set individual propensities governing how they take and use advice.
+The literature suggests that people have idiosyncrasies governing confidence and its relationship with advice-seeking [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017; @pescetelliConfidenceAdviceSeeking2021], but it is nevertheless plausible that these idiosyncrasies vary dramatically across time and context. 
 Further simulation work might investigate the effects of heterogeneity within rather than between agents.
 
 #### Context
 
 Polarisation and homophily are not inherently bad features.
-In some discussions (e.g. debates about whether slave ownership is morally permissable) we can be glad that near-universal opinion reigns on the issue, despite its once being a contested issue.
+In some discussions (e.g. debates about whether slave ownership is morally permissible) we can be glad that near-universal opinion reigns on the issue, despite its once being a contested issue.
 In others (e.g. discussion concerning the extent to which the state should be involved in individuals' lives) it is helpful to have a range of opinion to maintain the diversity of approaches [@diamondGunsGermsSteel1998 p482].
 
 This means that the context must be considered when evaluating the implications of these models. 

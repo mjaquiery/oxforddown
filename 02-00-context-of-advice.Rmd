@@ -26,7 +26,7 @@ The difference between the initial estimate and the final decision is taken as m
 
 In these experiments, the task performance for the advisor is usually as good or better than that of the judge.
 This performance structure can be well captured for most tasks with Gaussian answer + error distribution where the answer supplies the mean and the error supplies the variance. 
-When combining individual estimates from multiple distributions, optimal results are obtained by weighting the estimates according to the relative precision of their parent distributions  [@sollStrategiesRevisingJudgment2009; @bahramiOptimallyInteractingMinds2010]. This is analogous to multisensory integration [@ernstHumansIntegrateVisual2002; @kordingCausalInferenceMultisensory2007], and many other cognitive processes argued to be modelled on Bayesian integration, such as those listed in Section 2 of @colomboBayesianCognitiveScience2015.
+When combining individual estimates from multiple distributions, optimal results are obtained by weighting the estimates according to the relative precision of their parent distributions  [@sollStrategiesRevisingJudgment2009; @bahramiOptimallyInteractingMinds2010]. This is analogous to multi-sensory integration [@ernstHumansIntegrateVisual2002; @kordingCausalInferenceMultisensory2007], and many other cognitive processes argued to be modelled on Bayesian integration, such as those listed in Section 2 of @colomboBayesianCognitiveScience2015.
 Where the performance of the advisor is higher than the judge, the advisor's error will be lower than the judge's, and thus the variance of the advisor's distribution will be narrower and therefore the precision of the advisor's distribution will be higher.
 When a judge combines their own estimate with that of an advisor who is at least as good, an optimal judge will weight the advisor's opinion at least as highly as their own (Equation \ref{eq:variance-weights}).
 The classic presentation of egocentric discounting is when, in these scenarios, the weight applied to the advice is lower than the optimal weight.
@@ -86,7 +86,7 @@ Using a similar methodology, but a different analytical approach, @moussaidSocia
 More complex task designs, in which reflection and discussion are encouraged, can reduce discounting.
 @minsonTwoTangoEffects2011 and @libermanNaiveRealismCapturing2012 asked dyads to take simultaneous roles as judge and advisor, providing initial estimates, exchanging advice during a discussion, and then providing final decisions on estimation tasks.
 Discounting was reduced, but still evident in this process, as it was in @vanswolForecastingAnotherEnjoyment2011, which used a traditional Judge-Advisor System paradigm where advice was delivered face-to-face. 
-Liberman and colleagues did manage to eliminate discounting where, between exchanging advice and providing a final decision, participants produced a single mutually satisfactory collaborative judgement, and showed that the value of this collaborative judgement was itself improved by open-minded discussion over justifying estimates or exchanging bids.
+@libermanNaiveRealismCapturing2012 did manage to eliminate discounting where, between exchanging advice and providing a final decision, participants produced a single mutually satisfactory collaborative judgement, and showed that the value of this collaborative judgement was itself improved by open-minded discussion over justifying estimates or exchanging bids.
 @schultzeInabilityIgnoreUseless2017 demonstrated that asking judges to selectively generate reasons why the advice might be correct or incorrect led to lower and higher levels of egocentric discounting respectively.
 
 ### Advice properties {#coa-ed-advice}
@@ -175,7 +175,7 @@ This means that discounting may still occur even when the advisor's estimate is 
 @sollStrategiesRevisingJudgment2009 observed greater influence of more expert advisors across three experiments in which expertise was signalled by familiarity ratings with a university for which the graduate salary was being estimated, country of origin in a geography knowledge task, and confidence in a set of trivia questions.
 Likewise, @sollJudgmentalAggregationStrategies2011 saw that participants paired with advisors who were more accurate than they were at estimating basketball teams' point-per-game from other team statistics were more influenced by advice than those paired with advisors who were less accurate than they were.
 @tostPowerCompetitivenessAdvice2012 used a weight-estimation task and observed that greater weight was placed on advice from advisors labelled as experts compared to the same advice from advisors labelled as novices.
-@schultzeInabilityIgnoreUseless2017 labelled advisors using a ranking system and saw that participants placed a higher weight on advice from highly-ranked advisors compared to low-ranked advisors, although the actual advice was (unbeknownest to the participants) the same.
+@schultzeInabilityIgnoreUseless2017 labelled advisors using a ranking system and saw that participants placed a higher weight on advice from highly-ranked advisors compared to low-ranked advisors, although the actual advice was (unbeknownst to the participants) the same.
 @wangWhyDoesAdvice2018 showed that participants placed greater weight on advice from expert as opposed to novice advice in a coin-jar estimation task using advice that was genuinely expert or novice.
 @onkalEvaluatingExpertAdvice2017 reported a series of experiments using a stock price estimation task in which advisor expertise was manipulated using both labels and experience. 
 Where experience alone was provided there was no clear effect of expertise, while labelling had a substantial effect.
@@ -311,7 +311,7 @@ I argue that the normative model of advice-taking, and the pared-down experiment
 According to this hypothesis, the hyper-priors on advice-taking are a consequence of the many opportunities for deception and misunderstanding which apply to advice but not to one's own opinion.
 The most obvious of these is the opportunity for deception.
 As @troucheVigilantConservatismEvaluating2018 point out, advisors do not always have the judge's best interests at heart when supplying advice. 
-Consider, for example, a situation where one coworker, Sally, asks another, Hanan, whether it is a good idea to apply for a promotion.
+Consider, for example, a situation where one co-worker, Sally, asks another, Hanan, whether it is a good idea to apply for a promotion.
 Hanan may think it would be good for Sally to apply, because Sally is well-qualified and hard-working, but nevertheless discourage Sally from applying because Hanan herself is going to apply and wishes to reduce the competition.
 
 It is not necessary, however, for there to be misaligned incentives of this kind.
@@ -322,7 +322,7 @@ Likewise, Sally may well have spent considerable time researching and thinking a
 
 There is room for misunderstanding even where an advisor's interests are aligned with the judge's and the advisor's ability equals the judge's.
 Advice must be communicated to the judge, and communication in the real world is inherently noisy.
-Communication of advice requires something in the mind of the advisor to be encoded into a set of signals, transmitted to the judge, and then reencoded into something in the mind of the judge, at which point it can be integrated with what the judge already believes.
+Communication of advice requires something in the mind of the advisor to be encoded into a set of signals, transmitted to the judge, and then re-encoded into something in the mind of the judge, at which point it can be integrated with what the judge already believes.
 Information can be degraded at any of these steps, resulting in advice that is less informative than the judge's own opinion.
 When Sally asks Hanan what to do about a work problem, and Hanan rapidly and confidently rattles off a suggestion, Sally may be forgiven for thinking the rapidity and confidence are a property of Hanan's confidence in the suggestion rather than an underlying characteristic of Hanan. 
 If Sally does not adjust for the fact that Hanan is always more confident about things than Sally is, then Hanan's suggestion will be overly dominant relative to its informational value.

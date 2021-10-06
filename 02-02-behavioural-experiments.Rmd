@@ -731,7 +731,7 @@ Nevertheless, we have demonstrated sensitivity to context, but not universal dis
 It remains a matter of speculation that people exercise epistemic hygiene by ensuring that information comes from trusted sources before integrating it, and that no source is as trusted as one's own mind.
 This result is in keeping with evidence from experiments where initial estimates are labelled as advice (and vice-versa).
 @sollJudgmentalAggregationStrategies2011 collected initial estimates from participants and then presented those estimates back to participants along with advice so participants could provide final decisions in a classic Judge-Advisor System.
-Unbeknownest to the participants, for some of the questions, the participant's initial estimate was labelled as the advice, and the advice was labelled as the participant's initial estimate. 
+Unbeknownst to the participants, for some of the questions, the participant's initial estimate was labelled as the advice, and the advice was labelled as the participant's initial estimate. 
 For those questions that were switched in this manner, the participants appeared to treat the advice as if it were their own initial decision -- placing more weight on the advice than their actual initial decision.
 If egocentric discounting of advice were due to judges having better access to the reasons for their own estimates, for example, their own initial estimates ought to appear most reasonable and therefore be more influential, regardless of whether they were labelled as "initial estimate" or "advice". 
 On the other hand, if people use a heuristic that their own opinion is more trustworthy because it is _their own_ opinion, they will rely most on whichever figure is presented as their own initial estimate, as indeed they did.
@@ -1569,7 +1569,7 @@ exclusions %>%
   summarise(across(where(is.logical), sum)) %>%
   mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
-  kable(caption = "Participant exclusions for Experiment 5") %>%
+  kable(caption = "Participant exclusions for Experiment 7") %>%
   row_spec((n - 1):n, bold = T)
 
 ```
@@ -2074,7 +2074,7 @@ exclusions %>%
   summarise(across(where(is.logical), sum)) %>%
   mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
-  kable(caption = "Participant exclusions for Experiment 5") %>%
+  kable(caption = "Participant exclusions for Experiment 8") %>%
   row_spec((n - 1):n, bold = T)
 
 ```

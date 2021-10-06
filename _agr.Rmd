@@ -86,7 +86,7 @@ These overall agreement rates were split based on the target accuracy rates for 
 
 ```{r ac-agr-dots-m-profiles} 
 
-kable(agr.table, caption = "Advisor advice profiles for Dots task Agreement experiment") %>%
+kable(agr.table, caption = "Advisor advice profiles for Dots task with dis/agreeing advisors") %>%
   kable_styling() %>%
   column_spec(1, bold = T) %>%
   row_spec(0, bold = F) %>%
@@ -152,7 +152,7 @@ exclusions %>%
   summarise(across(where(is.logical), sum)) %>%
   mutate(`Total remaining` = length(unique(trials$pid))) %>% 
   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
-  kable(caption = "Participant exclusions for Dots task Agreement experiment") %>%
+  kable(caption = "Participant exclusions for Dots task with dis/agreeing advisors") %>%
   row_spec((n - 1):n, bold = T)
 
 familiarisation <- trials %>%
@@ -452,7 +452,7 @@ agr.table %>%
     `Target|incorrect`,
     `Actual|incorrect`
   ) %>%
-  kable(caption = "Advisor agreement for Dots task Agreement experiment")
+  kable(caption = "Advisor agreement for Dots task with dis/agreeing advisors")
 
 ```
 
@@ -469,7 +469,7 @@ agr.table %>%
   select(Advisor, `Target accuracy` = `Overall accuracy`) %>%
   left_join(tmp, by = "Advisor") %>%
   mutate(`Mean accuracy` = prop2str(`Mean accuracy`)) %>%
-  kable(caption = "Advisor accuracy for Dots task Agreement experiment")
+  kable(caption = "Advisor accuracy for Dots task with dis/agreeing advisors")
 
 ```
 
@@ -479,7 +479,7 @@ All participants experienced the intended relationship wherein the High agreemen
 
 ##### \OpenScience{prereg} Hypothesis test {#ac-agr-dots-r-h}
 
-```{r ac-agr-dots-r-graph, fig.caption="Dot task advisor choice for High/Low agreement advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line.", fig.height=6, fig.width=5}
+```{r ac-agr-dots-r-graph, fig.caption="Dot task advisor choice for dis/agreeing advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line.", fig.height=6, fig.width=5}
 
 test <- trials %>% 
   filter(hasChoice) %>%
@@ -954,7 +954,7 @@ agr.table %>%
     `Target|incorrect`,
     `Actual|incorrect`
   ) %>%
-  kable(caption = "Advisor agreement for Dates task Accuracy experiment")
+  kable(caption = "Advisor agreement for Dates task Agreement experiment")
 
 ```
 
@@ -983,7 +983,7 @@ Most (`r n_ap`/`r length(unique(Familiarisation$pid))`, `r num2str(n_ap / length
 
 ##### \OpenScience{prereg} Hypothesis test {#ac-agr-dates-r-h}
 
-```{r ac-agr-dates-r-graph, fig.caption="Dates task advisor choice for High/Low agreement advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line. Participants in the Feedback condition received feedback during the Familiarisation phase, but not during the Choice phase.", fig.height=6, fig.width=6}
+```{r ac-agr-dates-r-graph, fig.caption="Dates task advisor choice for dis/agreeing advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line. Participants in the Feedback condition received feedback during the Familiarisation phase, but not during the Choice phase.", fig.height=6, fig.width=6}
 
 tmp <- AdvisedTrial %>% 
   filter(advisorChoice == T) %>%
@@ -1022,7 +1022,6 @@ ggplot(tmp, aes(x = feedbackCondition, y = pChooseHigh)) +
   annotate(geom = 'segment', x = 1, xend = 2, y = 1.2, yend = 1.2) +
   annotate(geom = 'label', x = 1.5, y = 1.2, label = paste0('BF = ', bf.comp)) +
   scale_y_continuous(limits = c(0, 1.2), breaks = seq(0, 1, length.out = 5)) +
-  scale_fill_hue(direction = -1, aesthetics = c('fill', 'colour')) +
   labs(y = 'p(Choose High agreement advisor)', x = '') +
   theme(axis.line.x = element_blank(), axis.ticks.x = element_blank()) +
   scale_fill_feedback(aesthetics = c("fill", "colour"))

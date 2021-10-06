@@ -15,19 +15,19 @@ rm(list = ls())
 # Load libraries which are widely shared by the chapter files
 
 library(tidyverse)  # Pipes, tidyselectors, string manipulation, data wrangling, etc.
-library(glue)
+library(glue)       # Handlebar strings to replace `paste()`
 library(kableExtra) # Pretty formatting of output tables
 library(esmData)    # My own data package holding the data for the project (`remotes::install_github('oxacclab/esmData')`)
 library(prettyMD)   # My own formatting library for neatly formatting stats output (`remotes::install_github('mjaquiery/prettyMD)`)
 
+
+options(warning.length = 8170)  # show more latex knitting warnings
 
 # Load specific knitr stuff -----------------------------------------------
 
 ##### add chunk options for PDF output ####
 # for guidance on how to create your own chunk options see
 # https://ulyngs.github.io/blog/posts/2019-02-01-how-to-create-your-own-chunk-options-in-r-markdown/
-
-options(warning.length = 8170)  # show more latex knitting warnings
 
 knitr::knit_hooks$set(vspace_output = function(before, options, envir) {
   if (!before) {
@@ -70,6 +70,7 @@ knitr::opts_chunk$set(
   messages = F
 )
 
+#' Wrap with kableExtra's `linebreak()` in latex output only
 #' @inheritDotParams kableExtra::linebreak
 linebreak <- function(x, ...) {
   if (knitr::is_latex_output())
@@ -80,10 +81,14 @@ linebreak <- function(x, ...) {
 
 # Options -----------------------------------------------------------------
 
+# This does not work as fully as originally intended, although for most of the 
+# modelling work in the first half it does a good job. The evolutionary 
+# simulations do not really obey this command, and if you want to run them from
+# scratch you need to load the external library and execute the code.
 ESM.recalculate <- 
   if (is.null(getOption('ESM.recalculate'))) 0 else getOption('ESM.recalculate')
 
-# Plot theme --------------------------------------------------------------
+# Plotting ----------------------------------------------------------------
 
 # ggplot basic theme
 theme_set(
@@ -102,27 +107,54 @@ theme_set(
     )
 )
 
-broken_axis_y <- theme(axis.line.y = element_line(arrow = arrow(ends = 'both', length = unit(6, 'points'), type = 'closed')))
-broken_axis_top <- theme(axis.line.y = element_line(arrow = arrow(ends = 'last', length = unit(6, 'points'), type = 'closed')))
-broken_axis_bottom <- theme(axis.line.y = element_line(arrow = arrow(ends = 'first', length = unit(6, 'points'), type = 'closed')))
+# These theme tweaks add arrows to the ends of the axes to indicate that the 
+# possible values for data lie beyond the limits of the axes.
+broken_axis_y <- theme(
+  axis.line.y = element_line(
+    arrow = arrow(ends = 'both', length = unit(6, 'points'), type = 'closed')
+  )
+)
+broken_axis_top <- theme(
+  axis.line.y = element_line(
+    arrow = arrow(ends = 'last', length = unit(6, 'points'), type = 'closed')
+  )
+)
+broken_axis_bottom <- theme(
+  axis.line.y = element_line(
+    arrow = arrow(ends = 'first', length = unit(6, 'points'), type = 'closed')
+  )
+)
 
-broken_axis_x <- theme(axis.line.x = element_line(arrow = arrow(ends = 'both', length = unit(6, 'points'), type = 'closed')))
-broken_axis_right <- theme(axis.line.x = element_line(arrow = arrow(ends = 'last', length = unit(6, 'points'), type = 'closed')))
-broken_axis_left <- theme(axis.line.x = element_line(arrow = arrow(ends = 'first', length = unit(6, 'points'), type = 'closed')))
+broken_axis_x <- theme(
+  axis.line.x = element_line(
+    arrow = arrow(ends = 'both', length = unit(6, 'points'), type = 'closed')
+  )
+)
+broken_axis_right <- theme(
+  axis.line.x = element_line(
+    arrow = arrow(ends = 'last', length = unit(6, 'points'), type = 'closed')
+  )
+)
+broken_axis_left <- theme(
+  axis.line.x = element_line(
+    arrow = arrow(ends = 'first', length = unit(6, 'points'), type = 'closed')
+  )
+)
 
-
-scale_fill_advisor <- function(...) scale_fill_viridis_d(..., begin = .25, end = .9, option = "C")
-scale_fill_decision <- function(...) scale_fill_viridis_d(..., begin = .3, end = .5, option = "A")
-scale_fill_feedback <- function(...) scale_fill_viridis_d(..., begin = .5, end = .9, option = "D")
+# These functions extend `scale_fill_viridis_d()` to give consistent names to
+# different values so that the same colours are used for comparing the same
+# kind of information throughout the thesis.
+scale_fill_advisor <- function(...) 
+  scale_fill_viridis_d(..., begin = .25, end = .9, option = "C")
+scale_fill_decision <- function(...) 
+  scale_fill_viridis_d(..., begin = .3, end = .5, option = "A")
+scale_fill_feedback <- function(...) 
+  scale_fill_viridis_d(..., begin = .5, end = .9, option = "D")
 
 simulation <- theme(
   plot.background = element_rect(linetype = 'dashed', colour = 'black', size = 1),
   plot.margin = margin(10, 10, 10, 10, 'pt')
 )
-
-# For prettyMD ------------------------------------------------------------
-
-# Here is a bunch of stuff for plotting etc. which should eventually go in prettyMD
 
 #' GGplot2 helper function to get offset x coordinates to the left or right
 #' depending on whether the x coordinate is to the left or right.
@@ -140,71 +172,67 @@ nudge <- function(x, amount, direction = 'outwards') {
 #' Adapted from https://stackoverflow.com/a/45614547 
 #' The split violin shows only one half of the violin plot, 
 #' specifically the left half for group = 1 and the right half for group = 2
-GeomSplitViolin <- ggproto("GeomSplitViolin", GeomViolin, 
-                           draw_group = function(self, data, ..., draw_quantiles = NULL) {
-                             data <- transform(data, xminv = x - violinwidth * width * (x - xmin), xmaxv = x + violinwidth * width * (xmax - x))
-                             grp <- data[1, "group"]
-                             newdata <- plyr::arrange(transform(data, x = if (grp %% 2 == 1) xminv else xmaxv), if (grp %% 2 == 1) y else -y)
-                             newdata <- rbind(newdata[1, ], newdata, newdata[nrow(newdata), ], newdata[1, ])
-                             newdata[c(1, nrow(newdata) - 1, nrow(newdata)), "x"] <- data[1, "x"]
-                             
-                             if (length(draw_quantiles) > 0 & !scales::zero_range(range(data$y))) {
-                               stopifnot(all(draw_quantiles >= 0), all(draw_quantiles <=
-                                                                         1))
-                               quantiles <- ggplot2:::create_quantile_segment_frame(data, draw_quantiles)
-                               aesthetics <- data[rep(1, nrow(quantiles)), setdiff(names(data), c("x", "y")), drop = FALSE]
-                               aesthetics$alpha <- rep(1, nrow(quantiles))
-                               both <- cbind(quantiles, aesthetics)
-                               quantile_grob <- GeomPath$draw_panel(both, ...)
-                               ggplot2:::ggname("geom_split_violin", grid::grobTree(GeomPolygon$draw_panel(newdata, ...), quantile_grob))
-                             }
-                             else {
-                               ggplot2:::ggname("geom_split_violin", GeomPolygon$draw_panel(newdata, ...))
-                             }
-                           })
-
-geom_split_violin <- function(mapping = NULL, data = NULL, stat = "ydensity", position = "identity", ..., 
-                              draw_quantiles = NULL, trim = TRUE, scale = "area", na.rm = FALSE, 
-                              show.legend = NA, inherit.aes = TRUE) {
-  layer(data = data, mapping = mapping, stat = stat, geom = GeomSplitViolin, 
-        position = position, show.legend = show.legend, inherit.aes = inherit.aes, 
-        params = list(trim = trim, scale = scale, draw_quantiles = draw_quantiles, na.rm = na.rm, ...))
-}
-
-
-#' Compare models within a anovaBF output to get relative likelihood
-#' @param x the BFBayesFactor object containing the results
-#' @param comparisons list of values for the comparisons. Values can be row
-#'   numbers or model strings. Pairs of values will be compared to one another;
-#'   individual values will be included directly (compared to null model).
-#' @return data frame with columns M1, M2, BF(M1,M2)
-marginalBF <- function(x, comparisons) {
-  ns <- rownames(x@bayesFactor)
-  getIndex <- function(i) if (i %in% ns) which(ns == i) else i
-  bf <- function(a, b) exp(a - b)
-  out <- NULL
-  for (comp in comparisons) {
-    if (length(comp) == 1) {
-      a <- getIndex(comp[1])
-      out <- rbind(out, data.frame(
-        M1 = ns[a],
-        M2 = x@denominator@longName,
-        BF.M1.M2 = exp(x@bayesFactor$bf[a])
-      ))
-    } else {
-      a <- getIndex(comp[1]); b <- getIndex(comp[2]);
-      out <- rbind(out, data.frame(
-        M1 = ns[a], 
-        M2 = ns[b],
-        BF.M1.M2 = bf(x@bayesFactor$bf[a], x@bayesFactor$bf[b])
-      ))
-    }
+GeomSplitViolin <- ggproto(
+  "GeomSplitViolin", 
+  GeomViolin, 
+  draw_group = function(self, data, ..., draw_quantiles = NULL) {
+    data <- transform(
+      data, 
+      xminv = x - violinwidth * width * (x - xmin), 
+      xmaxv = x + violinwidth * width * (xmax - x)
+    )
+    grp <- data[1, "group"]
+    newdata <- plyr::arrange(
+      transform(data, x = if (grp %% 2 == 1) xminv else xmaxv), 
+      if (grp %% 2 == 1) y else -y
+    )
+    newdata <- rbind(
+      newdata[1, ], 
+      newdata, 
+      newdata[nrow(newdata), ], 
+      newdata[1, ]
+    )
+    newdata[c(1, nrow(newdata) - 1, nrow(newdata)), "x"] <- data[1, "x"]
     
+    if (length(draw_quantiles) > 0 & !scales::zero_range(range(data$y))) {
+      stopifnot(all(draw_quantiles >= 0), all(draw_quantiles <= 1))
+      quantiles <- ggplot2:::create_quantile_segment_frame(data, draw_quantiles)
+      aesthetics <- data[
+        rep(1, nrow(quantiles)), 
+        setdiff(names(data), c("x", "y")), drop = FALSE
+      ]
+      aesthetics$alpha <- rep(1, nrow(quantiles))
+      both <- cbind(quantiles, aesthetics)
+      quantile_grob <- GeomPath$draw_panel(both, ...)
+      ggplot2:::ggname(
+        "geom_split_violin", 
+        grid::grobTree(GeomPolygon$draw_panel(newdata, ...), quantile_grob)
+      )
+    }
+    else {
+      ggplot2:::ggname(
+        "geom_split_violin", 
+        GeomPolygon$draw_panel(newdata, ...)
+      )
+    }
   }
-  if (!is.null(names(comparisons)))
-    rownames(out) <- names(comparisons)
-  out
+)
+
+geom_split_violin <- function(
+  mapping = NULL, data = NULL, stat = "ydensity", position = "identity", ..., 
+  draw_quantiles = NULL, trim = TRUE, scale = "area", na.rm = FALSE, 
+  show.legend = NA, inherit.aes = TRUE) {
+  layer(
+    data = data, mapping = mapping, stat = stat, geom = GeomSplitViolin, 
+    position = position, show.legend = show.legend, inherit.aes = inherit.aes, 
+    params = list(
+      trim = trim, scale = scale, draw_quantiles = draw_quantiles, 
+      na.rm = na.rm, ...
+    )
+  )
 }
+
+# Printing stats ------------------------------------------------------------
 
 #' Produce marginal means summaries for a 2x2 ANOVA on long data
 #' @param data tbl to process
@@ -287,10 +315,7 @@ summariseANOVA <- function(ANOVA, mMeans) {
     mutate(
       aov = map_chr(
         d, 
-        ~ glue(
-          "F({.$DFn},{.$DFd}) = {num2str(.$F, 2)}, ", 
-          "_p_{p2str(.$p)}"
-        )
+        ~ glue("F({.$DFn},{.$DFd}) = {num2str(.$F, 2)}, _p_{p2str(.$p)}")
       )
     ) %>%
     unnest(d) %>%
@@ -298,7 +323,7 @@ summariseANOVA <- function(ANOVA, mMeans) {
     mutate(s = paste(aov, mm, sep = "; "))
 }
 
-# For esmData -------------------------------------------------------------
+# Data wrangling -------------------------------------------------------------
 
 # This stuff might belong better in esmData
 
@@ -402,7 +427,7 @@ order_factors <- function(x) {
 }
 
 
-# For new analysis package ------------------------------------------------
+# Analysis ------------------------------------------------
 
 #' Calculate the probability that confidence is greater than \code{quantiles}
 #' for each quantile. This is used to obtain data for plotting receiver operator

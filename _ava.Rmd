@@ -98,7 +98,7 @@ agr.table <- tribble(
 ) %>% 
   prop2str()
 
-kable(agr.table, caption = "Advisor advice profiles for Dots task Accuracy/agreement experiment") %>%
+kable(agr.table, caption = "Advisor advice profiles for Dots task with accurate versus agreeing advisor") %>%
   kable_styling() %>%
   column_spec(1, bold = T) %>%
   row_spec(0, bold = F) %>%
@@ -174,7 +174,7 @@ exclusions %>%
   summarise(across(where(is.logical), sum)) %>%
   mutate(`Total remaining` = length(unique(trials$pid))) %>% 
   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
-  kable(caption = "Participant exclusions for Dots task Accuracy versus Agreement experiment") %>%
+  kable(caption = "Participant exclusions for Dots task with accurate versus agreeing advisors") %>%
   row_spec((n - 1):n, bold = T)
 
 ```
@@ -487,7 +487,7 @@ agr.table %>%
     `Target|incorrect`,
     `Actual|incorrect`
   ) %>%
-  kable(caption = "Advisor agreement for Dots task Accuracy versus Agreement experiment")
+  kable(caption = "Advisor agreement for Dots task with accurate versus agreeing advisors")
 
 ```
 
@@ -504,7 +504,7 @@ agr.table %>%
   select(Advisor, `Target accuracy` = `Overall accuracy`) %>%
   left_join(tmp, by = "Advisor") %>%
   mutate(`Mean accuracy` = prop2str(`Mean accuracy`)) %>%
-  kable(caption = "Advisor accuracy for Dots task Accuracy versus Agreement experiment")
+  kable(caption = "Advisor accuracy for Dots task with accurate versus agreeing advisors")
 
 ```
 
@@ -513,7 +513,7 @@ The advisors agreed with the participants' initial estimates at close to target 
 
 ##### \OpenScience{prereg} Hypothesis test {#ac-ava-dots-r-h}
 
-```{r ac-ava-dots-r-graph, fig.caption="Dot task advisor choice for High accuracy/agreement advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line.", fig.height=6, fig.width=4}
+```{r ac-ava-dots-r-graph, fig.caption="Dot task advisor choice for accurate versus agreeing advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line.", fig.height=6, fig.width=4}
 
 test <- trials %>% 
   filter(hasChoice) %>%
@@ -797,7 +797,7 @@ On each trial, participants were presented with an historical event that occurre
 They were asked to drag one of three markers onto a timeline to indicate the date range within which they thought the event occurred.
 The three markers each had different widths, and each marker had point value associated with it, with wider markers worth fewer points.
 The markers were 7, 13, and 21 years wide, being worth 25, 10, and 5 points respectively.
-Participants then received advice indicating a region of the timeline in which the advisor suggested the event occured.
+Participants then received advice indicating a region of the timeline in which the advisor suggested the event occurred.
 Participants could then mark a final response in the same manner as their original response, and could choose a different marker width if they wished.
 
 Participants started with `r sum(tmp$type == "practice")` block of `r tmp %>% filter(type == "practice") %>% pull(n) %>% round()` trials that contained no advice to allow them to familiarise themselves with the task.
@@ -876,7 +876,7 @@ exclusions %>%
   summarise(across(where(is.logical), sum)) %>%
   mutate(`Total remaining` = length(unique(AdvisedTrial$pid))) %>% 
   pivot_longer(everything(), names_to = "Reason", values_to = "Participants excluded") %>%
-  kable(caption = "Participant exclusions for Dates task Accuracy versus Agreement experiment") %>%
+  kable(caption = "Participant exclusions for Dates task with accurate versus agreeing advisors") %>%
   row_spec((n - 1):n, bold = T)
 
 ```
@@ -1142,7 +1142,7 @@ Overall, this indicates that the manipulation was implemented as planned.
 
 ##### \OpenScience{prereg} Hypothesis test {#ac-ava-dates-r-h}
 
-```{r ac-ava-dates-r-graph, fig.caption="Dates task advisor choice for High accuracy/agreement advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line. Participants in the Feedback condition received feedback during the Familiarisation phase, but not during the Choice phase. The dotted outline indicates the distribution of participant means in the original experiment of which this experiment is a replication.", fig.height=6, fig.width=6}
+```{r ac-ava-dates-r-graph, fig.caption="Dates task advisor choice for accurate versus agreeing advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line. Participants in the Feedback condition received feedback during the Familiarisation phase, but not during the Choice phase. The dotted outline indicates the distribution of participant means in the original experiment of which this experiment is a replication.", fig.height=6, fig.width=6}
 
 for (E in c(.GlobalEnv, .prevStudy)) {
   E$tmp <- E$AdvisedTrial %>% 
@@ -1174,7 +1174,10 @@ bf <- tmp %>%
 bf$bf <- sapply(1:nrow(bf), 
                 function(i) bf2str(exp(pull(bf, bf)[[i]]@bayesFactor$bf)))
 
-bf.comp <- ttestBF(formula = pChooseAcc ~ feedbackCondition, data = tmp) %>%
+bf.comp <- ttestBF(
+  formula = pChooseAcc ~ feedbackCondition, 
+  data = tmp %>% as.data.frame()
+) %>%
   .@bayesFactor %>% .$bf %>% exp() %>% bf2str()
 
 ggplot(tmp, aes(x = feedbackCondition, y = pChooseAcc)) +
@@ -1216,7 +1219,7 @@ This qualitative difference from the No feedback condition also translated into 
 
 ##### Advisor influence
 
-```{r ac-ava-dates-r-influence-graph, fig.caption="Date task advisor WoA for High accuracy/agreement advisors.  Participants' weight on the advice for advisors in the Familiarisation phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The dotted outline indicates the distribution of participant means in the original experiment of which this experiment is a replication."}
+```{r ac-ava-dates-r-influence-graph, fig.caption="Date task advisor WoA for accurate versus agreeing advisors.  Participants' weight on the advice for advisors in the Familiarisation phase of the experiment. The shaded area and boxplots indicate the distribution of the individual participants' mean influence of advice. Individual means for each participant are shown with lines in the centre of the graph. The dotted outline indicates the distribution of participant means in the original experiment of which this experiment is a replication."}
 
 for (E in c(.GlobalEnv, .prevStudy)) {
   E$tmp <- E$OffBrand %>% 

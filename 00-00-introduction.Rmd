@@ -82,7 +82,7 @@ To these three properties of the advisor we may add the decision-maker's general
 #### Ability {#i-ability}
 
 Ability captures the expertise of an advisor: their raw ability to perform the task for which they are giving advice.
-In some cases this is relatively straightforward, as in the expertise of a General Practitioner in matters of health and disease, and in others more complex, as in the expertise of a hairdresser when deciding on a haircut (when matters of personal taste comingle with aesthetic considerations of facial structure, practical considerations of hair constitution, and social considerations of fashion).
+In some cases this is relatively straightforward, as in the expertise of a General Practitioner in matters of health and disease, and in others more complex, as in the expertise of a hairdresser when deciding on a haircut (when matters of personal taste co-mingle with aesthetic considerations of facial structure, practical considerations of hair constitution, and social considerations of fashion).
 The greater the ability of an advisor, the greater the influence of their advice, as demonstrated by experiments showing that participants' decisions are more affected by the advice of advisors who are labelled as more expert in a relevant domain [@sahCheapTalkCredibility2013; @schultzeInabilityIgnoreUseless2017; @sniezekImprovingJudgementPrepaid2004; @sniezekTrustConfidenceExpertise2001; @sollJudgmentalAggregationStrategies2011], or are shown to be more expert empirically [@pescetelliRoleDecisionConfidence2021; @sahCheapTalkCredibility2013; @yanivAdviceTakingDecision2000].
 
 #### Benevolence
@@ -133,7 +133,7 @@ The behavioural experiments in this thesis use historical date estimation and pe
 
 Advice-taking can be evaluated formally with reference to a normative model.
 The simplest and most common of these views the decision-making task as an estimation problem (or combination of estimation problems), and provides an approximately Bayesian variance-weighted integration of independent estimates.
-To borrow from Galton [-@galtonVoxPopuliWisdom1907]}, consider the task of judging the weight of a bullock.
+To borrow from Galton [-@galtonVoxPopuliWisdom1907], consider the task of judging the weight of a bullock.
 We can model any single guess ($i$) as the true weight ($v$) plus some error ($\epsilon$):
 
 \begin{align}
@@ -247,7 +247,7 @@ Despite both the initial estimates and the advice estimates being similarly accu
 Instead of producing decisions that were midway between the two estimates, as would be achieved with mathematically optimal averaging, participants weighted their initial estimate about 70:30 with the advice they received.
 
 Egocentric discounting occurs in both feedback and no-feedback contexts [@yanivAdviceTakingDecision2000].
-Explanations for egocentric discounting are usually framed in terms of personal-level psychology: decision-makers have better access to reasons for their decision [@yanivAdviceTakingDecision2000]; overrate their own competence [@sniezekImprovingJudgementPrepaid2004]; may have a desire to appear consistent [@yanivUsingAdviceMultiple2007]; may see opinions as possessions [@sollJudgmentalAggregationStrategies2011]; may be loss-averse to providing a worse fnitial decision due to advice-taking [@sollJudgmentalAggregationStrategies2011]; or have difficulty avoiding anchoring [@schultzeInabilityIgnoreUseless2017] or repetition bias effects [@troucheVigilantConservatismEvaluating2018].
+Explanations for egocentric discounting are usually framed in terms of personal-level psychology: decision-makers have better access to reasons for their decision [@yanivAdviceTakingDecision2000]; overrate their own competence [@sniezekImprovingJudgementPrepaid2004]; may have a desire to appear consistent [@yanivUsingAdviceMultiple2007]; may see opinions as possessions [@sollJudgmentalAggregationStrategies2011]; may be loss-averse to providing a worse final decision due to advice-taking [@sollJudgmentalAggregationStrategies2011]; or have difficulty avoiding anchoring [@schultzeInabilityIgnoreUseless2017] or repetition bias effects [@troucheVigilantConservatismEvaluating2018].
 None of these explanations has survived rigorous empirical testing, however, and recently suggestions have widened to include consideration of aggregate-level rather than personal-level causes, with @troucheVigilantConservatismEvaluating2018 arguing that the potential for misaligned incentives between decision-maker and advisor motivate discounting of advice.
 The latter part of this thesis§\@ref(chapter-advice-taking-context) explores whether egocentric discounting may be a stable meta-strategy which protects against exploitation, carelessness, incompetence, and miscommunication.
 From this perspective, the normative model is only normative within the very particular scenario it describes.
@@ -384,7 +384,7 @@ Endogenous experience refers to the information that advice on a given trial car
 
 Endogenous experience of advice means that the weighting of an advisor is in part dependent upon the past advice offered by that advisor.
 As each piece of advice is evaluated, the overall weighting of the advisor is updated accordingly.
-For clarity, two simplifiying assumptions are made in the explanation below.
+For clarity, two simplifying assumptions are made in the explanation below.
 Firstly, while it is probable that properties of the advice are used to inform the dimensions of ability, integrity, and benevolence simultaneously, the examples below will deal with ability in isolation.
 Another project could explore in detail how experience of advice on any given trial updates an advisor's position in 3-dimensional trust space in a Bayesian manner according to the relative certainties about each dimension.
 This would capture the task of assigning blame for erroneous advice (e.g. was it unintentionally poor - a failure of ability - or deliberately misleading - a failure of benevolence?).

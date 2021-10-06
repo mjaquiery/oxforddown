@@ -133,7 +133,7 @@ Some free text responses may be redacted in the open data to prevent participant
 ##### Specific limitations of the Dots task
 
 The Dots task uses a perceptual decision with a high number of trials.
-There is a longstanding debate concerning whether social learning processes are unique or merely the operation of general learning processes on social cues [@lockwoodComputationalModellingSocial2020], and this structure makes this task especially unsuitable for addressing this issue.
+There is a long-standing debate concerning whether social learning processes are unique or merely the operation of general learning processes on social cues [@lockwoodComputationalModellingSocial2020], and this structure makes this task especially unsuitable for addressing this issue.
 It plausible that participants respond to the advice in this task primarily through simple reinforcement learning rather than through specific social processes even if those processes do exist.
 We can therefore draw only tentative conclusions that we are capturing fluctuations in trust in advisors during this task, as opposed to capturing fluctuations in the association between advice and stimuli.
 
@@ -155,7 +155,7 @@ The advice took the same form as the initial estimate, a range of years in the f
 During practice trials (either with or without advice), participants received feedback on their answers.
 Some participants were placed in a Feedback condition where they received feedback on all trials except those where they were asked to choose an advisor to provide advice.
 
-After completing all the trials, participants were presented with a feedback form for each advisor, requiring them to rate the advisor on their level of knowledge, helpfulness, and likability, chosen to reflect the three aspects of trust identified by @mayerIntegrativeModelOrganizational1995 (ability, integrity, and benevolence).
+After completing all the trials, participants were presented with a feedback form for each advisor, requiring them to rate the advisor on their level of knowledge, helpfulness, and likeability, chosen to reflect the three aspects of trust identified by @mayerIntegrativeModelOrganizational1995 (ability, integrity, and benevolence).
 Participants could also provide free-text responses containing further comments on the advisors.
 Participants then completed a general debrief form that told them: "There was a difference between the advisors. What do you think it was?" 
 They also had the opportunity to add free text questions or comments about the experiment. 
@@ -216,7 +216,7 @@ The correct year was also displayed in text.
 This allowed participants to see both their own marker placement and the advisor's advice marker placement (if it was a trial with advice), and to compare both easily to the correct answer.
 The feedback screen lasted 2 seconds before the next trial began.
 
-Catch trials in the continuous Dates task consisted of an instruction to use the smallest marker to include a specific year, written out in words (e.g. 1942 would be "nineteen fourty-two").
+Catch trials in the continuous Dates task consisted of an instruction to use the smallest marker to include a specific year, written out in words (e.g. 1942 would be "nineteen forty-two").
 Participants who failed in this attention check task immediately failed the experiment, and were not allowed to continue.
 
 ```{r m-dates, fig.align='center', fig.caption="Dates Task with continuous responses.", out.width="100%"}
@@ -276,7 +276,7 @@ Questions where respondents' answers were particularly accurate or inaccurate we
 ##### Verification of the Dates task
 
 We ran a study with the Dates task that aimed to replicate effects previously observed in the Dots task, as a check on likely data quality and for the comparability of results across methods (Appendix \@ref(appendix-2)).
-The results indicated that the results were similar to those found by @pescetelliRoleDecisionConfidence2021 for the feedback condition, in which participants were more influenced by advice from accurate comared to agreeing advisors, but not for the no feedback condition, in which participants were equally influenced by advice from both advisors.
+The results indicated that the results were similar to those found by @pescetelliRoleDecisionConfidence2021 for the feedback condition, in which participants were more influenced by advice from accurate compared to agreeing advisors, but not for the no feedback condition, in which participants were equally influenced by advice from both advisors.
 
 ##### Specific limitations of the Dates task
 
@@ -407,13 +407,13 @@ A limitation is that the truncation happens most extremely where initial estimat
 Conceptually, these changes where a participant adjusts a view previously held with near certainty may in fact be the most interesting of all.
 
 An alternative approach to capping, not used here, is to scale the observed adjustment by the potential space for adjustment. 
-This approach often has the effect of overinflating influence of agreement, and can make very subtle differences in the use of the top end of the scale highly important.
+This approach often has the effect of over-inflating influence of agreement, and can make very subtle differences in the use of the top end of the scale highly important.
 If, for example, a participant using a 50-point rating scale selected 48 for their initial estimate and received agreeing advice, a final decision of 49 would constitute an influence rating of 50% and a final decision of 50 an influence rating of 100%. 
 It is not at all clear that participants differentiate the positions on the scales with this decree of precision, and so we considered this approach to capping influence inappropriate.
 
 ### Inferential statistics
 
-Statistical analyses are conducted using a both Frequentist and Bayesian statistics.
+Statistical analyses are conducted using a both frequentest and Bayesian statistics.
 
 #### Frequentist statistics
 
@@ -480,7 +480,7 @@ The meaning of open science varies within each sub-discipline, and this section 
 ### Badges {#os-badges}
 
 Following the Center for Open Science (https://cos.io), this thesis uses a series of badges to indicate adherence to particular aspects of open science.
-Three badges, _preregistration_, _open materials_, and _open data_, are adopted directly from the Centre and used according to the [Centre's rules](https://osf.io/tvyxz/wiki/1.%20View%20the%20Badges/).
+Three badges, _preregistration_, _open materials_, and _open data_, are adopted directly from the Center and used according to the [Center's rules](https://osf.io/tvyxz/wiki/1.%20View%20the%20Badges/).
 Studies which qualify for a badge will have the badge displayed immediately below their title.
 Each badge will contain a link to on-line resources which provide the content for which the badge is awarded.
 
@@ -508,7 +508,7 @@ The links accompanying the open materials badge points to this code.
 #### \OpenScience{data} Open data {#os-data}
 
 Theories are the output of science as a whole, but data are the output of any individual study.
-Sharing data directly allows other scientists to check and extend the data analysis conducted, to reuse the data in meta-analyses, and to repurpose the data for other investigations.
+Sharing data directly allows other scientists to check and extend the data analysis conducted, to reuse the data in meta-analyses, and to re-purpose the data for other investigations.
 This increases the robustness of the results, and increases the efficiency of science as a whole.
 The links accompanying the open data badge point to on-line storage where the data can be obtained for a study, along with appropriate metadata.
 
