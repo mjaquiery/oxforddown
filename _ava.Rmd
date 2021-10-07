@@ -42,7 +42,7 @@ A snapshot of the state of the code for running the experiment at the time the e
 
 An initial version of this study was conducted and run as a proper experiment in which participants learned about both advisors simultaneously (preregistered at https://osf.io/5z2fp), but there were no effects in the data. 
 We suspected the absence of effects was because participants had difficulty distinguishing the advisors when they were presented together. 
-The version of the experiment reported here presented one advisor per block in the familiarisation phase.
+The version of the experiment reported here presented one advisor per block in the Familiarisation phase.
 Data for the unreported null study can be found in the `esmData` R package [@jaquieryOxacclabEsmDataThesis2021] and at https://osf.io/26yut/.
 
 #### Method {#ac-ava-dots-m}
@@ -62,7 +62,7 @@ tmp <- trials %>%
 
 `r length(unique(trials$pid))` participants each completed `r sum(tmp$n)` trials over `r nrow(tmp)` blocks of the Dots task.
 Participants started with `r sum(tmp$typeName == "catch")` blocks of `r tmp %>% filter(typeName == "catch") %>% mutate(n = n - (n %% 4)) %>% .$n %>% unique()` trials that contained no advice.
-The first three trials were introductory trials that explained the task.
+The first 3 trials were introductory trials that explained the task.
 All trials in this section included feedback indicating whether or not the participant's response was correct.
 
 Participants then did `r tmp %>% filter(typeName == "force" & practice) %>% .$n %>% sum()` trials with a practice advisor.
@@ -179,7 +179,7 @@ exclusions %>%
 
 ```
 
-In line with the pre-registration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or finish the experiment after `r preRegParticipants` participants have already submitted data which passed the other exclusion tests. 
+In line with the preregistration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or finish the experiment after `r preRegParticipants` participants have already submitted data which passed the other exclusion tests. 
 Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-ava-dots-r-exclusions-tab).
 This number is somewhat higher than in the previous experiments, but this is largely due to collecting data in larger batches than previously: a large number of participants were excluded because their data were in excess of the preregistered sample size.
 
@@ -812,7 +812,7 @@ Participants then performed `r sum(tmp$type == "core")` blocks of trials that co
 The first two of these were Familiarisation blocks where participants had a single advisor in each block for `r tmp %>% filter(block == 2, type == "core") %>% pull(n) %>% round()` trials, plus `r tmp %>% filter(block == 2, type == "atn_check") %>% pull(n) %>% round()` attention check.
 
 Participants were split into four conditions that produced differences in their experience of these Familiarisation blocks.
-These conditions were whether or not they received feedback, and which of the two advisors they were familiarized with first.
+These conditions were whether or not they received feedback, and which of the two advisors they were familiarised with first.
 For each advisor, participants saw the advisor's advice on `r unique(at$all/2)` trials. 
 On most of these trials, including the first two, the advisor gave advice according to the advice profile (detailed below). 
 On between `r paste(range(at$nOffBrand) / 2, collapse = " and ")` trials, the advisors issued the same kind of advice as one another, chosen to neither agree with the participant's answer nor indicate the correct answer. 
@@ -826,7 +826,7 @@ No participants received feedback during the test phase, and all advisors gave o
 The High accuracy and High agreement advisor profiles defined marker placements based on the timeline based on the correct answer and the participant's initial estimate respectively. 
 Both advisors used markers that spanned 7 years, and both placed the markers in a normal distribution around the target point with a standard deviation of 5 years.
 The target point for the High accuracy advisor was the correct answer, and the target point for the High agreement advisor was the participant's initial estimate.
-Neither advisor ever placed their marker exactly on the midpoint of the participant's marker (because doing so means the weight on advice statistic is undefined). 
+Neither advisor ever placed their marker exactly on the midpoint of the participant's marker (because doing so means the Weight on Advice statistic is undefined). 
 
 Note that just as the task is continuous rather than binary, so agreement is continuous rather than binary. 
 There is no objective threshold at which to classify advice as 'agreement', although we can classify accuracy in a binary way as whether or not a marker includes the correct answer.

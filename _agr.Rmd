@@ -46,7 +46,7 @@ tmp <- trials %>%
 Each trial consisted of three phases: participants gave an initial estimate (with confidence) of which of two briefly presented boxes contained more dots; received advice on their decision from an advisor; and made a final decision (again, with confidence).
 
 Participants started with `r sum(tmp$typeName == "catch")` blocks of `r tmp %>% filter(typeName == "catch") %>% mutate(n = n - (n %% 4)) %>% .$n %>% unique()` trials that contained no advice.
-The first three trials were introductory trials that explained the task.
+The first 3 trials were introductory trials that explained the task.
 All trials in this section included feedback indicating whether or not the participant's response was correct.
 
 Participants then did `r tmp %>% filter(typeName == "force" & practice) %>% .$n %>% sum()` trials with a practice advisor.
@@ -163,7 +163,7 @@ familiarisation <- trials %>%
 
 ```
 
-In line with the pre-registration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or finished the experiment after `r preRegParticipants` participants had already submitted data which passed the other exclusion tests. 
+In line with the preregistration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or finished the experiment after `r preRegParticipants` participants had already submitted data which passed the other exclusion tests. 
 Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-agr-dots-r-exclusions).
 
 ##### Task performance {#ac-agr-dots-r-performance}
@@ -609,13 +609,13 @@ All trials in this section included feedback for all participants indicating whe
 Participants then did `r tmp %>% filter(type == "advice_practice") %>% pull(n) %>% round()` trials with a practice advisor.
 They also received feedback on these trials.
 They were informed that they would "receive advice from advisors" to "help you complete the task".
-They were told that the "advisors aren't always correct, but they are quite good at the task", and informed that they should "identify which advisors are best and to weigh their advice accordingly".
+They were told that the "advisors aren't always correct, but they are quite good at the task", and informed that they should "identify which advisors are best" and "weigh their advice accordingly".
 
 Participants then performed `r sum(tmp$type == "core")` blocks of trials that constituted the main experiment.
 The first two of these were Familiarisation blocks where participants had a single advisor in each block for `r tmp %>% filter(block == 2, type == "core") %>% pull(n) %>% round()` trials, plus `r tmp %>% filter(block == 2, type == "atn_check") %>% pull(n) %>% round()` attention check.
 
 Participants were split into four conditions that produced differences in their experience of these Familiarisation blocks.
-These conditions were whether or not they received feedback, and which of the two advisors they were familiarized with first.
+These conditions were whether or not they received feedback, and which of the two advisors they were familiarised with first.
 
 Finally, participants performed a Test block of `r tmp %>% filter(block == 4) %>% pull(n) %>% round()` trials that offered them a choice on each trial of which of the two advisors they had encountered over the last two blocks would give them advice.
 No participants received feedback during the test phase.
@@ -900,7 +900,7 @@ There were some similarities to and some differences from the basic behavioural 
 Participants' accuracy (Figure \@ref(fig:ac-agr-dates-r-performance-acc)), which was uncontrolled in this task, was greater on final decisions than on initial estimates (`r s_acc$s[2]`).
 There was no significant difference between advisors (`r s_acc$s[1]`), but the increase in final decision accuracy was greater for the Low agreement advisor than the High agreement advisor (`r s_acc$s[3]`).
 
-As expected, and as shown in Figure \@ref(fig:ac-agr-dates-r-performance-conf) participants were systematically more confident when their initial estimate was correct as compared to incorrect (`r s_conf$s[1]`).
+As expected, and as shown in Figure \@ref(fig:ac-agr-dates-r-performance-conf), participants were systematically more confident when their initial estimate was correct as compared to incorrect (`r s_conf$s[1]`).
 Participants were less confident on final decisions than on initial estimates (`r s_conf$s[2]`), as expected given that the scale allows more scope for reducing than increasing confidence between initial estimate and final decision. 
 This decrease in confidence was greater when the initial estimate was incorrect as compared to correct (`r s_conf$s[3]`).
 
@@ -977,7 +977,7 @@ agr.table %>%
 
 The advice is generated probabilistically from the rules described previously (Advice profiles§\@ref(ac-acc-dates-m-advice-profiles)).
 The advisors agreed with participants contingent on the accuracy of the participants' initial estimates at close to the target rates (Table \@ref(tab:ac-agr-dates-r-advice-agr)).
-This meant that advisors were distinguished by their overall agreement rates as they were intended to be in the familiarisation phase. 
+This meant that advisors were distinguished by their overall agreement rates as they were intended to be in the Familiarisation phase. 
 The accuracy of participants' initial estimates was not much above 50%, meaning that the overall accuracy rates of the advisors were similar to those projected (Table \@ref(tab:ac-agr-dates-r-advice-acc)).
 Most (`r n_ap`/`r length(unique(Familiarisation$pid))`, `r num2str(n_ap / length(unique(Familiarisation$pid)) * 100)`%) participants experienced the High agreement advisor as providing advice that agreed more frequently than the Low agreement advisor.
 

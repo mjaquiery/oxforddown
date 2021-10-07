@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
   libfontconfig1-dev \
   cargo \
   nginx
-  
+
 # Update pandoc
 RUN wget -O /pandoc.deb https://github.com/jgm/pandoc/releases/download/2.14.2/pandoc-2.14.2-1-amd64.deb
 RUN sudo dpkg -i /pandoc.deb
@@ -36,3 +36,5 @@ RUN cp scripts_and_filters/docker-setup/localhost.conf \
 
 # Update packages from renv.lock file
 RUN R -e "renv::restore(); tinytex::tlmgr_install('cbfonts-fd')"
+
+RUN cat README.md

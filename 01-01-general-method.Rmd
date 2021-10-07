@@ -22,7 +22,7 @@ Individual experiments reported in subsequent chapters have truncated methods se
 
 ## Behavioural experiments {#gm}
 
-The experiments take place using a judge-advisor system.
+The experiments take place using a Judge-Advisor System.
 Participants give an **initial estimate** for a decision-making task, receive **advice**, and then provide a **final decision**.
 The advice is always computer-generated, although the specifics of the generating procedure vary between experiments.
 
@@ -80,15 +80,15 @@ On each trial, participants were faced with a decision-making task for which the
 They then received advice (on some trials they were able to choose which of two advisors would provide this advice).
 They then made a final decision.
 On feedback trials, they received feedback on their final decision.
-The schematic for this trial structure is shown for the Dots Task in Figure \@ref(fig:m-trial).
+The schematic for this trial structure is shown for the Dots task in Figure \@ref(fig:m-trial).
 
-```{r m-trial, fig.align='center', fig.caption="Trial structure of the Dots Task.  In the initial estimate phase, participants saw two boxes of dots presented simultaneously for 300ms. Participants then reported whether there were more dots on in the left or the right box, and how confident they were in this decision. Participants then received advice, sometimes being offered the choice of which advisor would provide the advice. The advice was displayed for 2000ms before participants could submit a final decision, again reporting which box they believe contained more dots and their confidence in their decision. On feedback trials, feedback was presented by redisplaying the correct box while showing the other box as empty.", out.width="100%"}
+```{r m-trial, fig.align='center', fig.caption="Trial structure of the Dots task.  In the initial estimate phase, participants saw two boxes of dots presented simultaneously for 300ms. Participants then reported whether there were more dots on in the left or the right box, and how confident they were in this decision. Participants then received advice, sometimes being offered the choice of which advisor would provide the advice. The advice was displayed for 2000ms before participants could submit a final decision, again reporting which box they believe contained more dots and their confidence in their decision. On feedback trials, feedback was presented by redisplaying the correct box while showing the other box as empty.", out.width="100%"}
 knitr::include_graphics("figures/methods/dots-structure.jpg")
 ```
 
 #### Perceptual decision (Dots task) {#m-p-dots}
 
-The Dots task is a two-alternative forced choice task that has been used in various forms for many experiments in our lab [@steinhauserDecisionProcessesHuman2010; @boldtSharedNeuralMarkers2015a; @charlesDynamicSourcesEvidence2019; @carlebachSubjectiveConfidenceActs2020; @pescetelliConfidenceAdviceSeeking2021; @pescetelliRoleDecisionConfidence2021] and beyond [@rouaultFormingGlobalEstimates2019; @rouaultPsychiatricSymptomDimensions2018; @flemingDomainspecificImpairmentMetacognitive2014].
+The Dots task is a two-alternative forced choice task that has been used in various forms for many experiments in our lab [@steinhauserDecisionProcessesHuman2010; @boldtSharedNeuralMarkers2015; @charlesDynamicSourcesEvidence2019; @carlebachSubjectiveConfidenceActs2020; @pescetelliConfidenceAdviceSeeking2021; @pescetelliRoleDecisionConfidence2021] and beyond [@rouaultFormingGlobalEstimates2019; @rouaultPsychiatricSymptomDimensions2018; @flemingDomainspecificImpairmentMetacognitive2014].
 This task has several key features that make it appealing for studying decision-making and advice.
 Firstly, stimuli are only presented very briefly, meaning that many trials can be performed in a relatively short experimental session.
 Secondly, the difficulty of the task can be titrated to bring all participants to a desired level of accuracy, and this process can be done continually and unobtrusively throughout the experiment.
@@ -105,11 +105,11 @@ The number of dots was exactly determined by the difficulty of the trial: the bo
 The dots did not move during the presentation of the stimulus.
 There was thus an objectively correct answer to the question which, given enough time, could be precisely determined from the stimulus.
 
-```{r m-dots, fig.align='center', fig.caption="Dots Task stimulus.", out.width="100%"}
+```{r m-dots, fig.align='center', fig.caption="Dots task stimulus.", out.width="100%"}
 knitr::include_graphics("figures/methods/dots.jpg")
 ```
 
-The Dots Task stimuli can be customised to make the discrimination easier or more difficult.
+The Dots task stimuli can be customised to make the discrimination easier or more difficult.
 This means that the stimuli can be adjusted to maintain a specific accuracy for each individual participant, allowing confidence to be examined in the absence of confounds with the probability of being correct.
 Stimuli were continually adjusted throughout the experiment to maintain an initial estimate accuracy of around 71% using a 2-down-1-up staircase procedure.
 There were a substantial number of trials in the practice block so that participants could eliminate practice effects and thus experience a more stable objective difficulty during the core trial blocks.
@@ -174,7 +174,7 @@ Secondly, we wanted to replicate the effects in a task domain that was more simi
 While people do occasionally consult one another concerning perceptual decisions ("is that a bird or a plane?"), such consultation is rare, especially in comparison to the ubiquity of perceptual decision-making. 
 We thus selected a more deliberative task.
 
-Thirdly, much of the judge-advisor system and advice-taking literature has used tasks based on estimation [@sniezekImprovingJudgementPrepaid2004; @ginoEffectsTaskDifficulty2007; @seeDetrimentalEffectsPower2011; @sollJudgmentalAggregationStrategies2011; @ginoAnxietyAdviceAbility2012; @libermanNaiveRealismCapturing2012; @minsonCostCollaborationWhy2012; @tostPowerCompetitivenessAdvice2012; @yanivExploitingWisdomOthers2012; @bonnerGroupJudgmentAdviceTaking2014; @schultzeEffectsDistanceInitial2015; @hutterSeekingAdviceSampling2016; @schultzeInabilityIgnoreUseless2017; @troucheVigilantConservatismEvaluating2018; @wangWhyDoesAdvice2018], and often specifically estimation of dates [@yanivAdviceTakingDecision2000; @yanivUsingAdviceMultiple2007; @ginoWeListenAdvice2008].
+Thirdly, much of the Judge-Advisor System and advice-taking literature has used tasks based on estimation [@sniezekImprovingJudgementPrepaid2004; @ginoEffectsTaskDifficulty2007; @seeDetrimentalEffectsPower2011; @sollJudgmentalAggregationStrategies2011; @ginoAnxietyAdviceAbility2012; @libermanNaiveRealismCapturing2012; @minsonCostCollaborationWhy2012; @tostPowerCompetitivenessAdvice2012; @yanivExploitingWisdomOthers2012; @bonnerGroupJudgmentAdviceTaking2014; @schultzeEffectsDistanceInitial2015; @hutterSeekingAdviceSampling2016; @schultzeInabilityIgnoreUseless2017; @troucheVigilantConservatismEvaluating2018; @wangWhyDoesAdvice2018], and often specifically estimation of dates [@yanivAdviceTakingDecision2000; @yanivUsingAdviceMultiple2007; @ginoWeListenAdvice2008].
 We felt that being able to replicate the effects seen by @pescetelliRoleDecisionConfidence2021 in a task domain commonly used for evaluating advice-taking behaviour would be especially useful.
 
 Lastly, we wanted to design a task in a way that would be engaging for participants. 
@@ -195,7 +195,8 @@ The participant's choice of a narrower or wider marker was taken as an implicit 
 In order to score points, the participant's marker had to contain the correct year on the timeline, and thus the more confident a participant was about the answer the more likely they would be able to score points using a smaller marker, and consequently the higher their average return from using a smaller marker.
 
 Advice in the continuous version of the task was presented using a one-second animation wherein the advisor's avatar slid along the timeline to the middle of the advisory estimate. 
-Attached to the avatar was the advisor's marker, and this indicated a range of years into that the advisor signalled included the year of the event.
+The advisor's avatar had a marker attached. 
+This marker covered a range of years, indicating that the advisor suggested the year of the event lay within that range.
 Once the advisor's advice had reached its target location, the advisor's advice remained visible throughout the remainder of the trial, and the participant could enter a final decision.
 
 To enter a final decision the participant could either simply click their existing marker, confirming their initial estimate as their final decision, move the marker along the timeline, or, where multiple markers were available, drag a different marker onto the timeline.
@@ -214,12 +215,12 @@ There was never a time limit for making this choice.
 On trials that contained feedback, the correct year was identified by the placement of a gold star placed over the timeline with a line pointing to the correct point on the timeline. 
 The correct year was also displayed in text. 
 This allowed participants to see both their own marker placement and the advisor's advice marker placement (if it was a trial with advice), and to compare both easily to the correct answer.
-The feedback screen lasted 2 seconds before the next trial began.
+The feedback screen lasted 2s before the next trial began.
 
 Catch trials in the continuous Dates task consisted of an instruction to use the smallest marker to include a specific year, written out in words (e.g. 1942 would be "nineteen forty-two").
 Participants who failed in this attention check task immediately failed the experiment, and were not allowed to continue.
 
-```{r m-dates, fig.align='center', fig.caption="Dates Task with continuous responses.", out.width="100%"}
+```{r m-dates, fig.align='center', fig.caption="Dates task with continuous responses.", out.width="100%"}
 knitr::include_graphics("figures/methods/dates.jpg")
 ```
 
@@ -248,14 +249,14 @@ Specifically, the advice was generated by drawing a random year from a normal di
 The advice was given according to whether this year fell before or after the anchor year, with confidence scaled as a function of the distance between those years.
 This method is a somewhat rationalist version of how participants themselves may generate confidence judgements in this task.
 
-When a choice of advisors was offered, advisor avatars were placed vertically in the centre of the screen, between the two bars, and participants clicked on the avatar of the advisor from whom they wished to hear advice.
+When a choice of advisors was offered, advisor avatars were placed vertically in the centre of the screen, between the two bars, and participants clicked on the avatar of the advisor from whom they wished to get advice.
 There was never a time limit for this choice.
 
 Attention check trials in the binary Dates task prompted the participant to enter a specific response with a specific confidence. 
 For example, the prompt that usually contained an event might instruct the participant to "enter 'Before' with high confidence".
 As with the continuous version, entering an incorrect response would result in immediate termination of the experiment.
 
-```{r m-dates-binary, fig.align='center', fig.caption="Dates Task with binary responses.", out.width="100%"}
+```{r m-dates-binary, fig.align='center', fig.caption="Dates task with binary responses.", out.width="100%"}
 knitr::include_graphics("figures/methods/dates-binary.jpg")
 ```
 
@@ -306,7 +307,7 @@ While social and non-social information processing would not invalidate any find
 Secondly, artificial advisors may not trigger a number of human-centred processes such as equality bias [@mahmoodiEqualityBiasImpairs2015], meaning that effects revealed in these experiments may be much more difficult to observe in real human advice exchanges.
 
 The advice presented to participants in the experiments is specific and impersonal.
-During real-life advice-taking, advice is often provided within a discussion, with estimates accompanied by reasons and points responded interactively.
+During real-life advice-taking, advice is often provided within a discussion, with estimates accompanied by reasons and points responded to interactively.
 Although studies have indicated that advice-taking behaviour remains similar where discussion is allowed [@libermanNaiveRealismCapturing2012; @minsonTwoTangoEffects2011], these experiments placed discussion within the context of advice exchanges over a decision made by both dyad members individually, and not with distinct roles for the advisor and judge as used in these experiments.
 The relationship between the judge and the advisor is also less rich than real-life relationships where numerous other factors may alter or overwhelm any advice-taking and advisor evaluation processes revealed by these experiments. 
 
@@ -316,7 +317,7 @@ This structure is intended to condense a real-world relationship with an advisor
 It is possible that this temporal compression does not fundamentally alter the processes of advisor evaluation and trust formation, but we have little positive evidence to support this supposition.
 
 Lastly, both the Dots task and the Dates task had an objectively correct answer on every question.
-A substantial portion of everyday real-world advice-seeking behaviour concerns questions on which there is no readily-determinable objectively correct answer, such as where might be a good holiday destination, or whether one should pursue postgraduate education.
+A substantial portion of everyday real-world advice-seeking behaviour concerns questions on which there is no readily determinable objectively correct answer, such as where might be a good holiday destination, or whether one should pursue postgraduate education.
 These more subjective questions have received some attention by @vanswolForecastingAnotherEnjoyment2011, but are seldom studied in the advice-taking cognitive psychology literature.
     
 ## Analysis {#m-analysis}
@@ -384,7 +385,7 @@ I|\text{disagree} = -I|\text{agree}
 
 The confidence scale excludes 0, and thus the final decision can always be more extreme when moving against the direction of the initial answer than when moving further in the direction of the initial answer.
 A capped measure of influence was used to minimise biases arising from the natural asymmetry of the scale.
-This measure was calculated by truncating absolute influence values which were greater than the maximum influence which could have obtained had the final decision been a maximal response in the direction of the initial answer (Figure \@ref(fig:m-capping)).
+This measure was calculated by truncating absolute influence values that were greater than the maximum influence that could have occurred had the final decision been a maximal response in the direction of the initial answer (Figure \@ref(fig:m-capping)).
 
 ```{r m-capping, fig.align='center', fig.caption="Capping influence to avoid scale bias.  In this example the judge’s initial response is 42, meaning that their final decision could be up to 13 points more confident or up to 97 points less confident. Any final decision which is more than 13 points less confident is therefore capped at 13 points less confident.", out.width="100%"}
 knitr::include_graphics("figures/experiment_01_MATLAB/capping.jpg")
@@ -413,7 +414,7 @@ It is not at all clear that participants differentiate the positions on the scal
 
 ### Inferential statistics
 
-Statistical analyses are conducted using a both frequentest and Bayesian statistics.
+Statistical analyses are conducted using both frequentest and Bayesian statistics.
 
 #### Frequentist statistics
 
@@ -457,7 +458,7 @@ For a full list of packages and software environment information, see Appendix 3
 
 ### Unanalysed data
 
-Early versions of several experiments had bugs in the experiment code made the results unreliable.
+Early versions of several experiments had bugs in the experiment code that made the results unreliable.
 The data collected during these runs are available alongside the data collected in the final versions of experiments.
 These participants were paid on an ad hoc basis depending upon the time taken before the errors emerged and the detail of the error reports they submitted on the Prolific participant recruitment platform.
 For details on what went wrong with the experiments in which bugs were found, see the description column of the data files in the `esmData::` R package.

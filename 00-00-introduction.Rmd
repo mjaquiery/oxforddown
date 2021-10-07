@@ -33,7 +33,7 @@ Egocentric discounting is the name for the general observation that people do no
 
 This thesis explores two questions related to those ideas: does the way individuals seek advice produce echo chamber-like networks?; and is the well-established phenomenon of people 'irrationally under-weighting' advice actually explicable as a rational process?
 The first of these questions concerns how people learn about the trustworthiness of others who give them advice, especially where they have no objective way of knowing how useful that advice actually is.
-I ask whether people are more likely to seek advice from others whom they consider more trustworthy, and whether this might lead to forming echo-chambers full of like-minded individuals who assess one another as trustworthy because they parrot their own opinions back again.
+I ask whether people are more likely to seek advice from others whom they consider more trustworthy, and whether this might lead to forming echo chambers full of like-minded individuals who assess one another as trustworthy because they parrot their own opinions back again.
 This question is addressed using on-line empirical behavioural experiments to characterise the individual psychological processes underlying advice seeking, followed by agent-based computational simulations that implement the variation in those processes observed in human participants.
 
 The second question takes as its starting point the observation that people do not take as much advice as they _should_ (as defined by a mathematical model of information). 
@@ -53,7 +53,7 @@ Finally, I develop the normative model with ideas of use of advice and advisor e
 
 Advice can be broadly defined as information which comes from a social source.
 Defined this way, it includes things most people would intuitively understand as advice, such as guidance from a mentor or lawn care tips, and things most people may not, such as advertisements, traffic, and recommender algorithms in on-line shops.
-Advice is different from other sources of information, such as the forbiddingness of a storm cloud or the rattle of a rattlesnake, in that it is the result of human mental processing of other information.^[There are of course cases that defy this categorisation: for example, it seems uncontentious to allow that Honey Guides and Guide Dogs offer advice to their human counterparts.]
+Advice is different from other sources of information, such as the forbiddingness of a storm cloud or the rattle of a rattlesnake, in that it is the result of human mental processing of other information.^[There are of course cases that defy this categorisation: for example, it seems uncontentious to allow that honeyguides and guide dogs offer advice to their human counterparts.]
 In some cases, it may additionally include discussions among different group members (e.g.
 advice from the International Advisory Panel on Climate Change).
 
@@ -82,7 +82,7 @@ To these three properties of the advisor we may add the decision-maker's general
 #### Ability {#i-ability}
 
 Ability captures the expertise of an advisor: their raw ability to perform the task for which they are giving advice.
-In some cases this is relatively straightforward, as in the expertise of a General Practitioner in matters of health and disease, and in others more complex, as in the expertise of a hairdresser when deciding on a haircut (when matters of personal taste co-mingle with aesthetic considerations of facial structure, practical considerations of hair constitution, and social considerations of fashion).
+In some cases this is relatively straightforward, as in the expertise of a general practitioner in matters of health and disease, and in others more complex, as in the expertise of a hairdresser when deciding on a haircut (when matters of personal taste co-mingle with aesthetic considerations of facial structure, practical considerations of hair constitution, and social considerations of fashion).
 The greater the ability of an advisor, the greater the influence of their advice, as demonstrated by experiments showing that participants' decisions are more affected by the advice of advisors who are labelled as more expert in a relevant domain [@sahCheapTalkCredibility2013; @schultzeInabilityIgnoreUseless2017; @sniezekImprovingJudgementPrepaid2004; @sniezekTrustConfidenceExpertise2001; @sollJudgmentalAggregationStrategies2011], or are shown to be more expert empirically [@pescetelliRoleDecisionConfidence2021; @sahCheapTalkCredibility2013; @yanivAdviceTakingDecision2000].
 
 #### Benevolence
@@ -97,7 +97,7 @@ Experimental work has shown that participants are more inclined to reject advice
 Advisors with integrity exhibit adherence to principles which the decision-maker endorses.
 "Integrity" in this sense is related to the common-use sense of integrity as following a code or set of principles unwaveringly, but with the caveat that the principles have to be ones shared with or respected by the decision-maker. 
 To borrow an example from @mayerIntegrativeModelOrganizational1995, a ruthless dedication to "profit seeking at all costs" would lead to an advisor being highly mistrusted, except where the person doing the trusting also endorsed that value.
-While benevolence and integrity are not mutually exclusive, integrity is typically important where relationships are less personal (e.g. we may place great trust in a General Practitioner because of their expertise in medical matters and their integrity in adhering to a set of professional ethical and conduct requirements).
+While benevolence and integrity are not mutually exclusive, integrity is typically important where relationships are less personal (e.g. we may place great trust in a general practitioner because of their expertise in medical matters and their integrity in adhering to a set of professional ethical and conduct requirements).
 In many cases, integrity is difficult to disentangle from ability, because subscription to values often indicates a knowledge of a domain, which can act as a cue for ability.
 Where professional societies are involved, for example, many require formally-recognised training for membership.
 Providing a concise and accurate definition of integrity, complete with appropriate qualifiers and explanations, is well beyond the scope of this thesis: integrity has long suffered from conceptual confusion and disagreement between researchers [@palanskiIntegrityLeadershipClearing2007], with recent consensus perhaps emerging that it is best understood as a multi-dimensional construct [@moormanUnderstandingHowPerceived2018] that may or may not bear close resemblance to the construct imagined by @mayerIntegrativeModelOrganizational1995.
@@ -189,11 +189,11 @@ Below, I show how this framework extends to cover the use of advice where agents
 
 ## Advice-taking phenomena
 
-This work is primarily interested in two advice-taking phenomena, one in which people weigh advice too heavily, and one in which people weigh advice too lightly.
+This work is primarily interested in two advice-taking phenomena: one in which people weigh advice too heavily; and one in which people weigh advice too lightly.
 In one of these, people form echo chambers in which they are over-reliant on the advice of those like themselves, leading to missed opportunities to make accurate assessments.
 In the other, egocentric discounting, people take less advice than they should, according to the normative model presented above§\@ref(i-normative) when integrating multiple opinions with their own.
 
-### Homophily and echo-chambers
+### Homophily and echo chambers
 
 Homophily is the ubiquitous phenomenon that individuals more closely connected to one another within a social network tend to be more similar to one another than would be expected by chance across numerous dimensions, from demographics to attitudes [@mcphersonBirdsFeatherHomophily2001].
 @mcphersonBirdsFeatherHomophily2001 review a wealth of examples, including the tendency for married couples to be more similar to one another than chance would dictate in their ethnicity, age, and religion (and along many other dimensions).
@@ -201,7 +201,7 @@ The use of homophily as a concept has increased dramatically in the last few dec
 Different fields (and researchers) provide different measurements, such as asking people to nominate their friends and comparing demographic information [@mccormickFeasibleRigorousRelevant2015] or comparing social media users' content similarity and interactivity [@cardosoTopicalHomophilyOnline2017], but the unifying idea is that more similar individuals are more likely to have closer contact with one another [@lawrenceHomophilyMeasuresMeaning2020].
 
 Homophily is often discussed negatively, especially in the context of ethnic differences and intergroup tensions [@mcphersonBirdsFeatherHomophily2001], but in many contexts it is not only expected but desired.
-Homophily on the basis of shared interests is unavoidable: provided people spend time doing things they are interested in, for example playing a sport, they will tend to spend time with other people doing those things.
+Homophily on the basis of shared interests is unavoidable: provided people spend time doing things they are interested in, such as playing a sport, they will tend to spend time with other people doing those things.
 Similarly, many romantic matchmaking services deliberately use similarity on dimensions such as age to identify likely partnerships.
 Due to association between the many dimensions in which homophily operates, such as ethnicity and religion, it is often difficult in practice to separate out the dimensions along which homophily is operating.
 
@@ -221,7 +221,7 @@ More extreme ideas in keeping with the views appear pioneering and courageous, w
 
 Most people who argue for the nefarious consequences of homophily and polarisation for society as a whole highlight social media, and the fluency of association that it offers, as a catalyst that sweeps away many traditional checks to the vicious cycle of homophily and polarisation.
 Whereas in the physical world we can only interact with those nearby, in the on-line world we can interact with people anywhere in the world, meaning we can find people whose opinions are far more similar to our own along far more dimensions [@daviesTwinImpactHomophily2017].
-Added to this, the algorithms that curate content on dominant social media platforms prioritise emotive content, selecting extremes of opinion to be reviled or applauded, and replacing the previously universally-shared culture with a culture shared only by our echo chamber [@sunsteinRepublicCom2002; @sunsteinRepublicDividedDemocracy2018]. 
+Added to this, the algorithms that curate content on dominant social media platforms prioritise emotive content, selecting extremes of opinion to be reviled or applauded, and replace the previously universally-shared culture with a culture shared only by our echo chamber [@sunsteinRepublicCom2002; @sunsteinRepublicDividedDemocracy2018]. 
 Modelling work demonstrates that where there is a bias in assimilation of information, homophily exacerbates polarisation [@dandekarBiasedAssimilationHomophily2013].
 Where polarisation in turn increases homophily, for example through selective exposure (where individuals seek out reinforcing views) or avoidance (where individuals avoid challenges to their views), a self-reinforcing spiral emerges wherein social connections become increasingly homogeneous and attitudes increasingly extreme [@songDynamicSpiralsPut2017].
 
@@ -240,7 +240,7 @@ This thesis explores biased source selection, its heterogeneity, and their impac
 
 From the perspective of the normative model above§\@ref(i-normative), decision-makers should weigh their own estimate equally with each other estimate they receive in the process of coming to their decision.
 This is because the errors in the judgements made by the decision-maker and the advisors are interchangeable, mathematically-speaking, and on average one will approximate the correct answer most nearly by allowing all of the errors to cancel one another out, which is achieved by averaging across all estimates as show in Equation \ref{eq:wisdom-of-crowds}.
-However, one of the most robust findings in the literature on advice-taking is that people routinely under-weight advisory estimates relative to their own estimates, a phenomenon known as _egocentric discounting_[@danaAdviceChoice2015; @ginoEffectsTaskDifficulty2007; @hutterSeekingAdviceSampling2016; @libermanNaiveRealismCapturing2012; @minsonCostCollaborationWhy2012; @raderAdviceFormSocial2017; @ronayneIgnoringGoodAdvice2018; @seeDetrimentalEffectsPower2011; @sollJudgmentalAggregationStrategies2011; @troucheVigilantConservatismEvaluating2018; @yanivAdviceTakingDecision2000; @yanivExploitingWisdomOthers2012; @yanivUsingAdviceMultiple2007].
+However, one of the most robust findings in the literature on advice-taking is that people routinely under-weight advisory estimates relative to their own estimates, a phenomenon known as _egocentric discounting_ [@danaAdviceChoice2015; @ginoEffectsTaskDifficulty2007; @hutterSeekingAdviceSampling2016; @libermanNaiveRealismCapturing2012; @minsonCostCollaborationWhy2012; @raderAdviceFormSocial2017; @ronayneIgnoringGoodAdvice2018; @seeDetrimentalEffectsPower2011; @sollJudgmentalAggregationStrategies2011; @troucheVigilantConservatismEvaluating2018; @yanivAdviceTakingDecision2000; @yanivExploitingWisdomOthers2012; @yanivUsingAdviceMultiple2007].
 
 @yanivAdviceTakingDecision2000 provided a classic example of egocentric discounting in a task that required participants to provide initial estimates of historical dates (e.g. "When were the Dead Sea Scrolls first discovered?"), and then provide final decisions of the same after seeing advice (taken from a random participant's answer in a previous study).
 Despite both the initial estimates and the advice estimates being similarly accurate, participants' final decisions were much closer to their initial estimates than to the advice.
@@ -371,7 +371,7 @@ Such additional complexity is not warranted here, but I highlight the distinctio
 
 The criticisms above are important, but they do not invalidate the model for use in the present project.
 This work seeks to establish how differences in advice-taking manifest according to properties of advisors.
-These differences are well characterised by the model, especially in the judge-advisor system used for the experiments.
+These differences are well characterised by the model, especially in the Judge-Advisor System used for the experiments.
 All models are inexact descriptions of reality, and inclusion of a more complex model capable of handling the cases outlined above would require greatly increased complexity for relatively little gain in explanatory power.
 For studying the questions at hand, the psychological model is an appropriate and useful approximation of human behaviour.
 
@@ -416,7 +416,7 @@ This likely happens as an analogue of reinforcement learning, where feedback all
 
 #### Criticism of the advisor evalutation model
 
-While many experiments have established the existence reinforcement learning in humans and other animals, it is unclear whether reinforcement learning operates in the social domain in which advising takes place.
+While many experiments have established the existence of reinforcement learning in humans and other animals, it is unclear whether reinforcement learning operates in the social domain in which advising takes place.
 It is not obvious that there are many situations in the course of everyday relationships which can be characterised by the rapid advice-feedback cycle required to learn about advisor ability in the manner modelled above.
 @feldmanhallViewingAdaptiveSocial2019 argued in a review that a wide variety of social phenomena could be explained via reinforcement learning processes, and @behrensAssociativeLearningSocial2008 demonstrated that a Bayesian reinforcement learning model provided a good fit to behavioural data from a social influence task.
 Additionally, @heyesKnowingOurselvesTogether2020 have argued that social learning is wholly explicable in terms of general reinforcement learning processes paired with attentional biases to social stimuli.
@@ -450,7 +450,7 @@ This is because the probability that you and your advisor agree depends on both 
 ##### Confidence-weighted agreement
 
 The insight that the usefulness of agreement as a proxy for accuracy scales with the judge's own probability of being correct means judges may be able to gain insights into that usefulness.
-Judge's accuracy varies from decision to decision, and this variation means that some decisions are accurate (and hence agreement is a useful proxy for advisor accuracy) while others are inaccurate (and hence agreement is a poor proxy).
+The judge's accuracy varies from decision to decision, and this variation means that some decisions are accurate (and hence agreement is a useful proxy for advisor accuracy) while others are inaccurate (and hence agreement is a poor proxy).
 Insofar as a judge has insight into whether or not their decisions are more or less accurate, they have insight into whether or not agreement is a useful proxy for advisor accuracy.
 The judge's own confidence in their decisions is a metacognitive signal that, for well-calibrated judges, can serve this purpose.
 

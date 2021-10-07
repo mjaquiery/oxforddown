@@ -95,7 +95,7 @@ A snapshot of the state of the code for running the experiment at the time the e
 There were two deviations from the preregistered analysis in this experiment.
 Several participants used translation software to translate the experiment website. 
 We could not guarantee that the questions were accurately translated and so these participants were excluded.
-Some participants never rated the Sometimes deceptive advisor's advice as 'honest', and so they were excluded in the t-test comparing advisors.
+Some participants never rated the Sometimes deceptive advisor's advice as 'Honest', and so they were excluded in the t-test comparing advisors.
 
 #### Method {#be-dba-m}
 
@@ -520,14 +520,14 @@ Participants chose their own ratings for the advice, and it was common for parti
 This meant that the statistical tests preregistered for this hypothesis were broken down into separate contrasts of advice and advisor. 
 Using a more complete test, such as 2x3 ANOVA, would have suffered greatly from missing values.
 
-To explore the effect of advice, a 1x3 ANOVA was run on weight on advice across ratings. 
+To explore the effect of advice, a 1x3 ANOVA was run on Weight on Advice across ratings. 
 In all, `r length(unique(x$pid))`/`r length(unique(Familiarisation$pid))` (`r num2str(length(unique(x$pid)) / length(unique(Familiarisation$pid)) * 100)`%) participants had at least one trial rated with each of the three ratings.
-The weight on advice differed according to the rating assigned the advice (`r s_advice$s[1]`; Mauchly's test for Sphericity W = `r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][2][[1]])`, _p_ = `r p2str(aov_advice[["Mauchly's Test for Sphericity"]][3][[1]])`).
+The Weight on Advice differed according to the rating assigned the advice (`r s_advice$s[1]`; Mauchly's test for Sphericity W = `r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][2][[1]])`, _p_`r p2str(aov_advice[["Mauchly's Test for Sphericity"]][3][[1]])`).
 As expected, participants were more influenced by advice they rated as Honest compared to advice they rated as Deceptive.
 
 ###### \OpenScience{prereg} Effect of advisor {#be-dba-r-h-advisor}
 
-```{r be-dba-r-advisor, fig.caption="Weight on Advice in Experiment 5.  Shows the weight of the advice of the advisors. Only trials where the participant rated the advice as Honest are included. The shaded area and boxplots indicate the distribution of the individual participants' mean weight on advice. Individual means for each participant are shown with lines in the centre of the graph. The dashed outline shows the distribution of participant means in the original study of which this is a replication."}
+```{r be-dba-r-advisor, fig.caption="Weight on Advice in Experiment 5.  Shows the weight of the advice of the advisors. Only trials where the participant rated the advice as Honest are included. The shaded area and boxplots indicate the distribution of the individual participants' mean Weight on Advice. Individual means for each participant are shown with lines in the centre of the graph. The dashed outline shows the distribution of participant means in the original study of which this is a replication."}
 for (E in c(.GlobalEnv, .prevStudy)) {
   E$tmp <- E$Familiarisation %>% 
     filter(Rating == "Honest") %>%
@@ -594,7 +594,7 @@ tmp %>%
 
 ```
 
-To distinguish the effects of the advisor from the effects of the advice, we compared weight on advice for only those trials where the participant rated the advice as Honest. 
+To distinguish the effects of the advisor from the effects of the advice, we compared Weight on Advice for only those trials where the participant rated the advice as Honest. 
 This approach has the limitation that `r lost` (`r num2str(lost / length(unique(Familiarisation$pid)) * 100)`%) participants had to be dropped due to never rating advice from the Sometimes deceptive advisor as Honest.
 
 Comparing the two (Figure \@ref(fig:be-dba-r-advisor)) showed that participants placed more weight on the Honest advice from the Always honest advisor (`r .T`).
@@ -638,7 +638,7 @@ coefs <- cbind(
     across(c(Estimate:last_col(), -`Pr(>|t|)`), num2str),
     `Pr(>|t|)` = p2str(`Pr(>|t|)`),
     s = glue(
-      "{Estimate} [{`2.5 %`}, {`97.5 %`}], df = {df}, _p_ = {`Pr(>|t|)`}"
+      "{Estimate} [{`2.5 %`}, {`97.5 %`}], df = {df}, _p_{`Pr(>|t|)`}"
     )
   )
 
@@ -1036,7 +1036,7 @@ s_acc <- summariseANOVA(aov_acc$ANOVA, mm_acc)
 
 ```
 
-Participants decreased the error between the midpoint of their answer and the true answer from the initial estimate to the final decision (`r s_acc$s[1]`), which suggests that they incorporated the advice, which was indicative of the correct answer (Figure \@ref(fig:be-dbc-r-performance)).
+Participants decreased the error between the midpoint of their answer and the true answer from the initial estimate to the final decision (`r s_acc$s[1]`), which suggests that they incorporated the (generally accurate) advice (Figure \@ref(fig:be-dbc-r-performance)).
 The participants had less error on decisions made with the Honest group of advisors than the Deceptive group of advisors (`r s_acc$s[2]`), although once again the interaction was not significant, so the ANOVA did not demonstrate that this was due to greater reduction in error scores over time for those advisors (`r s_acc$s[3]`).
 
 Participants only had one marker they could place, and separate confidence judgements were not asked for, so we cannot directly assess confidence in these data.
@@ -1174,18 +1174,18 @@ s_advice <- summariseANOVA(aov_advice, mm_advice)
 
 ```
 
-Participants chose their own ratings for the advice, and it was common for participants not to use all ratings for all advisors (e.g. many participants never rated advice from the Always honest advisor as Deceptive).
+Participants chose their own ratings for the advice, and it was common for participants not to use all ratings for all advisors (e.g. many participants never rated advice from the Honest group of advisors as Deceptive).
 This meant that the statistical tests preregistered for this hypothesis were broken down into separate contrasts of advice and advisor. 
 Using a more complete test, such as 2x3 ANOVA, would have suffered greatly from missing values.
 
-To explore the effect of advice, a 1x3 ANOVA was run on weight on advice across ratings. 
+To explore the effect of advice, a 1x3 ANOVA was run on Weight on Advice across ratings. 
 In all, `r length(unique(x$pid))`/`r length(unique(Familiarisation$pid))` (`r num2str(length(unique(x$pid)) / length(unique(Familiarisation$pid)) * 100)`%) participants had at least one trial rated with each of the three ratings.
-The weight on advice differed according to the rating assigned the advice (`r s_advice$s[1]`; Mauchly's test for Sphericity W = `r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][2][[1]])`, _p_ = `r p2str(aov_advice[["Mauchly's Test for Sphericity"]][3][[1]])`).
+The Weight on Advice differed according to the rating assigned the advice (`r s_advice$s[1]`; Mauchly's test for Sphericity W = `r prop2str(aov_advice[["Mauchly's Test for Sphericity"]][2][[1]])`, _p_`r p2str(aov_advice[["Mauchly's Test for Sphericity"]][3][[1]])`).
 As expected, participants were more influenced by advice they rated as Honest compared to advice they rated as Deceptive.
 
 ###### \OpenScience{prereg} Effect of advisor
 
-```{r be-dbc-r-advisor, fig.caption="Weight on Advice in Experiment 6.  Shows the weight of the advice of the advisors. Only trials where the participant rated the advice as Honest are included. The shaded area and boxplots indicate the distribution of the individual participants' mean weight on advice. Individual means for each participant are shown with lines in the centre of the graph."}
+```{r be-dbc-r-advisor, fig.caption="Weight on Advice in Experiment 6.  Shows the weight of the advice of the advisors. Only trials where the participant rated the advice as Honest are included. The shaded area and boxplots indicate the distribution of the individual participants' mean Weight on Advice. Individual means for each participant are shown with lines in the centre of the graph."}
 
 tmp <- Familiarisation %>% 
   filter(Rating == "Honest") %>%
@@ -1245,8 +1245,8 @@ tmp %>%
 
 ```
 
-To distinguish the effects of the advisor from the effects of the advice, we compared weight on advice for only those trials where the participant rated the advice as Honest. 
-This approach has the limitation that `r lost` (`r num2str(lost / length(unique(Familiarisation$pid)) * 100)`%) participants had to be dropped due to never rating advice from the Sometimes deceptive advisor as Honest.
+To distinguish the effects of the advisor from the effects of the advice, we compared Weight on Advice for only those trials where the participant rated the advice as Honest. 
+This approach has the limitation that `r lost` (`r num2str(lost / length(unique(Familiarisation$pid)) * 100)`%) participants had to be dropped due to never rating advice from the Deceptive group of advisors as Honest.
 
 Comparing the two (Figure \@ref(fig:be-dbc-r-advisor)) showed that participants placed more weight on the Honest advice from advisors in the Honest group (`r .T`), although the Bayes factor was not above our threshold of 3.
 
@@ -1289,7 +1289,7 @@ coefs <- cbind(
     across(c(Estimate:last_col(), -`Pr(>|t|)`), num2str),
     `Pr(>|t|)` = p2str(`Pr(>|t|)`),
     s = glue(
-      "{Estimate} [{`2.5 %`}, {`97.5 %`}], df = {df}, _p_ = {`Pr(>|t|)`}"
+      "{Estimate} [{`2.5 %`}, {`97.5 %`}], df = {df}, _p_{`Pr(>|t|)`}"
     )
   )
 
@@ -2298,13 +2298,12 @@ Test %>%
     ),
     Key = factor(if_else(KeyTrial, "Key", "Flavour"))
   ) %>% 
-  ggplot(aes(x = Advisor, y = Confidence, colour = Advisor)) +
+  ggplot(aes(x = Advisor, y = Confidence)) +
   geom_hline(linetype = 'dashed', yintercept = boundaries[1]) +
   geom_hline(linetype = 'dashed', yintercept = boundaries[2]) +
   geom_violin() +
   geom_point(position = position_jitter(.1), alpha = .5, aes(shape = Key)) + 
-  scale_colour_discrete(h.start = 45) +
-  scale_shape_manual(values = c(4, 16))
+  scale_shape_manual(values = c(4, 16)) 
 
 ```
 
@@ -2423,7 +2422,7 @@ coefs <- cbind(
     across(c(Estimate:last_col(), -`Pr(>|t|)`), num2str),
     `Pr(>|t|)` = p2str(`Pr(>|t|)`),
     s = glue(
-      "{Estimate} [{`2.5 %`}, {`97.5 %`}], df = {df}, _p_ = {`Pr(>|t|)`}"
+      "{Estimate} [{`2.5 %`}, {`97.5 %`}], df = {df}, _p_{`Pr(>|t|)`}"
     )
   )
 
@@ -2535,7 +2534,7 @@ The difficulty we encountered would cast serious doubt on the amount of support 
 There is one major feature of advice-taking that has received relatively little investigation, yet that would, if real, be entirely inexplicable in terms of evolutionarily optimal hyper-priors.
 This is the finding that people tend to consider all advisory estimates they receive as a single, multifaceted opinion, which is then integrated with their own individual opinion§\@ref(context-number).
 Crucially, this seems to happen no matter how many advisory estimates are supplied [@hutterSeekingAdviceSampling2016; @yonahTheyDonKnow2021].
-Some studies have found the opposite -- rational weighting of advice according to the size of the group that produces it: @parkIntegrationIndividualSocial2017 showed that a Bayesian model that took group size into account outperformed other models of advice-taking, although linear mixed modelling of their behavioural data did not show a group size effect except as an interaction with opinion differences; @martinoSocialInformationIntegrated2017a found that participants' ratings of on-line shopping products were influenced by other users' reviews, although they did not present evidence as to how closely social influence scaled with the number of reviewers.
+Some studies have found the opposite -- rational weighting of advice according to the size of the group that produces it: @parkIntegrationIndividualSocial2017 showed that a Bayesian model that took group size into account outperformed other models of advice-taking, although linear mixed modelling of their behavioural data did not show a group size effect except as an interaction with opinion differences; @martinoSocialInformationIntegrated2017 found that participants' ratings of on-line shopping products were influenced by other users' reviews, although they did not present evidence as to how closely social influence scaled with the number of reviewers.
 A rational approach to egocentric discounting might attempt, as we have above, to explain how it is sensible to afford less weight to another's opinion compared to one's own, but it cannot explain how it is sensible to afford the same weight to one's opinion whether integrating it with the opinions of one advisor or of several advisors.
 At best, we may be able to offer arguments that plead for different interpretations of advice from multiple estimates: many presentations may represent multiple estimates as a single estimate, and ones that do not may impose a cognitive load that leads to participants ignoring some information; or perhaps people sometimes interpret a mixture of answers as representing a general confusion and down-weight the group estimates as if they were advisory estimates given with very low confidence.
 Advice-taking is sensitive to particulars of task, presentation, and context, and the question of the extent to which multiple pieces of advice are weighted individually versus as a single piece of advice is also likely sensitive to those factors.

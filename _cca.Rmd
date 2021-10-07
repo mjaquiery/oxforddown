@@ -9,7 +9,7 @@ Where the initial estimate is made with high confidence, agreement is taken to i
 Where the initial estimate is low confidence, however, neither agreement nor disagreement is a good indicator of correctness. 
 This intuition accords neatly with a Bayesian approach: the greater the uncertainty around whether or not the advice is correct, the lower the strength of the updating of trust in the advisor.
 
-This mechanism can be directly tested by using advisors who have different agreement rates contingent upon the judge's confidence in their initial estimate, and @pescetelliRoleDecisionConfidence2021 used just such an approach to provided evidence for the mechanism in the domain of advisor influence.
+This mechanism can be directly tested by using advisors who have different agreement rates contingent upon the judge's confidence in their initial estimate, and @pescetelliRoleDecisionConfidence2021 used just such an approach to provide evidence for the mechanism in the domain of advisor influence.
 Here, a very similar design is used to explore this effect in the domain of advisor choice.
 
 Unlike the previous experiments, in which the same approach was implemented in both the Dots and the Dates tasks, this experiment uses only the Dots task. 
@@ -24,15 +24,15 @@ There is no Experiment 4B, because it was not possible to use the Dates task wit
 
 ### Lab study of confidence-contingent advice {#ac-cca-lab}
 
-@pescetelliRoleDecisionConfidence2021 used a judge-advisor system to demonstrate that judges are influenced to a greater extent by advisors who share their biases.
-Participants played the role of judge in a judge-advisor system, while the advisors were virtual agents whose advice-giving was dependent upon the confidence and correctness of the judges' initial estimates.
+@pescetelliRoleDecisionConfidence2021 used a Judge-Advisor System to demonstrate that judges are influenced to a greater extent by advisors who share their biases.
+Participants played the role of judge in a Judge-Advisor System, while the advisors were virtual agents whose advice-giving was dependent upon the confidence and correctness of the judges' initial estimates.
 The advisors were balanced for both overall agreement with the judge and objective correctness of advice.
 This was achieved by varying the agreement rates for the advisors contingent on the confidence of the judge's initial estimate. 
-The Bias-sharing advisor would agree more frequently when the participant expressed high confidence in their initial estimate and less frequently when the participant expressed low confidence in their initial estimate.
-The Anti-bias advisor did the opposite.
+The **Bias-sharing** advisor would agree more frequently when the participant expressed high confidence in their initial estimate and less frequently when the participant expressed low confidence in their initial estimate.
+The **Anti-bias** advisor did the opposite.
 Crucially, the advisors were matched in agreement when participants were moderately confident in their initial estimates, allowing the advisors to be compared directly on these trials [@pescetelliRoleDecisionConfidence2021].
-We place participants in a similar paradigm in which they are given a choice between advisors, and hypothesise that they will more frequently seek advice from the _Bias Sharing_ advisor than from the _Anti Bias_ advisor.
-We predict that, given a choice, judges will prefer to receive advice from a _Bias Sharing_ advisor over receiving advice from an advisor who does not share the judge’s bias.
+We place participants in a similar paradigm in which they are given a choice between advisors, and hypothesise that they will more frequently seek advice from the Bias Sharing advisor than from the Anti Bias advisor.
+We predict that, given a choice, judges will prefer to receive advice from a Bias Sharing advisor over receiving advice from an advisor who does not share the judge’s bias.
 
 #### Open scholarship practices
 
@@ -141,14 +141,14 @@ The basic trial experience was the same: participants saw two boxes of dots flas
 Participants then received advice and provided a final decision.
 On some trials participants were able to choose which of their advisors would provide the advice (Figure \@ref(fig:ac-ex1-paradigm)).
 
-```{r ac-ex1-paradigm, fig.align='center', fig.caption="Experiment 1 procedure.  The task began with a blank screen containing only a fixation cross and progress bar. Momentarily prior to the onset of the stimuli the fixation cross flickered. The stimuli, two rectangles containing approximately 200 dots each, appeared for 0.16s, one on either side of the fixation cross. Once the stimuli disappeared, a response-collection screen appeared and prompted the participant to indicate their initial estimate and its confidence by selecting a point within one of two regions. Next, the participant was presented with a choice screen. The choice screen displayed two images, one at the top of the screen and one at the bottom. The images were one of the following: an advisor portrait, a silhouette, or a red cross. The red cross was not selectable, forcing participants to choose the other option. The silhouette offered no advice, and was only ever offered as a forced choice. Selecting an advisor image provided the participant with the opinion of that advisor on the trial.  Having heard the advice, the participant was again presented with the response-collection screen, with a yellow indicator marking their original response. A second (final) judgement was collected using this screen (except on catch trials), and the trial concluded.", out.width="100%"}
+```{r ac-ex1-paradigm, fig.align='center', fig.caption="Experiment 1 procedure.  The task began with a blank grey screen containing only a fixation cross and progress bar. Momentarily prior to the onset of the stimuli the fixation cross flickered. The stimuli, two rectangles containing approximately 200 dots each, appeared for 0.16s, one on either side of the fixation cross. Once the stimuli disappeared, a response-collection screen appeared and prompted the participant to indicate their initial estimate and its confidence by selecting a point within one of two regions. Next, the participant was presented with a choice screen. The choice screen displayed two images, one at the top of the screen and one at the bottom. The images were one of the following: an advisor portrait, a silhouette, or a red cross. The red cross was not selectable, forcing participants to choose the other option. The silhouette offered no advice, and was only ever offered as a forced choice. Selecting an advisor image provided the participant with the opinion of that advisor on the trial.  Having heard the advice, the participant was again presented with the response-collection screen, with a yellow indicator marking their original response. A second (final) judgement was collected using this screen (except on catch trials), and the trial concluded.", out.width="100%"}
 knitr::include_graphics("figures/experiment_01_MATLAB/paradigm.jpg")
 ```
 
-Overall, `r nrow(exclusions) + 1` participants were recruited from the University of Oxford participant recruitment platforms took part in the experiment and attended experimental sessions.
+Overall, `r nrow(exclusions) + 1` participants who were recruited from the University of Oxford participant recruitment platforms took part in the experiment and attended experimental sessions.
 `r nrow(exclusions) - nrow(participants)` participant was excluded because the preregistered sample size had already been met when their data were collected, and one participant's data was lost due to technical issues.
 The remaining participants had an average age of `r num2str(mean(participants$age))` (±SD `r num2str(sd(participants$age), 1)`).
-Their self-identified genders were give as `r sum(tolower(participants$gender) == 'm')` male, `r sum(tolower(participants$gender) == 'f')` female, `r sum(tolower(participants$gender) != 'm' & tolower(participants$gender) != 'f')` other.
+Their self-identified genders were given as `r sum(tolower(participants$gender) == 'm')` male, `r sum(tolower(participants$gender) == 'f')` female, `r sum(tolower(participants$gender) != 'm' & tolower(participants$gender) != 'f')` other.
 Participants were compensated for their time with either course credit for a psychology degree, or 10GBP.
 
 Each participant completed 363 trials (51 practice trials over 2 blocks + 12 x 26-trial experimental blocks).
@@ -584,7 +584,7 @@ This was chronologically the first experiment we ran, and the analysis was prere
 No main effect was found for advisor (`r aov_inf$s[1]`, `r mmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(s)`, `r mmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(s)`), meaning that the previous finding was not replicated.
 As shown in Table \@ref(tab:ac-ex1-r-influence-aov), the only statistically significant effect was the main effect of agreement, with disagreement producing higher influence than agreement (`r aov_inf$s[4]`, `r mmAgree %>% filter(agree == "Agree") %>% pull(s)`, `r mmAgree %>% filter(agree == "Disagree") %>% pull(s)`).
 
-When this analysis was repeated with the capped influence values (General Method - Capped influence§\@ref(m-analysis-dv-influence)) the effect of agreement was still significant, but less so (`r aov_inf_cap$s[1]`, `r mmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(sCapped)`, `r mmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(sCapped)`), and a main effect of trial type also emerged (raw influence: `r aov_inf$s[2]`, `r mmTrialType %>% filter(trialType == "Choice") %>% pull(s)`, `r mmTrialType %>% filter(trialType == "Force") %>% pull(s)`; capped influence: `r aov_inf_cap$s[2]`, `r mmTrialType %>% filter(trialType == "Choice") %>% pull(sCapped)`, `r mmTrialType %>% filter(trialType == "Force") %>% pull(sCapped)`).
+When this analysis was repeated with the capped influence values (General Method - Capped influence§\@ref(m-analysis-dv-influence)) the effect of agreement was still significant, but less pronounced (`r aov_inf_cap$s[1]`, `r mmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(sCapped)`, `r mmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(sCapped)`), and a main effect of trial type also emerged (raw influence: `r aov_inf$s[2]`, `r mmTrialType %>% filter(trialType == "Choice") %>% pull(s)`, `r mmTrialType %>% filter(trialType == "Force") %>% pull(s)`; capped influence: `r aov_inf_cap$s[2]`, `r mmTrialType %>% filter(trialType == "Choice") %>% pull(sCapped)`, `r mmTrialType %>% filter(trialType == "Force") %>% pull(sCapped)`).
 
 ```{r ac-ex1-r-influence, fig.align='center', fig.caption="Advisor influence for Lab experiment.  Influence of advice from each advisor by advisor, agreement, and trial type. Faint lines and indicate data from individual participants, while the dots indicate the mean proportion across all participants. Error bars give 95\\% confidence intervals.  Note: vertical axis is truncated to show group differences more clearly, the theoretical maximum influence given the scale is 110. The minimum is 0 as shown.", out.width="100%"}
 
@@ -814,7 +814,7 @@ We conducted an on-line replication of this study so that we could collect data 
 ### Experiment 4A: confidence-contingent advice effects in the Dots task {#ac-cca-dots}
 
 The results of the previous studies indicated that people update their preferences for advisors using agreement in place of feedback where objective feedback is unavailable. 
-Previous results from our lab [@pescetelliRoleDecisionConfidence2021] suggested that this capacity is heuristic is modified by confidence.
+Previous results from our lab [@pescetelliRoleDecisionConfidence2021] suggested that this capacity is modified by confidence.
 The results of the previous experiment, however, failed to demonstrate these effects with advisor choice as the outcome.
 
 The previous experiment was tightly controlled but the sample size was small.
@@ -877,7 +877,7 @@ tmp <- trials %>%
 
 `r length(unique(trials$pid))` participants each completed `r sum(tmp$n)` trials over `r nrow(tmp)` blocks of the Dots task.
 Participants started with `r sum(tmp$typeName == "catch")` blocks of `r tmp %>% filter(typeName == "catch") %>% mutate(n = n - (n %% 4)) %>% .$n %>% unique()` trials that contained no advice.
-The first three trials were introductory trials that explained the task.
+The first 3 trials were introductory trials that explained the task.
 All trials in this section included feedback indicating whether or not the participant's response was correct.
 
 Participants then did `r tmp %>% filter(typeName == "force" & practice) %>% .$n %>% sum()` trials with a practice advisor.
@@ -1011,7 +1011,7 @@ familiarisation <- trials %>%
 
 ```
 
-In line with the pre-registration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or finished the experiment after `r preRegParticipants` participants had already submitted data which passed the other exclusion tests. 
+In line with the preregistration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or finished the experiment after `r preRegParticipants` participants had already submitted data which passed the other exclusion tests. 
 Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-cca-dots-r-exclusions).
 
 ##### Task performance

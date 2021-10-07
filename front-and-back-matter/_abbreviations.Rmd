@@ -12,9 +12,13 @@
 
 \item[Feedback] Objective information concerning the correctness of a decision.
 
+\item[GBP] Great British Pound; £ -- currency of the United Kingdom of Great Britain and Northern Ireland.
+
 \item[Homophily] The ubiquitous phenomenon that individuals more closely connected to one another within a social network tend to be more similar to one another than would be expected by chance across numerous dimensions.
 
 \item[HTML] Hyper-Text Markup Language; used for specifying the layout of web pages.
+
+\item[Hyper-prior] An expectation that is not changed as a function of experience within the scope of a given scenario, forming part of the context within which the scenario occurs.
 
 \item[Influence] The amount a binary decision with confidence is adjusted in the direction of advice.
 
@@ -28,7 +32,11 @@
 
 \item[R] Open source statistical programming language.
 
-\item[ROC] Receiver Operator Characteristic; a formal description of descriminative ability.
+\item[ROC] Receiver Operator Characteristic; a formal description of discriminative ability.
 
-\item[WoA] Weight on Advice; a measure of the relative contribution of advice (as compared to an initial estimate) to a final decision.
+\item[Staircasing] Tuning the difficulty of a task adaptively based on performance to achieve a target level of difficulty.
+
+\item[Weight on Advice] A measure of the relative contribution of advice (as compared to an initial estimate) to a final decision.
+
+\item[WoA] Weight on Advice; see entry.
 

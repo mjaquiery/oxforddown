@@ -9,7 +9,7 @@ The ability to distinguish between accurate advisors in these experiments is imp
 @pescetelliRoleDecisionConfidence2021 demonstrated that people could identify and exploit more accurate advice, and these experiments seek to determine whether people will use that ability to obtain advice from a more reliable source.
 Experiment 1A§\@ref(ac-acc-dots) addressed this issue using the same perceptual decision task as use by @pescetelliRoleDecisionConfidence2021; Experiment 1B§\@ref(ac-acc-dates) extended the approach in a task asking participants to estimate historical dates.
 
-### Experiment 1A: advice accuracy effects in the Dots Task {#ac-acc-dots}
+### Experiment 1A: advice accuracy effects in the Dots task {#ac-acc-dots}
 
 ```{r ac-acc-dots-load, include = F}
 source('scripts_and_filters/general_setup.R')
@@ -57,7 +57,7 @@ tmp <- trials %>%
 Each trial consisted of three phases: participants gave an initial estimate (with confidence) of which of two briefly presented boxes contained more dots; received advice on their decision from an advisor; and made a final decision (again, with confidence).
 
 Participants started with `r sum(tmp$typeName == "catch")` blocks of `r tmp %>% filter(typeName == "catch") %>% mutate(n = n - (n %% 4)) %>% .$n %>% unique()` trials that contained no advice to allow them to familiarise themselves with the task; to allow the staircasing process to titrate the difficulty to their ability in order to maintain approximately 71% initial estimate accuracy; and to allow estimating of participants' idiosyncratic confidence reporting style.
-The first three trials were introductory trials that explained the task.
+The first 3 trials were introductory trials that explained the task.
 All trials in this section included feedback indicating whether or not the participant's response was correct.
 
 Participants then did `r tmp %>% filter(typeName == "force" & practice) %>% .$n %>% sum()` trials with a practice advisor to get used to receiving advice.
@@ -441,7 +441,7 @@ r_f <- correlationBF(r$finalAccuracy, r$finalConfidence, paired = T)
 
 ```
 
-```{r ac-acc-dots-r-confidence-cor, fig.caption="Accuracy x Confidence correlations for Dots task with in/accurate advisors.  Each point marks the Bayes factor for a participant's correlation between their initial accuracy and confidence (horizontal axis) and final accuracy and confidence (vertical axis). Shaded bands show areas of no information (1/3 < BF < 3), with evidence for a correlation rightwards and upwards of the area and evidence against below and leftwards. Note that the Bayes factor is a measure of the likelihood the correlation is not 0, not a direct measure of the strenght of the correlation. The blue line indicates the overall pattern, with shaded area giving the 95\\% confidence intervals. Axes use $\\text{log}_{10}$ scale."}
+```{r ac-acc-dots-r-confidence-cor, fig.caption="Accuracy x Confidence correlations for Dots task with in/accurate advisors.  Each point marks the Bayes factor for a participant's correlation between their initial accuracy and confidence (horizontal axis) and final accuracy and confidence (vertical axis). Shaded bands show areas of no information (1/3 < BF < 3), with evidence for a correlation rightwards and upwards of the area and evidence against below and leftwards. Note that the Bayes factor is a measure of the likelihood the correlation is not 0, not a direct measure of the strength of the correlation. The blue line indicates the overall pattern, with shaded area giving the 95\\% confidence intervals. Axes use $\\text{log}_{10}$ scale."}
 
 
 f <- function(x, y) {
@@ -480,9 +480,9 @@ We ran an ANOVA on confidence by Time (initial estimates versus final decisions)
 For this analysis confidence was directionally coded so that final decision confidence was negative if the answer side changed between the initial estimate and final decision.
 The analysis indicated that participants were more confident in their initial estimates than their final decisions (`r s$s[1]`).
 This makes sense given that there is more scope for participants to reverse their confidence than to increase it on any given trial given the way the scale works.
-There was also a main effect of Correctness, with participants being more confident overall where their initial estimate was on correct as compared to when it was incorrect (`r s$s[[2]]`). 
+There was also a main effect of Correctness, with participants being more confident overall where their initial estimate was correct as compared to when it was incorrect (`r s$s[[2]]`). 
 There was an interaction, with participants becoming even less confident between initial estimates and final decisions for trials where the initial estimate was incorrect (`r s$s[3]`).
-This indicates that confidence is behaving as in a sensible manner.
+This indicates that confidence is behaving in a sensible manner.
 
 ###### Metacognitive ability
 
@@ -566,8 +566,7 @@ tmp.avg %>%
   scale_y_continuous(limits = c(0, 1), expand = c(0, .01)) +
   coord_fixed() +
   facet_wrap(~Response) +
-  theme(panel.spacing.x = unit(2, 'lines'),
-        plot.margin = unit(c(0, 0, 4, 0), 'lines')) +
+  theme(axis.text.x = element_text(angle = 270, vjust = .5)) +
   labs(x = 'p( Confidence > threshold | Incorrect )', 
        y = 'p( Confidence > threshold | Correct )')
 
@@ -750,11 +749,11 @@ As predicted, and as shown in Figure \@ref(fig:ac-acc-dots-r-graph), participant
 The modal choice remained at chance level (.5), but almost all participants manifesting a preference preferred the High accuracy advisor.
 
 While this effect is interesting, it is substantially smaller than participants' preference for picking the top advisor regardless of identity (`r .T.first`), an effect that we would hope would be random and even out across participants. 
-Note that because the advisor position is well balanced (`r .T.pos`) across advisors the presence of a preference for advisor by position would not cause a preference for an individual advisor.
+Note that because the advisor position is well balanced (`r .T.pos`) across advisors, the presence of a preference for advisor by position would not cause a preference for an individual advisor.
 
 ##### Follow-up tests {#ac-acc-dots-r-follow-up}
 
-```{r ac-acc-dots-r-choice-by-exp, fig.caption="Advisor choice by experience in the Dots task with in/accurate advisors.  Each dot is a participant's proportions. The difference in accuracy rates is calculated as the proportion of correct answers seen from the High accuracy advisor minus the proportion of correct answers seen from the Low accuracy advisor, and the difference in agreement rates similarly for agreement. The participants did not receive feedback on the correct answers"}
+```{r ac-acc-dots-r-choice-by-exp, fig.caption="Advisor choice by experience in the Dots task with in/accurate advisors.  Each dot is a participant's proportions. The difference in accuracy rates is calculated as the proportion of correct answers seen from the High accuracy advisor minus the proportion of correct answers seen from the Low accuracy advisor, and the difference in agreement rates similarly for agreement. The participants did not receive feedback on the correct answers."}
 
 tmp <- left_join(
   left_join(
@@ -943,13 +942,13 @@ All trials in this section included feedback for all participants indicating whe
 Participants then did `r tmp %>% filter(type == "advice_practice") %>% pull(n) %>% round()` trials with a practice advisor to get used to receiving advice.
 They also received feedback on these trials.
 They were informed that they would "receive advice from advisors" to "help you complete the task".
-They were told that the "advisors aren't always correct, but they are quite good at the task", and informed that they should "identify which advisors are best and to weigh their advice accordingly".
+They were told that the "advisors aren't always correct, but they are quite good at the task", and informed that they should "identify which advisors are best" and "weigh their advice accordingly".
 
 Participants then performed `r sum(tmp$type == "core")` blocks of trials that constituted the main experiment.
 The first two of these were Familiarisation blocks where participants had a single advisor in each block for `r tmp %>% filter(block == 2, type == "core") %>% pull(n) %>% round()` trials, plus `r tmp %>% filter(block == 2, type == "atn_check") %>% pull(n) %>% round()` attention check.
 
 Participants were split into four conditions that produced differences in their experience of these Familiarisation blocks.
-These conditions were whether or not they received feedback, and which of the two advisors they were familiarized with first.
+These conditions were whether or not they received feedback, and which of the two advisors they were familiarised with first.
 
 Finally, participants performed a Test block of `r tmp %>% filter(block == 4) %>% pull(n) %>% round()` trials that offered them a choice on each trial of which of the two advisors they had encountered over the last two blocks would give them advice.
 No participants received feedback during the test phase.
@@ -957,7 +956,7 @@ No participants received feedback during the test phase.
 ##### Advice profiles {#ac-acc-dates-m-advice-profiles}
 
 The High accuracy and Low accuracy advisor profiles issued binary advice (endorsing either the 'before' or 'after' column) probabilistically based on whether or not the participant had selected the correct column in their initial estimate (Table \@ref(tab:ac-acc-dates-m-profiles)). 
-The High accuracy advisor was agreed with the participant's initial estimate on 80% of the trials where the participant was correct, but only 20% of the trials on which the participant was incorrect, meaning that the High accuracy advisor was correct 80% of the time. 
+The High accuracy advisor agreed with the participant's initial estimate on 80% of the trials where the participant was correct, but on only 20% of the trials in which the participant was incorrect, meaning that the High accuracy advisor was correct 80% of the time. 
 Using an analogous setup, the Low accuracy advisor was correct 59% of the time.
 To the extent that a participant was better than chance in answering the questions, the High accuracy advisor profile would agree more frequently.
 This mimics the hypothesised relationship wherein agreement between advisors and judges is driven by shared access to the truth.
@@ -1074,7 +1073,7 @@ In this section, task performance is explored during the Familiarisation phase o
 There were an equal number of these trials for each participant for each advisor, although as mentioned above a small number of trials were dropped from analysis where response times were overly long.
 
 For the purposes of exploring participants' performance on the task, the conditions are pooled together.
-The participants were randomly assigned to conditions, and thus we know any differences in performance between conditions would be random. 
+The participants were randomly assigned to conditions, and thus we know any differences in performance between conditions are random. 
 
 ###### Response times
 
@@ -1498,8 +1497,7 @@ roc.avg %>%
   scale_y_continuous(limits = c(0, 1), expand = c(0, .01)) +
   coord_fixed() +
   facet_wrap(~Response) +
-  theme(panel.spacing.x = unit(2, 'lines'),
-        plot.margin = unit(c(0, 0, 4, 0), 'lines')) +
+  theme(axis.text.x = element_text(angle = 270, vjust = .5)) +
   labs(x = 'p(Confidence > threshold | Incorrect)', 
        y = 'p(Confidence > threshold | Correct)')
 
@@ -1539,7 +1537,7 @@ r = .acc %>%
 ```
 
 Estimates of the participants' metacognitive abilities were highly variable, with many participants displaying below-chance metacognitive ability (Figure \@ref(fig:ac-acc-dates-r-metacog)).
-While this may appear concerning, recall that metacognitive sensitivity and bias vary substantially and cannot be reliably estimated using ROC curves where performance accuracy on the underlying task is highly variable, so it is not necessarily the case that these values give cause for alarm.
+While this may appear concerning, recall that metacognitive sensitivity and bias vary substantially and cannot be reliably estimated using ROC curves where performance accuracy on the underlying task is highly variable, these values do not necessarily give cause for alarm.
 
 Performance on the underlying task and metacognitive ability were correlated (Initial estimates: `r r$s[1]`; Final decisions: `r r$s[2]`), showing that, as one might expect, participants with a greater ability to perform the Dates task have a greater insight into their performance on the Dates task.
 This in turn suggests that, despite the low number of trials on the task, we are able to obtain meaningful insights into participants' metacognitive abilities, albeit without being able to precisely estimate the metacognitive sensitivity or bias for an individual participant.
@@ -1614,7 +1612,7 @@ agr.table %>%
 
 The advice is generated probabilistically from the rules described previously (Advice profiles§\@ref(ac-acc-dates-m-advice-profiles)).
 The advisors agreed with participants contingent on the accuracy of the participants' initial estimates at close to the target rates (Table \@ref(tab:ac-acc-dates-r-advice-agr)).
-This meant that advisors were as accurate overall as they were intended to be in the familiarisation phase (Table \@ref(tab:ac-acc-dates-r-advice-acc)).
+This meant that advisors were as accurate overall as they were intended to be in the Familiarisation phase (Table \@ref(tab:ac-acc-dates-r-advice-acc)).
 Most (`r n_ap`/`r length(unique(Familiarisation$pid))`, `r num2str(n_ap / length(unique(Familiarisation$pid)) * 100)`%) participants experienced the High accuracy advisor as providing more accurate advice than the Low accuracy advisor.
 
 ##### Advisor influence

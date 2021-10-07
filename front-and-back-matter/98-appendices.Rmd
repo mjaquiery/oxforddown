@@ -20,7 +20,7 @@ Other versions had a bug in the staircasing code used to titrate the difficulty 
 Once the staircasing bug was fixed, two more experiments were run, one with 60 practice trials in which participants did not quite reach the desired accuracy before the beginning of the main experiment, and one with 120 practice trials which constitutes the data analysed below.
 
 #### Experiments 1B and 2B
-Early versions included a bug which prevented feedback from being shown during the familiarisation phase even to participants in the Feedback condition.
+Early versions included a bug which prevented feedback from being shown during the Familiarisation phase even to participants in the Feedback condition.
 These participants could theoretically be included in the No feedback condition regardless of their condition label in the data, but this is not done here.
 
 #### Experiment 3A
@@ -35,7 +35,7 @@ Data for these participants could be included in a study that was agnostic about
 
 #### Experiment 4A
 
-The first version had a bug which meant that the advisors were identical in the familiarisation phase.
+The first version had a bug which meant that the advisors were identical in the Familiarisation phase.
 Both the first and second versions had a bug in which advisors who were supposed to agree with the participant's initial estimate gave the correct answer rather than agreeing.
 These participants' data could be included in an analysis which used a participant's actual experience of advice to predict their advice-taking and advisor choice behaviour, provided appropriate care was taken to reconstruct the advice data from the raw values instead of relying on the reported summaries.
 
@@ -49,7 +49,7 @@ Later versions introduced a clearer manipulation, equivalent rather than genuine
 
 Two short pilot versions of this experiment were run, and participants' data were not analysed due to bugs in the experiment code.
 
-# Appendix 2: advice-taking in the Dates task {#appendix-2}
+# Appendix 2: Advice-taking in the Dates task {#appendix-2}
 
 ```{r setup-appendix-2, echo = F, include = F}
 source('scripts_and_filters/general_setup.R')
@@ -60,7 +60,7 @@ library(patchwork)
 ```
 
 The advice-taking framework underlying this thesis§\@ref(i-framework) has some empirical support from previous work in our lab [@pescetelliRoleDecisionConfidence2021].
-In those experiments, participants completed a perceptual decision-making task within a judge-advisor system.
+In those experiments, participants completed a perceptual decision-making task within a Judge-Advisor System.
 Participants provided a judgement (including a confidence rating) concerning which of two briefly presented boxes of dots contained more dots. 
 They then received advice on the answer from an advisor and provided a final decision, again including a confidence judgement.
 
@@ -185,7 +185,7 @@ These trials are the key ones for analysis because they allow us to assess the i
 The High accuracy and High agreement advisor profiles defined marker placements based on the timeline based on the correct answer and the participant's initial estimate respectively. 
 Both advisors used markers that spanned 7 years, and both placed the markers in a normal distribution around the target point with a standard deviation of 5 years, but they differed in the central 'target point' around which this distribution was centred..
 The target point for the High accuracy advisor was the correct answer, whereas the target point for the High agreement advisor was the participant's initial estimate.
-Neither advisor ever placed their marker exactly on the midpoint of the participant's marker (because doing so means the weight on advice statistic is undefined). 
+Neither advisor ever placed their marker exactly on the midpoint of the participant's marker (because doing so means the Weight on Advice statistic is undefined). 
 
 Each advice trial had a 20% chance of being designated "Off-brand".
 On these trials advisors neither indicated the correct answer nor agreed with the participant. 

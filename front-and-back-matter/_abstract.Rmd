@@ -5,7 +5,7 @@ Both parts are investigated with a mixture of computational simulations and beha
 For the first question, behavioural experiments implementing a Judge-Advisor System with a perceptual decision-making task and a date estimation task are used to characterise people's propensity to use agreement as a signal of advice quality in the absence of feedback.
 These experiments provide moderate evidence suggesting that people do do this, and that experience of agreement in the absence of feedback increases their trust in advisors.
 Agent-based computational simulations take the results of the behavioural experiments and simulate their effects on trust ratings between agents.
-The simulations indicate that including the kind of heterogeneity seen in the participants in the behavioural experiments slows down the formation of echo-chambers and limits the extent of polarisation.
+The simulations indicate that including the kind of heterogeneity seen in the participants in the behavioural experiments slows down the formation of echo chambers and limits the extent of polarisation.
 
 In the second part, I argue that egocentric discounting deviates from a normative model of advice-taking because it is a rational response to concerns that always accompany advice: that the advice might be deliberately misleading, lazily researched, or misunderstood.
 Evolutionary computational simulations of advice-taking illustrate that when any of these circumstances might be true, egocentric discounting emerges as an adaptive response.
@@ -13,3 +13,5 @@ Behavioural experiments using a date estimation task within a Judge-Advisor Syst
 These experiments show that people respond flexibly to changes in the probability that their advisor will attempt to mislead them.
 Experiments attempting to explore people's ability to flexibly respond to acquiring information about an advisor's confidence calibration were inconclusive.
 
+A web-book version of this thesis is available at [https://mjaquiery.github.io/oxforddown/](https://mjaquiery.github.io/oxforddown/).
+Its RMarkdown source code is available at [https://github.com/mjaquiery/oxforddown](https://github.com/mjaquiery/oxforddown).

@@ -20,11 +20,11 @@ params:
 
 This thesis presented work on two questions: whether people take too much advice from those who agree with them; and why people do not take enough advice in general.
 Behavioural experiments using a Judge-Advisor System extended previous work [@pescetelliRoleDecisionConfidence2021] on advice-taking to the domain of advisor choice, showing that people can use an advisor's agreement as a proxy for the advisor's accuracy where direct feedback about accuracy is not available.
-Computational simulations explored the implications of this tendency for the structure of social networks, replicating the echo chamber formation and polarisation found in similar simulations [@pescetelliRoleDecisionConfidence2021; @madsenLargeNetworksRational2018a] but suggesting that modelling heterogeneous agents reduced the speed and extent of these effects. 
+Computational simulations explored the implications of this tendency for the structure of social networks, replicating the echo chamber formation and polarisation found in similar simulations [@pescetelliRoleDecisionConfidence2021; @madsenLargeNetworksRational2018] but suggesting that modelling heterogeneous agents reduced the speed and extent of these effects. 
 The second arm of the thesis argued that egocentric discounting -- taking advice less seriously than a normative model would predict -- is not as irrational as it is often portrayed.
 Computation simulations showed that egocentric discounting was an adaptive trait in environments where advice was sometimes misleading, where advisors put less effort into making decisions than judges, and even where honest and diligent advice was communicated with a slightly different scaling of confidence.
 These simulations were complemented with a series of behavioural experiments investigating whether short-term changes in an advice-taking context would produce the discounting behaviour seen in the simulations.
-The results of these experiments were mixed: reducing the risk of deceptive advice increased advice-taking; but we found no evidence that familiarisation with an advisor's confidence calibration increased advice-taking.
+The results of these experiments were mixed: reducing the risk of deceptive advice increased advice-taking, but we found no evidence that familiarisation with an advisor's confidence calibration increased advice-taking.
 
 The first of our questions is motivated by a concern that people are trapped in echo chambers -- hearing only their own opinions parroted back to them and ignoring other perspectives.
 The argument is that people form social connections on the basis of similarities with others (homophily), and that their behaviour becomes increasingly similar to those they interact with. 
@@ -33,14 +33,14 @@ Overall, as @sunsteinRepublicDividedDemocracy2018 persuasively argued, the on-li
 In the last two decades there has been a great deal of discussion about the extent to which this picture is true [@garrettEchoChambersOnline2009; @colleoniEchoChamberPublic2014; @barberaHowSocialMedia2015; @weeksPartisanEnclavesShared2016; @sunsteinRepublicCom2002].
 
 We found some evidence that the basic processes necessary for this to occur exist using behavioural experiments: people do seem to prefer to hear from advisors who are likely to support their initial opinion in the absence of reliable feedback, but this tendency did not show clearly when accurate and agreeing advisors were contrasted directly.
-Similar work using media sources rather than ostensibly human advisors has likewise shown mixed results: people seem to have a moderate tendency to choose sources likely to agree with their perspective when given a direct choice [@kobayashiSelectiveExposurePolitical2009; @marquartSelectiveExposureContext2016; @hartFeelingValidatedBeing2009], but do not seem to deliberately avoid sources likely to disagree [@jangChallengesSelectiveExposure2014a; @hartFeelingValidatedBeing2009].
+Similar work using media sources rather than ostensibly human advisors has likewise shown mixed results: people seem to have a moderate tendency to choose sources likely to agree with their perspective when given a direct choice [@kobayashiSelectiveExposurePolitical2009; @marquartSelectiveExposureContext2016; @hartFeelingValidatedBeing2009], but do not seem to deliberately avoid sources likely to disagree [@jangChallengesSelectiveExposure2014; @hartFeelingValidatedBeing2009].
 Viewing agreement as a positive attribute, while pathologised in this discourse, is not inherently misguided.
 We follow others [@sollStrategiesRevisingJudgment2009] in highlighting that, for advisors and judges who perform better than chance, their answers overlap more the better they are at the task.
 Likewise, when consulting media sources, the framing placed on events and policies will ring more true for a person where it matches their own framing: a newspaper that talks about 'riots' will probably appear to be giving a more truthful account to a police officer, while one that speaks of 'protests' will probably appear more truthful to an activist.
 
 Partisan media and homophilic social networks are long-standing concerns [@freedmanConfidenceUtilitySelective1965; @searsSelectiveExposureInformation1967]^[The Pamphlet wars [@PamphletWars2020] are an example from the 16th and 17th centuries.], so a key question is whether, as argued by @sunsteinRepublicDividedDemocracy2018, on-line social media exacerbates the effects due to its presenting people with a multitude of potential social connections, activated by the click of a button. 
 Our computational simulations presented agents with a similar frictionless environment -- they were free to associate with which other agents they chose and incurred no cost to do so.
-These simulations reproduced the basic phenomenon of echo chamber formation seen in previous work [@pescetelliRoleDecisionConfidence2021; @madsenLargeNetworksRational2018a], but including the kind of heterogeneity in advice-taking and -seeking behaviour observed in our participant population worked to dilute the effect, slowing them down and making the divergence into two camps less complete.
+These simulations reproduced the basic phenomenon of echo chamber formation seen in previous work [@pescetelliRoleDecisionConfidence2021; @madsenLargeNetworksRational2018], but including the kind of heterogeneity in advice-taking and -seeking behaviour observed in our participant population worked to dilute the effect, slowing them down and making the divergence into two camps less complete.
 
 There are further reasons to question whether experimental and simulation evidence adequately supports the idea of on-line social networks as engines of division and polarisation rather than tools for connecting the world.
 The interactions considered in this thesis and similar work are information transfers along social connections.
@@ -86,7 +86,7 @@ Advice also serves several important social tasks: seeking advice can be a mark 
 
 These interactions are what build up the social relationships modelled in our simulations, and they do not change greatly in the on-line social arena.
 Like the off-line world, the on-line world is full of the same people pursuing the same goals; they may have slightly different opportunities and affordances, but they are in service of the same ends.
-The implications for real social networks of our simulations that are constructed from a narrow, information-centric view of advice-taking should be interpreted with caution -- as should the simulations of others [@songDynamicSpiralsPut2017; @madsenLargeNetworksRational2018a].
+The implications for real social networks of our simulations that are constructed from a narrow, information-centric view of advice-taking should be interpreted with caution -- as should the simulations of others [@songDynamicSpiralsPut2017; @madsenLargeNetworksRational2018].
 
 Our work is limited even within the information part of social information.
 We examined situations that present decision-makers with constrained choices concerning their advisors and variation only in the trust dimension of (perceived) ability.
@@ -106,7 +106,7 @@ Thirdly, the cost of consulting sources in terms of time, effort, or social risk
 As with the relative importance of personal experience with an advisor to other factors, depending upon the extent of these considerations governing advisor choice, and depending upon their tendency to exacerbate or reduce homophily, the results of our computational simulations of network dynamics might be considerably different if they included these features.
 
 Our work on egocentric discounting appears more robustly generalisable to the phenomenon of interest.
-Although the broader contextual considerations highlighted by our evolutionary simulations affect the conclusions one draws from egocentric discounting relative to the normative model, however, they do not detract substantially from the practice of using the normative model as an optimum 'set point' from which to evaluate advice-taking behaviour.
+Although the broader contextual considerations highlighted by our evolutionary simulations affect the conclusions one draws from egocentric discounting relative to the normative model, they do not detract substantially from the practice of using the normative model as an optimum 'set point' from which to evaluate advice-taking behaviour.
 The conclusion is therefore not that the normative model should be abandoned or even extended in general use, rather a recommendation that researchers avoid implying that deviation from the normative model is 'irrational', mistaken, or even the result of a 'satisficing' heuristic [@radnerSatisficing1975].
 
 Our theory of egocentric discounting's underlying rationality is not incontrovertible. 
@@ -136,9 +136,9 @@ Even the second of these, most like the tasks faced by participants in the behav
 It is important to investigate whether similar 'agreement' effects operate in these more complex interactions.
 It is plausible, for instance, that agreement is actually an instance of endorsement or positivity, and that these are responsible for increasing trust more than agreement per se.
 
-This work replicated other models of polarisation and echo-chamber formation [@pescetelliRoleDecisionConfidence2021; @madsenLargeNetworksRational2018a] and indicated that the heterogeneity seen in the participants of the behavioural experiments worked to slow the pace and limit the extent of those effects.
+This work replicated other models of polarisation and echo chamber formation [@pescetelliRoleDecisionConfidence2021; @madsenLargeNetworksRational2018] and indicated that the heterogeneity seen in the participants of the behavioural experiments worked to slow the pace and limit the extent of those effects.
 Whether that heterogeneity needs to be a stable feature of agents deserves investigation, especially in light of the suggestion from our data that there was as much heterogeneity within participants as between them.
-Secondly, although these models make a strong theoretical case for polarisation and echo-chamber formation in social networks, more work needs to be done to investigate whether these effects actually occur in practice.
+Secondly, although these models make a strong theoretical case for polarisation and echo chamber formation in social networks, more work needs to be done to investigate whether these effects actually occur in practice.
 Analysis of data from on-line social networks has been equivocal on the subject [@colleoniEchoChamberPublic2014; @barberaHowSocialMedia2015; @weeksPartisanEnclavesShared2016; @huiGroupthinkPeerPressure2009], and this is an area where further research is needed.
 
 This thesis presented a view of egocentric discounting that sees it as a rational response to ubiquitous issues in advice-taking: whether advice is well-intentioned; the quality of the advice; and the interpretability of advice.
