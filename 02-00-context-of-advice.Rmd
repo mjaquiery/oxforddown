@@ -25,7 +25,7 @@ In a typical design, the judge offers an initial estimate for some decision, e.g
 The difference between the initial estimate and the final decision is taken as measure of how influential the advice was, typically expressed in terms of the contributions of the initial estimate and the advice to the final decision.
 
 In these experiments, the task performance for the advisor is usually as good or better than that of the judge.
-This performance structure can be well captured for most tasks with Gaussian answer + error distribution where the answer supplies the mean and the error supplies the variance. 
+This performance structure can be well captured for most tasks by a Gaussian answer + error distribution where the answer supplies the mean and the error supplies the variance. 
 When combining individual estimates from multiple distributions, optimal results are obtained by weighting the estimates according to the relative precision of their parent distributions  [@sollStrategiesRevisingJudgment2009; @bahramiOptimallyInteractingMinds2010]. This is analogous to multi-sensory integration [@ernstHumansIntegrateVisual2002; @kordingCausalInferenceMultisensory2007], and many other cognitive processes argued to be modelled on Bayesian integration, such as those listed in Section 2 of @colomboBayesianCognitiveScience2015.
 Where the performance of the advisor is higher than the judge, the advisor's error will be lower than the judge's, and thus the variance of the advisor's distribution will be narrower and therefore the precision of the advisor's distribution will be higher.
 When a judge combines their own estimate with that of an advisor who is at least as good, an optimal judge will weight the advisor's opinion at least as highly as their own (Equation \ref{eq:variance-weights}).
@@ -51,7 +51,7 @@ One obvious reference value is the case where equal weight is given to one’s o
 This is often the value implicitly or explicitly stated. 
 However, equal weighting is only normatively prescribed if advice is exactly as reliable as one’s own initial estimate. 
 
-Nevertheless, it should be borne in mind, therefore, that depending on the circumstances, very high or low levels of advice weighting might not correspond to very low or high levels of discounting.
+It should be borne in mind, therefore, that depending on the circumstances, very high or low levels of advice weighting might not correspond to very low or high levels of discounting.
 When @schultzeInabilityIgnoreUseless2017 provide participants with advisory estimates from a random number generator, ascribing any weight at all to the advice is suboptimal.
 Conversely there are many experiments in which expert advice is provided, and in these experiments weighting advice evenly corresponds to egocentric discounting because the advisor's estimates are more accurate on average.
 
@@ -86,7 +86,7 @@ Using a similar methodology, but a different analytical approach, @moussaidSocia
 More complex task designs, in which reflection and discussion are encouraged, can reduce discounting.
 @minsonTwoTangoEffects2011 and @libermanNaiveRealismCapturing2012 asked dyads to take simultaneous roles as judge and advisor, providing initial estimates, exchanging advice during a discussion, and then providing final decisions on estimation tasks.
 Discounting was reduced, but still evident in this process, as it was in @vanswolForecastingAnotherEnjoyment2011, which used a traditional Judge-Advisor System paradigm where advice was delivered face-to-face. 
-@libermanNaiveRealismCapturing2012 did manage to eliminate discounting where, between exchanging advice and providing a final decision, participants produced a single mutually satisfactory collaborative judgement, and showed that the value of this collaborative judgement was itself improved by open-minded discussion over justifying estimates or exchanging bids.
+@libermanNaiveRealismCapturing2012 did manage to eliminate discounting where, between exchanging advice and providing a final decision, participants produced a single mutually satisfactory collaborative judgement, and showed that the value of this collaborative judgement was itself improved by open-minded discussion more than by justifying estimates or exchanging bids.
 @schultzeInabilityIgnoreUseless2017 demonstrated that asking judges to selectively generate reasons why the advice might be correct or incorrect led to lower and higher levels of egocentric discounting respectively.
 
 ### Advice properties {#coa-ed-advice}
@@ -104,7 +104,7 @@ More generally, the assumption that more confident advice will be more accurate 
 
 A frequently-manipulated property of advice, and the most interesting in the context of the first part of this thesis, is the similarity of the advice to the initial estimate. 
 This is sometimes expressed as agreement or reasonableness of advice.^[Note that the influence of advice that is perfectly in accord with an initial estimate is undefined when using Weight on Advice§\@ref(m-analysis-dv-woa) measures.]
-The evidence on the effects of advice distance on advice influence is equivocal.
+The evidence concerning the effects of advice distance on advice influence is equivocal.
 Some studies show that advice is less influential the further it is from the initial estimate, while other studies show a greater influence of more distant advice.
 Other studies have indicated that the relationship is quadratic: low weight is assigned to advice which is too near or far from the initial estimate, and a greater weight assigned to advice which is in the moderately distant.
 
@@ -179,7 +179,7 @@ Likewise, @sollJudgmentalAggregationStrategies2011 saw that participants paired 
 @wangWhyDoesAdvice2018 showed that participants placed greater Weight on Advice from expert as opposed to novice advice in a coin-jar estimation task using advice that was genuinely expert or novice.
 @onkalEvaluatingExpertAdvice2017 reported a series of experiments using a stock price estimation task in which advisor expertise was manipulated using both labels and experience. 
 Where experience alone was provided there was no clear effect of expertise, while labelling had a substantial effect.
-Follow-up experiments did demonstrate effects of expertise.
+Follow-up experiments did demonstrate effects of experience.
 
 #### Familiarity of advisors {#context-familiarity}
 
@@ -279,7 +279,7 @@ A third cognitive bias invoked to explain egocentric discounting is naïve reali
 Naïve realism occurs when people treat their own perceptions as reflective of shared underlying reality and others' perceptions as misguided or biased to the extent that they do not agree.
 @minsonTwoTangoEffects2011 argue strongly for a naïve realism explanation of egocentric discounting, although it is never fully explained why, on a naïve realism view, _any_ adjustment to advice is warranted (because ex hypothesi the initial estimate reflects the true answer).
 The most creative element of the experiments involves funnelling integrated decisions (corresponding to judges' final decisions in the typical Judge-Advisor System) through a collaborative joint decision process before extracting a final individual decision.
-Naïve realism once again fails to provide a compelling explanation why the final individual decisions closely reflect the collaborative join decisions rather than the initial estimates: rather than continuing to endorse their own view of 'reality', participants appeared to be willing to accept the joint view once it had been established.
+Naïve realism once again fails to provide a compelling explanation why the final individual decisions closely reflected the collaborative joint decisions rather than the initial estimates: rather than continuing to endorse their own view of 'reality', participants appeared to be willing to accept the joint view once it had been established.
 
 ### Responsibility / feeling of deserving outcomes
 

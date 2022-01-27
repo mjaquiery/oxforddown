@@ -195,7 +195,7 @@ For the particularly bad advice offered by the agents in this scenario, probabil
 </h3>
 <p>As one might expect, where there is the potential for exploiting trust it is safer to trust less, even if this reduces some of the benefits which would be gained from trusting.
 Egocentric discounting may be a viable strategy, even if there is no difference in ability between advice-seekers and advice-givers, given social contexts where the interests of advice-seekers and advice-givers are not perfectly aligned.</p>
-<p>Note that, because of the rarity of bad advice (it occurs at most 1.8% of the time in the most pronounced case), most individuals never experience bad advice.
+<p>Note that, because of the rarity of bad advice (it occurs 1.8% of the time in the most pronounced case), most individuals never experience bad advice.
 This means that any mutant that is more conservative than their parent is likely to lose fitness by ignoring good advice much of the time, but in the rare cases where bad advice is given they save themselves from taking such a heavy penalty.
 Perhaps the advice in these simulations is too bad to go undetected in more realistic interactions (the agents here do not consider the plausibility of the advice they receive); more plausible misleading advice would have to be more common to produce the same magnitude of effects in self-weight evolution, but the results would be qualitatively similar.
 The reproductive function also matters: if we selected a single agent to spawn the entire subsequent generation, we would likely see a wholly trusting agent be selected each time, just one that happened to never be given bad advice.
@@ -265,7 +265,7 @@ v_t = N(50,1)
 Agents were equiprobably assigned a personal confidence factor (<span class="math inline">\(c^a\)</span>) of 0 or 0.5.
 This was used to scale the difference between the advising agent’s initial estimate and the category boundary to produce the advice:</p>
 <p><span class="math display" id="eq:models-scenario-3-advice">\[\begin{align}
-i^{a,a'}_t = (i^{a'}_t - 50) * (c^{a'} \cdot x + 1)
+i^{a,a'}_t = (i^{a'}_t - 50)(c^{a'} \cdot x + 1)
 \tag{6.8}
 \end{align}\]</span></p>
 <p>This meant that around half the agents in any given simulation expressed their internal confidence directly (because <span class="math inline">\(c^a = 0\)</span>), while other agents magnified their confidence by a factor between 0 and 1.9.

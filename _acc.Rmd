@@ -173,7 +173,7 @@ familiarisation <- trials %>%
   order_factors()
 ```
 
-In line with the preregistration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or had completed the experiment after the preregistered amount of data has already been collected. 
+In line with the preregistration, participants' data were excluded from analysis where they had an average accuracy below `r accuracyRange[1]` or above `r accuracyRange[2]`, did not have choice trials in all confidence categories (bottom 30%, middle 40%, and top 30% of prior confidence responses), had fewer than `r minTrialsPerCategory` trials in each confidence category, or had completed the experiment after the preregistered amount of data had already been collected. 
 Overall, `r sum(pull(exclusions, "Total excluded"))` participants were excluded, with the details shown in Table \@ref(tab:ac-acc-dots-r-exclusions).
 
 ##### Task performance {#ac-acc-dots-r-performance}
@@ -211,7 +211,8 @@ tmp <- familiarisation %>%
   pivot_longer(
     cols = c(`Initial estimate`, `Final decision`),
     names_to = 'Response', values_to = 'Accuracy'
-  )
+  ) %>%
+  mutate(Response = factor(Response))
 
 adv <- familiarisation %>%
   group_by(Advisor, pid) %>%
@@ -288,7 +289,8 @@ tmp <- familiarisation %>%
   ) %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`),
                names_to = 'Response', values_to = 'Confidence') %>%
-  mutate(`Initial estimate accuracy` = factor(`Initial estimate accuracy`))
+  mutate(`Initial estimate accuracy` = factor(`Initial estimate accuracy`)) %>%
+  mutate(Response = factor(Response))
 
 bf <- tmp %>%
   nest(d = -Response) %>%
@@ -513,7 +515,8 @@ tmp <- tmp %>%
   ) %>%
   pivot_wider(names_from = AnswerCorrect, 
               names_prefix = 'Correct', 
-              values_from = pConf) 
+              values_from = pConf)  %>%
+  mutate(Response = factor(Response))
 
 auroc <- tmp %>% 
   nest(d = c(-pid, -Response)) %>%
@@ -548,11 +551,13 @@ auroc.gg <- auroc %>%
               panel.grid.major.x = element_line(),
               plot.margin = unit(rep(0, 4), 'lines'))
     )
-  )
+  ) %>%
+  mutate(Response = factor(Response))
 
 tmp.avg <- tmp %>%
   group_by(Confidence, Response) %>%
-  summarise(across(where(is.numeric), mean), .groups = 'drop')
+  summarise(across(where(is.numeric), mean), .groups = 'drop') %>%
+  mutate(Response = factor(Response))
 
 tmp.avg %>%
   order_factors() %>%
@@ -877,7 +882,7 @@ In the next experiment, we aimed to replicate the results in a different task.
 ### Experiment 1B: Advice accuracy effects in the Dates task {#ac-acc-dates}
 
 This experiment attempted to replicate the results of the previous experiment using a different task.
-The replication used a binary version of the Dates task reported in Experiment 0§\@ref(ai-ava). 
+The replication used a binary version of the Dates task reported in Experiment \@ref(ai-ava). 
 Unlike in the Dots task above, and because the study was newly designed for this work, participants in the Dates task were split into conditions so that half received feedback while learning about the advisors and half did not.
 
 ```{r ac-acc-dates-load, include = F}
@@ -1085,7 +1090,7 @@ In the former, decisions for both initial estimates and final decisions are tigh
 In the Dates task however, response times are not only longer, but they are also much more varied within participants.
 Some increase in variance is expected with an increase in mean, especially with fewer trials for each participant, but the extent of the differences clearly shows that the tasks provide participants with different experiences: the Dots task is tightly rhythmic and repetitive, while the Dates task is more heterogeneous.
 
-```{r ac-acc-dates-r-response-times, fig.caption="Response times for the Dates task with in/accurate advisors.  Each row indicates a single participant's trials. The error bars show the 95\\% confidence intervals of the mean response time for each decision. The plusses on the right show the number of trials where response times were more than 3 standard deviations away from the mean of all Dates task final response times (rounded to the next 10s): + = 1-5 trials, ++ = 6-10 trials.", fig.height=6}
+```{r ac-acc-dates-r-response-times, fig.caption="Response times for the Dots and Dates tasks with in/accurate advisors.  Each row indicates a single participant's trials. The error bars show the 95\\% confidence intervals of the mean response time for each decision. The plusses on the right show the number of trials where response times were more than 3 standard deviations away from the mean of all Dates task final response times (rounded to the next 10s): + = 1-5 trials, ++ = 6-10 trials.", fig.height=6}
 
 load(paste0(tempdir(), "/.dot_rt.rda"))
 unlink(paste0(tempdir(), "/.dot_rt.rda"))
@@ -1105,10 +1110,14 @@ tmp <- Familiarisation %>%
 tmp <- bind_rows(
   mutate(tmp, Experiment = "Dates task"),
   mutate(dots_rt, Experiment = "Dots task")
-)
+) %>%
+  mutate(
+    Response = factor(Event),
+    Experiment = factor(Experiment)
+  )
 
 max_rt <- tmp %>% 
-  filter(Event == 'Final decision', Experiment == "Dates task") %>%
+  filter(Response == 'Final decision', Experiment == "Dates task") %>%
   mutate(zTime = scale(Time)) %>%
   filter(zTime > 3) %>%
   filter(zTime == min(zTime)) %>% 
@@ -1132,7 +1141,6 @@ tmp <- tmp %>%
   filter(Time <= max_rt) %>% 
   mutate(
     Participant = fct_reorder(Participant, Time, .desc = T),
-    Response = factor(Event),
     Experiment = factor(Experiment),
     Time = Time / 1000,
     g = glue("{Participant}_{Response}")
@@ -1180,7 +1188,8 @@ acc <- Familiarisation %>%
     .groups = 'drop'
   ) %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`), 
-               names_to = 'Response', values_to = 'Accuracy')
+               names_to = 'Response', values_to = 'Accuracy') %>%
+  mutate(Response = factor(Response))
 
 adv <- Familiarisation %>%
   group_by(Advisor, pid) %>%
@@ -1246,7 +1255,8 @@ conf <- Familiarisation %>%
     .groups = 'drop'
   ) %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`), 
-               names_to = 'Response', values_to = 'Confidence')
+               names_to = 'Response', values_to = 'Confidence') %>%
+  mutate(Response = factor(Response))
 
 bf <- conf %>% 
   nest(d = -Response) %>%
@@ -1444,7 +1454,8 @@ roc <- roc %>%
   ) %>%
   pivot_wider(names_from = AnswerCorrect, 
               names_prefix = 'Correct', 
-              values_from = pConf) 
+              values_from = pConf) %>%
+  mutate(Response = factor(Response))
 
 auroc <- roc %>% 
   nest(d = c(-pid, -Response)) %>%
@@ -1479,11 +1490,13 @@ auroc.gg <- auroc %>%
               panel.grid.major.x = element_line(),
               plot.margin = unit(rep(0, 4), 'lines'))
     )
-  )
+  ) %>%
+  mutate(Response = factor(Response))
 
 roc.avg <- roc %>%
   group_by(Confidence, Response) %>%
-  summarise(across(where(is.numeric), mean), .groups = 'drop')
+  summarise(across(where(is.numeric), mean), .groups = 'drop') %>%
+  mutate(Response = factor(Response))
 
 roc.avg %>%
   order_factors() %>%

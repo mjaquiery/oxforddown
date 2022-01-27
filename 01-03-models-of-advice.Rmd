@@ -1482,7 +1482,7 @@ It is important to note that, at least in these models, the extreme that is sele
 
 Heterogeneous weighted selection can prevent a full consensus forming where individuals have access to trusted advisors of a variety of different opinions.
 This was evident in the Random starting trust weights simulations in Figure \@ref(fig:nw-r-bias-evolution): minority groups emerge and reinforce their own biases to adopt the opposite extreme to the consensus favoured by the majority; and several agents continue to occupy the middle-ground long after the majority and minority groups have adopted their extreme positions.
-This pattern in the Heterogeneous and Empirical simulations emerges because those who have a strong preference for agreement rapidly disregard the advice of their previously-trusted advisors who offers a different opinion.
+This pattern in the Heterogeneous and Empirical simulations emerges because those who have a strong preference for agreement rapidly disregard the advice of their previously-trusted advisors who offer a different opinion.
 These agents form their own polarised minority, consulting and advising one another consistent with their bias (as the majority are also doing, just with the other bias).
 This pattern differed from the Baseline and Homogeneous simulations, illustrating the impact of inter-individual variability on network level behaviour.
 

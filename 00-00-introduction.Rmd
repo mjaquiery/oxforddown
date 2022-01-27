@@ -478,16 +478,15 @@ The behavioural experiments do not offer severe tests of the framework because t
 
 ### Thesis structure
 
-Chapters 2-5 consider the psychology of advisor choice, asking how people choose advisors and how these choices impact network-level dynamics.
+Chapters 2-4 consider the psychology of advisor choice, asking how people choose advisors and how these choices impact network-level dynamics.
 Chapter 2 introduces the general methodology used in the behavioural experiments and the analytical approach.
-Chapter 3 extends previous behavioural experiment work on advice use to a new task.
-Chapter 4 presents behavioural experiments that use both the previous perceptual decision-making task and the new general knowledge estimation task to investigate advisor choice.
-Chapter 5 presents computational simulations guided by the results presented in Chapter 4 that explore the impact of individual-level advice-seeking and advice-taking tendencies on overall network dynamics.
+Chapter 3 presents behavioural experiments that use both the previous perceptual decision-making task and the new general knowledge estimation task to investigate advisor choice.
+Chapter 4 presents computational simulations guided by the results presented in Chapter 4 that explore the impact of individual-level advice-seeking and advice-taking tendencies on overall network dynamics.
 
-Chapters 6-8 explore advice-taking more closely, asking whether under-weighting advice could be rationally motivated.
-Chapter 6 reviews the literature on egocentric discounting, and introduces our perspective.
-Chapter 7 presents computational simulations that illustrate the adaptiveness of egocentric discounting as a response to several plausible features of the advice-taking context.
-Chapter 8 presents behavioural experiments that explore whether people can flexibly response to changes in the features modelled in Chapter 7.
+Chapters 5-7 explore advice-taking more closely, asking whether under-weighting advice could be rationally motivated.
+Chapter 5 reviews the literature on egocentric discounting, and introduces our perspective.
+Chapter 6 presents computational simulations that illustrate the adaptiveness of egocentric discounting as a response to several plausible features of the advice-taking context.
+Chapter 7 presents behavioural experiments that explore whether people can flexibly response to changes in the features modelled in Chapter 7.
 
-Finally, Chapter 9 concludes the thesis with a short summary of results and interpretations.
+Finally, Chapter 8 concludes the thesis with a short summary of results and interpretations.
 The broader implications of the work are considered, alongside its generalisability and limitations.

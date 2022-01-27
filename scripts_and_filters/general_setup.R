@@ -299,12 +299,13 @@ marginalMeans <- function(
 #' @param ANOVA ANOVA object from an ezANOVA call
 #' @param mMeans marginal means list from a marginalMeans call
 summariseANOVA <- function(ANOVA, mMeans) {
+  slug <- function(s) str_replace_all(str_to_lower(s), " ", "")
   if (class(ANOVA) == "list" && has_name(ANOVA, "ANOVA"))
     ANOVA <- ANOVA$ANOVA
   mm <- mMeans[lapply(mMeans, is_tibble) == T]
   mm <- lapply(1:length(mm), \(i) {
     tibble(
-      Effect = names(mm)[i],
+      Effect = slug(names(mm)[i]),
       mm = mm[[i]] %>% pull(s) %>% paste(collapse = ", ")
     )
   }) %>% 
@@ -316,7 +317,8 @@ summariseANOVA <- function(ANOVA, mMeans) {
       aov = map_chr(
         d, 
         ~ glue("F({.$DFn},{.$DFd}) = {num2str(.$F, 2)}, _p_{p2str(.$p)}")
-      )
+      ),
+      Effect = slug(Effect)
     ) %>%
     unnest(d) %>%
     left_join(mm, by = "Effect") %>%
@@ -417,7 +419,8 @@ order_factors <- function(x) {
       all(str_detect(levels(f), c('^[fF]eedback', '^[nN]o'))) ||
       all(str_detect(levels(f), c('^[cC]orrect', '^[iI]ncorrect'))) ||
       all(str_detect(levels(f), c('^[aA]gree', '^[dD]isagree'))) ||
-      all(str_detect(levels(f), c('^[aA]s planned', '^[aA]nomalous')))
+      all(str_detect(levels(f), c('^[aA]s planned', '^[aA]nomalous'))) ||
+      all(str_detect(levels(f), c('^[dD]ates [tT]ask', '^[dD]ots [tT]ask')))
     )
       fct_rev(f)
     else

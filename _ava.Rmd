@@ -713,7 +713,7 @@ The next experiment explores the contrasted High agreement and High accuracy adv
 
 ### Experiment 3B: accuracy versus agreement effects in the Dates task {#ac-ava-dates}
 
-This experiment explored preferences for accuracy versus agreement using the continuous version of the Dates task introduced in Experiment 0§\@ref(ai-ava).
+This experiment explored preferences for accuracy versus agreement using the continuous version of the Dates task introduced in Experiment \@ref(ai-ava).
 The continuous task was used because we aimed to investigate both advisor influence and advisor choice as dependent variables.
 Once again, participants were separated into Feedback and No feedback conditions.
 
@@ -833,7 +833,7 @@ There is no objective threshold at which to classify advice as 'agreement', alth
 
 On Off-brand advice trials, of which there were between `r paste(range(at$nOffBrand) / 2, collapse = " and ")` per Familiarisation block, advisors neither indicated the correct answer nor agreed with the participant. 
 This was achieved by picking a target point of the participant's answer reflected around the correct answer. 
-A detailed example was given in Experiment 0§\@ref(ai-ava-m-advisors).
+A detailed example was given in Appendix \@ref(ai-ava-m-advisors).
 
 #### Results {#ac-ava-dates-r}
 
@@ -933,6 +933,7 @@ for (E in c(.GlobalEnv, .prevStudy))
   ) %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`), 
                names_to = 'Response', values_to = 'Error') %>%
+  mutate(Response = factor(Response)) %>%
   order_factors()
 
 bf <- tmp %>% 
@@ -982,12 +983,17 @@ for (E in c(.GlobalEnv, .prevStudy))
     `Final error` = responseErrorFinal,
     `Final width` = responseMarkerWidthFinal
   ) %>%
-  pivot_longer(cols = c(starts_with('Initial'), starts_with('Final')), 
-               names_to = c('Response', '.value'), 
-               names_pattern = '(\\w+) (\\w+)') %>%
+  pivot_longer(
+    cols = c(starts_with('Initial'), starts_with('Final')), 
+    names_to = c('Response', '.value'), 
+    names_pattern = '(\\w+) (\\w+)'
+  ) %>%
   group_by(pid, Response, width) %>%
   summarise(Error = mean(error), .groups = 'drop') %>%
-  mutate(`Marker width` = factor(width)) %>%
+  mutate(
+    `Marker width` = factor(width),
+    Response = factor(Response)
+  ) %>%
   order_factors() 
 
 # BFs for comparisons
@@ -1018,8 +1024,10 @@ bf <- bf %>%
                   x == 13 ~ 52,
                   x == 7 & xend == 21 ~ 58),
     y = y,
-    mid = (as.numeric(x) + as.numeric(xend))/2
-  )
+    mid = (as.numeric(x) + as.numeric(xend))/2,
+    Response = factor(Response)
+  ) %>%
+  order_factors()
 
 m <- tmp %>% 
   select(`Marker width`, width) %>%
@@ -1332,7 +1340,7 @@ The Dates task distribution is more in keeping with previous experiments: the ex
 In the Feedback condition where systematic differences are seen, we still see the entire range of preference directions and strengths, as we did before, although the clustering towards the High accuracy advisor is much more pronounced than in previous experiments. 
 This clustering of the distribution suggests that the manipulation worked more effectively in this experiment, perhaps because of the use of the continuous Dates task: participants may have experienced the visual depiction of a distance between their estimate and the advice as a stronger signal than binary agreement or disagreement.
 
-The results of the advisor choice behaviour in this experiment conceptually replicate the advisor influence results in Experiment 0 (Appendix 2§\@ref(appendix-2)), and the influence results in the Dates task similarly replicate those findings. 
+The results of the advisor choice behaviour in this experiment conceptually replicate the advisor influence results in Experiment \@ref(appendix-2), and the influence results in the Dates task similarly replicate those findings. 
 While this study was not set up to examine influence rigorously, the inclusion of trials where the advisors offered equivalent advice allowed us to explore advisor influence without the confound of differences in the nature of the advice itself. 
 We found, in two preregistered studies, that participants in the Feedback condition discriminated between their advisors, being more influenced by the accurate rather than agreeing advice. 
 Contrary to our hypothesis, however, we found that participants in the No feedback condition either did not discriminate (original) or did not provide evidence of discrimination (replication). 

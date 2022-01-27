@@ -126,7 +126,7 @@ These results are consistent with an account of advisor trust updating which use
 #### Accuracy of advice
 
 Our experiments showed that people will prefer to seek advice from an advisor who is more accurate, provided that they can identify that advisor.
-This coheres well with results from Experiment 0§\@ref(ai-ava-r-h) and other literature in the advice-taking domain where greater task accuracy is referred to as 'expertise' [@pescetelliRoleDecisionConfidence2021; @yanivAdviceTakingDecision2000; @ginoAnxietyAdviceAbility2012; @rakoczyYoungChildrenHeed2015; @sniezekImprovingJudgementPrepaid2004; @sollStrategiesRevisingJudgment2009; @tostPowerCompetitivenessAdvice2012; @schultzeInabilityIgnoreUseless2017; @wangWhyDoesAdvice2018; @onkalEvaluatingExpertAdvice2017]. 
+This coheres well with results from Experiment \@ref(ai-ava-r-h) and other literature in the advice-taking domain where greater task accuracy is referred to as 'expertise' [@pescetelliRoleDecisionConfidence2021; @yanivAdviceTakingDecision2000; @ginoAnxietyAdviceAbility2012; @rakoczyYoungChildrenHeed2015; @sniezekImprovingJudgementPrepaid2004; @sollStrategiesRevisingJudgment2009; @tostPowerCompetitivenessAdvice2012; @schultzeInabilityIgnoreUseless2017; @wangWhyDoesAdvice2018; @onkalEvaluatingExpertAdvice2017]. 
 A review of this advice-taking literature can be found in another chapter§\@ref(context-expertise).
 
 Like @pescetelliRoleDecisionConfidence2021, we were interested in whether people are sensitive to accuracy for decisions they make where feedback is not provided.
@@ -157,7 +157,7 @@ The results were doubtful that participants with greater accuracy or confidence 
 It could have been the case that individual high-impact trials where a participant was extremely confident of the correct answer happened to systematically coincide with the less accurate advisor agreeing with the participant, but this seems very unlikely indeed.
 All in all, the results from Experiment 1B do not cohere well with the theory.
 
-Experiments 3A§\@ref(ac-ava-dots-r-h) and 3B§\@ref(ac-ava-dates-r-h) are also consistent with the theory.
+Experiments 3A§\@ref(ac-ava-dots-r-h) and 3B§\@ref(ac-ava-dates-r-h) may also be consistent with the theory.
 Participants denied feedback did not prefer to see advice from the agreeing advisor over the accurate one.
 This result would make sense if participants were able to detect the accuracy advantage of the accurate advisor: they might well have noticed that that advisor tended to agree with them where they were confident of the correct answer, and to disagree otherwise.
 The data did not support that conclusion.

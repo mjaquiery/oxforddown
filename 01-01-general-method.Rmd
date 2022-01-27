@@ -440,7 +440,7 @@ These priors govern the expected distributions of observed differences between s
 The use of the same, weakly-informative priors for all tests means the approach used here is an 'objective Bayesian' approach.
 This objective Bayesian approach can be contrasted with a 'subjective Bayesian' approach in which the goal is to specify the exact amount of belief one should have in one hypothesis over another.
 Neither the objective nor subjective approach is clearly superior. 
-The subjective approach is used here because it is simpler.
+The objective approach is used here because it is simpler.
 There is some risk that results will be a poor fit to reality because the priors are inappropriate, but this risk is fairly low and somewhat mitigated by the additional inclusion of frequentist statistics.
 
 #### Integrating statistical results
@@ -454,7 +454,7 @@ In these cases Bayesian statistics will be interpreted, with the caveat that the
 #### Software
 
 Data analysis was performed using R [@rcoreteamLanguageEnvironmentStatistical2018], and relied extensively on the Tidyverse family of packages [@R-tidyverse].
-For a full list of packages and software environment information, see Appendix 3§\@ref(appendix-3).
+For a full list of packages and software environment information, see Appendix \@ref(appendix-3).
 
 ### Unanalysed data
 
@@ -463,7 +463,7 @@ The data collected during these runs are available alongside the data collected 
 These participants were paid on an ad hoc basis depending upon the time taken before the errors emerged and the detail of the error reports they submitted on the Prolific participant recruitment platform.
 For details on what went wrong with the experiments in which bugs were found, see the description column of the data files in the `esmData::` R package.
 While not useful for the hypotheses of the experiments for which the data were collected, some excluded data can be used for other purposes such as analysing responses to advice.
-A breakdown of unanalysed data by experiment is provided as Appendix 1§\@ref(appendix-1).
+A breakdown of unanalysed data by experiment is provided as Appendix \@ref(appendix-1).
 
 ## Open science approach {#open-science}
 
@@ -482,8 +482,7 @@ The meaning of open science varies within each sub-discipline, and this section 
 
 Following the Center for Open Science (https://cos.io), this thesis uses a series of badges to indicate adherence to particular aspects of open science.
 Three badges, _preregistration_, _open materials_, and _open data_, are adopted directly from the Center and used according to the [Center's rules](https://osf.io/tvyxz/wiki/1.%20View%20the%20Badges/).
-Studies which qualify for a badge will have the badge displayed immediately below their title.
-Each badge will contain a link to on-line resources which provide the content for which the badge is awarded.
+The preregistration badges are used throughout the thesis to indicate analyses that were specifically declared in preregistrations.
 
 #### \OpenScience{prereg} Preregistration {#os-prereg}
 
@@ -505,13 +504,15 @@ Open materials facilitate reproduction by making it easier to rerun an experimen
 Open materials also increase the likelihood that errors can be identified.
 In the case of the behavioural experiments reported here, the open materials include computer code necessary to run the experiment.
 The links accompanying the open materials badge points to this code.
+In some cases links are provided without badges; this badge indicates that the shared materials are considered suitable for release.
 
 #### \OpenScience{data} Open data {#os-data}
 
 Theories are the output of science as a whole, but data are the output of any individual study.
 Sharing data directly allows other scientists to check and extend the data analysis conducted, to reuse the data in meta-analyses, and to re-purpose the data for other investigations.
 This increases the robustness of the results, and increases the efficiency of science as a whole.
-The links accompanying the open data badge point to on-line storage where the data can be obtained for a study, along with appropriate metadata.
+All data are available on-line, with links provided throughout the thesis. 
+This badge is unused because there are no cases where non-open data need to be differentiated from open data.
 
 ### Thesis workflow
 

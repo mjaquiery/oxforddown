@@ -586,7 +586,7 @@ As shown in Table \@ref(tab:ac-ex1-r-influence-aov), the only statistically sign
 
 When this analysis was repeated with the capped influence values (General Method - Capped influence§\@ref(m-analysis-dv-influence)) the effect of agreement was still significant, but less pronounced (`r aov_inf_cap$s[1]`, `r mmAdvisor %>% filter(Advisor == "Bias-sharing") %>% pull(sCapped)`, `r mmAdvisor %>% filter(Advisor == "Anti-bias") %>% pull(sCapped)`), and a main effect of trial type also emerged (raw influence: `r aov_inf$s[2]`, `r mmTrialType %>% filter(trialType == "Choice") %>% pull(s)`, `r mmTrialType %>% filter(trialType == "Force") %>% pull(s)`; capped influence: `r aov_inf_cap$s[2]`, `r mmTrialType %>% filter(trialType == "Choice") %>% pull(sCapped)`, `r mmTrialType %>% filter(trialType == "Force") %>% pull(sCapped)`).
 
-```{r ac-ex1-r-influence, fig.align='center', fig.caption="Advisor influence for Lab experiment.  Influence of advice from each advisor by advisor, agreement, and trial type. Faint lines and indicate data from individual participants, while the dots indicate the mean proportion across all participants. Error bars give 95\\% confidence intervals.  Note: vertical axis is truncated to show group differences more clearly, the theoretical maximum influence given the scale is 110. The minimum is 0 as shown.", out.width="100%"}
+```{r ac-ex1-r-influence, fig.align='center', fig.caption="Advisor influence for Lab experiment.  Influence of advice from each advisor by advisor, agreement, and trial type. Faint lines and indicate data from individual participants, while the dots indicate the mean proportion across all participants. Error bars give 95\\% confidence intervals.  Note: vertical axis is truncated to show group differences more clearly, the theoretical maximum influence given the scale is 110. The minimum is -110 as shown.", out.width="100%"}
 
 tmp %>%
   mutate(
@@ -1029,7 +1029,8 @@ tmp <- familiarisation %>%
     .groups = 'drop'
   ) %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`),
-               names_to = 'Response', values_to = 'Accuracy')
+               names_to = 'Response', values_to = 'Accuracy') %>%
+  mutate(Response = factor(Response))
 
 adv <- familiarisation %>%
   group_by(Advisor, pid) %>%
@@ -1107,7 +1108,8 @@ tmp <- familiarisation %>%
   ) %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`),
                names_to = 'Response', values_to = 'Confidence') %>%
-  mutate(`Initial estimate accuracy` = factor(`Initial estimate accuracy`))
+  mutate(`Initial estimate accuracy` = factor(`Initial estimate accuracy`)) %>%
+  mutate(Response = factor(Response))
 
 bf <- tmp %>%
   nest(d = -Response) %>%
@@ -1429,9 +1431,9 @@ Intriguingly, almost all participants who expressed a stronger preference expres
 In the Medium confidence trials, where the Lab experiment showed a glimmer of a difference, there was evidence against the existence of a difference (`r .T_med`).
 
 In this experiment we saw an extremely strong effect of picking the advisor in the first position on the screen (`r .T.first`), an effect that we would hope would be random and even out across participants. 
-In this experiment, as a function of chance, the Bias-sharing advisor appeared in the favoured top position more frequently than we would expect (`r .T.pos`).
-The effect of preferring to pick the advisor in the first position, therefore, would enhance the pick rate of the Bias-sharing advisor.
-Despite this, we saw that the advisors were picked at equivalent rates, allowing us to be even more sure that there is no overall preference for the Bias-sharing advisor driven by that advisor's method of providing advice.
+In this experiment, as a function of chance, the Bias-sharing advisor appeared in the favoured top position less frequently than we would expect (`r .T.pos`).
+The effect of preferring to pick the advisor in the first position, therefore, would enhance the pick rate of the Anti-bias advisor.
+This may to some extent explain why we did not find an effect of advisor (because a supposed preference for the Bias-sharing advisor was offset by a preference for picking the top advisor, i.e. favouring the Anti-bias advisor), although this explanation seems unlikely.
 
 #### Discussion
 

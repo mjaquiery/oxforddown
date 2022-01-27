@@ -1409,7 +1409,7 @@ We suggest that this may be a failure in experimental design rather than reliabl
 
 The expression of confidence is highly idiosyncratic [@aisIndividualConsistencyAccuracy2016; @navajasIdiosyncraticNatureConfidence2017].
 Given this, we hypothesised that the same advice may be treated differently depending upon whether or not it was labelled as coming from repeated interactions with a single individual or from a series of one-off interactions with different individuals.
-Where the advice comes from the same individual over and over again, participants should become more aware of that individual's confidence calibration (the relationship between their confidence and the probability they are correct), and should thus be able to better discriminate higher-quality (more confident) advice.
+Where the advice comes from the same individual over and over again, participants should become more aware of that individual's confidence calibration (the relationship between their confidence and the probability they are correct), and should thus be able to better discriminate higher-quality (more well calibrated) advice.
 
 In this experiment the effect of individuality is confounded with familiarity, a feature that we expect will increase the palatability of advice. 
 While participants are learning about the advisors, and learning more about the confidence calibration of the individual advisor than that of the group members, they are also becoming more familiar with the individual advisor.
@@ -1607,7 +1607,10 @@ acc <- Familiarisation %>%
   ) %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`), 
                names_to = 'Response', values_to = 'Accuracy') %>%
-  mutate(Advisor = factor(paste0(Advisor, '\n')))
+  mutate(
+    Advisor = factor(paste0(Advisor, '\n')),
+    Response = factor(Response)
+  )
 
 adv <- Familiarisation %>%
   group_by(Advisor, pid) %>%
@@ -1769,7 +1772,7 @@ This peculiar pattern was driven by a significant difference in participants' ac
 It is not clear why this occurred; it was likely the result of random chance.
 
 A second ANOVA was run to explore the effects of advisor influence, using factors of advisor (Consistent individual versus Group member) and stage (Familiarisation versus Test). 
-The influence of advisors might differ according to whether participants had learned become familiar with them, hence separating out the initial Familiarisation trials (that contained feedback) from the later Test trials (that did not) might provide some evidence of learning.
+The influence of advisors might differ according to whether participants had become familiar with them, hence separating out the initial Familiarisation trials (that contained feedback) from the later Test trials (that did not) might provide some evidence of learning.
 No significant effects were found for influence (Figure \@ref(fig:be-ce-r-performance-inf)).
 Neither the advisor presentation (`r s_inf$s[1]`), nor whether the trial was in the Familiarisation stage (with feedback) or the test stage (without feedback) appeared to be systematically linked to the influence of the advice (`r s_inf$s[2]`). 
 There was also no indication that the influence of the advisors' advice changed differently between stages (`r s_inf$s[3]`).
@@ -2120,7 +2123,10 @@ acc <- Familiarisation %>%
   ) %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`), 
                names_to = 'Response', values_to = 'Accuracy') %>%
-  mutate(Advisor = factor(paste0(Advisor, '\n')))
+  mutate(
+    Advisor = factor(paste0(Advisor, '\n')),
+    Response = factor(Response)
+  )
 
 adv <- Familiarisation %>%
   group_by(Advisor, pid) %>%

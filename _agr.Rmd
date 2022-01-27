@@ -181,7 +181,8 @@ tmp <- familiarisation %>%
     .groups = 'drop'
   ) %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`),
-               names_to = 'Response', values_to = 'Accuracy')
+               names_to = 'Response', values_to = 'Accuracy') %>%
+  mutate(Response = factor(Response))
 
 adv <- familiarisation %>%
   group_by(Advisor, pid) %>%
@@ -259,7 +260,8 @@ tmp <- familiarisation %>%
   ) %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`),
                names_to = 'Response', values_to = 'Confidence') %>%
-  mutate(`Initial estimate accuracy` = factor(`Initial estimate accuracy`))
+  mutate(`Initial estimate accuracy` = factor(`Initial estimate accuracy`)) %>%
+  mutate(Response = factor(Response))
 
 bf <- tmp %>%
   nest(d = -Response) %>%
@@ -477,7 +479,7 @@ The advisors agreed with the participants' initial estimates at close to target 
 Nevertheless, some participants experienced in practice 10-20% differences in advisor accuracy (although neither advisor was systematically more accurate across participants). 
 All participants experienced the intended relationship wherein the High agreement advisor agreed with them more than the Low agreement advisor.
 
-##### \OpenScience{prereg} Hypothesis test {#ac-agr-dots-r-h}
+##### Hypothesis test {#ac-agr-dots-r-h}
 
 ```{r ac-agr-dots-r-graph, fig.caption="Dot task advisor choice for dis/agreeing advisors.  Participants' pick rate for the advisors in the Choice phase of the experiment. The violin area shows a density plot of the individual participants' pick rates, shown by dots. The chance pick rate is shown by a dashed line.", fig.height=6, fig.width=5}
 
@@ -753,7 +755,8 @@ acc <- Familiarisation %>%
     .groups = 'drop'
   ) %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`), 
-               names_to = 'Response', values_to = 'Accuracy')
+               names_to = 'Response', values_to = 'Accuracy') %>%
+  mutate(Response = factor(Response))
 
 adv <- Familiarisation %>%
   group_by(Advisor, pid) %>%
@@ -818,7 +821,8 @@ conf <- Familiarisation %>%
     .groups = 'drop'
   ) %>%
   pivot_longer(cols = c(`Initial estimate`, `Final decision`), 
-               names_to = 'Response', values_to = 'Confidence')
+               names_to = 'Response', values_to = 'Confidence') %>%
+  mutate(Response = factor(Response))
 
 bf <- conf %>% 
   nest(d = -Response) %>%
